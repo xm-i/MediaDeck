@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using MapControl;
 using PixChest.Models.Files;
+using PixChest.Utils.Objects;
 
 namespace PixChest.Models.Maps;
 
@@ -13,7 +14,7 @@ public class MapModel {
 
 	public ReactiveProperty<double> MapPinSize {
 		get;
-	} = new(30);
+	} = new(100);
 
 	public ReactiveProperty<double> West {
 		get;
@@ -38,6 +39,10 @@ public class MapModel {
 	public ReactiveProperty<IEnumerable<MapPin>?> MapPins {
 		get;
 	} = new();
+
+	public ReactiveProperty<GpsLocation> Center {
+		get;
+	} = new(new(35, 135));
 
 	public void UpdateItemsForMapView() {
 		if(this._map is not {} map) {
