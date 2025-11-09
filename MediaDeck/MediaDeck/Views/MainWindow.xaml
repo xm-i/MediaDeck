@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window
+    x:Class="MediaDeck.Views.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:MediaDeck.Views"
+    xmlns:controls="using:Microsoft.UI.Xaml.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:vm="using:MediaDeck.ViewModels"
+	xmlns:viewerPanes="using:MediaDeck.Views.Panes.ViewerPanes"
+	xmlns:filterPanes="using:MediaDeck.Views.Panes.FilterPanes"
+	xmlns:detailPanes="using:MediaDeck.Views.Panes.DetailPanes"
+	xmlns:repositoryPanes="using:MediaDeck.Views.Panes.RepositoryPanes"
+	mc:Ignorable="d"
+	Title="MediaDeck">
+	<Grid Loaded="Window_Loaded">
+		<Grid.RowDefinitions>
+			<RowDefinition Height="auto"/>
+			<RowDefinition Height="*"/>
+		</Grid.RowDefinitions>
+		<local:NavigationMenu Grid.Row="0" DataContext="{x:Bind ViewModel.NavigationMenuViewModel}"/>
+		<Grid Grid.Row="1">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="250"/>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="250"/>
+			</Grid.ColumnDefinitions>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="*"/>
+				<RowDefinition Height="*"/>
+			</Grid.RowDefinitions>
+			<repositoryPanes:RepositorySelector
+				Grid.Column="0"
+				Grid.Row="0"
+				DataContext="{x:Bind ViewModel.RepositorySelectorViewModel}"/>
+			<filterPanes:FilterSelector
+				Grid.Column="0"
+				Grid.Row="1"
+				DataContext="{x:Bind ViewModel.FilterSelectorViewModel}"/>
+			<viewerPanes:ViewerSelector
+				Grid.Column="1"
+				Grid.RowSpan="2"
+				DataContext="{x:Bind ViewModel.ViewerSelectorViewModel}"/>
+			<detailPanes:DetailSelector
+				Grid.Column="2"
+				Grid.RowSpan="2"
+				DataContext="{x:Bind ViewModel.DetailSelectorViewModel}"/>
+		</Grid>
+	</Grid>
+</Window>

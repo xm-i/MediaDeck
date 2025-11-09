@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<local:RepositorySelectorUserControl
+    x:Class="MediaDeck.Views.Panes.RepositoryPanes.RepositorySelector"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:MediaDeck.Views.Panes.RepositoryPanes"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:controls="using:CommunityToolkit.WinUI.Controls"
+	mc:Ignorable="d">
+
+	<TabView IsAddTabButtonVisible="False" Visibility="{x:Bind ViewModel.SelectedRepositoryPane.Value ,Mode=OneWay, Converter={StaticResource NullToCollapseConverter}}">
+		<TabViewItem Header="Folder" IsClosable="False">
+			<local:FolderRepository DataContext="{x:Bind ViewModel}"/>
+		</TabViewItem>
+	</TabView>
+</local:RepositorySelectorUserControl>

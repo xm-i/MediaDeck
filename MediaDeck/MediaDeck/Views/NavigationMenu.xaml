@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<local:NavigationMenuUserControl
+    x:Class="MediaDeck.Views.NavigationMenu"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:MediaDeck.Views"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid>
+		<MenuBar
+			Grid.Row="0">
+			<MenuBarItem Title="Tools">
+				<MenuFlyoutItem Text="Tag Manager" Click="MenuFlyoutItem_Click" Tag="TagManager"/>
+				<MenuFlyoutItem Text="Folder Manager" Click="MenuFlyoutItem_Click" Tag="FolderManager"/>
+				<MenuFlyoutSeparator/>
+				<MenuFlyoutItem Text="Config" Click="MenuFlyoutItem_Click" Tag="Config"/>
+				<MenuFlyoutSeparator/>
+				<MenuFlyoutItem Text="Background Tasks" Click="MenuFlyoutItem_Click" Tag="BackgroundTasks"/>
+			</MenuBarItem>
+		</MenuBar>
+    </Grid>
+</local:NavigationMenuUserControl>

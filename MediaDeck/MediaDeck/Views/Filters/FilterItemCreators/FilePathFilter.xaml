@@ -1,0 +1,24 @@
+<local:FlePathFilterPageBase
+	x:Class="MediaDeck.Views.Filters.FilterItemCreators.FilePathFilter"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:local="using:MediaDeck.Views.Filters.FilterItemCreators"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	mc:Ignorable="d">
+	<StackPanel Orientation="Horizontal">
+		<TextBlock Text="ファイルパスに" />
+		<TextBox Width="200" Text="{x:Bind ViewModel.FilePath.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+		<TextBlock Text="を" />
+		<ComboBox ItemsSource="{x:Bind ViewModel.SearchTypeList, Mode=OneWay}" SelectedItem="{x:Bind ViewModel.SearchType.Value, Mode=TwoWay}">
+			<ItemsControl.ItemTemplate>
+				<DataTemplate>
+					<TextBlock Text="{Binding DisplayString}" />
+				</DataTemplate>
+			</ItemsControl.ItemTemplate>
+		</ComboBox>
+		<Button
+			Command="{x:Bind ViewModel.AddFilterCommand}"
+			Content="Add Filter" />
+	</StackPanel>
+</local:FlePathFilterPageBase>
