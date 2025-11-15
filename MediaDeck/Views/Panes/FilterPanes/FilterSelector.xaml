@@ -8,7 +8,6 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:filtersVm="using:MediaDeck.ViewModels.Panes.FilterPanes"
 	xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
-	xmlns:core="using:Microsoft.Xaml.Interactions.Core"
 	mc:Ignorable="d">
 
     <Grid>
@@ -37,11 +36,11 @@
 			ItemsSource="{x:Bind ViewModel.FilteringConditions, Mode=OneWay}"
 			SelectedItem="{x:Bind ViewModel.CurrentCondition.Value, Mode=OneWay}">
 			<interactivity:Interaction.Behaviors>
-				<core:EventTriggerBehavior EventName="SelectionChanged">
-					<core:InvokeCommandAction
+				<interactivity:EventTriggerBehavior EventName="SelectionChanged">
+					<interactivity:InvokeCommandAction
 						Command="{x:Bind ViewModel.ChangeFilteringConditionSelectionCommand}"
 						CommandParameter="{Binding SelectedItem,ElementName=FilteringCondisionListBox}"/>
-				</core:EventTriggerBehavior>
+				</interactivity:EventTriggerBehavior>
 			</interactivity:Interaction.Behaviors>
 			<ItemsControl.ItemTemplate>
 				<DataTemplate x:DataType="filtersVm:FilteringConditionViewModel">

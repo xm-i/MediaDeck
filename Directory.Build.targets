@@ -1,27 +1,27 @@
 <Project>
   <ItemGroup>
     <PackageReference Update="CommunityToolkit.Mvvm" Version="8.4.0" />
-    <PackageReference Update="CommunityToolkit.WinUI.Behaviors" Version="8.1.240916"/>
-    <PackageReference Update="CommunityToolkit.WinUI.Collections" Version="8.1.240916" />
-    <PackageReference Update="CommunityToolkit.WinUI.Controls.Primitives" Version="8.1.240916" />
-    <PackageReference Update="CommunityToolkit.WinUI.Controls.Segmented" Version="8.1.240916" />
-    <PackageReference Update="CommunityToolkit.WinUI.Controls.TokenizingTextBox" Version="8.1.240916" />
-    <PackageReference Update="CommunityToolkit.WinUI.Converters" Version="8.1.240916" />
-    <PackageReference Update="FFMpegCore" Version="5.2.0" />
-    <PackageReference Update="Magick.NET-Q16-AnyCPU" Version="14.7.0" />
-    <PackageReference Update="MetadataExtractor" Version="2.8.1" />
-    <PackageReference Update="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.7" />
-    <PackageReference Update="Microsoft.Extensions.DependencyInjection" Version="9.0.7" />
-    <PackageReference Update="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.4654" />
-    <PackageReference Update="Microsoft.WindowsAppSDK" Version="1.7.250606001" />
+    <PackageReference Update="CommunityToolkit.WinUI.Behaviors" Version="8.2.250402"/>
+    <PackageReference Update="CommunityToolkit.WinUI.Collections" Version="8.2.250402" />
+    <PackageReference Update="CommunityToolkit.WinUI.Controls.Primitives" Version="8.2.250402" />
+    <PackageReference Update="CommunityToolkit.WinUI.Controls.Segmented" Version="8.2.250402" />
+    <PackageReference Update="CommunityToolkit.WinUI.Controls.TokenizingTextBox" Version="8.2.250402" />
+    <PackageReference Update="CommunityToolkit.WinUI.Converters" Version="8.2.250402" />
+    <PackageReference Update="FFMpegCore" Version="5.4.0" />
+    <PackageReference Update="Magick.NET-Q16-AnyCPU" Version="14.9.1" />
+    <PackageReference Update="MetadataExtractor" Version="2.9.0" />
+    <PackageReference Update="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.0" />
+    <PackageReference Update="Microsoft.Extensions.DependencyInjection" Version="10.0.0" />
+    <PackageReference Update="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.6901" />
+    <PackageReference Update="Microsoft.WindowsAppSDK" Version="1.8.251106002" />
     <PackageReference Update="ObservableCollections" Version="3.3.4" />
     <PackageReference Update="ObservableCollections.R3" Version="3.3.4" />
-    <PackageReference Update="Pdfium.Net.SDK" Version="4.100.2704" />
+    <PackageReference Update="Pdfium.Net.SDK" Version="4.103.2704" />
     <PackageReference Update="R3" Version="1.3.0" />
-    <PackageReference Update="R3Extensions.WinUI3" Version="1.2.9" />
+    <PackageReference Update="R3Extensions.WinUI3" Version="1.3.0" />
     <PackageReference Update="ReactiveProperty" Version="9.7.0" />
     <PackageReference Update="System.Interactive" Version="6.0.3" />
     <PackageReference Update="System.Reactive" Version="6.0.1" />
-    <PackageReference Update="XAML.MapControl.WinUI" Version="13.5.0" />
+    <PackageReference Update="XAML.MapControl.WinUI" Version="14.2.0" />
   </ItemGroup>
 </Project>

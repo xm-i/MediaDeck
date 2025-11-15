@@ -40,7 +40,7 @@
     <PackageReference Include="Microsoft.WindowsAppSDK" />
     <PackageReference Include="ObservableCollections" />
     <PackageReference Include="ObservableCollections.R3" />
-    <PackageReference Include="Pdfium.Net.SDK" Version="4.92.2704" />
+    <PackageReference Include="Pdfium.Net.SDK" />
     <PackageReference Include="R3" />
     <PackageReference Include="R3Extensions.WinUI3" />
     <PackageReference Include="ReactiveProperty" />
