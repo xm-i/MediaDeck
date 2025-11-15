@@ -12,7 +12,6 @@ using MediaDeck.Models.Preferences;
 using FFMpegCore;
 using MediaDeck.FileTypes.Base;
 using MediaDeck.Utils.Constants;
-using System.Diagnostics;
 namespace MediaDeck;
 
 public partial class App : Application {

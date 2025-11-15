@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "MediaDeck (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "MediaDeck (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
