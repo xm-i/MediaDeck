@@ -50,8 +50,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\MediaDeck.Composition\MediaDeck.Composition.csproj" />
-    <ProjectReference Include="..\..\MediaDeck.Database\MediaDeck.Database.csproj" />
+    <ProjectReference Include="..\MediaDeck.Composition\MediaDeck.Composition.csproj" />
+    <ProjectReference Include="..\MediaDeck.Database\MediaDeck.Database.csproj" />
   </ItemGroup>
 
   <ItemGroup>
