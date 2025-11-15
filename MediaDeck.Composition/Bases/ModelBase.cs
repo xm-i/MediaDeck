@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.ComponentModel;
 using System.Collections.Concurrent;
+using MediaDeck.Composition.Interfaces;
 
 namespace MediaDeck.Composition.Bases;
 public class ModelBase : ObservableObject, IModelBase {

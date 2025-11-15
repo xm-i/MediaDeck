@@ -1,7 +1,9 @@
 using System.Threading.Tasks;
+
 using MapControl;
+
+using MediaDeck.Composition.Enum;
 using MediaDeck.FileTypes.Base.Models.Interfaces;
-using MediaDeck.Utils.Enums;
 using MediaDeck.Utils.Objects;
 
 namespace MediaDeck.FileTypes.Base.ViewModels.Interfaces;

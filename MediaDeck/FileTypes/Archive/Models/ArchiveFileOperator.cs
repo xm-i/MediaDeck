@@ -1,12 +1,14 @@
 using System.IO;
 using System.IO.Compression;
 using System.Threading.Tasks;
+
 using ImageMagick;
+
+using MediaDeck.Composition.Enum;
 using MediaDeck.Database.Tables;
 using MediaDeck.FileTypes.Base.Models;
 using MediaDeck.Models.Files.Metadata.Images;
 using MediaDeck.Utils.Constants;
-using MediaDeck.Utils.Enums;
 
 namespace MediaDeck.FileTypes.Archive.Models;
 [AddTransient]

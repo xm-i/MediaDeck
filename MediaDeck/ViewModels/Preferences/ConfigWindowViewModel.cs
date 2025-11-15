@@ -1,36 +1,35 @@
 using MediaDeck.Composition.Bases;
-using MediaDeck.Models.Preferences;
-using MediaDeck.ViewModels.Preferences.CustomConfigs;
+using MediaDeck.Stores.Config;
+using MediaDeck.ViewModels.Preferences.Config;
 
 namespace MediaDeck.ViewModels.Preferences;
 
 [AddTransient]
 public class ConfigWindowViewModel : ViewModelBase {
-	public ConfigWindowViewModel(Config config,ScanConfigPageViewModel scanConfigPageViewModel,ExecutionConfigPageViewModel executionConfigPageViewModel) {
+	public ConfigWindowViewModel(ConfigStore configStore,ScanConfigPageViewModel scanConfigPageViewModel,ExecutionConfigPageViewModel executionConfigPageViewModel) {
 		this.ScanConfigPageViewModel = scanConfigPageViewModel;
 		this.ExecutionConfigPageViewModel = executionConfigPageViewModel;
+		this.ConfigPageViewModels = [
+			this.ScanConfigPageViewModel,
+			this.ExecutionConfigPageViewModel
+		];
+		this.SelectedPageViewModel.Value = this.ScanConfigPageViewModel;
 		this.SaveCommand.Subscribe(_ => {
-			foreach (var vm in this.ConfigPageViewModels) {
-				vm.Save();
-			}
-			config.Save();
+			configStore.Save();
 		});
 
 		this.LoadCommand.Subscribe(_ => {
-			config.Load();
-			foreach (var vm in this.ConfigPageViewModels) {
-				vm.Load();
-			}
+			configStore.Load();
 		});
 	}
-	private IConfigPageViewModel[] ConfigPageViewModels {
-		get {
-			return [
-				this.ScanConfigPageViewModel,
-				this.ExecutionConfigPageViewModel
-			];
-		}
+
+	public IConfigPageViewModel[] ConfigPageViewModels {
+		get;
 	}
+
+	public BindableReactiveProperty<IConfigPageViewModel> SelectedPageViewModel {
+		get;
+	} = new();
 
 	public ReactiveCommand SaveCommand {
 		get;

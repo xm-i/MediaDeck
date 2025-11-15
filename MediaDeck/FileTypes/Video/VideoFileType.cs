@@ -1,11 +1,11 @@
 using CommunityToolkit.Mvvm.DependencyInjection;
 
+using MediaDeck.Composition.Enum;
 using MediaDeck.Database.Tables;
 using MediaDeck.FileTypes.Base;
 using MediaDeck.FileTypes.Video.Models;
 using MediaDeck.FileTypes.Video.ViewModels;
 using MediaDeck.FileTypes.Video.Views;
-using MediaDeck.Utils.Enums;
 
 namespace MediaDeck.FileTypes.Video;
 [AddTransient(typeof(IFileType))]

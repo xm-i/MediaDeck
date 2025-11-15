@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 
+using MediaDeck.Composition.Enum;
 using MediaDeck.Database.Tables;
-using MediaDeck.Utils.Enums;
 
 namespace MediaDeck.FileTypes.Base.Models.Interfaces;
 public interface IFileOperator {

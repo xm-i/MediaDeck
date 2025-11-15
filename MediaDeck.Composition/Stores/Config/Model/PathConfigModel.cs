@@ -1,15 +1,19 @@
 using System.IO;
-using MediaDeck.Utils.Constants;
 
-namespace MediaDeck.Models.Preferences.CustomConfigs;
+using MediaDeck.Composition.Constants;
+
+using R3.JsonConfig.Attributes;
+
+namespace MediaDeck.Composition.Stores.Config.Model;
 
 [AddSingleton]
-public class PathConfig : SettingsBase {
+[GenerateR3JsonConfigDefaultDto]
+public class PathConfigModel {
 	/// <summary>
 	/// サムネイルフォルダパス
 	/// </summary>
 
-	public SettingsItem<string> ThumbnailFolderPath {
+	public ReactiveProperty<string> ThumbnailFolderPath {
 		get;
 	} = new(Path.Combine(FilePathConstants.BaseDirectory, "thumbs"));
 
@@ -17,7 +21,7 @@ public class PathConfig : SettingsBase {
 	/// 一時フォルダパス
 	/// </summary>
 
-	public SettingsItem<string> TemporaryFolderPath {
+	public ReactiveProperty<string> TemporaryFolderPath {
 		get;
 	} = new(Path.Combine(FilePathConstants.BaseDirectory, "temp"));
 
@@ -25,7 +29,7 @@ public class PathConfig : SettingsBase {
 	/// FFMpegフォルダパス
 	/// </summary>
 
-	public SettingsItem<string> FFMpegFolderPath {
+	public ReactiveProperty<string> FFMpegFolderPath {
 		get;
 	} = new(Path.Combine(AppDomain.CurrentDomain.BaseDirectory!, "Assets"));
 }

@@ -8,6 +8,16 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
+  <Folder Name="/lib/">
+    <Project Path="lib/R3.JsonConfig/R3.JsonConfig.Generators/R3.JsonConfig.Generators.csproj">
+      <BuildType Solution="Debug-Unpackaged|*" Project="Debug" />
+      <BuildType Solution="Release-Unpackaged|*" Project="Release" />
+    </Project>
+    <Project Path="lib/R3.JsonConfig/R3.JsonConfig/R3.JsonConfig.csproj">
+      <BuildType Solution="Debug-Unpackaged|*" Project="Debug" />
+      <BuildType Solution="Release-Unpackaged|*" Project="Release" />
+    </Project>
+  </Folder>
   <Folder Name="/SolutionItems/">
     <File Path=".editorconfig" />
     <File Path=".gitattributes" />

@@ -2,11 +2,11 @@ using System.Threading.Tasks;
 
 using CommunityToolkit.Mvvm.DependencyInjection;
 
+using MediaDeck.Composition.Enum;
 using MediaDeck.Database;
 using MediaDeck.Database.Tables;
 using MediaDeck.FileTypes.Base.Models.Interfaces;
 using MediaDeck.Utils.Constants;
-using MediaDeck.Utils.Enums;
 
 namespace MediaDeck.FileTypes.Base.Models;
 

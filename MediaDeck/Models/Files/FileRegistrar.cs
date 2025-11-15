@@ -1,12 +1,8 @@
 using System.Threading.Tasks;
 
-using CommunityToolkit.Mvvm.DependencyInjection;
-
-using Microsoft.Extensions.DependencyInjection;
-
 using MediaDeck.FileTypes.Base.Models.Interfaces;
-using MediaDeck.Models.Preferences;
 using MediaDeck.Utils.Notifications;
+using MediaDeck.Composition.Stores.Config.Model;
 
 namespace MediaDeck.Models.Files;
 
@@ -21,7 +17,7 @@ public class FileRegistrar {
 		get;
 	} = new();
 
-	public Config Config {
+	public ConfigModel Config {
 		get;
 	}
 
@@ -29,7 +25,7 @@ public class FileRegistrar {
 		_fileOperators = FileTypeUtility.CreateFileOperators();
 	}
 
-	public FileRegistrar(Config config) {
+	public FileRegistrar(ConfigModel config) {
 		this.Config = config;
 		this.RegistrationQueue
 			.ObserveAdd()

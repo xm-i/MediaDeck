@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Xaml;
 
+using MediaDeck.Composition.Constants;
 using MediaDeck.Models.Preferences.CustomStates;
 
 namespace MediaDeck.Models.Preferences;
@@ -10,7 +11,6 @@ namespace MediaDeck.Models.Preferences;
 /// </summary>
 [AddSingleton]
 public class States {
-	private string? _statesFilePath;
 	private readonly SettingsBase[] _states;
 
 	/// <summary>
@@ -43,27 +43,17 @@ public class States {
 		this.SearchStates = searchStates;
 		this.FolderManagerStates = folderManagerStates;
 		this._states = [this.SearchStates,this.FolderManagerStates];
-	}
-
-	/// <summary>
-	/// ファイルパス設定
-	/// </summary>
-	/// <param name="path">パス</param>
-	public void SetFilePath(string path) {
-		this._statesFilePath = path;
+		this.Load();
 	}
 
 	/// <summary>
 	/// 保存
 	/// </summary>
 	public void Save() {
-		if (this._statesFilePath == null) {
-			throw new InvalidOperationException();
-		}
 		using var ms = new MemoryStream();
 		var d = this._states.ToDictionary(x => x.GetType(), x => x.Export());
 		XamlServices.Save(ms, d);
-		using var fs = File.Create(this._statesFilePath);
+		using var fs = File.Create(FilePathConstants.StateFilePath);
 		ms.WriteTo(fs);
 	}
 
@@ -72,11 +62,8 @@ public class States {
 	/// </summary>
 	public void Load() {
 		this.LoadDefault();
-		if (!File.Exists(this._statesFilePath)) {
-			return;
-		}
 
-		if (XamlServices.Load(this._statesFilePath) is not Dictionary<Type, Dictionary<string, dynamic>> states) {
+		if (XamlServices.Load(FilePathConstants.StateFilePath) is not Dictionary<Type, Dictionary<string, dynamic>> states) {
 			return;
 		}
 		foreach (var s in this._states) {

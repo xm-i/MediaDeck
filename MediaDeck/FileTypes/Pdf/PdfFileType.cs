@@ -1,11 +1,11 @@
 using CommunityToolkit.Mvvm.DependencyInjection;
 
+using MediaDeck.Composition.Enum;
 using MediaDeck.Database.Tables;
 using MediaDeck.FileTypes.Base;
 using MediaDeck.FileTypes.Pdf.Models;
 using MediaDeck.FileTypes.Pdf.ViewModels;
 using MediaDeck.FileTypes.Pdf.Views;
-using MediaDeck.Utils.Enums;
 
 namespace MediaDeck.FileTypes.Pdf;
 [AddTransient(typeof(IFileType))]

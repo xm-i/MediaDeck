@@ -1,6 +1,6 @@
 using System.ComponentModel;
 
-namespace MediaDeck.Utils.Enums;
+namespace MediaDeck.Composition.Enum;
 /// <summary>
 /// メディアタイプ
 /// </summary>

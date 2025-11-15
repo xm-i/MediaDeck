@@ -1,51 +1,45 @@
-using Microsoft.UI.Xaml;
-
-using MediaDeck.Views;
+using System.IO;
+using System.Reflection;
 
 using CommunityToolkit.Mvvm.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection;
-using System.Reflection;
-using Microsoft.Data.Sqlite;
-using MediaDeck.Database;
-using System.IO;
-using MediaDeck.Models.Preferences;
+
 using FFMpegCore;
+
+using MediaDeck.Composition.Constants;
+using MediaDeck.Database;
 using MediaDeck.FileTypes.Base;
-using MediaDeck.Utils.Constants;
+using MediaDeck.Models.Preferences;
+using MediaDeck.Stores.Config;
+using MediaDeck.Views;
+
+using Microsoft.Data.Sqlite;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.UI.Xaml;
 namespace MediaDeck;
 
 public partial class App : Application {
 	private Window? _window;
-	private readonly string _stateFilePath;
-	private readonly string _configFilePath;
-	private readonly Config _config;
+	private readonly ConfigStore _configStore;
 	private readonly States _states;
 
 	public App() {
 		if (!Directory.Exists(FilePathConstants.BaseDirectory)) {
 			Directory.CreateDirectory(FilePathConstants.BaseDirectory);
 		}
-		this._stateFilePath = Path.Combine(FilePathConstants.BaseDirectory, "MediaDeck.states");
-		this._configFilePath = Path.Combine(FilePathConstants.BaseDirectory, "MediaDeck.config");
-
 		BuildConfigureServices();
 
 		var db = Ioc.Default.GetRequiredService<MediaDeckDbContext>();
 		db.Database.EnsureCreated();
 		InitialDataRegisterer.Register(db);
 
-		this._config = Ioc.Default.GetRequiredService<Config>();
-		this._config.SetFilePath(this._configFilePath);
-		this._config.Load();
+		this._configStore = Ioc.Default.GetRequiredService<ConfigStore>();
 		this._states = Ioc.Default.GetRequiredService<States>();
-		this._states.SetFilePath(this._stateFilePath);
-		this._states.Load();
-		Directory.CreateDirectory(this._config.PathConfig.TemporaryFolderPath.Value);
+		Directory.CreateDirectory(this._configStore.ConfigModel.PathConfig.TemporaryFolderPath.Value);
 
 		Reactive.Bindings.UIDispatcherScheduler.Initialize();
 
 		GlobalFFOptions.Configure(options => {
-			options.BinaryFolder = Path.Combine(this._config.PathConfig.FFMpegFolderPath.Value);
+			options.BinaryFolder = Path.Combine(this._configStore.ConfigModel.PathConfig.FFMpegFolderPath.Value);
 		});
 		this.InitializeComponent();
 	}
@@ -58,7 +52,7 @@ public partial class App : Application {
 		this._window = Ioc.Default.GetRequiredService<MainWindow>();
 		this._window.Closed += (_, _) => {
 			this._states.Save();
-			this._config.Save();
+			this._configStore.Save();
 			Current.Exit();
 		};
 		this._window.Activate();
@@ -66,12 +60,11 @@ public partial class App : Application {
 
 	private static void BuildConfigureServices() {
 		var serviceCollection = new ServiceCollection();
+
+		var types = AppDomain.CurrentDomain.GetAssemblies().SelectMany(x => x.GetTypes());
+
 		// Transient
-		var targetTypes = Assembly
-			.GetExecutingAssembly()
-			.GetTypes()
-			.Where(x =>
-				x.GetCustomAttributes<AddTransientAttribute>(inherit: true).Any());
+		var targetTypes = types.Where(x => x.GetCustomAttributes<AddTransientAttribute>(inherit: true).Any());
 
 		foreach (var targetType in targetTypes) {
 			var attribute = targetType.GetCustomAttribute<AddTransientAttribute>();
@@ -79,23 +72,15 @@ public partial class App : Application {
 		}
 
 		// Singleton
-		var singletonTargetTypes = Assembly
-			.GetExecutingAssembly()
-			.GetTypes()
-			.Where(x =>
-				x.GetCustomAttributes<AddSingletonAttribute>(inherit: true).Any());
+		var singletonTargetTypes =types.Where(x => x.GetCustomAttributes<AddSingletonAttribute>(inherit: true).Any());
 
 		foreach (var singletonTargetType in singletonTargetTypes) {
 			var attribute = singletonTargetType.GetCustomAttribute<AddSingletonAttribute>();
-			serviceCollection.AddSingleton(attribute?.ServiceType ?? singletonTargetType);
+			serviceCollection.AddSingleton(attribute?.ServiceType ?? singletonTargetType, singletonTargetType);
 		}
 
 		// Scoped
-		var scopedTargetTypes = Assembly
-			.GetExecutingAssembly()
-			.GetTypes()
-			.Where(x =>
-				x.GetCustomAttributes<AddScopedAttribute>(inherit: true).Any());
+		var scopedTargetTypes = types.Where(x => x.GetCustomAttributes<AddScopedAttribute>(inherit: true).Any());
 
 		foreach (var scopedTargetType in scopedTargetTypes) {
 			var attribute = scopedTargetType.GetCustomAttribute<AddScopedAttribute>();
@@ -103,10 +88,7 @@ public partial class App : Application {
 		}
 
 		// FileTypes
-		var fileTypes =
-			Assembly
-				.GetExecutingAssembly()
-				.GetTypes()
+		var fileTypes =types
 				.Where(x =>
 					x.GetInterfaces()
 					.Any(t => t == typeof(IFileType)))

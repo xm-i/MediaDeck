@@ -1,4 +1,4 @@
-namespace MediaDeck.Utils.Attributes;
+namespace MediaDeck.Composition.Utils.Attributes;
 
 [AttributeUsage(AttributeTargets.Class)]
 public class AddScopedAttribute(Type? serviceType = null) : Attribute {

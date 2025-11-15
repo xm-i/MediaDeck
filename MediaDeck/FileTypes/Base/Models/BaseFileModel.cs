@@ -1,20 +1,22 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
+
 using CommunityToolkit.Mvvm.DependencyInjection;
+
 using MediaDeck.Composition.Bases;
+using MediaDeck.Composition.Enum;
+using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.FileTypes.Base.Models.Interfaces;
 using MediaDeck.Models.Files;
-using MediaDeck.Models.Preferences.CustomConfigs;
-using MediaDeck.Utils.Enums;
 using MediaDeck.Utils.Objects;
 
 namespace MediaDeck.FileTypes.Base.Models;
 
 public abstract class BaseFileModel(long id, string filePath, IFileOperator fileOperator) : ModelBase, IFileModel {
-	private static readonly ExecutionConfig executionConfig;
+	private static readonly ExecutionConfigModel executionConfig;
 	static BaseFileModel() {
-		executionConfig = Ioc.Default.GetRequiredService<ExecutionConfig>();
+		executionConfig = Ioc.Default.GetRequiredService<ExecutionConfigModel>();
 	}
 	protected IFileOperator FileOperator {
 		get;
@@ -163,7 +165,7 @@ public abstract class BaseFileModel(long id, string filePath, IFileOperator file
 	}
 
 	public async Task ExecuteFileAsync() {
-		var epo = executionConfig.ExecutionProgramObjects.FirstOrDefault(x => x.MediaType.Value == this.MediaType);
+		var epo = executionConfig.ExecutionPrograms.FirstOrDefault(x => x.MediaType.Value == this.MediaType);
 		if (epo is null) {
 			var psi = new ProcessStartInfo {
 				FileName = this.FilePath,

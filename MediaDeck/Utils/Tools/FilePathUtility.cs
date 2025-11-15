@@ -2,14 +2,14 @@ using System.Text;
 using System.Security.Cryptography;
 using System.IO;
 using CommunityToolkit.Mvvm.DependencyInjection;
-using MediaDeck.Utils.Enums;
-using MediaDeck.Models.Preferences;
+using MediaDeck.Composition.Stores.Config.Model;
+using MediaDeck.Composition.Enum;
 
 namespace MediaDeck.Utils.Tools;
 internal static class FilePathUtility {
-	private static readonly Config _config;
+	private static readonly ConfigModel _config;
 	static FilePathUtility() {
-		_config = Ioc.Default.GetRequiredService<Config>();
+		_config = Ioc.Default.GetRequiredService<ConfigModel>();
 	}
     /// <summary>
     /// サムネイル相対ファイルパス取得

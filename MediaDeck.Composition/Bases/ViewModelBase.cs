@@ -4,6 +4,7 @@ using System.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 using MediaDeck.Composition.Enum;
+using MediaDeck.Composition.Interfaces;
 using MediaDeck.Composition.Objects;
 
 using R3;

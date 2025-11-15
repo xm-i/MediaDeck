@@ -1,11 +1,11 @@
 using CommunityToolkit.Mvvm.DependencyInjection;
 
+using MediaDeck.Composition.Enum;
 using MediaDeck.Database.Tables;
 using MediaDeck.FileTypes.Base;
 using MediaDeck.FileTypes.Image.Models;
 using MediaDeck.FileTypes.Image.ViewModels;
 using MediaDeck.FileTypes.Image.Views;
-using MediaDeck.Utils.Enums;
 
 namespace MediaDeck.FileTypes.Image;
 [AddTransient(typeof(IFileType))]

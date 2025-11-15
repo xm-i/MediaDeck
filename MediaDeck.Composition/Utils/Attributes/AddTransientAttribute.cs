@@ -1,4 +1,4 @@
-namespace MediaDeck.Utils.Attributes;
+namespace MediaDeck.Composition.Utils.Attributes;
 
 [AttributeUsage(AttributeTargets.Class)]
 public class AddTransientAttribute(Type? serviceType = null) : Attribute {

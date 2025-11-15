@@ -1,12 +1,12 @@
 using MediaDeck.Database.Tables;
 using System.IO;
-using MediaDeck.Utils.Enums;
 using Patagames.Pdf.Net;
 using Patagames.Pdf.Enums;
 using System.Drawing.Imaging;
 using MediaDeck.FileTypes.Base.Models;
 using System.Threading.Tasks;
 using MediaDeck.Utils.Constants;
+using MediaDeck.Composition.Enum;
 
 namespace MediaDeck.FileTypes.Pdf.Models;
 [AddTransient]

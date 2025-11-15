@@ -7,22 +7,22 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
-	xmlns:core="using:Microsoft.Xaml.Interactions.Core"
+	xmlns:config="using:MediaDeck.ViewModels.Preferences.Config"
     mc:Ignorable="d"
 	Title="Configuration">
-	<Grid>
-		<Grid.RowDefinitions>
-			<RowDefinition Height="*"/>
-			<RowDefinition Height="Auto"/>
-		</Grid.RowDefinitions>
-		<NavigationView Grid.Row="0" SelectionChanged="NavigationView_SelectionChanged">
-			<NavigationView.MenuItems>
-				<NavigationViewItem	Icon="Scan" Content="Scan" Tag="ScanConfig"/>
-				<NavigationViewItem	Icon="Play" Content="Execution" Tag="ExecutionConfig"/>
-			</NavigationView.MenuItems>
-			<Frame x:Name="ContentFrame" DataContext="{x:Bind ViewModel}"/>
-		</NavigationView>
-		<Grid Grid.Row="1">
+	<Grid RowDefinitions="*,Auto" ColumnDefinitions="200,*">
+		<StackPanel Grid.Column="0" Padding="12" Spacing="8">
+			<TextBlock Text="Categories" FontWeight="SemiBold"/>
+			<ListView x:Name="CategoryList" ItemsSource="{x:Bind ViewModel.ConfigPageViewModels}" SelectedItem="{x:Bind ViewModel.SelectedPageViewModel.Value, Mode=TwoWay}">
+				<ListView.ItemTemplate>
+					<DataTemplate x:DataType="config:IConfigPageViewModel">
+						<TextBlock Text="{Binding PageName}"/>
+					</DataTemplate>
+				</ListView.ItemTemplate>
+			</ListView>
+		</StackPanel>
+		<Frame x:Name="ContentFrame" Grid.Column="1"/>
+		<Grid Grid.Row="1" Grid.ColumnSpan="2">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="*"/>
 				<ColumnDefinition Width="Auto"/>

@@ -1,21 +1,21 @@
 using MediaDeck.Database.Tables;
 using System.IO;
-using MediaDeck.Models.Preferences;
 using FFMpegCore;
 using System.Text.RegularExpressions;
 using MediaDeck.Database.Tables.Metadata;
-using MediaDeck.Utils.Enums;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using System.Drawing;
 using MediaDeck.FileTypes.Base.Models;
 using MediaDeck.FileTypes.Base.Models.Interfaces;
 using System.Threading.Tasks;
 using MediaDeck.Utils.Constants;
+using MediaDeck.Composition.Stores.Config.Model;
+using MediaDeck.Composition.Enum;
 
 namespace MediaDeck.FileTypes.Video.Models;
 [AddTransient]
 public partial class VideoFileOperator : BaseFileOperator {
-	private readonly Config _config;
+	private readonly ConfigModel _config;
 
 	public override MediaType TargetMediaType {
 		get;
@@ -27,7 +27,7 @@ public partial class VideoFileOperator : BaseFileOperator {
 		];
 
 	public VideoFileOperator() {
-		this._config = Ioc.Default.GetRequiredService<Config>();
+		this._config = Ioc.Default.GetRequiredService<ConfigModel>();
 	}
 
 	public override async Task<MediaFile?> RegisterFileAsync(string filePath) {

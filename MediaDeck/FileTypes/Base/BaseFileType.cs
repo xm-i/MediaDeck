@@ -1,12 +1,14 @@
 using System.IO;
+
 using CommunityToolkit.Mvvm.DependencyInjection;
+
+using MediaDeck.Composition.Enum;
+using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Database.Tables;
 using MediaDeck.FileTypes.Base.Models.Interfaces;
 using MediaDeck.FileTypes.Base.ViewModels.Interfaces;
 using MediaDeck.FileTypes.Base.Views;
 using MediaDeck.Models.Files;
-using MediaDeck.Models.Preferences;
-using MediaDeck.Utils.Enums;
 
 namespace MediaDeck.FileTypes.Base;
 public abstract class BaseFileType<TFileOperator, TFileModel, TFileViewModel, TDetailViewerPreviewControlView, TThumbnailPickerViewModel, TThumbnailPickerView> : IFileType<TFileOperator, TFileModel, TFileViewModel, TDetailViewerPreviewControlView, TThumbnailPickerViewModel, TThumbnailPickerView>
@@ -30,7 +32,7 @@ public abstract class BaseFileType<TFileOperator, TFileModel, TFileViewModel, TD
 
 	protected void SetModelProperties(TFileModel fileModel, MediaFile mediaFile) {
 		if (mediaFile.ThumbnailFileName != null) {
-			fileModel.ThumbnailFilePath = Path.Combine(Ioc.Default.GetRequiredService<Config>().PathConfig.ThumbnailFolderPath.Value, mediaFile.ThumbnailFileName);
+			fileModel.ThumbnailFilePath = Path.Combine(Ioc.Default.GetRequiredService<ConfigModel>().PathConfig.ThumbnailFolderPath.Value, mediaFile.ThumbnailFileName);
 		}
 		fileModel.Rate = mediaFile.Rate;
 		fileModel.Description = mediaFile.Description;

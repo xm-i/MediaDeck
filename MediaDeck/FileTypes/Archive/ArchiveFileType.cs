@@ -5,7 +5,7 @@ using MediaDeck.FileTypes.Base;
 using MediaDeck.FileTypes.Archive.Models;
 using MediaDeck.FileTypes.Archive.ViewModels;
 using MediaDeck.FileTypes.Archive.Views;
-using MediaDeck.Utils.Enums;
+using MediaDeck.Composition.Enum;
 
 namespace MediaDeck.FileTypes.Archive;
 [AddTransient(typeof(IFileType))]
