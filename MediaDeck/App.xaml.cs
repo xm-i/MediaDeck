@@ -27,51 +27,9 @@ public partial class App : Application {
 		}
 		this._stateFilePath = Path.Combine(FilePathConstants.BaseDirectory, "MediaDeck.states");
 		this._configFilePath = Path.Combine(FilePathConstants.BaseDirectory, "MediaDeck.config");
-		var serviceCollection = new ServiceCollection();
 
-		var targetTypes = Assembly 
-			.GetExecutingAssembly()
-			.GetTypes()
-			.Where(x =>
-				x.GetCustomAttributes<AddTransientAttribute>(inherit: true).Any());
+		BuildConfigureServices();
 
-		foreach (var targetType in targetTypes) {
-			var attribute = targetType.GetCustomAttribute<AddTransientAttribute>();
-			serviceCollection.AddTransient(attribute?.ServiceType ?? targetType, targetType);
-		}
-
-		var singletonTargetTypes = Assembly
-			.GetExecutingAssembly()
-			.GetTypes()
-			.Where(x =>
-				x.GetCustomAttributes<AddSingletonAttribute>(inherit: true).Any());
-
-		foreach (var singletonTargetType in singletonTargetTypes) {
-			serviceCollection.AddSingleton(singletonTargetType);
-		}
-
-		var fileTypes =
-			Assembly
-				.GetExecutingAssembly()
-				.GetTypes()
-				.Where(x =>
-					x.GetInterfaces()
-					.Any(t => t == typeof(IFileType)))
-				.Where(x => x.IsAbstract == false);
-		foreach (var fileTypeType in fileTypes) {
-			serviceCollection.AddSingleton(typeof(IFileType), fileTypeType);
-		}
-
-		// DataBase
-		var sb = new SqliteConnectionStringBuilder {
-			DataSource = Path.Combine(FilePathConstants.BaseDirectory, "pix.db")
-		};
-		serviceCollection.AddDbContextFactory<MediaDeckDbContext>(x => {
-			x.UseSqlite(sb.ConnectionString);
-		}, ServiceLifetime.Transient);
-		Ioc.Default.ConfigureServices(
-			serviceCollection.BuildServiceProvider()
-		);
 		var db = Ioc.Default.GetRequiredService<MediaDeckDbContext>();
 		db.Database.EnsureCreated();
 		InitialDataRegisterer.Register(db);
@@ -104,5 +62,69 @@ public partial class App : Application {
 			Current.Exit();
 		};
 		this._window.Activate();
+	}
+
+	private static void BuildConfigureServices() {
+		var serviceCollection = new ServiceCollection();
+		// Transient
+		var targetTypes = Assembly
+			.GetExecutingAssembly()
+			.GetTypes()
+			.Where(x =>
+				x.GetCustomAttributes<AddTransientAttribute>(inherit: true).Any());
+
+		foreach (var targetType in targetTypes) {
+			var attribute = targetType.GetCustomAttribute<AddTransientAttribute>();
+			serviceCollection.AddTransient(attribute?.ServiceType ?? targetType, targetType);
+		}
+
+		// Singleton
+		var singletonTargetTypes = Assembly
+			.GetExecutingAssembly()
+			.GetTypes()
+			.Where(x =>
+				x.GetCustomAttributes<AddSingletonAttribute>(inherit: true).Any());
+
+		foreach (var singletonTargetType in singletonTargetTypes) {
+			var attribute = singletonTargetType.GetCustomAttribute<AddSingletonAttribute>();
+			serviceCollection.AddSingleton(attribute?.ServiceType ?? singletonTargetType);
+		}
+
+		// Scoped
+		var scopedTargetTypes = Assembly
+			.GetExecutingAssembly()
+			.GetTypes()
+			.Where(x =>
+				x.GetCustomAttributes<AddScopedAttribute>(inherit: true).Any());
+
+		foreach (var scopedTargetType in scopedTargetTypes) {
+			var attribute = scopedTargetType.GetCustomAttribute<AddScopedAttribute>();
+			serviceCollection.AddScoped(attribute?.ServiceType ?? scopedTargetType, scopedTargetType);
+		}
+
+		// FileTypes
+		var fileTypes =
+			Assembly
+				.GetExecutingAssembly()
+				.GetTypes()
+				.Where(x =>
+					x.GetInterfaces()
+					.Any(t => t == typeof(IFileType)))
+				.Where(x => x.IsAbstract == false);
+		foreach (var fileTypeType in fileTypes) {
+			serviceCollection.AddSingleton(typeof(IFileType), fileTypeType);
+		}
+
+		// DataBase
+		var sb = new SqliteConnectionStringBuilder {
+			DataSource = Path.Combine(FilePathConstants.BaseDirectory, "pix.db")
+		};
+		serviceCollection.AddDbContextFactory<MediaDeckDbContext>(x => {
+			x.UseSqlite(sb.ConnectionString);
+		}, ServiceLifetime.Transient);
+
+		Ioc.Default.ConfigureServices(
+			serviceCollection.BuildServiceProvider()
+		);
 	}
 }
