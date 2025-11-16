@@ -47,14 +47,6 @@ public class FilterManagerViewModel : ViewModelBase {
 	} = new();
 
 	/// <summary>
-	/// 読み込みコマンド
-	/// </summary>
-	public ReactiveCommand LoadCommand {
-		get;
-	} = new();
-
-
-	/// <summary>
 	/// フィルター条件作成VMリスト
 	/// </summary>
 	public IEnumerable<IFilterCreatorViewModel> FilterCreatorViewModels {
@@ -84,10 +76,6 @@ public class FilterManagerViewModel : ViewModelBase {
 			this.Save();
 		}).AddTo(this.CompositeDisposable);
 
-		this.LoadCommand.Subscribe(_ => {
-			this.Load();
-		}).AddTo(this.CompositeDisposable);
-
 		this.FilteringConditions = filterManager.FilteringConditions.CreateView(x => new FilteringConditionEditorViewModel(x)).ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
 
 		this.FilterCreatorViewModels = [
@@ -114,13 +102,6 @@ public class FilterManagerViewModel : ViewModelBase {
 	/// </summary>
 	public void Remove(FilteringConditionEditorViewModel filteringConditionViewModel) {
 		this._filterManager.RemoveCondition(filteringConditionViewModel.Model);
-	}
-
-	/// <summary>
-	/// 読み込み
-	/// </summary>
-	public void Load() {
-		this._filterManager.Load();
 	}
 
 	/// <summary>

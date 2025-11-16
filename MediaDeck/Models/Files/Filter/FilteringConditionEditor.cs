@@ -4,7 +4,6 @@ using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Objects;
 using MediaDeck.Composition.Stores.State.Model.Objects;
 using MediaDeck.Models.Files.Filter.FilterItemObjects;
-using MediaDeck.Utils.Objects;
 
 namespace MediaDeck.Models.Files.Filter;
 /// <summary>
@@ -18,42 +17,28 @@ public class FilteringConditionEditor : ModelBase {
 	/// <param name="filterObject">復元用フィルターオブジェクト</param>
 	public FilteringConditionEditor(FilterObject filterObject) {
 		this.FilterObject = filterObject;
-		this.Load();
+		this.DisplayName = filterObject.DisplayName;
+		this.FilterItemObjects = this.FilterObject.FilterItemObjects;
 	}
 	/// <summary>
 	/// 表示名
 	/// </summary>
 	public ReactiveProperty<string> DisplayName {
 		get;
-	} = new();
+	}
 
 	/// <summary>
 	/// フィルター条件クリエイター
 	/// </summary>
 	public ObservableList<IFilterItemObject> FilterItemObjects {
 		get;
-	} = [];
+	}
 
 	/// <summary>
 	/// フィルター保存用オブジェクト
 	/// </summary>
 	public FilterObject FilterObject {
 		get;
-	}
-
-	public void Load() {
-		this.DisplayName.Value = this.FilterObject.DisplayName.Value;
-		this.FilterItemObjects.Clear();
-		this.FilterItemObjects.AddRange(this.FilterObject.FilterItemObjects);
-	}
-
-	/// <summary>
-	/// 復元用フィルターオブジェクトを更新する。
-	/// </summary>
-	public void Save() {
-		this.FilterObject.DisplayName.Value = this.DisplayName.Value;
-		this.FilterObject.FilterItemObjects.Clear();
-		this.FilterObject.FilterItemObjects.AddRange(this.FilterItemObjects);
 	}
 
 	/// <summary>

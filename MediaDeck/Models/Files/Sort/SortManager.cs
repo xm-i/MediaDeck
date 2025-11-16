@@ -41,6 +41,6 @@ public class SortManager : ModelBase {
 	/// </summary>
 	/// <param name="sortObject">削除するソート条件</param>
 	public void RemoveCondition(SortObject sortObject) {
-		this._stateStore.State.SearchState.SortConditions.Remove(sortObject);
+		this._stateStore.State.SearchState.RemoveSortCondition(sortObject);
 	}
 }

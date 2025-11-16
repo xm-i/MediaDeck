@@ -85,4 +85,14 @@ public class SearchStateModel {
 	public void RemoveSortCondition(SortObject sortObject) {
 		this.SortConditions.Remove(sortObject);
 	}
+
+	public FilterObject AddFilteringCondition() {
+		var fo = this._serviceProvider.CreateScope().ServiceProvider.GetRequiredService<FilterObject>();
+		this.FilteringConditions.Add(fo);
+		return fo;
+	}
+
+	public void RemoveFilteringCondition(FilterObject filterObject) {
+		this.FilteringConditions.Remove(filterObject);
+	}
 }
