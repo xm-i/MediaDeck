@@ -12,11 +12,13 @@
   <ItemGroup>
     <ProjectReference Include="..\lib\R3.JsonConfig\R3.JsonConfig\R3.JsonConfig.csproj" />
     <ProjectReference Include="..\lib\R3.JsonConfig\R3.JsonConfig.Generators\R3.JsonConfig.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\MediaDeck.Database\MediaDeck.Database.csproj" />
     <PackageReference Include="CommunityToolkit.Mvvm" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
     <PackageReference Include="Microsoft.WindowsAppSDK" />
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" />
     <PackageReference Include="R3" />
     <PackageReference Include="ObservableCollections" />
+    <PackageReference Include="XAML.MapControl.WinUI" />
   </ItemGroup>
 </Project>

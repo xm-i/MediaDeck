@@ -1,4 +1,4 @@
-using MediaDeck.Utils.Objects;
+using MediaDeck.Composition.Objects;
 
 namespace MediaDeck.Utils.Tools;
 

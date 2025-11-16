@@ -6,7 +6,7 @@
     xmlns:local="using:MediaDeck.Views.Filters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-	xmlns:filteritemobjects="using:MediaDeck.Models.Files.Filter.FilterItemObjects"
+	xmlns:filteritemobjects="using:MediaDeck.Composition.Interfaces.Files"
 	xmlns:creators="using:MediaDeck.ViewModels.Filters.FilterItemCreators"
 	mc:Ignorable="d">
 

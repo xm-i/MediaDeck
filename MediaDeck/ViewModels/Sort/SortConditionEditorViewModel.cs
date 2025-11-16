@@ -1,35 +1,37 @@
 using System.ComponentModel;
 
 using MediaDeck.Composition.Bases;
-using MediaDeck.Models.Files.Sort;
-using MediaDeck.Utils.Enums;
+using MediaDeck.Composition.Enum;
+using MediaDeck.Composition.Stores.State.Model.Objects;
 
 namespace MediaDeck.ViewModels.Sort;
 
 public class SortConditionEditorViewModel : ViewModelBase {
-	public SortConditionEditorViewModel(SortConditionEditor model) {
+	public SortConditionEditorViewModel(SortObject model) {
 		this.Model = model;
 		this.DisplayName = this.Model.DisplayName.ToBindableReactiveProperty(null!);
 		this.DisplayName.Subscribe(x => {
 			this.Model.DisplayName.Value = x;
 		});
 
-		this.SortItemCreators = this.Model.SortItemCreators.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
+		this.SortItemObjects = this.Model.SortItemObjects.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
 
 		this.AddSortItemCommand.Subscribe(x => {
 			if (x is not { } sortItemKey) {
 				return;
 			}
-			this.Model.AddSortItem(new SortItemCreator(sortItemKey!, this.Direction.Value));
+			var si = this.Model.AddSortItemObject();
+			si.SortItemKey = sortItemKey;
+			si.Direction = this.Direction.Value;
 		}).AddTo(this.CompositeDisposable);
-		this.RemoveSortItemCommand.Subscribe(this.Model.RemoveSortItem).AddTo(this.CompositeDisposable);
+		this.RemoveSortItemCommand.Subscribe(this.Model.RemoveSortItemObject).AddTo(this.CompositeDisposable);
 		this.CandidateSortItemKeys.Value = Enum.GetValues<SortItemKey>();
 	}
 
 	/// <summary>
 	/// モデル
 	/// </summary>
-	public SortConditionEditor Model {
+	public SortObject Model {
 		get;
 	}
 
@@ -43,7 +45,7 @@ public class SortConditionEditorViewModel : ViewModelBase {
 	/// <summary>
 	/// ソート条件クリエイター
 	/// </summary>
-	public INotifyCollectionChangedSynchronizedViewList<SortItemCreator> SortItemCreators {
+	public INotifyCollectionChangedSynchronizedViewList<SortItemObject> SortItemObjects {
 		get;
 	}
 
@@ -64,7 +66,7 @@ public class SortConditionEditorViewModel : ViewModelBase {
 	/// <summary>
 	/// ソート条件削除コマンド
 	/// </summary>
-	public ReactiveCommand<SortItemCreator> RemoveSortItemCommand {
+	public ReactiveCommand<SortItemObject> RemoveSortItemCommand {
 		get;
 	} = new ();
 

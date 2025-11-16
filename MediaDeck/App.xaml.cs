@@ -8,8 +8,8 @@ using FFMpegCore;
 using MediaDeck.Composition.Constants;
 using MediaDeck.Database;
 using MediaDeck.FileTypes.Base;
-using MediaDeck.Models.Preferences;
 using MediaDeck.Stores.Config;
+using MediaDeck.Stores.State;
 using MediaDeck.Views;
 
 using Microsoft.Data.Sqlite;
@@ -20,7 +20,7 @@ namespace MediaDeck;
 public partial class App : Application {
 	private Window? _window;
 	private readonly ConfigStore _configStore;
-	private readonly States _states;
+	private readonly StateStore _stateStore;
 
 	public App() {
 		if (!Directory.Exists(FilePathConstants.BaseDirectory)) {
@@ -33,13 +33,13 @@ public partial class App : Application {
 		InitialDataRegisterer.Register(db);
 
 		this._configStore = Ioc.Default.GetRequiredService<ConfigStore>();
-		this._states = Ioc.Default.GetRequiredService<States>();
-		Directory.CreateDirectory(this._configStore.ConfigModel.PathConfig.TemporaryFolderPath.Value);
+		this._stateStore = Ioc.Default.GetRequiredService<StateStore>();
+		Directory.CreateDirectory(this._configStore.Config.PathConfig.TemporaryFolderPath.Value);
 
 		Reactive.Bindings.UIDispatcherScheduler.Initialize();
 
 		GlobalFFOptions.Configure(options => {
-			options.BinaryFolder = Path.Combine(this._configStore.ConfigModel.PathConfig.FFMpegFolderPath.Value);
+			options.BinaryFolder = Path.Combine(this._configStore.Config.PathConfig.FFMpegFolderPath.Value);
 		});
 		this.InitializeComponent();
 	}
@@ -51,7 +51,7 @@ public partial class App : Application {
 	protected override void OnLaunched(LaunchActivatedEventArgs args) {
 		this._window = Ioc.Default.GetRequiredService<MainWindow>();
 		this._window.Closed += (_, _) => {
-			this._states.Save();
+			this._stateStore.Save();
 			this._configStore.Save();
 			Current.Exit();
 		};

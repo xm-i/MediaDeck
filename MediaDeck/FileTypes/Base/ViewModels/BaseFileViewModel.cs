@@ -4,9 +4,9 @@ using MapControl;
 
 using MediaDeck.Composition.Constants;
 using MediaDeck.Composition.Enum;
-using MediaDeck.FileTypes.Base.Models.Interfaces;
+using MediaDeck.Composition.Interfaces.FileTypes.Models;
+using MediaDeck.Composition.Objects;
 using MediaDeck.FileTypes.Base.ViewModels.Interfaces;
-using MediaDeck.Utils.Objects;
 
 namespace MediaDeck.FileTypes.Base.ViewModels;
 

@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using System.Reactive.Linq;
 
 using MediaDeck.Composition.Bases;
+using MediaDeck.Composition.Interfaces.FileTypes.Models;
+using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Database.Tables;
-using MediaDeck.FileTypes.Base.Models.Interfaces;
-using MediaDeck.Models.Preferences;
 
 namespace MediaDeck.Models.Files.Filter;
 /// <summary>
@@ -15,10 +15,10 @@ public class FilterSelector : ModelBase {
 	/// <summary>
 	/// コンストラクタ
 	/// </summary>
-	public FilterSelector(States states) {
-		this.FilteringConditions.AddRange(states.SearchStates.FilteringConditions.Select(x => new FilteringCondition(x)));
+	public FilterSelector(StateModel state) {
+		this.FilteringConditions.AddRange(state.SearchState.FilteringConditions.Select(x => new FilteringCondition(x)));
 
-		this.CurrentFilteringCondition.Value = this.FilteringConditions.FirstOrDefault(x => x.FilterObject == states.SearchStates.CurrentFilteringCondition.Value);
+		this.CurrentFilteringCondition.Value = this.FilteringConditions.FirstOrDefault(x => x.FilterObject.Id == state.SearchState.CurrentFilteringCondition.Value);
 
 		IDisposable? beforeCurrent = null;
 		this.CurrentFilteringCondition
@@ -28,13 +28,13 @@ public class FilterSelector : ModelBase {
 				beforeCurrent = x?.OnUpdateFilteringConditions
 					.Subscribe(_ =>
 						this._onUpdateFilteringChanged.OnNext(Unit.Default));
-				states.SearchStates.CurrentFilteringCondition.Value = x?.FilterObject;
+				state.SearchState.CurrentFilteringCondition.Value = x?.FilterObject.Id;
 			})
 			.AddTo(this.CompositeDisposable);
 
-		states.SearchStates.FilteringConditions.ObserveChanged().Subscribe(x => {
+		state.SearchState.FilteringConditions.ObserveChanged().Subscribe(x => {
 			this.FilteringConditions.Clear();
-			this.FilteringConditions.AddRange(states.SearchStates.FilteringConditions.Select(x => new FilteringCondition(x)));
+			this.FilteringConditions.AddRange(state.SearchState.FilteringConditions.Select(x => new FilteringCondition(x)));
 			this.CurrentFilteringCondition.Value = this.FilteringConditions.FirstOrDefault(x => x.DisplayName == this.CurrentFilteringCondition.Value?.DisplayName);
 		});
 	}

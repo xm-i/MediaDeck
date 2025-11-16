@@ -3,11 +3,14 @@ using System.IO;
 using CommunityToolkit.Mvvm.DependencyInjection;
 
 using MediaDeck.Composition.Enum;
+using MediaDeck.Composition.Interfaces.Files;
+using MediaDeck.Composition.Interfaces.FileTypes.Models;
+using MediaDeck.Composition.Objects;
 using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Database.Tables;
 using MediaDeck.FileTypes.Base.Models.Interfaces;
 using MediaDeck.FileTypes.Base.ViewModels.Interfaces;
-using MediaDeck.FileTypes.Base.Views;
+using MediaDeck.FileTypes.Base.Views.Interfaces;
 using MediaDeck.Models.Files;
 
 namespace MediaDeck.FileTypes.Base;
@@ -44,9 +47,9 @@ public abstract class BaseFileType<TFileOperator, TFileModel, TFileViewModel, TD
 		fileModel.LastAccessTime = mediaFile.LastAccessTime;
 		fileModel.RegisteredTime = mediaFile.RegisteredTime;
 		if (mediaFile.Latitude is { } lat && mediaFile.Longitude is { } lon ) {
-			fileModel.Location = new Utils.Objects.GpsLocation(lat, lon, mediaFile.Altitude);
+			fileModel.Location = new GpsLocation(lat, lon, mediaFile.Altitude);
 		}
-		fileModel.Tags = mediaFile.MediaFileTags.Select(mft => new TagModel(mft.Tag)).ToList();
+		fileModel.Tags = [.. mediaFile.MediaFileTags.Select(mft => new TagModel(mft.Tag) as ITagModel)];
 	}
 
 	IFileOperator IFileType.CreateFileOperator() {

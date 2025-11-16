@@ -87,8 +87,6 @@ public class SortManagerViewModel : ViewModelBase {
 	/// 読み込み
 	/// </summary>
 	public void Load() {
-		this._sortManager.Load();
-
 		this.CurrentCondition.Value = this.SortConditions.FirstOrDefault();
 	}
 

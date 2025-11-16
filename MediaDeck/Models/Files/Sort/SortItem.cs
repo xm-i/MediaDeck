@@ -2,8 +2,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 
 using MediaDeck.Composition.Bases;
-using MediaDeck.FileTypes.Base.Models.Interfaces;
-using MediaDeck.Utils.Enums;
+using MediaDeck.Composition.Enum;
+using MediaDeck.Composition.Interfaces.FileTypes.Models;
 
 namespace MediaDeck.Models.Files.Sort;
 /// <summary>

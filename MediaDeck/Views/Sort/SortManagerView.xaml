@@ -7,7 +7,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:sortVm="using:MediaDeck.ViewModels.Sort"
-	xmlns:sortM="using:MediaDeck.Models.Files.Sort"
+	xmlns:stateObjects="using:MediaDeck.Composition.Stores.State.Model.Objects"
 	mc:Ignorable="d">
 
 	<Grid x:Name="Root" DataContext="{x:Bind ViewModel}">
@@ -58,9 +58,9 @@
 						Text="適用済みソート : " />
 					<ItemsControl
 						Grid.Row="2"
-						ItemsSource="{x:Bind ViewModel.CurrentCondition.Value.SortItemCreators,Mode=OneWay}">
+						ItemsSource="{x:Bind ViewModel.CurrentCondition.Value.SortItemObjects,Mode=OneWay}">
 						<ItemsControl.ItemTemplate>
-							<DataTemplate x:DataType="sortM:SortItemCreator">
+							<DataTemplate x:DataType="stateObjects:SortItemObject">
 								<Grid>
 									<Grid.ColumnDefinitions>
 										<ColumnDefinition Width="Auto"/>
@@ -88,9 +88,9 @@
 						<RowDefinition Height="5" />
 						<RowDefinition Height="Auto" />
 					</Grid.RowDefinitions>
-					<ListBox ItemsSource="{x:Bind ViewModel.CurrentCondition.Value.SortItemCreators,Mode=OneWay}">
+					<ListBox ItemsSource="{x:Bind ViewModel.CurrentCondition.Value.SortItemObjects,Mode=OneWay}">
 						<ItemsControl.ItemTemplate>
-							<DataTemplate x:DataType="sortM:SortItemCreator">
+							<DataTemplate x:DataType="stateObjects:SortItemObject">
 								<StackPanel Orientation="Horizontal">
 									<FontIcon Glyph="{x:Bind Direction, Mode=OneWay, Converter={StaticResource ListSortDirectionToIconGlyphConverter}}" />
 									<TextBlock Text="{x:Bind SortItemKey, Converter={StaticResource SortKeyToDisplayNameConverter}}" />

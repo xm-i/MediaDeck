@@ -1,8 +1,7 @@
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
-
-using MediaDeck.Models.Files;
 using MediaDeck.Utils.Objects;
+using MediaDeck.Composition.Interfaces.Files;
 
 namespace MediaDeck.Views.Panes.DetailPanes;
 public sealed partial class TagsDetail : DetailPaneBase {
@@ -23,7 +22,7 @@ public sealed partial class TagsDetail : DetailPaneBase {
 	}
 
 	private void TagGrid_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e) {
-		if (this.TagListBox.SelectedItem is not ValueCountPair<TagModel> tag) {
+		if (this.TagListBox.SelectedItem is not ValueCountPair<ITagModel> tag) {
 			return;
 		}
 		this.ViewModel?.SearchTaggedFilesCommand.Execute(tag);

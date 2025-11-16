@@ -1,6 +1,8 @@
 using System.Reactive.Linq;
-using MediaDeck.FileTypes.Base.Models.Interfaces;
-using MediaDeck.Utils.Objects;
+
+using MediaDeck.Composition.Interfaces.FileTypes.Models;
+using MediaDeck.Composition.Objects;
+
 using Reactive.Bindings;
 
 namespace MediaDeck.Models.Maps;

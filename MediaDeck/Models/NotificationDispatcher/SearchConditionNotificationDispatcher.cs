@@ -1,4 +1,4 @@
-using MediaDeck.Models.Files.SearchConditions;
+using MediaDeck.Composition.Interfaces.Files;
 
 namespace MediaDeck.Models.NotificationDispatcher;
 [AddSingleton]

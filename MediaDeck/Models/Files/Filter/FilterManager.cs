@@ -1,7 +1,8 @@
 using System.Collections.Generic;
 
 using MediaDeck.Composition.Bases;
-using MediaDeck.Models.Preferences;
+using MediaDeck.Composition.Stores.State.Model.Objects;
+using MediaDeck.Stores.State;
 
 namespace MediaDeck.Models.Files.Filter;
 /// <summary>
@@ -11,8 +12,8 @@ namespace MediaDeck.Models.Files.Filter;
 /// コンストラクタ
 /// </remarks>
 [AddSingleton]
-public class FilterManager(States states) : ModelBase {
-	private readonly States _states = states;
+public class FilterManager(StateStore stateStore) : ModelBase {
+	private readonly StateStore _stateStore = stateStore;
 	/// <summary>
 	/// フィルター条件リスト
 	/// </summary>
@@ -25,7 +26,7 @@ public class FilterManager(States states) : ModelBase {
 	/// </summary>
 	public void Load() {
 		this.FilteringConditions.Clear();
-		this.FilteringConditions.AddRange(this._states.SearchStates.FilteringConditions.Select(x => new FilteringConditionEditor(x)));
+		this.FilteringConditions.AddRange(this._stateStore.State.SearchState.FilteringConditions.Select(x => new FilteringConditionEditor(x)));
 	}
 
 	/// <summary>
@@ -33,14 +34,14 @@ public class FilterManager(States states) : ModelBase {
 	/// </summary>
 	public void Save() {
 		// 削除分
-		this._states.SearchStates.FilteringConditions.RemoveRange(this._states.SearchStates.FilteringConditions.Except(this.FilteringConditions.Select(x => x.FilterObject)));
+		this._stateStore.State.SearchState.FilteringConditions.RemoveRange(this._stateStore.State.SearchState.FilteringConditions.Except(this.FilteringConditions.Select(x => x.FilterObject)));
 		// 追加分
-		this._states.SearchStates.FilteringConditions.AddRange(this.FilteringConditions.Select(x => x.FilterObject).Except(this._states.SearchStates.FilteringConditions));
+		this._stateStore.State.SearchState.FilteringConditions.AddRange(this.FilteringConditions.Select(x => x.FilterObject).Except(this._stateStore.State.SearchState.FilteringConditions));
 		// 更新分
 		foreach (var filteringCondition in this.FilteringConditions) {
 			filteringCondition.Save();
 		}
-		this._states.Save();
+		this._stateStore.Save();
 	}
 
 	/// <summary>

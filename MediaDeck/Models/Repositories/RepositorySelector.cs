@@ -1,10 +1,8 @@
-using MediaDeck.Models.Preferences;
-
 namespace MediaDeck.Models.Repositories;
 [AddSingleton]
 public class RepositorySelector {
 
-	public RepositorySelector(FolderRepository folderRepository,States states) {
+	public RepositorySelector(FolderRepository folderRepository) {
 		this.Repositories = [
 			folderRepository
 		];

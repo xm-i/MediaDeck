@@ -1,5 +1,5 @@
+using MediaDeck.Composition.Enum;
 using MediaDeck.Models.Files.Filter.FilterItemObjects;
-using MediaDeck.Utils.Enums;
 
 namespace MediaDeck.Models.Files.Filter.FilterItemCreators;
 /// <summary>

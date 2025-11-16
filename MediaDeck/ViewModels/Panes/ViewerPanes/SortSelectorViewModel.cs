@@ -3,7 +3,7 @@ using System.ComponentModel;
 using MediaDeck.Composition.Bases;
 using MediaDeck.Models.Files;
 using MediaDeck.Models.Files.Sort;
-using MediaDeck.Models.Preferences;
+using MediaDeck.Stores.State;
 
 namespace MediaDeck.ViewModels.Panes.ViewerPanes;
 
@@ -15,8 +15,8 @@ public class SortSelectorViewModel : ViewModelBase {
 	/// <summary>
 	/// コンストラクタ
 	/// </summary>
-	public SortSelectorViewModel(SortSelector model, States states, MediaContentLibrary mediaContentLibrary) {
-		this._states = states;
+	public SortSelectorViewModel(SortSelector model, StateStore stateStore, MediaContentLibrary mediaContentLibrary) {
+		this._stateStore = stateStore;
 		this.SortConditions = model.SortConditions.CreateView(x => new SortConditionViewModel(x)).ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
 		this.CurrentCondition.Value = this.SortConditions.FirstOrDefault(c => c.Model == model.CurrentSortCondition.Value);
 		this.CurrentCondition.Subscribe(async x => {
@@ -30,7 +30,7 @@ public class SortSelectorViewModel : ViewModelBase {
 		});
 	}
 
-	private readonly States _states;
+	private readonly StateStore _stateStore;
 	/// <summary>
 	/// カレント条件
 	/// </summary>
@@ -50,7 +50,7 @@ public class SortSelectorViewModel : ViewModelBase {
 	} = new();
 
 	protected override void Dispose(bool disposing) {
-		this._states.Save();
+		this._stateStore.Save();
 		base.Dispose(disposing);
 	}
 }

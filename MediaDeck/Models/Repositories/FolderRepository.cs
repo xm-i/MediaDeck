@@ -1,12 +1,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using System.Windows;
+
+using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Database;
-using MediaDeck.Models.Files;
 using MediaDeck.Models.Files.SearchConditions;
 using MediaDeck.Models.NotificationDispatcher;
-using MediaDeck.Models.Preferences;
 using MediaDeck.Models.Repositories.Objects;
 using MediaDeck.Utils.Constants;
 using MediaDeck.Utils.Notifications;
@@ -16,11 +15,11 @@ namespace MediaDeck.Models.Repositories;
 
 [AddTransient]
 public class FolderRepository : RepositoryBase {
-	private readonly States _states;
-	public FolderRepository(MediaDeckDbContext dbContext, SearchConditionNotificationDispatcher searchConditionNotificationDispatcher,States states) {
+	private readonly StateModel _state;
+	public FolderRepository(MediaDeckDbContext dbContext, SearchConditionNotificationDispatcher searchConditionNotificationDispatcher,StateModel state) {
 		this._db = dbContext;
 		this._searchConditionNotificationDispatcher = searchConditionNotificationDispatcher;
-		this._states = states;
+		this._state = state;
 		FileNotifications
 			.FileRegistered
 			.ThrottleLast(TimeSpan.FromSeconds(10))
@@ -95,7 +94,7 @@ public class FolderRepository : RepositoryBase {
 	}
 
 	private void Restore() {
-		var condition = this._states.SearchStates.SearchCondition.FirstOrDefault(x => x is FolderSearchCondition) as FolderSearchCondition;
+		var condition = this._state.SearchState.SearchCondition.FirstOrDefault(x => x is FolderSearchCondition) as FolderSearchCondition;
 		if(condition == null) {
 			return;
 		}

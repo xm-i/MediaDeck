@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
-namespace MediaDeck.Utils.Enums;
+namespace MediaDeck.Composition.Enum;
 /// <summary>
 /// 検索タイプ(含む/含まない)
 /// </summary>

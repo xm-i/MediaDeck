@@ -1,8 +1,9 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
+using MediaDeck.Composition.Interfaces.Files;
+using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Database;
-using MediaDeck.FileTypes.Base.Models.Interfaces;
 using MediaDeck.Models.Files.Filter;
 using MediaDeck.Models.Files.SearchConditions;
 using MediaDeck.Models.Files.Sort;

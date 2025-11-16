@@ -6,11 +6,11 @@ using MediaDeck.Database.Tables.Metadata;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using System.Drawing;
 using MediaDeck.FileTypes.Base.Models;
-using MediaDeck.FileTypes.Base.Models.Interfaces;
 using System.Threading.Tasks;
 using MediaDeck.Utils.Constants;
 using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Composition.Enum;
+using MediaDeck.Composition.Interfaces.FileTypes.Models;
 
 namespace MediaDeck.FileTypes.Video.Models;
 [AddTransient]

@@ -1,5 +1,5 @@
 using MediaDeck.Composition.Bases;
-using MediaDeck.Models.Files.Sort;
+using MediaDeck.Composition.Stores.State.Model.Objects;
 
 namespace MediaDeck.ViewModels.Panes.ViewerPanes;
 
@@ -7,7 +7,7 @@ public class SortConditionViewModel : ViewModelBase {
 	/// <summary>
 	/// モデル
 	/// </summary>
-	public SortCondition Model {
+	public SortObject Model {
 		get;
 	}
 
@@ -18,8 +18,8 @@ public class SortConditionViewModel : ViewModelBase {
 		get;
 	}
 
-	public SortConditionViewModel(SortCondition model) {
+	public SortConditionViewModel(SortObject model) {
 		this.Model = model;
-		this.DisplayName = this.Model.DisplayName.ToBindableReactiveProperty(null!);
+		this.DisplayName = this.Model.DisplayName.ToBindableReactiveProperty(string.Empty);
 	}
 }

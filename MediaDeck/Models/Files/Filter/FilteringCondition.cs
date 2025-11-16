@@ -1,8 +1,9 @@
 using System.Collections.Generic;
 using MediaDeck.Composition.Bases;
-using MediaDeck.Models.Files.Filter.FilterItemObjects;
 using MediaDeck.Database.Tables;
-using MediaDeck.FileTypes.Base.Models.Interfaces;
+using MediaDeck.Composition.Interfaces.FileTypes.Models;
+using MediaDeck.Composition.Interfaces.Files;
+using MediaDeck.Composition.Stores.State.Model.Objects;
 
 namespace MediaDeck.Models.Files.Filter;
 /// <summary>

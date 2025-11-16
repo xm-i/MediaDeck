@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace MediaDeck.Utils.Objects;
+namespace MediaDeck.Composition.Objects;
 /// <summary>
 /// 属性リスト
 /// </summary>

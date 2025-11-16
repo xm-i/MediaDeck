@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 
+using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Database.Tables;
-using MediaDeck.FileTypes.Base.Models.Interfaces;
 
 namespace MediaDeck.Models.Files.Filter;
 public static class FilterExtensions {

@@ -1,7 +1,8 @@
 using System.Collections.Generic;
 
+using MediaDeck.Composition.Interfaces.Files;
+using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Database.Tables;
-using MediaDeck.FileTypes.Base.Models.Interfaces;
 using MediaDeck.Models.Files.Filter;
 using MediaDeck.Models.Files.SearchConditions;
 

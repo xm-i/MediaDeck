@@ -1,7 +1,6 @@
 using Microsoft.UI.Xaml.Data;
-
-using MediaDeck.Utils.Enums;
 using System.Collections.Generic;
+using MediaDeck.Composition.Enum;
 
 namespace MediaDeck.Views.Resources.Converters; 
 

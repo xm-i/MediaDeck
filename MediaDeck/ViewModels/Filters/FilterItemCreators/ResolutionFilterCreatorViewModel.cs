@@ -3,8 +3,10 @@ using System.ComponentModel.DataAnnotations;
 using System.Reactive.Linq;
 
 using MediaDeck.Composition.Bases;
+using MediaDeck.Composition.Enum;
+using MediaDeck.Composition.Interfaces.Files;
+using MediaDeck.Composition.Objects;
 using MediaDeck.Models.Files.Filter.FilterItemObjects;
-using MediaDeck.Utils.Enums;
 using MediaDeck.Utils.Objects;
 
 using Reactive.Bindings.Extensions;

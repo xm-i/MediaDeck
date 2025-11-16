@@ -1,4 +1,4 @@
-using MediaDeck.Models.Files.Filter.FilterItemObjects;
+using MediaDeck.Composition.Interfaces.Files;
 
 namespace MediaDeck.Models.Files.Filter.FilterItemCreators; 
 /// <summary>

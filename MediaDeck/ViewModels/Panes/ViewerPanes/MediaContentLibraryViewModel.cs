@@ -1,7 +1,7 @@
 using MediaDeck.Composition.Bases;
+using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.FileTypes.Base.ViewModels.Interfaces;
 using MediaDeck.Models.Files;
-using MediaDeck.Models.Files.SearchConditions;
 using MediaDeck.Models.NotificationDispatcher;
 
 namespace MediaDeck.ViewModels.Panes.ViewerPanes;

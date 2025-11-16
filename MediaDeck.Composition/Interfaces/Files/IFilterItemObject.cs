@@ -1,4 +1,5 @@
-namespace MediaDeck.Models.Files.Filter.FilterItemObjects; 
+namespace MediaDeck.Composition.Interfaces.Files;
+
 public interface IFilterItemObject {
 	/// <summary>
 	/// 表示名

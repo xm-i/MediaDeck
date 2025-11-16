@@ -1,6 +1,6 @@
 using MediaDeck.Composition.Bases;
-using MediaDeck.FileTypes.Base.Views;
 using MediaDeck.FileTypes.Archive.ViewModels;
+using MediaDeck.FileTypes.Base.Views.Interfaces;
 
 namespace MediaDeck.FileTypes.Archive.Views;
 public sealed partial class ArchiveThumbnailPickerView : ArchiveThumbnailPickerViewUserControl, IThumbnailPickerView {

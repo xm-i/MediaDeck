@@ -1,7 +1,9 @@
 using System.Collections.Generic;
+
 using MapControl;
+
+using MediaDeck.Composition.Objects;
 using MediaDeck.Models.Files;
-using MediaDeck.Utils.Objects;
 
 namespace MediaDeck.Models.Maps;
 

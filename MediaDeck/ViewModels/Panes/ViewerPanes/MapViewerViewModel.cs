@@ -1,8 +1,10 @@
 using System.Collections.Generic;
+
 using MapControl;
+
+using MediaDeck.Composition.Objects;
 using MediaDeck.Models.FileDetailManagers;
 using MediaDeck.Models.Maps;
-using MediaDeck.Utils.Objects;
 
 namespace MediaDeck.ViewModels.Panes.ViewerPanes;
 

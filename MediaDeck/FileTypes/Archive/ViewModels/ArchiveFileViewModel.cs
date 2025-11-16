@@ -1,5 +1,5 @@
 using MediaDeck.Composition.Enum;
-using MediaDeck.FileTypes.Base.Models.Interfaces;
+using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.FileTypes.Base.ViewModels;
 
 namespace MediaDeck.FileTypes.Archive.ViewModels;

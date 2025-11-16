@@ -1,16 +1,27 @@
-using MediaDeck.Models.Files.Filter.FilterItemObjects;
+using MediaDeck.Composition.Interfaces.Files;
 
-namespace MediaDeck.Models.Files.Filter;
+using R3.JsonConfig.Attributes;
+
+namespace MediaDeck.Composition.Stores.State.Model.Objects;
 /// <summary>
 /// フィルター設定復元用オブジェクト
 /// </summary>
+[AddScoped]
+[GenerateR3JsonConfigDefaultDto]
 public class FilterObject {
+	/// <summary>
+	/// ID
+	/// </summary>
+	public Guid Id {
+		get;
+		set;
+	} = Guid.NewGuid();
+
 	/// <summary>
 	/// 表示名
 	/// </summary>
 	public ReactiveProperty<string> DisplayName {
 		get;
-		set;
 	} = new();
 
 	/// <summary>
@@ -18,6 +29,5 @@ public class FilterObject {
 	/// </summary>
 	public ObservableList<IFilterItemObject> FilterItemObjects {
 		get;
-		set;
 	} = [];
 }

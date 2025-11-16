@@ -1,7 +1,8 @@
 using System.Collections.Generic;
 
-using MediaDeck.Utils.Enums;
-using MediaDeck.Utils.Objects;
+using MediaDeck.Composition.Enum;
+using MediaDeck.Composition.Interfaces.Files;
+using MediaDeck.Composition.Objects;
 
 namespace MediaDeck.Models.Files.Filter.FilterItemObjects;
 /// <summary>

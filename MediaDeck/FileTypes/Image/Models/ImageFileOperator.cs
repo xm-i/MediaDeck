@@ -4,10 +4,10 @@ using MediaDeck.Models.Files.Metadata.Images;
 using MediaDeck.Models.Files.Metadata.Images.Formats;
 using ImageMagick;
 using MediaDeck.FileTypes.Base.Models;
-using MediaDeck.FileTypes.Base.Models.Interfaces;
 using MediaDeck.Utils.Constants;
 using System.Threading.Tasks;
 using MediaDeck.Composition.Enum;
+using MediaDeck.Composition.Interfaces.FileTypes.Models;
 
 namespace MediaDeck.FileTypes.Image.Models;
 [AddTransient]

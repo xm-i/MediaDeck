@@ -1,5 +1,5 @@
 using MediaDeck.Composition.Bases;
-using MediaDeck.FileTypes.Base.Views;
+using MediaDeck.FileTypes.Base.Views.Interfaces;
 using MediaDeck.FileTypes.Video.ViewModels;
 
 namespace MediaDeck.FileTypes.Video.Views;

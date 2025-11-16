@@ -1,6 +1,6 @@
 using MapControl;
 
-namespace MediaDeck.Utils.Objects;
+namespace MediaDeck.Composition.Objects;
 /// <summary>
 /// 場所、座標クラス
 /// </summary>

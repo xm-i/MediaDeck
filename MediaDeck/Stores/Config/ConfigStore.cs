@@ -16,7 +16,7 @@ public class ConfigStore {
 		get;
 	}
 
-	public ConfigModel ConfigModel {
+	public ConfigModel Config {
 		get;
 		private set;
 	}
@@ -29,7 +29,7 @@ public class ConfigStore {
 	/// <summary>
 	///     保存済み設定を読み込みます。
 	/// </summary>
-	[MemberNotNull(nameof(ConfigModel))]
+	[MemberNotNull(nameof(Config))]
 	public void Load() {
 		var scope = this.ScopedService.CreateScope();
 		try {
@@ -37,14 +37,14 @@ public class ConfigStore {
 				var json = File.ReadAllText(FilePathConstants.ConfigFilePath);
 				var loaded = JsonSerializer.Deserialize(json, ConfigJsonSerializerContext.Default.ConfigModelForJson);
 				if (loaded != null) {
-					this.ConfigModel = ConfigModelForJson.CreateModel(loaded, scope.ServiceProvider);
+					this.Config = ConfigModelForJson.CreateModel(loaded, scope.ServiceProvider);
 					return;
 				}
 			}
 		} catch (Exception) {
 			// TODO: 失敗通知
 		}
-		this.ConfigModel = scope.ServiceProvider.GetRequiredService<ConfigModel>();
+		this.Config = scope.ServiceProvider.GetRequiredService<ConfigModel>();
 	}
 
 	/// <summary>
@@ -54,7 +54,7 @@ public class ConfigStore {
 		try {
 			Directory.CreateDirectory(Path.GetDirectoryName(FilePathConstants.ConfigFilePath)!);
 
-			var jsonDto = ConfigModelForJson.CreateJson(this.ConfigModel);
+			var jsonDto = ConfigModelForJson.CreateJson(this.Config);
 			var json = JsonSerializer.Serialize(jsonDto, ConfigJsonSerializerContext.Default.ConfigModelForJson);
 			File.WriteAllText(FilePathConstants.ConfigFilePath, json);
 		} catch (Exception) {

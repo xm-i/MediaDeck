@@ -1,9 +1,10 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
+using MediaDeck.Composition.Interfaces.Files;
+using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Database;
 using MediaDeck.Database.Tables;
-using MediaDeck.FileTypes.Base.Models.Interfaces;
 using MediaDeck.Models.Files;
 using MediaDeck.Utils.Constants;
 
@@ -17,7 +18,7 @@ public class TagsManager(MediaDeckDbContext dbContext) {
 		get;
 	} = [];
 
-	public ObservableList<TagModel> Tags {
+	public ObservableList<ITagModel> Tags {
 		get;
 	} = [];
 

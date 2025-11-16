@@ -1,7 +1,7 @@
 using MediaDeck.Composition.Bases;
 using MediaDeck.Models.Files;
 using MediaDeck.Models.Files.Filter;
-using MediaDeck.Models.Preferences;
+using MediaDeck.Stores.State;
 
 namespace MediaDeck.ViewModels.Panes.FilterPanes;
 
@@ -13,8 +13,8 @@ public class FilterSelectorViewModel :ViewModelBase {
 	/// <summary>
 	/// コンストラクタ
 	/// </summary>
-	public FilterSelectorViewModel(FilterSelector model, States states,MediaContentLibrary mediaContentLibrary) {
-		this._states = states;
+	public FilterSelectorViewModel(FilterSelector model, StateStore stateStore,MediaContentLibrary mediaContentLibrary) {
+		this._stateStore = stateStore;
 		this.FilteringConditions = model.FilteringConditions.CreateView(x => new FilteringConditionViewModel(x)).ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
 		this.CurrentCondition = model.CurrentFilteringCondition.Select(x => this.FilteringConditions.FirstOrDefault(c => c.Model == x)).ToBindableReactiveProperty();
 		this.ChangeFilteringConditionSelectionCommand.Subscribe(async x => {
@@ -23,7 +23,7 @@ public class FilterSelectorViewModel :ViewModelBase {
 		});
 	}
 
-	private readonly States _states;
+	private readonly StateStore _stateStore;
 	/// <summary>
 	/// カレント条件
 	/// </summary>
@@ -43,7 +43,7 @@ public class FilterSelectorViewModel :ViewModelBase {
 	} = new();
 
 	protected override void Dispose(bool disposing) {
-		this._states.Save();
+		this._stateStore.Save();
 		base.Dispose(disposing);
 	}
 }

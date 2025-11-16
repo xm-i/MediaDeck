@@ -1,8 +1,9 @@
 
 using System.Linq.Expressions;
 
+using MediaDeck.Composition.Interfaces.Files;
+using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Database.Tables;
-using MediaDeck.FileTypes.Base.Models.Interfaces;
 
 namespace MediaDeck.Models.Files.SearchConditions;
 public class WordSearchCondition: ISearchCondition {

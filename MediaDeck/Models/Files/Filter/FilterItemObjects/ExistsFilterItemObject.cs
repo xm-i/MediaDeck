@@ -1,3 +1,5 @@
+using MediaDeck.Composition.Interfaces.Files;
+
 namespace MediaDeck.Models.Files.Filter.FilterItemObjects;
 /// <summary>
 /// ファイル存在フィルターアイテムオブジェクト

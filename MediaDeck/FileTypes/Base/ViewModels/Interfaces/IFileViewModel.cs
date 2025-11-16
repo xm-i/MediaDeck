@@ -3,8 +3,8 @@ using System.Threading.Tasks;
 using MapControl;
 
 using MediaDeck.Composition.Enum;
-using MediaDeck.FileTypes.Base.Models.Interfaces;
-using MediaDeck.Utils.Objects;
+using MediaDeck.Composition.Interfaces.FileTypes.Models;
+using MediaDeck.Composition.Objects;
 
 namespace MediaDeck.FileTypes.Base.ViewModels.Interfaces;
 

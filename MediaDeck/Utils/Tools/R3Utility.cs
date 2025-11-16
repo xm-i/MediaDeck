@@ -1,3 +1,5 @@
+using R3;
+
 namespace MediaDeck.Utils.Tools;
 
 public static class R3Utility
@@ -11,5 +13,15 @@ public static class R3Utility
 			source.Value = x;
 		});
 		return bindable;
+	}
+	public static ReactiveProperty<TResult> ToTwoWayReactiveProperty<TProperty, TResult>(this ReactiveProperty<TProperty> source, Func<TProperty, TResult> convert, Func<TResult, TProperty> convertBack, TResult initialValue = default!) {
+		var resultRp = new ReactiveProperty<TResult>(initialValue);
+		source.Subscribe(x => {
+			resultRp.Value = convert(x);
+		});
+		resultRp.Subscribe(x => {
+			source.Value = convertBack(x);
+		});
+		return resultRp;
 	}
 }

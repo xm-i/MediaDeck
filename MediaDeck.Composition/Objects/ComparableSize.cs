@@ -1,4 +1,4 @@
-namespace MediaDeck.Utils.Objects;
+namespace MediaDeck.Composition.Objects;
 
 /// <summary>
 /// 比較可能なサイズ構造体

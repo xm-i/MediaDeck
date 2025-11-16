@@ -1,9 +1,10 @@
 using System.Collections.Generic;
 
+using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Database.Tables;
 
 namespace MediaDeck.Models.Files; 
-public class TagModel {
+public class TagModel: ITagModel {
 	[Obsolete("for serialize")]
 	public TagModel() {
 		this.TagCategory = null!;
@@ -38,7 +39,7 @@ public class TagModel {
 		set;
 	}
 
-	public TagCategoryModel TagCategory {
+	public ITagCategoryModel TagCategory {
 		get;
 		set;
 	}
@@ -64,7 +65,7 @@ public class TagModel {
 		set;
 	}
 
-	public List<TagAliasModel> TagAliases {
+	public List<ITagAliasModel> TagAliases {
 		get;
 		set;
 	}
@@ -75,7 +76,7 @@ public class TagModel {
 	} = new();
 }
 
-public class TagCategoryModel {
+public class TagCategoryModel: ITagCategoryModel {
 	[Obsolete("for serialize")]
 	public TagCategoryModel() {
 		this.TagCategoryName = null!;
@@ -112,7 +113,7 @@ public class TagCategoryModel {
 	}
 }
 
-public class TagAliasModel {
+public class TagAliasModel: ITagAliasModel {
 	[Obsolete("for serialize")]
 	public TagAliasModel() {
 		this.Alias = null!;

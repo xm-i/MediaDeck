@@ -1,8 +1,9 @@
 using MediaDeck.Composition.Enum;
+using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Database.Tables;
 using MediaDeck.FileTypes.Base.Models.Interfaces;
 using MediaDeck.FileTypes.Base.ViewModels.Interfaces;
-using MediaDeck.FileTypes.Base.Views;
+using MediaDeck.FileTypes.Base.Views.Interfaces;
 
 namespace MediaDeck.FileTypes.Base;
 public interface IFileType<TFileOperator, TFileModel, TFileViewModel, TDetailViewerPreviewControlView, TThumbnailPickerViewModel, TThumbnailPickerView>:IFileType

@@ -2,10 +2,10 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 
 using MediaDeck.Composition.Enum;
-using MediaDeck.Models.Files;
-using MediaDeck.Utils.Objects;
+using MediaDeck.Composition.Interfaces.Files;
+using MediaDeck.Composition.Objects;
 
-namespace MediaDeck.FileTypes.Base.Models.Interfaces;
+namespace MediaDeck.Composition.Interfaces.FileTypes.Models;
 
 public interface IFileModel {
 	public MediaType MediaType {
@@ -41,7 +41,7 @@ public interface IFileModel {
 	/// <summary>
 	/// タグリスト
 	/// </summary>
-	public List<TagModel> Tags {
+	public List<ITagModel> Tags {
 		get;
 		set;
 	}

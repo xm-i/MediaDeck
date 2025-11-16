@@ -1,6 +1,6 @@
 using MediaDeck.Composition.Bases;
+using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Models.Files.Filter;
-using MediaDeck.Models.Files.Filter.FilterItemObjects;
 
 namespace MediaDeck.ViewModels.Filters;
 

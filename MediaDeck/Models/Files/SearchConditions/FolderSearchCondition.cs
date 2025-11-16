@@ -1,8 +1,9 @@
 using System.IO;
 using System.Linq.Expressions;
 
+using MediaDeck.Composition.Interfaces.Files;
+using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Database.Tables;
-using MediaDeck.FileTypes.Base.Models.Interfaces;
 using MediaDeck.Models.Repositories.Objects;
 
 namespace MediaDeck.Models.Files.SearchConditions;

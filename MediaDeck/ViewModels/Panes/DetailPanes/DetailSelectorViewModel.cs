@@ -1,4 +1,5 @@
 using MediaDeck.Composition.Bases;
+using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.FileTypes.Base.ViewModels.Interfaces;
 using MediaDeck.Models.FileDetailManagers;
 using MediaDeck.Models.FileDetailManagers.Objects;
@@ -83,7 +84,7 @@ public class DetailSelectorViewModel : ViewModelBase
 		this.Tags = this._tags.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
 	}
 
-	private readonly ObservableList<ValueCountPair<TagModel>> _tags = [];
+	private readonly ObservableList<ValueCountPair<ITagModel>> _tags = [];
 
 	public BindableReactiveProperty<IFileViewModel[]> TargetFiles {
 		get;
@@ -100,11 +101,11 @@ public class DetailSelectorViewModel : ViewModelBase
 		get;
 	} = new();
 
-	public ISynchronizedView<TagModel, TagModel> TagCandidates {
+	public ISynchronizedView<ITagModel, ITagModel> TagCandidates {
 		get;
 	}
 
-	public INotifyCollectionChangedSynchronizedViewList<TagModel> FilteredTagCandidates {
+	public INotifyCollectionChangedSynchronizedViewList<ITagModel> FilteredTagCandidates {
 		get;
 	}
 
@@ -116,11 +117,11 @@ public class DetailSelectorViewModel : ViewModelBase
 		get;
 	} = new();
 
-	public INotifyCollectionChangedSynchronizedViewList<ValueCountPair<TagModel>> Tags {
+	public INotifyCollectionChangedSynchronizedViewList<ValueCountPair<ITagModel>> Tags {
 		get;
 	}
 
-	public ReactiveCommand<ValueCountPair<TagModel>> SearchTaggedFilesCommand {
+	public ReactiveCommand<ValueCountPair<ITagModel>> SearchTaggedFilesCommand {
 		get;
 	} = new();
 
@@ -147,7 +148,7 @@ public class DetailSelectorViewModel : ViewModelBase
 		get;
 	} = new();
 
-	public ReactiveCommand<ValueCountPair<TagModel>> RemoveTagCommand {
+	public ReactiveCommand<ValueCountPair<ITagModel>> RemoveTagCommand {
 		get;
 	} = new();
 
@@ -162,7 +163,7 @@ public class DetailSelectorViewModel : ViewModelBase
 				.Value
 				.SelectMany(x => x.FileModel.Tags)
 				.GroupBy(x => x.TagId)
-				.Select(x => new ValueCountPair<TagModel>(x.First(), x.Count()))
+				.Select(x => new ValueCountPair<ITagModel>(x.First(), x.Count()))
 		);
 	}
 

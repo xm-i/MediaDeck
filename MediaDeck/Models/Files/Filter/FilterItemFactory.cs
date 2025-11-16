@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.DependencyInjection;
 
+using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Models.Files.Filter.FilterItemCreators;
 using MediaDeck.Models.Files.Filter.FilterItemObjects;
 

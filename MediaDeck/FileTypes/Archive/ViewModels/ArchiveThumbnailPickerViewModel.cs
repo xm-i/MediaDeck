@@ -2,9 +2,9 @@ using MediaDeck.FileTypes.Base.ViewModels;
 using MediaDeck.FileTypes.Archive.Models;
 using MediaDeck.Models.FileDetailManagers;
 using System.IO.Compression;
-using MediaDeck.FileTypes.Base.ViewModels.Interfaces;
 using System.Threading.Tasks;
 using Windows.System.Threading;
+using MediaDeck.FileTypes.Base.ViewModels.Interfaces;
 
 namespace MediaDeck.FileTypes.Archive.ViewModels;
 

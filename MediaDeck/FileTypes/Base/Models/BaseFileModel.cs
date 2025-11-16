@@ -6,10 +6,12 @@ using CommunityToolkit.Mvvm.DependencyInjection;
 
 using MediaDeck.Composition.Bases;
 using MediaDeck.Composition.Enum;
+using MediaDeck.Composition.Interfaces.Files;
+using MediaDeck.Composition.Interfaces.FileTypes.Models;
+using MediaDeck.Composition.Objects;
 using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.FileTypes.Base.Models.Interfaces;
 using MediaDeck.Models.Files;
-using MediaDeck.Utils.Objects;
 
 namespace MediaDeck.FileTypes.Base.Models;
 
@@ -55,7 +57,7 @@ public abstract class BaseFileModel(long id, string filePath, IFileOperator file
 	/// <summary>
 	/// タグリスト
 	/// </summary>
-	public List<TagModel> Tags {
+	public List<ITagModel> Tags {
 		get;
 		set;
 	} = [];

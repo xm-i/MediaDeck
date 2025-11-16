@@ -1,6 +1,6 @@
 using MediaDeck.Composition.Bases;
 using MediaDeck.FileTypes.Base.ViewModels.Interfaces;
-using MediaDeck.FileTypes.Base.Views;
+using MediaDeck.FileTypes.Base.Views.Interfaces;
 
 namespace MediaDeck.ViewModels.Thumbnails;
 [AddTransient]

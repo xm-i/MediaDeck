@@ -2,16 +2,17 @@ using System.IO;
 using System.Threading.Tasks;
 
 using MediaDeck.Composition.Bases;
+using MediaDeck.Composition.Stores.State.Model;
+using MediaDeck.Composition.Stores.State.Model.Objects;
 using MediaDeck.Models.Files;
-using MediaDeck.Models.Preferences.CustomStates;
 
 namespace MediaDeck.Models.FolderManager;
 
 [AddTransient]
 public class FolderManagerModel : ModelBase {
 	private readonly FileRegistrar _fileRegistrar;
-	private readonly FolderManagerStates _folderManagerStates;
-	public FolderManagerModel(FileRegistrar fileRegistrar, FolderManagerStates folderManagerStates) {
+	private readonly FolderManagerStateModel _folderManagerStates;
+	public FolderManagerModel(FileRegistrar fileRegistrar, FolderManagerStateModel folderManagerStates) {
 		this._fileRegistrar = fileRegistrar;
 		this._folderManagerStates = folderManagerStates;
 		this.Folders = this._folderManagerStates.Folders;
