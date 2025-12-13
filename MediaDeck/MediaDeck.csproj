@@ -84,5 +84,6 @@
     <PublishReadyToRun Condition="'$(Configuration)' == 'Debug-Unpackaged'">False</PublishReadyToRun>
     <PublishReadyToRun Condition="'$(Configuration)' == 'Release'">False</PublishReadyToRun>
     <PublishReadyToRun Condition="'$(Configuration)' == 'Release-Unpackaged'">True</PublishReadyToRun>
+    <ApplicationIcon>Assets\icon.ico</ApplicationIcon>
   </PropertyGroup>
 </Project>
