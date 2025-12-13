@@ -4,7 +4,7 @@ using MediaDeck.Models.FolderManager;
 
 namespace MediaDeck.ViewModels.FolderManager;
 
-[AddTransient]
+[Inject(InjectServiceLifetime.Transient)]
 public class FolderManagerViewModel: ViewModelBase {
 	private readonly FolderManagerModel _folderManager;
 

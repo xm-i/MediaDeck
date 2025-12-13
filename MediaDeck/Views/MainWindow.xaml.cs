@@ -4,7 +4,7 @@ using MediaDeck.ViewModels;
 
 namespace MediaDeck.Views;
 
-[AddSingleton]
+[Inject(InjectServiceLifetime.Singleton)]
 public sealed partial class MainWindow : Window {
 	private readonly MainWindowViewModel ViewModel;
 	public MainWindow(MainWindowViewModel viewModel) {

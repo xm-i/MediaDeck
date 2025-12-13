@@ -2,7 +2,7 @@ using R3.JsonConfig.Attributes;
 
 namespace MediaDeck.Composition.Stores.State.Model.Objects;
 
-[AddTransient]
+[Inject(InjectServiceLifetime.Transient)]
 [GenerateR3JsonConfigDefaultDto]
 public class FolderModel() {
 	public string FolderPath {

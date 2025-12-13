@@ -3,7 +3,7 @@ using MediaDeck.Database.Tables;
 using MediaDeck.Models.FileDetailManagers;
 
 namespace MediaDeck.ViewModels.Tags;
-[AddTransient]
+[Inject(InjectServiceLifetime.Transient)]
 public class TagViewModel : ViewModelBase {
 	public TagViewModel(TagCategoryViewModel parent,Tag tag, TagsManager tagsManager) {
 		this.TagName.Value = tag.TagName;

@@ -8,7 +8,7 @@ namespace MediaDeck.Models.Files.Filter;
 /// <remarks>
 /// コンストラクタ
 /// </remarks>
-[AddSingleton]
+[Inject(InjectServiceLifetime.Singleton)]
 public class FilterManager : ModelBase {
 	private readonly StateStore _stateStore;
 

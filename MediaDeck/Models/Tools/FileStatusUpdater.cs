@@ -7,7 +7,7 @@ using MediaDeck.Database.Tables;
 using MediaDeck.Utils.Constants;
 
 namespace MediaDeck.Models.Tools;
-[AddTransient]
+[Inject(InjectServiceLifetime.Transient)]
 public class FileStatusUpdater {
 	public FileStatusUpdater(MediaDeckDbContext db) {
 		this._db = db;

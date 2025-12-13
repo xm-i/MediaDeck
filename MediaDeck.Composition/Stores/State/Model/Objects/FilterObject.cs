@@ -6,7 +6,7 @@ namespace MediaDeck.Composition.Stores.State.Model.Objects;
 /// <summary>
 /// フィルター設定復元用オブジェクト
 /// </summary>
-[AddScoped]
+[Inject(InjectServiceLifetime.Scoped)]
 [GenerateR3JsonConfigDefaultDto]
 public class FilterObject {
 	/// <summary>

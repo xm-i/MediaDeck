@@ -4,7 +4,7 @@ using MediaDeck.ViewModels.Preferences.Config;
 
 namespace MediaDeck.ViewModels.Preferences;
 
-[AddTransient]
+[Inject(InjectServiceLifetime.Transient)]
 public class ConfigWindowViewModel : ViewModelBase {
 	public ConfigWindowViewModel(ConfigStore configStore,ScanConfigPageViewModel scanConfigPageViewModel,ExecutionConfigPageViewModel executionConfigPageViewModel) {
 		this.ScanConfigPageViewModel = scanConfigPageViewModel;

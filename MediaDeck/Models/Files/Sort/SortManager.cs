@@ -6,7 +6,7 @@ namespace MediaDeck.Models.Files.Sort;
 /// <summary>
 /// ソートマネージャー
 /// </summary>
-[AddSingleton]
+[Inject(InjectServiceLifetime.Singleton)]
 public class SortManager : ModelBase {
 	private readonly StateStore _stateStore;
 

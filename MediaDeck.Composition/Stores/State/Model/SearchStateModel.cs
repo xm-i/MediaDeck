@@ -13,7 +13,7 @@ namespace MediaDeck.Composition.Stores.State.Model;
 /// 検索状態
 /// </summary>
 
-[AddSingleton]
+[Inject(InjectServiceLifetime.Singleton)]
 [GenerateR3JsonConfigDefaultDto]
 public class SearchStateModel {
 	private readonly IServiceProvider _serviceProvider;

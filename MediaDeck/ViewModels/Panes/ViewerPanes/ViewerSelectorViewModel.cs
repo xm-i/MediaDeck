@@ -2,7 +2,7 @@ using MediaDeck.Composition.Bases;
 
 namespace MediaDeck.ViewModels.Panes.ViewerPanes;
 
-[AddTransient]
+[Inject(InjectServiceLifetime.Transient)]
 public class ViewerSelectorViewModel : ViewModelBase {
 	public ViewerSelectorViewModel(
 		MediaContentLibraryViewModel mediaContentLibraryViewModel,

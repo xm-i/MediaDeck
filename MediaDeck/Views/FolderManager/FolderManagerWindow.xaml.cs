@@ -6,7 +6,7 @@ using Windows.Graphics;
 
 namespace MediaDeck.Views.FolderManager;
 
-[AddTransient]
+[Inject(InjectServiceLifetime.Transient)]
 public sealed partial class FolderManagerWindow : Window {
 	public FolderManagerViewModel ViewModel {
 		get;

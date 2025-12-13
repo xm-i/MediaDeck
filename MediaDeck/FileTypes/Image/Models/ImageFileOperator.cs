@@ -10,7 +10,7 @@ using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
 
 namespace MediaDeck.FileTypes.Image.Models;
-[AddTransient]
+[Inject(InjectServiceLifetime.Transient)]
 public class ImageFileOperator : BaseFileOperator {
 	public override MediaType TargetMediaType {
 		get;

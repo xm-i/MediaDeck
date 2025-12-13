@@ -8,7 +8,7 @@ using MediaDeck.FileTypes.Pdf.ViewModels;
 using MediaDeck.FileTypes.Pdf.Views;
 
 namespace MediaDeck.FileTypes.Pdf;
-[AddTransient(typeof(IFileType))]
+[Inject(InjectServiceLifetime.Transient, typeof(IFileType))]
 public class PdfFileType: BaseFileType<PdfFileOperator, PdfFileModel, PdfFileViewModel, PdfDetailViewerPreviewControlView, PdfThumbnailPickerViewModel, PdfThumbnailPickerView> {
 	private PdfDetailViewerPreviewControlView? _pdfDetailViewerPreviewControlView;
 	public override MediaType MediaType {

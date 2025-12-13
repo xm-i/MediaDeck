@@ -6,7 +6,7 @@ using R3.JsonConfig.Attributes;
 
 namespace MediaDeck.Composition.Stores.Config.Model;
 
-[AddSingleton]
+[Inject(InjectServiceLifetime.Singleton)]
 [GenerateR3JsonConfigDefaultDto]
 public class PathConfigModel {
 	/// <summary>

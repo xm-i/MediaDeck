@@ -7,7 +7,7 @@ using MediaDeck.ViewModels.Tools;
 
 namespace MediaDeck.ViewModels;
 
-[AddSingleton]
+[Inject(InjectServiceLifetime.Singleton)]
 public class MainWindowViewModel : ViewModelBase {
 	public MainWindowViewModel(
 		ViewerSelectorViewModel viewerSelectorViewModel,

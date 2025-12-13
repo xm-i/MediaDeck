@@ -10,7 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace MediaDeck.Stores.Config;
 
-[AddSingleton]
+[Inject(InjectServiceLifetime.Singleton)]
 public class ConfigStore {
 	public IServiceProvider ScopedService {
 		get;

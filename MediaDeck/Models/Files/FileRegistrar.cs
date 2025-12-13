@@ -6,7 +6,7 @@ using MediaDeck.Composition.Stores.Config.Model;
 
 namespace MediaDeck.Models.Files;
 
-[AddSingleton]
+[Inject(InjectServiceLifetime.Singleton)]
 public class FileRegistrar {
 	private static readonly IFileOperator[] _fileOperators;
 	public ObservableQueue<string> RegistrationQueue {

@@ -8,7 +8,7 @@ using MediaDeck.FileTypes.Video.ViewModels;
 using MediaDeck.FileTypes.Video.Views;
 
 namespace MediaDeck.FileTypes.Video;
-[AddTransient(typeof(IFileType))]
+[Inject(InjectServiceLifetime.Transient, typeof(IFileType))]
 public class VideoFileType: BaseFileType<VideoFileOperator, VideoFileModel, VideoFileViewModel, VideoDetailViewerPreviewControlView, VideoThumbnailPickerViewModel, VideoThumbnailPickerView> {
 	private VideoDetailViewerPreviewControlView? _videoDetailViewerPreviewControlView;
 	public override MediaType MediaType {

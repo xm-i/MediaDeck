@@ -5,7 +5,7 @@ using MediaDeck.ViewModels.Tags;
 using Windows.Graphics;
 
 namespace MediaDeck.Views.Tags;
-[AddTransient]
+[Inject(InjectServiceLifetime.Transient)]
 public sealed partial class TagManagerWindow : Window {
 	public TagManagerWindow(TagManagerViewModel tagManagerViewModel) {
 		this.InitializeComponent();

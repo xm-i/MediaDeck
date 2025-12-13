@@ -2,7 +2,7 @@ using MediaDeck.Composition.Bases;
 using MediaDeck.Models.FileDetailManagers;
 
 namespace MediaDeck.ViewModels.Tags;
-[AddTransient]
+[Inject(InjectServiceLifetime.Transient)]
 public class TagManagerViewModel : ViewModelBase {
 	public TagManagerViewModel(TagsManager tagsManager) {
 		this._tagCategories = [.. tagsManager.TagCategories.Select(x => new TagCategoryViewModel(x, tagsManager))];

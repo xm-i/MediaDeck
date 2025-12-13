@@ -3,7 +3,7 @@ using MediaDeck.Composition.Stores.State.Model.Objects;
 
 namespace MediaDeck.ViewModels.FolderManager;
 
-[AddTransient]
+[Inject(InjectServiceLifetime.Transient)]
 public class FolderViewModel(FolderModel folderModel) : ViewModelBase {
 	private readonly FolderModel _folderModel = folderModel;
 	public string FolderPath {

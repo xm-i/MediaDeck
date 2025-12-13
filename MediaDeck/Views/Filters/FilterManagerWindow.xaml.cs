@@ -4,7 +4,7 @@ using MediaDeck.ViewModels.Filters;
 
 using Windows.Graphics;
 namespace MediaDeck.Views.Filters;
-[AddTransient]
+[Inject(InjectServiceLifetime.Transient)]
 public sealed partial class FilterManagerWindow : Window {
 	public FilterManagerWindow(FilterManagerViewModel filterManagerViewModel) {
 		this.InitializeComponent();

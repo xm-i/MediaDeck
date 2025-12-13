@@ -8,7 +8,7 @@ using MediaDeck.FileTypes.Image.ViewModels;
 using MediaDeck.FileTypes.Image.Views;
 
 namespace MediaDeck.FileTypes.Image;
-[AddTransient(typeof(IFileType))]
+[Inject(InjectServiceLifetime.Transient, typeof(IFileType))]
 public class ImageFileType : BaseFileType<ImageFileOperator, ImageFileModel, ImageFileViewModel, ImageDetailViewerPreviewControlView, ImageThumbnailPickerViewModel, ImageThumbnailPickerView> {
 	private ImageDetailViewerPreviewControlView? _imageDetailViewerPreviewControlView;
 	public override MediaType MediaType {

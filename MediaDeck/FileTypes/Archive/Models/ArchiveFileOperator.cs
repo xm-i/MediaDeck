@@ -11,7 +11,7 @@ using MediaDeck.Models.Files.Metadata.Images;
 using MediaDeck.Utils.Constants;
 
 namespace MediaDeck.FileTypes.Archive.Models;
-[AddTransient]
+[Inject(InjectServiceLifetime.Transient)]
 public partial class ArchiveFileOperator : BaseFileOperator {
 
 	public override MediaType TargetMediaType {

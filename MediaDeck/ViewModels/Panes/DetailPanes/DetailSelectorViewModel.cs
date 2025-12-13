@@ -10,7 +10,7 @@ using MediaDeck.Utils.Objects;
 
 namespace MediaDeck.ViewModels.Panes.DetailPanes;
 
-[AddTransient]
+[Inject(InjectServiceLifetime.Transient)]
 public class DetailSelectorViewModel : ViewModelBase
 {
 	private bool _isTargetChanging = false;

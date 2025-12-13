@@ -6,5 +6,5 @@ global using Microsoft.EntityFrameworkCore;
 global using ObservableCollections;
 global using R3;
 
-global using MediaDeck.Composition.Utils.Attributes;
+global using AutoDiAttributes;
 global using MediaDeck.Utils.Tools;

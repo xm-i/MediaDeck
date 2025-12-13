@@ -10,7 +10,7 @@ namespace MediaDeck.ViewModels.Panes.ViewerPanes;
 /// <summary>
 /// ソートセレクターViewModel
 /// </summary>
-[AddSingleton]
+[Inject(InjectServiceLifetime.Singleton)]
 public class SortSelectorViewModel : ViewModelBase {
 	/// <summary>
 	/// コンストラクタ

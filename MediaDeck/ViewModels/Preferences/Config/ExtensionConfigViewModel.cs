@@ -4,7 +4,7 @@ using MediaDeck.Composition.Stores.Config.Model.Objects;
 
 namespace MediaDeck.ViewModels.Preferences.Config;
 
-[AddScoped]
+[Inject(InjectServiceLifetime.Scoped)]
 public class ExtensionConfigViewModel : ViewModelBase {
 	public BindableReactiveProperty<string> Extension {
 		get;

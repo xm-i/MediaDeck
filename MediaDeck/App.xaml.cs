@@ -59,41 +59,8 @@ public partial class App : Application {
 	private static void BuildConfigureServices() {
 		var serviceCollection = new ServiceCollection();
 
-		var types = AppDomain.CurrentDomain.GetAssemblies().SelectMany(x => x.GetTypes());
-
-		// Transient
-		var targetTypes = types.Where(x => x.GetCustomAttributes<AddTransientAttribute>(inherit: true).Any());
-
-		foreach (var targetType in targetTypes) {
-			var attribute = targetType.GetCustomAttribute<AddTransientAttribute>();
-			serviceCollection.AddTransient(attribute?.ServiceType ?? targetType, targetType);
-		}
-
-		// Singleton
-		var singletonTargetTypes =types.Where(x => x.GetCustomAttributes<AddSingletonAttribute>(inherit: true).Any());
-
-		foreach (var singletonTargetType in singletonTargetTypes) {
-			var attribute = singletonTargetType.GetCustomAttribute<AddSingletonAttribute>();
-			serviceCollection.AddSingleton(attribute?.ServiceType ?? singletonTargetType, singletonTargetType);
-		}
-
-		// Scoped
-		var scopedTargetTypes = types.Where(x => x.GetCustomAttributes<AddScopedAttribute>(inherit: true).Any());
-
-		foreach (var scopedTargetType in scopedTargetTypes) {
-			var attribute = scopedTargetType.GetCustomAttribute<AddScopedAttribute>();
-			serviceCollection.AddScoped(attribute?.ServiceType ?? scopedTargetType, scopedTargetType);
-		}
-
-		// FileTypes
-		var fileTypes =types
-				.Where(x =>
-					x.GetInterfaces()
-					.Any(t => t == typeof(IFileType)))
-				.Where(x => x.IsAbstract == false);
-		foreach (var fileTypeType in fileTypes) {
-			serviceCollection.AddSingleton(typeof(IFileType), fileTypeType);
-		}
+		serviceCollection.AddGeneratedServices();
+		MediaDeck.Composition.DIRegistration.AddGeneratedServices(serviceCollection);
 
 		// DataBase
 		var sb = new SqliteConnectionStringBuilder {

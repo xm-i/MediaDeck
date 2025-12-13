@@ -4,7 +4,7 @@ using MediaDeck.Composition.Bases;
 using MediaDeck.Models.Tools;
 
 namespace MediaDeck.ViewModels.Tools;
-[AddSingleton]
+[Inject(InjectServiceLifetime.Singleton)]
 public class BackgroundTasksViewModel: ViewModelBase {
 
 	public BackgroundTasksViewModel(FileStatusUpdater fileStatusUpdater) {

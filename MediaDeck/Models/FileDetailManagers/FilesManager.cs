@@ -6,7 +6,7 @@ using MediaDeck.Utils.Constants;
 
 namespace MediaDeck.Models.FileDetailManagers;
 
-[AddTransient]
+[Inject(InjectServiceLifetime.Transient)]
 public class FilesManager {
 	public FilesManager(MediaDeckDbContext db) {
 		this._db = db;

@@ -13,7 +13,7 @@ using MediaDeck.Utils.Objects;
 
 namespace MediaDeck.Models.Repositories;
 
-[AddTransient]
+[Inject(InjectServiceLifetime.Transient)]
 public class FolderRepository : RepositoryBase {
 	private readonly StateModel _state;
 	public FolderRepository(MediaDeckDbContext dbContext, SearchConditionNotificationDispatcher searchConditionNotificationDispatcher,StateModel state) {

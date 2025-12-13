@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace MediaDeck.ViewModels.Preferences.Config;
 
-[AddTransient]
+[Inject(InjectServiceLifetime.Transient)]
 public class ExecutionConfigPageViewModel : ViewModelBase, IConfigPageViewModel {
 	public string PageName {
 		get;

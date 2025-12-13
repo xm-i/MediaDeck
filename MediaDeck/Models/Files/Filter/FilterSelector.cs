@@ -9,7 +9,7 @@ namespace MediaDeck.Models.Files.Filter;
 /// <summary>
 /// フィルターマネージャー
 /// </summary>
-[AddSingleton]
+[Inject(InjectServiceLifetime.Singleton)]
 public class FilterSelector : ModelBase {
 	/// <summary>
 	/// コンストラクタ

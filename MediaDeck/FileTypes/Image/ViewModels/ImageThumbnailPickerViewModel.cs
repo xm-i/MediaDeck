@@ -4,7 +4,7 @@ using MediaDeck.Models.FileDetailManagers;
 
 namespace MediaDeck.FileTypes.Image.ViewModels;
 
-[AddTransient]
+[Inject(InjectServiceLifetime.Transient)]
 public class ImageThumbnailPickerViewModel(ThumbnailsManager thumbnailsManager, ImageFileOperator imageFileOperator) : BaseThumbnailPickerViewModel(thumbnailsManager) {
 	private readonly ImageFileOperator _imageFileOperator = imageFileOperator;
 

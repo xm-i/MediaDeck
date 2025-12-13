@@ -6,7 +6,7 @@ using R3.JsonConfig.Attributes;
 
 namespace MediaDeck.Composition.Stores.State.Model.Objects;
 
-[AddScoped]
+[Inject(InjectServiceLifetime.Scoped)]
 [GenerateR3JsonConfigDefaultDto]
 public class SortItemObject {
 

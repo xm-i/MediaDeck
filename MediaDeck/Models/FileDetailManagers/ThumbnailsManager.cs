@@ -7,7 +7,7 @@ using MediaDeck.Utils.Constants;
 
 namespace MediaDeck.Models.FileDetailManagers;
 
-[AddSingleton]
+[Inject(InjectServiceLifetime.Singleton)]
 public class ThumbnailsManager(MediaDeckDbContext dbContext) {
 	private readonly MediaDeckDbContext _db = dbContext;
 

@@ -9,7 +9,7 @@ using MediaDeck.Utils.Tools;
 
 namespace MediaDeck.Models.Files.Sort;
 
-[AddSingleton]
+[Inject(InjectServiceLifetime.Singleton)]
 public class SortSelector: ModelBase {
 	/// <summary>
 	/// コンストラクタ

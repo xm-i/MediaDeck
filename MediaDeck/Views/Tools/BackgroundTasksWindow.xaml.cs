@@ -5,7 +5,7 @@ using MediaDeck.ViewModels.Tools;
 using Windows.Graphics;
 
 namespace MediaDeck.Views.Tools;
-[AddTransient]
+[Inject(InjectServiceLifetime.Transient)]
 public sealed partial class BackgroundTasksWindow : Window {
 	public BackgroundTasksWindow(BackgroundTasksViewModel backgroundTasksViewModel) {
 		this.InitializeComponent();

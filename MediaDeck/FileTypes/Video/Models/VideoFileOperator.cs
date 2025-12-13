@@ -13,7 +13,7 @@ using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
 
 namespace MediaDeck.FileTypes.Video.Models;
-[AddTransient]
+[Inject(InjectServiceLifetime.Transient)]
 public partial class VideoFileOperator : BaseFileOperator {
 	private readonly ConfigModel _config;
 

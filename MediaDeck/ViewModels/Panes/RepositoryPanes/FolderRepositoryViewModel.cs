@@ -3,7 +3,7 @@ using MediaDeck.Models.Repositories.Objects;
 
 namespace MediaDeck.ViewModels.Panes.RepositoryPanes;
 
-[AddTransient]
+[Inject(InjectServiceLifetime.Transient)]
 public class FolderRepositoryViewModel : RepositoryViewModelBase {
 	public FolderRepositoryViewModel(FolderRepository folderRepository) : base(folderRepository) {
 		this.RootFolder = folderRepository.RootFolder.ObserveOnCurrentSynchronizationContext().ToBindableReactiveProperty(null!);

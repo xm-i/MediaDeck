@@ -7,7 +7,7 @@ using MediaDeck.ViewModels.Filters.FilterItemCreators;
 
 namespace MediaDeck.ViewModels.Filters;
 
-[AddTransient]
+[Inject(InjectServiceLifetime.Transient)]
 public class FilterManagerViewModel : ViewModelBase {
 	private readonly FilterManager _filterManager;
 

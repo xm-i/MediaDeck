@@ -4,4 +4,4 @@ global using System.Linq;
 global using ObservableCollections;
 global using R3;
 
-global using MediaDeck.Composition.Utils.Attributes;
+global using AutoDiAttributes;

@@ -8,7 +8,7 @@ namespace MediaDeck.Composition.Stores.State.Model;
 /// フォルダ管理状態
 /// </summary>
 
-[AddSingleton]
+[Inject(InjectServiceLifetime.Singleton)]
 [GenerateR3JsonConfigDefaultDto]
 public class FolderManagerStateModel {
 	/// <summary>

@@ -8,7 +8,7 @@ using MediaDeck.FileTypes.Archive.Views;
 using MediaDeck.Composition.Enum;
 
 namespace MediaDeck.FileTypes.Archive;
-[AddTransient(typeof(IFileType))]
+[Inject(InjectServiceLifetime.Transient, typeof(IFileType))]
 public class ArchiveFileType: BaseFileType<ArchiveFileOperator, ArchiveFileModel, ArchiveFileViewModel, ArchiveDetailViewerPreviewControlView, ArchiveThumbnailPickerViewModel, ArchiveThumbnailPickerView> {
 	private ArchiveDetailViewerPreviewControlView? _archiveDetailViewerPreviewControlView;
 	public override MediaType MediaType {

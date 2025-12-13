@@ -3,7 +3,7 @@ using MediaDeck.Models.FileDetailManagers;
 
 namespace MediaDeck.ViewModels.Panes.ViewerPanes;
 
-[AddTransient]
+[Inject(InjectServiceLifetime.Transient)]
 public class DetailViewerViewModel : ViewerPaneViewModelBase {
 	public DetailViewerViewModel(MediaContentLibraryViewModel mediaContentLibraryViewModel, FilesManager filesManager) : base ("Detail", filesManager){
 		this.MediaContentLibraryViewModel = mediaContentLibraryViewModel;

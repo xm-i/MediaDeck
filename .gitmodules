@@ -1,3 +1,6 @@
 [submodule "lib/R3.JsonConfig"]
 	path = lib/R3.JsonConfig
 	url = https://github.com/xm-i/R3.JsonConfig
+[submodule "lib/AutoDiAttributes"]
+	path = lib/AutoDiAttributes
+	url = https://github.com/xm-i/AutoDiAttributes

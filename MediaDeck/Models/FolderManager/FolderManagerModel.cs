@@ -8,7 +8,7 @@ using MediaDeck.Models.Files;
 
 namespace MediaDeck.Models.FolderManager;
 
-[AddTransient]
+[Inject(InjectServiceLifetime.Transient)]
 public class FolderManagerModel : ModelBase {
 	private readonly FileRegistrar _fileRegistrar;
 	private readonly FolderManagerStateModel _folderManagerStates;

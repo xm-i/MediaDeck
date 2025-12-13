@@ -3,7 +3,7 @@ using MediaDeck.FileTypes.Base.ViewModels.Interfaces;
 using MediaDeck.FileTypes.Base.Views.Interfaces;
 
 namespace MediaDeck.ViewModels.Thumbnails;
-[AddTransient]
+[Inject(InjectServiceLifetime.Transient)]
 public class ThumbnailPickerSelectorViewModel: ViewModelBase {
 
 	public ThumbnailPickerSelectorViewModel() {

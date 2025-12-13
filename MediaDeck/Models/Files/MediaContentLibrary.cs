@@ -12,7 +12,7 @@ using MediaDeck.Models.Repositories;
 
 namespace MediaDeck.Models.Files;
 
-[AddSingleton]
+[Inject(InjectServiceLifetime.Singleton)]
 public class MediaContentLibrary: ModelBase {
 	public MediaContentLibrary(FilesLoader filesLoader, SearchConditionNotificationDispatcher searchConditionNotificationDispatcher,TagsManager tagsManager, FolderRepository folderRepository, StateModel states) {
 		this._filesLoader = filesLoader;

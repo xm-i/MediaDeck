@@ -3,7 +3,7 @@ using MediaDeck.Models.Files.Sort;
 
 namespace MediaDeck.ViewModels.Sort;
 
-[AddTransient]
+[Inject(InjectServiceLifetime.Transient)]
 public class SortManagerViewModel : ViewModelBase {
 	public SortManagerViewModel(SortManager sortManager) {
 		this._sortManager = sortManager;

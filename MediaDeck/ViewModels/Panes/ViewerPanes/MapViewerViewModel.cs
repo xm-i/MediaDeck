@@ -8,7 +8,7 @@ using MediaDeck.Models.Maps;
 
 namespace MediaDeck.ViewModels.Panes.ViewerPanes;
 
-[AddTransient]
+[Inject(InjectServiceLifetime.Transient)]
 public class MapViewerViewModel : ViewerPaneViewModelBase {
 	private readonly MapModel _mapModel;
 	public MapViewerViewModel(FilesManager filesManager,MapModel mapModel) : base ("Map", filesManager){

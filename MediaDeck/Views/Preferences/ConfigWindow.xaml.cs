@@ -8,7 +8,7 @@ using MediaDeck.ViewModels.Preferences.Config;
 
 namespace MediaDeck.Views.Preferences;
 
-[AddTransient]
+[Inject(InjectServiceLifetime.Transient)]
 public sealed partial class ConfigWindow : Window {
 	public ConfigWindowViewModel ViewModel {
 		get;

@@ -11,7 +11,7 @@ using MediaDeck.Utils.Constants;
 
 namespace MediaDeck.Models.Files.Loaders;
 
-[AddTransient]
+[Inject(InjectServiceLifetime.Transient)]
 public class FilesLoader(MediaDeckDbContext dbContext, SortSelector sortSelector,FilterSelector filterSetter) {
 	protected FilterSelector FilterSetter = filterSetter;
 	protected SortSelector SortSelector = sortSelector;

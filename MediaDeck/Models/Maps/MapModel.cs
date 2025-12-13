@@ -7,7 +7,7 @@ using MediaDeck.Models.Files;
 
 namespace MediaDeck.Models.Maps;
 
-[AddTransient]
+[Inject(InjectServiceLifetime.Transient)]
 public class MapModel {
 	private Map? _map;
 	public MapModel(MediaContentLibrary mediaContentLibrary) {

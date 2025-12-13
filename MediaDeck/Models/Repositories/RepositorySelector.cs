@@ -1,5 +1,5 @@
 namespace MediaDeck.Models.Repositories;
-[AddSingleton]
+[Inject(InjectServiceLifetime.Singleton)]
 public class RepositorySelector {
 
 	public RepositorySelector(FolderRepository folderRepository) {

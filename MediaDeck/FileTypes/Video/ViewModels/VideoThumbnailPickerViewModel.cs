@@ -7,7 +7,7 @@ using MediaDeck.Models.FileDetailManagers;
 
 namespace MediaDeck.FileTypes.Video.ViewModels;
 
-[AddTransient]
+[Inject(InjectServiceLifetime.Transient)]
 public class VideoThumbnailPickerViewModel : BaseThumbnailPickerViewModel {
 	public VideoThumbnailPickerViewModel(
 		ThumbnailsManager thumbnailsManager,

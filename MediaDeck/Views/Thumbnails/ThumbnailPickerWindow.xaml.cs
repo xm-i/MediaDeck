@@ -5,7 +5,7 @@ using MediaDeck.ViewModels.Thumbnails;
 using Windows.Graphics;
 
 namespace MediaDeck.Views.Thumbnails;
-[AddTransient]
+[Inject(InjectServiceLifetime.Transient)]
 public sealed partial class ThumbnailPickerWindow : Window {
 	public ThumbnailPickerWindow(ThumbnailPickerSelectorViewModel thumbnailPickerSelectorViewModel) {
 		this.InitializeComponent();

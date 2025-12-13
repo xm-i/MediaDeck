@@ -8,7 +8,7 @@ using MediaDeck.FileTypes.Base.ViewModels.Interfaces;
 
 namespace MediaDeck.FileTypes.Archive.ViewModels;
 
-[AddTransient]
+[Inject(InjectServiceLifetime.Transient)]
 public class ArchiveThumbnailPickerViewModel : BaseThumbnailPickerViewModel {
 	private readonly ArchiveFileOperator _archiveFileOperator;
 

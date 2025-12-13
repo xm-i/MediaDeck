@@ -4,7 +4,7 @@ using MediaDeck.Models.FileDetailManagers;
 
 namespace MediaDeck.FileTypes.Pdf.ViewModels;
 
-[AddTransient]
+[Inject(InjectServiceLifetime.Transient)]
 public class PdfThumbnailPickerViewModel(ThumbnailsManager thumbnailsManager, PdfFileOperator pdfFileOperator) : BaseThumbnailPickerViewModel(thumbnailsManager) {
 	private readonly PdfFileOperator _pdfFileOperator = pdfFileOperator;
 

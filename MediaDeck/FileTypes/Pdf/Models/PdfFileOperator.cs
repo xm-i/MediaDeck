@@ -9,7 +9,7 @@ using MediaDeck.Utils.Constants;
 using MediaDeck.Composition.Enum;
 
 namespace MediaDeck.FileTypes.Pdf.Models;
-[AddTransient]
+[Inject(InjectServiceLifetime.Transient)]
 public partial class PdfFileOperator : BaseFileOperator {
 
 	public override MediaType TargetMediaType {
