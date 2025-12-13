@@ -177,7 +177,7 @@ public abstract class BaseFileModel(long id, string filePath, IFileOperator file
 		} else {
 			var psi = new ProcessStartInfo {
 				FileName = epo.Path.Value,
-				Arguments = string.Format(epo.Args.Value, this.FilePath),
+				Arguments = string.Format(epo.Args.Value, $"\"{this.FilePath}\""),
 				UseShellExecute = true
 			};
 			_ = Process.Start(psi);
