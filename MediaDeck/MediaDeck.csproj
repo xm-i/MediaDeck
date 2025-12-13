@@ -23,7 +23,7 @@
   <PropertyGroup Condition="'$(Packaged)' != 'true'">
     <WindowsPackageType>None</WindowsPackageType>
   </PropertyGroup>
-
+  
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" />
     <PackageReference Include="CommunityToolkit.WinUI.Behaviors" />
@@ -43,9 +43,9 @@
     <PackageReference Include="Pdfium.Net.SDK" />
     <PackageReference Include="R3" />
     <PackageReference Include="R3Extensions.WinUI3" />
-    <PackageReference Include="ReactiveProperty" />
     <PackageReference Include="System.Interactive" />
     <PackageReference Include="XAML.MapControl.WinUI" />
+    <PackageReference Include="System.Reactive" />
     <Manifest Include="$(ApplicationManifest)" />
   </ItemGroup>
 

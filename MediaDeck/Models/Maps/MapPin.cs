@@ -1,9 +1,5 @@
-using System.Reactive.Linq;
-
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Composition.Objects;
-
-using Reactive.Bindings;
 
 namespace MediaDeck.Models.Maps;
 /// <summary>
@@ -16,9 +12,9 @@ public class MapPin {
 	/// <summary>
 	/// 代表メディア
 	/// </summary>
-	public IReactiveProperty<IFileModel> Core {
+	public ReactiveProperty<IFileModel> Core {
 		get;
-	} = new ReactivePropertySlim<IFileModel>();
+	} = new();
 
 	/// <summary>
 	/// 表示領域

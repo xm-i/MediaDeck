@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Reactive.Linq;
 
 using MediaDeck.Composition.Bases;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;

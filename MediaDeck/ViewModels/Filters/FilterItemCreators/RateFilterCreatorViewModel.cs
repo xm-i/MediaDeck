@@ -1,13 +1,10 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Reactive.Linq;
 
 using MediaDeck.Composition.Bases;
 using MediaDeck.Composition.Enum;
 using MediaDeck.Models.Files.Filter.FilterItemObjects;
 using MediaDeck.Utils.Objects;
-
-using Reactive.Bindings.Extensions;
 
 namespace MediaDeck.ViewModels.Filters.FilterItemCreators;
 /// <summary>
@@ -63,7 +60,7 @@ public class RateFilterCreatorViewModel : ViewModelBase, IFilterCreatorViewModel
 		this.SearchType.Value = this.SearchTypeList.First(x => x.Value == SearchTypeComparison.GreaterThanOrEqual);
 		this.AddFilterCommand =
 			this.RateText.Select(string.IsNullOrEmpty)
-				.CombineLatest(this.RateText.ErrorsChangedAsObservable().Select(_ => this.RateText.HasErrors).ToObservable(), (x, x2) => !x && !x2)
+				.CombineLatest(this.RateText.ErrorsChangedAsObservable().Select(_ => this.RateText.HasErrors), (x, x2) => !x && !x2)
 				.ToReactiveCommand();
 
 		this.AddFilterCommand

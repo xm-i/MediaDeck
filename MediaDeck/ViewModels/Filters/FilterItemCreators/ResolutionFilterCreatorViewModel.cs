@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Reactive.Linq;
 
 using MediaDeck.Composition.Bases;
 using MediaDeck.Composition.Enum;
@@ -8,8 +7,6 @@ using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Objects;
 using MediaDeck.Models.Files.Filter.FilterItemObjects;
 using MediaDeck.Utils.Objects;
-
-using Reactive.Bindings.Extensions;
 
 namespace MediaDeck.ViewModels.Filters.FilterItemCreators;
 /// <summary>
@@ -76,8 +73,8 @@ public class ResolutionFilterCreatorViewModel : ViewModelBase, IFilterCreatorVie
 		this.AddFilterCommand =
 			this.ResolutionWidthText.Select(string.IsNullOrEmpty).CombineLatest(
 				this.ResolutionHeightText.Select(string.IsNullOrEmpty),
-				this.ResolutionWidthText.ErrorsChangedAsObservable().Select(_ => this.ResolutionWidthText.HasErrors).ToObservable(),
-				this.ResolutionHeightText.ErrorsChangedAsObservable().Select(_ => this.ResolutionHeightText.HasErrors).ToObservable(),
+				this.ResolutionWidthText.ErrorsChangedAsObservable().Select(x => this.ResolutionWidthText.HasErrors),
+				this.ResolutionHeightText.ErrorsChangedAsObservable().Select(_ => this.ResolutionHeightText.HasErrors),
 				(x, x2, x3, x4) => !x && !x2 && !x3 && !x4
 				).ToReactiveCommand();
 

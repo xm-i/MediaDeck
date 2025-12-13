@@ -38,7 +38,7 @@ public class TagViewModel : ViewModelBase {
 		this.TagName
 			.ToUnit()
 			.Merge(this.Detail.ToUnit())
-			.Merge(Reactive.Bindings.Extensions.INotifyCollectionChangedExtensions.CollectionChangedAsObservable(this.TagAliases).ToObservable().ToUnit())
+			.Merge(this.TagAliases.ToObservable().ToUnit())
 			.Merge(this.TagCategory.ToUnit())
 			.Subscribe(_ => {
 			this._editedFlag = true;

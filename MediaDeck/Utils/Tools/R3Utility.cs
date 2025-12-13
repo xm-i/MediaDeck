@@ -1,4 +1,10 @@
+using System.ComponentModel;
+
+using Microsoft.Web.WebView2.Core;
+
 using R3;
+
+using Windows.Foundation;
 
 namespace MediaDeck.Utils.Tools;
 
@@ -23,5 +29,12 @@ public static class R3Utility
 			source.Value = convertBack(x);
 		});
 		return resultRp;
+	}
+
+	public static Observable<DataErrorsChangedEventArgs> ErrorsChangedAsObservable<T>(this BindableReactiveProperty<T> rp) {
+		return Observable.FromEvent<EventHandler<DataErrorsChangedEventArgs>, DataErrorsChangedEventArgs>(
+			h => (sender, e) => h(e),
+			h => rp.ErrorsChanged += h,
+			h => rp.ErrorsChanged -= h);
 	}
 }

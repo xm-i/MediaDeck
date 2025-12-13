@@ -36,8 +36,6 @@ public partial class App : Application {
 		this._stateStore = Ioc.Default.GetRequiredService<StateStore>();
 		Directory.CreateDirectory(this._configStore.Config.PathConfig.TemporaryFolderPath.Value);
 
-		Reactive.Bindings.UIDispatcherScheduler.Initialize();
-
 		GlobalFFOptions.Configure(options => {
 			options.BinaryFolder = Path.Combine(this._configStore.Config.PathConfig.FFMpegFolderPath.Value);
 		});

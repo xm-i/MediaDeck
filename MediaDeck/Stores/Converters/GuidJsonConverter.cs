@@ -1,7 +1,5 @@
-using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Xaml;
 
 namespace MediaDeck.Stores.Converters; 
 public class GuidJsonConverter: JsonConverter<Guid> {
@@ -15,8 +13,6 @@ public class GuidJsonConverter: JsonConverter<Guid> {
 	}
 
 	public override void Write(Utf8JsonWriter writer, Guid value, JsonSerializerOptions options) {
-		using var ms = new MemoryStream();
-		XamlServices.Save(ms, value);
 		writer.WriteStringValue(value.ToString());
 	}
 }

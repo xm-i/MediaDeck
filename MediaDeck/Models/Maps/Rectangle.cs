@@ -1,4 +1,5 @@
-using MapControl;
+using System.Drawing;
+
 namespace MediaDeck.Models.Maps;
 /// <summary>
 /// 矩形クラス
@@ -7,14 +8,14 @@ public readonly struct Rectangle {
 	/// <summary>
 	/// 左上座標
 	/// </summary>
-	public Point LeftTop {
+	public MapControl.Point LeftTop {
 		get;
 	}
 
 	/// <summary>
 	/// サイズ
 	/// </summary>
-	public System.Windows.Size Size {
+	public Size Size {
 		get;
 	}
 
@@ -23,7 +24,7 @@ public readonly struct Rectangle {
 	/// </summary>
 	/// <param name="leftTop"></param>
 	/// <param name="size"></param>
-	public Rectangle(Point leftTop, System.Windows.Size size) {
+	public Rectangle(MapControl.Point leftTop, Size size) {
 		this.LeftTop = leftTop;
 		this.Size = size;
 	}
@@ -50,7 +51,7 @@ public readonly struct Rectangle {
 	/// </remarks>
 	/// <param name="point">座標</param>
 	/// <returns>true: 含まれている false:含まれていない</returns>
-	public bool IncludedIn(Point point) {
+	public bool IncludedIn(MapControl.Point point) {
 		return
 			this.LeftTop.X <= point.X &&
 			point.X <= this.LeftTop.X + this.Size.Width &&

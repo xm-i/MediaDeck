@@ -14,7 +14,7 @@ public class MapModel {
 		this.MediaContentLibrary = mediaContentLibrary;
 	}
 
-	public ReactiveProperty<double> MapPinSize {
+	public ReactiveProperty<int> MapPinSize {
 		get;
 	} = new(100);
 
@@ -75,7 +75,7 @@ public class MapModel {
 			var rect =
 				new Rectangle(
 					viewPoint,
-					new System.Windows.Size(this.MapPinSize.Value, this.MapPinSize.Value)
+					new System.Drawing.Size(this.MapPinSize.Value, this.MapPinSize.Value)
 				);
 
 			// 生成した矩形が既に存在するピンとかぶる位置にあるかを確かめて、被るようであれば
