@@ -75,6 +75,16 @@
     <Folder Include="Models\Preferences\CustomStates\" />
   </ItemGroup>
 
+  <!-- .NET 10 で System.Text.Json のリフレクションベースのシリアライゼーションがデフォルトで無効になったことにFFMpegCoreが対応するまでの暫定対応 -->
+  <ItemGroup>
+    <RuntimeHostConfigurationOption Include="System.Text.Json.JsonSerializer.IsReflectionEnabledByDefault" Value="true" />
+    <RuntimeHostConfigurationOption Include="System.Text.Json.Serialization.EnableSourceGenReflectionFallback" Value="true" />
+  </ItemGroup>
+  <PropertyGroup>
+    <JsonSerializerIsReflectionEnabledByDefault>true</JsonSerializerIsReflectionEnabledByDefault>
+  </PropertyGroup>
+  <!-- .NET 10 で System.Text.Json のリフレクションベースのシリアライゼーションがデフォルトで無効になったことにFFMpegCoreが対応するまでの暫定対応 ここまで -->
+  
   <PropertyGroup Condition="'$(DisableHasPackageAndPublishMenuAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
     <HasPackageAndPublishMenu>true</HasPackageAndPublishMenu>
   </PropertyGroup>
