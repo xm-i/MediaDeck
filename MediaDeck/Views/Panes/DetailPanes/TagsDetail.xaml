@@ -12,8 +12,12 @@
 	xmlns:files="using:MediaDeck.Models.Files"
 	mc:Ignorable="d">
 
-	<StackPanel x:Name="ControlRoot">
-		<Grid>
+	<Grid x:Name="ControlRoot">
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition Height="*"/>
+		</Grid.RowDefinitions>
+		<Grid Grid.Row="0">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="*"/>
 				<ColumnDefinition Width="Auto"/>
@@ -48,23 +52,28 @@
 				Command="{x:Bind ViewModel.AddTagCommand}"/>
 		</Grid>
 		<ListBox
+			Grid.Row="1"
 			x:Name="TagListBox"
-			ItemsSource="{x:Bind ViewModel.Tags, Mode=OneWay}">
+			ItemsSource="{x:Bind ViewModel.Tags, Mode=OneWay}"
+			ScrollViewer.VerticalScrollMode="Auto">
 			<ListBox.ItemTemplate>
 				<DataTemplate>
 					<Grid DoubleTapped="TagGrid_DoubleTapped">
 						<Grid.ColumnDefinitions>
 							<ColumnDefinition Width="Auto"/>
 							<ColumnDefinition Width="Auto"/>
+							<ColumnDefinition Width="Auto"/>
 						</Grid.ColumnDefinitions>
-						<TextBlock Grid.Column="0">
+						<TextBlock IsTextSelectionEnabled="True" Grid.Column="0">
 							<Run Text="{Binding Value.TagName}"/>
+						</TextBlock>
+						<TextBlock Grid.Column="1">
 							<Run Text=" ("/>
 							<Run Text="{Binding Count}"/>
 							<Run Text=")"/>
 						</TextBlock>
 						<Button
-							Grid.Column="1"
+							Grid.Column="2"
 							Command="{Binding DataContext.RemoveTagCommand, ElementName=ControlRoot}"
 							CommandParameter="{Binding }">
 							<FontIcon Glyph="&#xE74D;" />
@@ -78,5 +87,5 @@
 				</ItemsPanelTemplate>
 			</ListBox.ItemsPanel>
 		</ListBox>
-	</StackPanel>
+	</Grid>
 </local:DetailPaneBase>
