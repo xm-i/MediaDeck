@@ -24,5 +24,10 @@ public enum MediaType {
 	/// Archive
 	/// </summary>
 	[Description("Archive")]
-	Archive
+	Archive,
+	/// <summary>
+	/// Unknown
+	/// </summary>
+	[Description("Unknown")]
+	Unknown
 }

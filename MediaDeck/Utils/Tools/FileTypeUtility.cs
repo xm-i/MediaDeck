@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.DependencyInjection;
 
 using Microsoft.Extensions.DependencyInjection;
 
+using MediaDeck.Composition.Enum;
 using MediaDeck.Database.Tables;
 using MediaDeck.FileTypes.Base;
 using MediaDeck.FileTypes.Base.Models.Interfaces;
@@ -13,8 +14,10 @@ namespace MediaDeck.Utils.Tools;
 public static class FileTypeUtility {
 	static FileTypeUtility() {
 		_fileTypes = Ioc.Default.GetServices<IFileType>().ToArray();
+		_unknownFileType = _fileTypes.First(x => x.MediaType == MediaType.Unknown);
 	}
 	private static readonly IFileType[] _fileTypes;
+	private static readonly IFileType _unknownFileType;
 	public static IFileModel CreateFileModelFromRecord(MediaFile mediaFile) {
 		return GetFileType(mediaFile).CreateFileModelFromRecord(mediaFile);
 	}
@@ -40,13 +43,13 @@ public static class FileTypeUtility {
 	}
 
 	private static IFileType GetFileType(MediaFile mediaFile) {
-		return _fileTypes.First(x => x.MediaType == mediaFile.FilePath.GetMediaType());
+		return _fileTypes.FirstOrDefault(x => x.MediaType == mediaFile.FilePath.GetMediaType()) ?? _unknownFileType;
 	}
 	private static IFileType GetFileType(IFileModel fileModel) {
-		return _fileTypes.First(x => x.MediaType == fileModel.MediaType);
+		return _fileTypes.FirstOrDefault(x => x.MediaType == fileModel.MediaType) ?? _unknownFileType;
 	}
 	private static IFileType GetFileType(IFileViewModel fileViewModel) {
-		return _fileTypes.First(x => x.MediaType == fileViewModel.MediaType);
+		return _fileTypes.FirstOrDefault(x => x.MediaType == fileViewModel.MediaType) ?? _unknownFileType;
 	}
 
 	public static IQueryable<MediaFile> IncludeTables(this IQueryable<MediaFile> mediaFiles) {
