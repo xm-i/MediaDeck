@@ -7,7 +7,7 @@ using R3.JsonConfig.Attributes;
 namespace MediaDeck.Composition.Stores.Config.Model;
 
 [Inject(InjectServiceLifetime.Singleton)]
-[GenerateR3JsonConfigDefaultDto]
+[GenerateR3JsonConfigDto]
 public class PathConfigModel {
 	/// <summary>
 	/// サムネイルフォルダパス

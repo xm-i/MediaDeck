@@ -9,7 +9,7 @@ namespace MediaDeck.Composition.Stores.State.Model.Objects;
 /// ソート設定復元用オブジェクト
 /// </summary>
 [Inject(InjectServiceLifetime.Scoped)]
-[GenerateR3JsonConfigDefaultDto]
+[GenerateR3JsonConfigDto]
 public class SortObject(IServiceProvider serviceProvider) {
 	/// <summary>
 	/// ID

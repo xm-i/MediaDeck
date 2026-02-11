@@ -6,7 +6,7 @@ namespace MediaDeck.Composition.Stores.State.Model;
 /// </summary>
 
 [Inject(InjectServiceLifetime.Singleton)]
-[GenerateR3JsonConfigDefaultDto]
+[GenerateR3JsonConfigDto]
 public class StateModel(SearchStateModel searchState, FolderManagerStateModel folderManagerState) {
 
 	public SearchStateModel SearchState {

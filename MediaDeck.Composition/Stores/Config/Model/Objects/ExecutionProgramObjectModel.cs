@@ -5,7 +5,7 @@ using R3.JsonConfig.Attributes;
 namespace MediaDeck.Composition.Stores.Config.Model.Objects;
 
 [Inject(InjectServiceLifetime.Scoped)]
-[GenerateR3JsonConfigDefaultDto]
+[GenerateR3JsonConfigDto]
 public class ExecutionProgramObjectModel {
 	public IServiceProvider ScopedServiceProvider {
 		get;
