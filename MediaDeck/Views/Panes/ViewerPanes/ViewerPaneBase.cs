@@ -4,13 +4,15 @@ using CommunityToolkit.WinUI.Controls;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Controls.Primitives;
 
 using MediaDeck.Composition.Bases;
 using MediaDeck.Models.Files.SearchConditions;
 using MediaDeck.ViewModels.Panes.ViewerPanes;
 using MediaDeck.Views.Thumbnails;
 using MediaDeck.FileTypes.Base.ViewModels.Interfaces;
+
+using System.Diagnostics;
+using System.IO;
 
 namespace MediaDeck.Views.Panes.ViewerPanes;
 
@@ -82,6 +84,15 @@ public class ViewerPaneBase : UserControlBase<ViewerSelectorViewModel> {
 					_ => "File removed from MediaDeck database"
 					);
 
+				break;
+			case "OpenFolder":
+				if (!string.IsNullOrEmpty(fvm.FilePath) && File.Exists(fvm.FilePath)) {
+					Process.Start(new ProcessStartInfo {
+						FileName = "explorer.exe",
+						Arguments = $"/select, \"{fvm.FilePath}\"",
+						UseShellExecute = true
+					});
+				}
 				break;
 		}
 	}

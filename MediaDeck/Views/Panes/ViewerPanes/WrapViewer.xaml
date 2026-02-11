@@ -53,6 +53,7 @@
 				<MenuFlyout x:Key="FileContextMenu">
 					<MenuFlyoutItem Text="Recreate Thumbnail" Click="MenuFlyoutItem_Click" Tag="RecreateThumbnail" />
 					<MenuFlyoutItem Text="Remove File" Click="MenuFlyoutItem_Click" Tag="RemoveFile" />
+					<MenuFlyoutItem Text="Open Folder" Click="MenuFlyoutItem_Click" Tag="OpenFolder" />
 				</MenuFlyout>
 			</GridView.Resources>
 			<GridView.ItemTemplate>
