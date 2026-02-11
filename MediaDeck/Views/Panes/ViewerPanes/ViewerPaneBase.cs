@@ -4,6 +4,7 @@ using CommunityToolkit.WinUI.Controls;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Controls.Primitives;
 
 using MediaDeck.Composition.Bases;
 using MediaDeck.Models.Files.SearchConditions;
@@ -33,6 +34,27 @@ public class ViewerPaneBase : UserControlBase<ViewerSelectorViewModel> {
 			return;
 		}
 		await fileViewModel.ExecuteFileAsync();
+	}
+
+	protected void List_RightTapped(object sender, RightTappedRoutedEventArgs e) {
+		if (sender is not FrameworkElement parentControl) {
+			return;
+		}
+
+		var element = e.OriginalSource as FrameworkElement;
+		while (element != null && element.DataContext is not IFileViewModel) {
+			element = element.Parent as FrameworkElement;
+		}
+
+		if (element?.DataContext is not IFileViewModel fileViewModel) {
+			return;
+		}
+
+		if (parentControl.Resources["FileContextMenu"] is not MenuFlyout menuFlyout) {
+			return;
+		}
+
+		menuFlyout.ShowAt(element, e.GetPosition(element));
 	}
 
 

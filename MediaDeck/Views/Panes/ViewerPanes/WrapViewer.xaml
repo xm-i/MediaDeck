@@ -46,19 +46,20 @@
 			SelectedItem="{x:Bind ViewModel.MediaContentLibraryViewModel.SelectedFile.Value, Mode=TwoWay}"
 			SelectionMode="Extended"
 			SelectionChanged="List_SelectionChanged"
+			RightTapped="List_RightTapped"
 			ScrollViewer.VerticalScrollMode="Auto"
 			ScrollViewer.VerticalScrollBarVisibility="Auto">
+			<GridView.Resources>
+				<MenuFlyout x:Key="FileContextMenu">
+					<MenuFlyoutItem Text="Recreate Thumbnail" Click="MenuFlyoutItem_Click" Tag="RecreateThumbnail" />
+					<MenuFlyoutItem Text="Remove File" Click="MenuFlyoutItem_Click" Tag="RemoveFile" />
+				</MenuFlyout>
+			</GridView.Resources>
 			<GridView.ItemTemplate>
 				<DataTemplate x:DataType="vmIf:IFileViewModel">
 					<Grid DoubleTapped="File_DoubleTapped">
 						<Image Stretch="Uniform" Height="{Binding DataContext.ItemSize.Value, Mode=OneWay, ElementName=List}" Source="{x:Bind ThumbnailFilePath.Value, Mode=OneWay}"/>
 						<Grid Opacity="0.7" Background="DarkGray" Visibility="{x:Bind Exists, Converter={StaticResource InvertBoolToVisibilityConverter}}"/>
-						<Grid.ContextFlyout>
-							<MenuFlyout>
-								<MenuFlyoutItem Text="Recreate Thumbnail" Click="MenuFlyoutItem_Click" Tag="RecreateThumbnail" />
-								<MenuFlyoutItem Text="Remove File" Click="MenuFlyoutItem_Click" Tag="RemoveFile" />
-							</MenuFlyout>
-						</Grid.ContextFlyout>
 					</Grid>
 				</DataTemplate>
 			</GridView.ItemTemplate>
