@@ -21,6 +21,7 @@ public class FilesLoader(MediaDeckDbContext dbContext, SortSelector sortSelector
 		var files =
 			(await dbContext
 				.MediaFiles
+				.AsNoTracking()
 				.Where(searchConditions)
 				.Include(mf => mf.MediaFileTags)
 				.ThenInclude(mft => mft.Tag)
