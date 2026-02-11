@@ -6,6 +6,7 @@
 	xmlns:converters="using:MediaDeck.Views.Resources.Converters"
 	xmlns:system="using:System" xmlns:specialized="using:System.Collections.Specialized">
 	<ctConverters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+	<converters:LongToDoubleConverter x:Key="LongToDoubleConverter" />
 	<converters:ToVisibilityConverter
         x:Key="NullToCollapseConverter"
         Collapse="{x:Null}"

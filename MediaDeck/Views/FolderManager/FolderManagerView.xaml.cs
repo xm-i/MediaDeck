@@ -49,9 +49,9 @@ public sealed partial class FolderManagerView : FolderManagerViewUserControl {
 
 				var dialog = new ContentDialog {
 					XamlRoot = this.Content.XamlRoot,
-					Title = "Are you sure you want to delete this folder? This action cannot be undone.",
-					PrimaryButtonText = "Remove",
-					CloseButtonText = "Cancel",
+					Title = "このフォルダを削除しますか？この操作は元に戻せません。",
+					PrimaryButtonText = "削除",
+					CloseButtonText = "キャンセル",
 					DefaultButton = ContentDialogButton.Primary
 				};
 

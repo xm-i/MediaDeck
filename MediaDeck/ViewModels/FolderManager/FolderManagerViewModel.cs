@@ -1,5 +1,4 @@
 using MediaDeck.Composition.Bases;
-using MediaDeck.Models.Files;
 using MediaDeck.Models.FolderManager;
 
 namespace MediaDeck.ViewModels.FolderManager;
@@ -12,6 +11,10 @@ public class FolderManagerViewModel: ViewModelBase {
 		get;
 	}
 
+	public BindableReactiveProperty<FolderViewModel?> SelectedFolder {
+		get;
+	} = new();
+
 	public ReactiveCommand<string> AddFolderCommand {
 		get;
 	} = new();
@@ -23,21 +26,20 @@ public class FolderManagerViewModel: ViewModelBase {
 		get;
 	} = new();
 
-	public BindableReactiveProperty<long> QueueCount {
+	public ReactiveCommand<FolderViewModel> ScanSelectedFolderCommand {
 		get;
-	}
+	} = new();
 
-	public BindableReactiveProperty<bool> IsScanning {
-		get;
-	}
-
-	public FolderManagerViewModel(FolderManagerModel folderManager, FileRegistrar fileRegistrar) {
+	public FolderManagerViewModel(FolderManagerModel folderManager) {
 		this._folderManager = folderManager;
 		this.Folders = this._folderManager.Folders.CreateView(x => new FolderViewModel(x)).ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
 		this.AddFolderCommand.Subscribe(x => this._folderManager.AddFolder(x)).AddTo(this.CompositeDisposable);
 		this.RemoveFolderCommand.Subscribe(x => this._folderManager.RemoveFolder(x.GetModel())).AddTo(this.CompositeDisposable);
 		this.ScanCommand.Subscribe(async x => await this._folderManager.Scan()).AddTo(this.CompositeDisposable);
-		this.QueueCount = fileRegistrar.QueueCount.ObserveOnCurrentSynchronizationContext().ToBindableReactiveProperty();
-		this.IsScanning = fileRegistrar.QueueCount.ObserveOnCurrentSynchronizationContext().Select(x => x > 0).ToBindableReactiveProperty();
+		this.ScanSelectedFolderCommand.Subscribe(async x => {
+			if (x is not null) {
+				await this._folderManager.ScanFolder(x.GetModel());
+			}
+		}).AddTo(this.CompositeDisposable);
 	}
 }

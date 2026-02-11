@@ -1,4 +1,3 @@
-using System.IO;
 using System.Threading.Tasks;
 
 using MediaDeck.Composition.Bases;
@@ -31,11 +30,12 @@ public class FolderManagerModel : ModelBase {
 	}
 
 	public async Task Scan() {
-		foreach (var folder in this.Folders) {
-			var files = Directory.EnumerateFiles(folder.FolderPath, "", SearchOption.AllDirectories);
-			await Task.Run(() => {
-				this._fileRegistrar.RegistrationQueue.EnqueueRange(files.Where(x => x.IsTargetFile()));
-			});
+		foreach (var folder in this.Folders.ToArray()) {
+			await this._fileRegistrar.ScanFolderAsync(folder);
 		}
+	}
+
+	public async Task ScanFolder(FolderModel folder) {
+		await this._fileRegistrar.ScanFolderAsync(folder);
 	}
 }
