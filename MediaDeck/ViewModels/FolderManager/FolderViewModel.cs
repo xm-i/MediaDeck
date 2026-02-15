@@ -33,9 +33,10 @@ public class FolderViewModel : ViewModelBase {
 		this._folderModel = folderModel;
 		this.IsScanning = folderModel.IsScanning.ToBindableReactiveProperty();
 		this.TotalCount = folderModel.TotalCount.ToBindableReactiveProperty();
-		this.RemainingCount = folderModel.RemainingCount.Debounce(TimeSpan.FromMilliseconds(500)).ToBindableReactiveProperty();
+		this.RemainingCount = folderModel.RemainingCount.Debounce(TimeSpan.FromMilliseconds(500)).ObserveOnCurrentSynchronizationContext().ToBindableReactiveProperty();
 		this.ProcessedCount = folderModel.TotalCount
 			.CombineLatest(folderModel.RemainingCount, (total, remaining) => total - remaining)
+			.ObserveOnCurrentSynchronizationContext()
 			.ToBindableReactiveProperty();
 	}
 

@@ -1,6 +1,6 @@
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 using MediaDeck.FileTypes.Base.Models.Interfaces;
@@ -32,10 +32,12 @@ public class FileRegistrar {
 		this.RegistrationQueue
 			.ObserveAdd()
 			.ThrottleFirst(TimeSpan.FromSeconds(0.1))
-			.Synchronize()
-			.Subscribe(async _ => {
-				await this.RegisterFilesAsync();
-			});
+			.ObserveOnThreadPool()
+			.SubscribeAwait(
+				async (x, ct) =>
+					await this.RegisterFilesAsync().ConfigureAwait(false),
+					AwaitOperation.Sequential,
+					false);
 	}
 
 	public async Task ScanFolderAsync(FolderModel folder) {
@@ -67,7 +69,7 @@ public class FileRegistrar {
 			try {
 				var type = filePath.GetMediaType();
 				var fileOperator = _fileOperators.First(x => x.TargetMediaType == type);
-				var mf = await fileOperator.RegisterFileAsync(filePath);
+				var mf = await fileOperator.RegisterFileAsync(filePath).ConfigureAwait(false);
 				if (mf is { } mf2) {
 					FileNotifications.FileRegistered.OnNext(mf2);
 				}
