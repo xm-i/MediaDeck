@@ -1,4 +1,5 @@
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
 using MediaDeck.Utils.Objects;
 using MediaDeck.Composition.Interfaces.Files;
@@ -27,4 +28,10 @@ public sealed partial class TagsDetail : DetailPaneBase {
 		}
 		this.ViewModel?.SearchTaggedFilesCommand.Execute(tag);
     }
+
+	private void TagGrid_RightTapped(object sender, RightTappedRoutedEventArgs e) {
+		if (sender is Grid grid) {
+			FlyoutBase.ShowAttachedFlyout(grid);
+		}
+	}
 }

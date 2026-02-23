@@ -58,9 +58,8 @@
 			ScrollViewer.VerticalScrollMode="Auto">
 			<ListBox.ItemTemplate>
 				<DataTemplate>
-					<Grid DoubleTapped="TagGrid_DoubleTapped">
+					<Grid DoubleTapped="TagGrid_DoubleTapped" RightTapped="TagGrid_RightTapped">
 						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="Auto"/>
 							<ColumnDefinition Width="Auto"/>
 							<ColumnDefinition Width="Auto"/>
 						</Grid.ColumnDefinitions>
@@ -72,12 +71,18 @@
 							<Run Text="{Binding Count}"/>
 							<Run Text=")"/>
 						</TextBlock>
-						<Button
-							Grid.Column="2"
-							Command="{Binding DataContext.RemoveTagCommand, ElementName=ControlRoot}"
-							CommandParameter="{Binding }">
-							<FontIcon Glyph="&#xE74D;" />
-						</Button>
+						<FlyoutBase.AttachedFlyout>
+							<MenuFlyout>
+								<MenuFlyoutItem
+									Text="Delete"
+									Command="{Binding DataContext.RemoveTagCommand, ElementName=ControlRoot}"
+									CommandParameter="{Binding }">
+									<MenuFlyoutItem.Icon>
+										<FontIcon Glyph="&#xE74D;" />
+									</MenuFlyoutItem.Icon>
+								</MenuFlyoutItem>
+							</MenuFlyout>
+						</FlyoutBase.AttachedFlyout>
 					</Grid>
 				</DataTemplate>
 			</ListBox.ItemTemplate>
