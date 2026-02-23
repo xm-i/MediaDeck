@@ -86,7 +86,10 @@ public class ViewerPaneBase : UserControlBase<ViewerSelectorViewModel> {
 					: $"Remove {targetFiles.Length} files from MediaDeck database?";
 				await DialogUtility.ConfirmDialogAndAction(
 					this.XamlRoot,
-					async () => await this.ViewModel.SelectedViewerPane.Value.RemoveFilesAsync(targetFiles),
+					async () => {
+						await this.ViewModel.SelectedViewerPane.Value.RemoveFilesAsync(targetFiles);
+						await this.ViewModel.MediaContentLibraryViewModel.ReloadAsync();
+					},
 					message,
 					_ => targetFiles.Length == 1
 						? "File removed from MediaDeck database"

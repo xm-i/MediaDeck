@@ -1,3 +1,5 @@
+using System.Threading.Tasks;
+
 using MediaDeck.Composition.Bases;
 using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.FileTypes.Base.ViewModels.Interfaces;
@@ -59,5 +61,9 @@ public class MediaContentLibraryViewModel : ViewModelBase {
 		this.SearchConditionCandidates.AttachFilter(x => {
 			return x.IsMatchForSuggest(word);
 		});
+	}
+
+	public async Task ReloadAsync() {
+		await this._mediaContentLibrary.SearchAsync();
 	}
 }
