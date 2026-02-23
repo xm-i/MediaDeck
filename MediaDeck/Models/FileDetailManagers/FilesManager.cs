@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
@@ -13,18 +15,20 @@ public class FilesManager {
 	}
 	private readonly MediaDeckDbContext _db;
 
-	public async Task RemoveFileAsync(IFileModel fileModel) {
+	public async Task RemoveFilesAsync(IEnumerable<IFileModel> fileModels) {
 		using var lockObject = await LockObjectConstants.DbLock.LockAsync();
 		using var transaction = await this._db.Database.BeginTransactionAsync();
-		var targetFile =
+		var ids = fileModels.Select(x => x.Id).ToArray();
+		var targetFiles =
 			await this._db
 				.MediaFiles
-				.FirstOrDefaultAsync(x => x.MediaFileId == fileModel.Id);
+				.Where(x => ids.Contains(x.MediaFileId))
+				.ToListAsync();
 
-		if(targetFile == null) {
+		if (targetFiles.Count == 0) {
 			return;
 		}
-		this._db.MediaFiles.Remove(targetFile);
+		this._db.MediaFiles.RemoveRange(targetFiles);
 		await this._db.SaveChangesAsync();
 		await transaction.CommitAsync();
 	}

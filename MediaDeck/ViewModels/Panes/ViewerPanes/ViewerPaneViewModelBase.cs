@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 using MediaDeck.Composition.Bases;
@@ -11,7 +13,7 @@ public abstract class ViewerPaneViewModelBase(string name, FilesManager filesMan
 		get;
 	} = name;
 
-	public async Task RemoveFileAsync(IFileViewModel fileViewModel) {
-		await filesManager.RemoveFileAsync(fileViewModel.FileModel);
+	public async Task RemoveFilesAsync(IEnumerable<IFileViewModel> fileViewModels) {
+		await filesManager.RemoveFilesAsync(fileViewModels.Select(x => x.FileModel));
 	}
 }

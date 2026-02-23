@@ -77,11 +77,20 @@ public class ViewerPaneBase : UserControlBase<ViewerSelectorViewModel> {
 				window?.Activate();
 				break;
 			case "RemoveFile":
+				var selectedFiles = this.ViewModel.MediaContentLibraryViewModel.SelectedFiles.Value;
+				var targetFiles = selectedFiles is { Length: > 0 } && selectedFiles.Contains(fvm)
+					? selectedFiles
+					: [fvm];
+				var message = targetFiles.Length == 1
+					? "Remove file from MediaDeck database?"
+					: $"Remove {targetFiles.Length} files from MediaDeck database?";
 				await DialogUtility.ConfirmDialogAndAction(
 					this.XamlRoot,
-					async () => await this.ViewModel.SelectedViewerPane.Value.RemoveFileAsync(fvm),
-					"Remove file from MediaDeck database?",
-					_ => "File removed from MediaDeck database"
+					async () => await this.ViewModel.SelectedViewerPane.Value.RemoveFilesAsync(targetFiles),
+					message,
+					_ => targetFiles.Length == 1
+						? "File removed from MediaDeck database"
+						: $"{targetFiles.Length} files removed from MediaDeck database"
 					);
 
 				break;
