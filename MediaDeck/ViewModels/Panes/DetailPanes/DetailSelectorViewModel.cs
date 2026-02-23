@@ -3,18 +3,21 @@ using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.FileTypes.Base.ViewModels.Interfaces;
 using MediaDeck.Models.FileDetailManagers;
 using MediaDeck.Models.FileDetailManagers.Objects;
-using MediaDeck.Models.Files;
 using MediaDeck.Models.Files.SearchConditions;
 using MediaDeck.Models.NotificationDispatcher;
 using MediaDeck.Utils.Objects;
+using MediaDeck.Database.Tables;
+using System.Threading.Tasks;
 
 namespace MediaDeck.ViewModels.Panes.DetailPanes;
 
 [Inject(InjectServiceLifetime.Transient)]
-public class DetailSelectorViewModel : ViewModelBase
-{
+public class DetailSelectorViewModel : ViewModelBase {
 	private bool _isTargetChanging = false;
+	private readonly TagsManager _tagsManager;
+	
 	public DetailSelectorViewModel(TagsManager tagsManager, SearchConditionNotificationDispatcher searchConditionNotificationDispatcher) {
+		this._tagsManager = tagsManager;
 		this.TagCandidates = tagsManager.Tags.CreateView(x => x);
 		this.LoadTagCandidatesCommand.Subscribe(async _ => await tagsManager.Load());
 		this.FilteredTagCandidates = this.TagCandidates.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
@@ -59,7 +62,19 @@ public class DetailSelectorViewModel : ViewModelBase
 			if (string.IsNullOrEmpty(this.Text.Value)) {
 				return;
 			}
-			await tagsManager.AddTagAsync(this.TargetFiles.Value.Select(x => x.FileModel).ToArray(), this.Text.Value);
+
+			var tag = await tagsManager.FindTagByNameAsync(this.Text.Value);
+			
+			if (tag is null) {
+				// 新規タグ作成リクエストを通知
+				this.NewTagRequested.OnNext(new NewTagRequestedContext(
+					this.Text.Value,
+					tagsManager.TagCategories
+				));
+				return;
+			}
+			
+			await tagsManager.AddTagAsync(this.TargetFiles.Value.Select(x => x.FileModel).ToArray(), tag);
 			this.Text.Value = "";
 			this.UpdateTags();
 		});
@@ -156,6 +171,18 @@ public class DetailSelectorViewModel : ViewModelBase
 		get;
 	} = new();
 
+	public Subject<NewTagRequestedContext> NewTagRequested {
+		get;
+	} = new();
+
+	public async Task OnNewTagCreated(Tag tag) {
+		await this._tagsManager.AddTagAsync([.. this.TargetFiles.Value.Select(x => x.FileModel)], tag);
+		this.Text.Value = "";
+		this.UpdateTags();
+	}
+
+	internal TagsManager GetTagsManager() => this._tagsManager;
+
 	private void UpdateTags() {
 		this._tags.Clear();
 		this._tags.AddRange(
@@ -191,3 +218,5 @@ public class DetailSelectorViewModel : ViewModelBase
 		});
 	}
 }
+
+public record NewTagRequestedContext(string TagName, ObservableList<TagCategory> TagCategories);

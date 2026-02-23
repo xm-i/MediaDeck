@@ -22,23 +22,53 @@ public class TagsManager(MediaDeckDbContext dbContext) {
 		get;
 	} = [];
 
-	public async Task AddTagAsync(IFileModel[] fileModels, string tagName, string detail = "") {
-		var target = fileModels.Where(x => !x.Tags.Any(t => t.TagName == tagName)).ToArray();
+	public async Task<Tag?> FindTagByNameAsync(string tagName) {
+		var tag = await this._db.Tags.FirstOrDefaultAsync(x => x.TagName == tagName);
+		return tag;
+	}
+
+	public async Task<Tag> CreateTagAsync(int tagCategoryId, string tagName, string detail, IEnumerable<TagAlias> aliases) {
 		using var lockObject = await LockObjectConstants.DbLock.LockAsync();
 		using var transaction = await this._db.Database.BeginTransactionAsync();
-		var tag = await this._db.Tags.FirstOrDefaultAsync(x => x.TagName == tagName);
-		if(tag == null) {
-			var targetCategory = this.TagCategories.MinBy(x => x.TagCategoryId)!;
-			tag = new Tag {
-				TagCategoryId = targetCategory.TagCategoryId,
-				TagName = tagName,
-				Detail = detail,
-				TagAliases = [],
-				TagCategory = targetCategory
-			};
-			await this._db.AddAsync(tag);
+		var tag = new Tag {
+			TagCategoryId = tagCategoryId,
+			TagName = tagName,
+			Detail = detail,
+			TagAliases = [],
+			TagCategory = null
+		};
+		await this._db.AddAsync(tag);
+		await this._db.SaveChangesAsync();
+
+		var aliasList = aliases.Select((x, i) => new TagAlias {
+			TagId = tag.TagId,
+			TagAliasId = i,
+			Alias = x.Alias,
+			Ruby = x.Ruby
+		}).ToArray();
+		
+		if (aliasList.Length > 0) {
+			await this._db.TagAliases.AddRangeAsync(aliasList);
 			await this._db.SaveChangesAsync();
 		}
+		
+		await transaction.CommitAsync();
+		return tag;
+	}
+
+	public async Task AddTagAsync(IFileModel[] fileModels, Tag tag) {
+		var target = fileModels.Where(x => !x.Tags.Any(t => t.TagId == tag.TagId)).ToArray();
+		if (target.IsEmpty()) {
+			return;
+		}
+		
+		using var lockObject = await LockObjectConstants.DbLock.LockAsync();
+		using var transaction = await this._db.Database.BeginTransactionAsync();
+		if (tag == null) {
+			await transaction.RollbackAsync();
+			return;
+		}
+		
 		await this._db.MediaFileTags.AddRangeAsync(target.Select(x => new MediaFileTag {
 			MediaFileId = x.Id,
 			TagId = tag.TagId
