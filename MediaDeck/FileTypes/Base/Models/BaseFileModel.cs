@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading.Tasks;
 
 using CommunityToolkit.Mvvm.DependencyInjection;
@@ -12,6 +11,7 @@ using MediaDeck.Composition.Objects;
 using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.FileTypes.Base.Models.Interfaces;
 using MediaDeck.Models.Files;
+using MediaDeck.Utils.Tools;
 
 namespace MediaDeck.FileTypes.Base.Models;
 
@@ -169,18 +169,10 @@ public abstract class BaseFileModel(long id, string filePath, IFileOperator file
 	public async Task ExecuteFileAsync() {
 		var epo = executionConfig.ExecutionPrograms.FirstOrDefault(x => x.MediaType.Value == this.MediaType);
 		if (epo is null) {
-			var psi = new ProcessStartInfo {
-				FileName = this.FilePath,
-				UseShellExecute = true
-			};
-			_ = Process.Start(psi);
+			ShellUtility.ShellExecute(this.FilePath);
 		} else {
-			var psi = new ProcessStartInfo {
-				FileName = epo.Path.Value,
-				Arguments = string.Format(epo.Args.Value, $"\"{this.FilePath}\""),
-				UseShellExecute = true
-			};
-			_ = Process.Start(psi);
+			var arguments = string.Format(epo.Args.Value, $"\"{this.FilePath}\"");
+			ShellUtility.ShellExecute(epo.Path.Value, arguments);
 		}
 
 		await this.IncrementUsageCountAsync();
