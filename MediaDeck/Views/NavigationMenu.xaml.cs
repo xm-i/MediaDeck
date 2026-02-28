@@ -4,6 +4,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
 using MediaDeck.Composition.Bases;
+using MediaDeck.Utils.Tools;
 using MediaDeck.ViewModels;
 using MediaDeck.Views.FolderManager;
 using MediaDeck.Views.Preferences;
@@ -35,7 +36,7 @@ public sealed partial class NavigationMenu : NavigationMenuUserControl {
 				window = Ioc.Default.GetRequiredService<BackgroundTasksWindow>();
 				break;
 		}
-		window?.Activate();
+		window?.ActivateCenteredOnMainWindow();
 	}
 }
 

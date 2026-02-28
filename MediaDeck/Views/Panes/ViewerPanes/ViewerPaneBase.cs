@@ -7,6 +7,7 @@ using Microsoft.UI.Xaml.Input;
 
 using MediaDeck.Composition.Bases;
 using MediaDeck.Models.Files.SearchConditions;
+using MediaDeck.Utils.Tools;
 using MediaDeck.ViewModels.Panes.ViewerPanes;
 using MediaDeck.Views.Thumbnails;
 using MediaDeck.FileTypes.Base.ViewModels.Interfaces;
@@ -74,7 +75,7 @@ public class ViewerPaneBase : UserControlBase<ViewerSelectorViewModel> {
 			case "RecreateThumbnail":
 				var window = Ioc.Default.GetRequiredService<ThumbnailPickerWindow>();
 				window.ViewModel.FileViewModel.Value = fvm;
-				window?.Activate();
+				window.ActivateCenteredOnMainWindow();
 				break;
 			case "RemoveFile":
 				var selectedFiles = this.ViewModel.MediaContentLibraryViewModel.SelectedFiles.Value;
