@@ -15,38 +15,39 @@
 			<RowDefinition Height="*"/>
 			<RowDefinition Height="auto"/>
 		</Grid.RowDefinitions>
-		<Grid Grid.Row="0">
+		<Grid Grid.Row="0" Padding="8,6" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}">
 			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="*"/>
 				<ColumnDefinition Width="Auto"/>
-				<ColumnDefinition Width="Auto"/>
-				<ColumnDefinition Width="Auto"/>
+				<ColumnDefinition Width="*"/>
 				<ColumnDefinition Width="Auto"/>
 			</Grid.ColumnDefinitions>
 			<controls:Segmented
-				Grid.Column="0"
+				Grid.Column="1"
 				SelectionMode="Single"
 				ItemsSource="{x:Bind ViewModel.ViewerPaneViewModels}"
 				SelectedItem="{x:Bind ViewModel.SelectedViewerPane.Value,Mode=TwoWay}"
 				DisplayMemberPath="Name">
 			</controls:Segmented>
-			<ComboBox
-				Grid.Column="1"
-				ItemsSource="{x:Bind ViewModel.SortSelectorViewModel.SortConditions,Mode=OneWay}"
-				SelectedItem="{x:Bind ViewModel.SortSelectorViewModel.CurrentCondition.Value,Mode=TwoWay}">
-				<ComboBox.ItemTemplate>
-					<DataTemplate x:DataType="viewerpanesVm:SortConditionViewModel">
-						<TextBlock Text="{x:Bind DisplayName.Value}"/>
-					</DataTemplate>
-				</ComboBox.ItemTemplate>
-			</ComboBox>
-			<ToggleButton
-				Grid.Column="2"
-				IsChecked="{x:Bind ViewModel.SortSelectorViewModel.Direction.Value, Mode=TwoWay, Converter={StaticResource ListSortDirectionToBooleanConverter}}">
-				<FontIcon Glyph="{x:Bind ViewModel.SortSelectorViewModel.Direction.Value, Mode=OneWay, Converter={StaticResource ListSortDirectionToIconGlyphConverter}}"/>
-			</ToggleButton>
-			<Button Grid.Column="3" Click="Button_Click">
-				<TextBlock Text="Sort Settings"/>
-			</Button>
+			<StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="6">
+				<ComboBox
+					MinWidth="140"
+					ItemsSource="{x:Bind ViewModel.SortSelectorViewModel.SortConditions,Mode=OneWay}"
+					SelectedItem="{x:Bind ViewModel.SortSelectorViewModel.CurrentCondition.Value,Mode=TwoWay}">
+					<ComboBox.ItemTemplate>
+						<DataTemplate x:DataType="viewerpanesVm:SortConditionViewModel">
+							<TextBlock Text="{x:Bind DisplayName.Value}"/>
+						</DataTemplate>
+					</ComboBox.ItemTemplate>
+				</ComboBox>
+				<ToggleButton
+					IsChecked="{x:Bind ViewModel.SortSelectorViewModel.Direction.Value, Mode=TwoWay, Converter={StaticResource ListSortDirectionToBooleanConverter}}">
+					<FontIcon Glyph="{x:Bind ViewModel.SortSelectorViewModel.Direction.Value, Mode=OneWay, Converter={StaticResource ListSortDirectionToIconGlyphConverter}}" FontSize="14"/>
+				</ToggleButton>
+				<Button Click="Button_Click">
+					<FontIcon Glyph="&#xE713;" FontSize="14"/>
+				</Button>
+			</StackPanel>
 		</Grid>
 		<controls:SwitchPresenter
 			Grid.Row="1"
