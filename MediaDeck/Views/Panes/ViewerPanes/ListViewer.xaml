@@ -16,7 +16,8 @@
 	mc:Ignorable="d">
 	<Grid>
 		<Grid.RowDefinitions>
-			<RowDefinition Height="auto"/>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition Height="Auto"/>
 			<RowDefinition Height="*"/>
 		</Grid.RowDefinitions>
 		<controls:TokenizingTextBox
@@ -38,15 +39,41 @@
 				</DataTemplate>
 			</controls:TokenizingTextBox.SuggestedItemTemplate>
 		</controls:TokenizingTextBox>
+		<!-- ヘッダー行 -->
+		<Grid Grid.Row="1" Background="{ThemeResource SubtleFillColorSecondaryBrush}" Padding="4,8">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="60"/>
+				<ColumnDefinition Width="*" MinWidth="200"/>
+				<ColumnDefinition Width="100"/>
+				<ColumnDefinition Width="100"/>
+				<ColumnDefinition Width="150"/>
+				<ColumnDefinition Width="60"/>
+			</Grid.ColumnDefinitions>
+			<TextBlock Grid.Column="0" Text="" FontWeight="SemiBold"/>
+			<TextBlock Grid.Column="1" Text="ファイル名" FontWeight="SemiBold"/>
+			<TextBlock Grid.Column="2" Text="解像度" FontWeight="SemiBold"/>
+			<TextBlock Grid.Column="3" Text="サイズ" FontWeight="SemiBold"/>
+			<TextBlock Grid.Column="4" Text="作成日時" FontWeight="SemiBold"/>
+			<TextBlock Grid.Column="5" Text="評価" FontWeight="SemiBold"/>
+		</Grid>
 		<ListBox
 			x:Name="List"
-			Grid.Row="1"
+			Grid.Row="2"
 			ItemsSource="{x:Bind ViewModel.MediaContentLibraryViewModel.Files, Mode=OneWay}"
 			SelectedItem="{x:Bind ViewModel.MediaContentLibraryViewModel.SelectedFile.Value, Mode=TwoWay}"
 			SelectionMode="Extended"
 			SelectionChanged="List_SelectionChanged"
 			ScrollViewer.VerticalScrollMode="Auto"
 			ScrollViewer.VerticalScrollBarVisibility="Auto">
+			<ListBox.ItemContainerStyle>
+				<Style TargetType="ListBoxItem">
+					<Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+					<Setter Property="VerticalContentAlignment" Value="Top"/>
+					<Setter Property="Padding" Value="0"/>
+					<Setter Property="Margin" Value="0"/>
+					<Setter Property="MinHeight" Value="0"/>
+				</Style>
+			</ListBox.ItemContainerStyle>
 			<ListBox.ItemsPanel>
 				<ItemsPanelTemplate>
 					<ItemsStackPanel/>
@@ -54,12 +81,25 @@
 			</ListBox.ItemsPanel>
 			<ListBox.ItemTemplate>
 				<DataTemplate x:DataType="vmIf:IFileViewModel">
-					<Grid DoubleTapped="File_DoubleTapped">
-						<StackPanel Orientation="Horizontal">
-							<Image Stretch="Uniform" Height="{Binding DataContext.ItemSize.Value, Mode=OneWay, ElementName=List}" Source="{x:Bind ThumbnailFilePath.Value, Mode=OneWay}"/>
-							<TextBlock Text="{x:Bind FilePath}"/>
-						</StackPanel>
-						<Grid Opacity="0.7" Background="DarkGray" Visibility="{x:Bind Exists, Converter={StaticResource InvertBoolToVisibilityConverter}}"/>
+					<Grid DoubleTapped="File_DoubleTapped" Height="Auto">
+						<Grid.RowDefinitions>
+							<RowDefinition Height="Auto"/>
+						</Grid.RowDefinitions>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="60"/>
+							<ColumnDefinition Width="*" MinWidth="200"/>
+							<ColumnDefinition Width="100"/>
+							<ColumnDefinition Width="100"/>
+							<ColumnDefinition Width="150"/>
+							<ColumnDefinition Width="60"/>
+						</Grid.ColumnDefinitions>
+						<Image Grid.Column="0" Stretch="Uniform" Height="40" Source="{x:Bind ThumbnailFilePath.Value, Mode=OneWay}"/>
+						<TextBlock Grid.Column="1" Text="{x:Bind FilePath}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+						<TextBlock Grid.Column="2" Text="{x:Bind FileModel.Resolution}" VerticalAlignment="Center"/>
+						<TextBlock Grid.Column="3" Text="{x:Bind FileModel.FileSize, Converter={StaticResource FileSizeConverter}}" VerticalAlignment="Center"/>
+						<TextBlock Grid.Column="4" Text="{x:Bind FileModel.CreationTime}" VerticalAlignment="Center"/>
+						<TextBlock Grid.Column="5" Text="{x:Bind FileModel.Rate}" VerticalAlignment="Center"/>
+						<Grid Grid.ColumnSpan="6" Opacity="0.7" Background="DarkGray" Visibility="{x:Bind Exists, Converter={StaticResource InvertBoolToVisibilityConverter}}"/>
 					</Grid>
 				</DataTemplate>
 			</ListBox.ItemTemplate>

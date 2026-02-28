@@ -20,4 +20,5 @@
 	<converters:PathToMediaPlaybackSourceConverter x:Key="PathToMediaPlaybackSourceConverter"/>
 	<converters:BinaryToImageSourceConverter x:Key="BinaryToImageSourceConverter"/>
 	<converters:TimeSpanToStringConverter x:Key="TimeSpanToStringConverter"/>
+	<converters:FileSizeConverter x:Key="FileSizeConverter"/>
 </ResourceDictionary>
