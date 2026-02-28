@@ -42,6 +42,7 @@ public abstract class BaseFileType<TFileOperator, TFileModel, TFileViewModel, TD
 		fileModel.UsageCount = mediaFile.UsageCount;
 		fileModel.Exists = mediaFile.IsExists;
 		fileModel.FileSize = mediaFile.FileSize;
+		fileModel.Resolution = new ComparableSize(mediaFile.Width, mediaFile.Height);
 		fileModel.CreationTime = mediaFile.CreationTime;
 		fileModel.ModifiedTime = mediaFile.ModifiedTime;
 		fileModel.LastAccessTime = mediaFile.LastAccessTime;
