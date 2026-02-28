@@ -7,12 +7,29 @@
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	mc:Ignorable="d">
-	<Grid Visibility="{x:Bind ViewModel.TargetFiles.Value,Mode=OneWay, Converter={StaticResource NullToCollapseConverter}}">
+
+	<Grid>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="Auto"/>
 			<RowDefinition Height="*"/>
 		</Grid.RowDefinitions>
-		<local:PropertiesDetail Grid.Row="0" DataContext="{x:Bind ViewModel}" Margin="0,0,0,15"/>		
-		<local:TagsDetail Grid.Row="1" DataContext="{x:Bind ViewModel}"/>
+
+		<!-- Header -->
+		<Grid Grid.Row="0" Padding="12,10" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="0,0,0,1">
+			<StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+				<FontIcon Glyph="&#xE946;" FontSize="16"/>
+				<TextBlock Text="Details" Style="{ThemeResource BodyStrongTextBlockStyle}" VerticalAlignment="Center"/>
+			</StackPanel>
+		</Grid>
+
+		<!-- Content -->
+		<Border Grid.Row="1" Background="{ThemeResource LayerFillColorDefaultBrush}">
+			<ScrollViewer Padding="12" Visibility="{x:Bind ViewModel.TargetFiles.Value, Mode=OneWay, Converter={StaticResource NullToCollapseConverter}}">
+				<StackPanel Spacing="16">
+					<local:PropertiesDetail DataContext="{x:Bind ViewModel}"/>
+					<local:TagsDetail DataContext="{x:Bind ViewModel}"/>
+				</StackPanel>
+			</ScrollViewer>
+		</Border>
 	</Grid>
 </local:DetailSelectorUserControl>
