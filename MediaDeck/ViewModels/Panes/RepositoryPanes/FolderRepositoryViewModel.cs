@@ -5,7 +5,7 @@ namespace MediaDeck.ViewModels.Panes.RepositoryPanes;
 
 [Inject(InjectServiceLifetime.Transient)]
 public class FolderRepositoryViewModel : RepositoryViewModelBase {
-	public FolderRepositoryViewModel(FolderRepository folderRepository) : base(folderRepository) {
+	public FolderRepositoryViewModel(FolderRepository folderRepository) : base("Folder", folderRepository) {
 		this.RootFolder = folderRepository.RootFolder.ObserveOnCurrentSynchronizationContext().ToBindableReactiveProperty(null!);
 		this.SetRepositoryConditionCommand.Merge(this.IncludeSubDirectories.ToUnit()).Subscribe(_ => {
 			if(this.SelectedFolder.Value is not { } folder) {
