@@ -90,6 +90,8 @@ public class ImageFileOperator : BaseFileOperator {
 		await this._db.SaveChangesAsync();
 		await transaction.CommitAsync();
 
+		this._fileHashUpdater.EnqueueHashUpdate(mf.MediaFileId);
+
 		return mf;
 	}
 	public byte[] CreateThumbnail(IFileModel fileModel, uint width, uint height) {

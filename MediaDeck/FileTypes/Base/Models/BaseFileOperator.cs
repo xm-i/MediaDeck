@@ -6,15 +6,18 @@ using MediaDeck.Composition.Enum;
 using MediaDeck.Database;
 using MediaDeck.Database.Tables;
 using MediaDeck.FileTypes.Base.Models.Interfaces;
+using MediaDeck.Models.Tools;
 using MediaDeck.Utils.Constants;
 
 namespace MediaDeck.FileTypes.Base.Models;
 
 public abstract class BaseFileOperator : IFileOperator {
 	protected readonly MediaDeckDbContext _db;
+	protected readonly FileHashUpdater _fileHashUpdater;
 
 	protected BaseFileOperator() {
 		this._db = Ioc.Default.GetRequiredService<MediaDeckDbContext>();
+		this._fileHashUpdater = Ioc.Default.GetRequiredService<FileHashUpdater>();
 	}
 
 	public virtual async Task<MediaFile?> UpdateRateAsync(long mediaFileId, int rate) {

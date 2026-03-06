@@ -80,6 +80,8 @@ public partial class ArchiveFileOperator : BaseFileOperator {
 		await this._db.SaveChangesAsync();
 		await transaction.CommitAsync();
 
+		this._fileHashUpdater.EnqueueHashUpdate(mf.MediaFileId);
+
 		return mf;
 	}
 
