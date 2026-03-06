@@ -43,15 +43,21 @@ public class FileStatusUpdater {
 						file.FileSize == fileInfo.Length &&
 						file.CreationTime == fileInfo.CreationTime &&
 						file.ModifiedTime == fileInfo.LastWriteTime &&
-						file.LastAccessTime == fileInfo.LastAccessTime
+						file.LastAccessTime == fileInfo.LastAccessTime &&
+						!string.IsNullOrEmpty(file.Hash)
 						)
 					)
 				) {
 				continue;
 			}
+			var needsHashUpdate = fileInfo.Exists && (file.FileSize != fileInfo.Length || file.ModifiedTime != fileInfo.LastWriteTime);
+
 			file.IsExists = fileInfo.Exists;
 
 			if (file.IsExists) {
+				if (needsHashUpdate || string.IsNullOrEmpty(file.Hash)) {
+					file.Hash = FileHashUtility.ComputeFileHash(file.FilePath);
+				}
 				file.FileSize = fileInfo.Length;
 				file.CreationTime = fileInfo.CreationTime;
 				file.ModifiedTime = fileInfo.LastWriteTime;
