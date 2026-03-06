@@ -9,10 +9,12 @@ using MediaDeck.Utils.Constants;
 namespace MediaDeck.Models.Tools;
 [Inject(InjectServiceLifetime.Transient)]
 public class FileStatusUpdater {
-	public FileStatusUpdater(MediaDeckDbContext db) {
+	public FileStatusUpdater(MediaDeckDbContext db, FileHashUpdater fileHashUpdater) {
 		this._db = db;
+		this._fileHashUpdater = fileHashUpdater;
 	}
 	private readonly MediaDeckDbContext _db;
+	private readonly FileHashUpdater _fileHashUpdater;
 
 	public ReactiveProperty<long> TargetCount {
 		get;
@@ -37,34 +39,34 @@ public class FileStatusUpdater {
 				continue;
 			}
 			if(
-				file.IsExists == fileInfo.Exists &&
-					(!file.IsExists ||
-						(
-						file.FileSize == fileInfo.Length &&
-						file.CreationTime == fileInfo.CreationTime &&
-						file.ModifiedTime == fileInfo.LastWriteTime &&
-						file.LastAccessTime == fileInfo.LastAccessTime &&
-						!string.IsNullOrEmpty(file.Hash)
+					file.IsExists == fileInfo.Exists &&
+						(!file.IsExists ||
+							(
+							file.FileSize == fileInfo.Length &&
+							file.CreationTime == fileInfo.CreationTime &&
+							file.ModifiedTime == fileInfo.LastWriteTime &&
+							file.LastAccessTime == fileInfo.LastAccessTime &&
+							file.HashUpdatedTime >= fileInfo.LastWriteTime
+							)
 						)
-					)
-				) {
-				continue;
-			}
-			var needsHashUpdate = fileInfo.Exists && (file.FileSize != fileInfo.Length || file.ModifiedTime != fileInfo.LastWriteTime);
-
-			file.IsExists = fileInfo.Exists;
-
-			if (file.IsExists) {
-				if (needsHashUpdate || string.IsNullOrEmpty(file.Hash)) {
-					file.Hash = FileHashUtility.ComputeFileHash(file.FilePath);
+					) {
+					continue;
 				}
-				file.FileSize = fileInfo.Length;
-				file.CreationTime = fileInfo.CreationTime;
-				file.ModifiedTime = fileInfo.LastWriteTime;
-				file.LastAccessTime = fileInfo.LastAccessTime;
+				var needsHashUpdate = fileInfo.Exists && (file.HashUpdatedTime == null || file.HashUpdatedTime < fileInfo.LastWriteTime);
+
+				file.IsExists = fileInfo.Exists;
+
+				if (file.IsExists) {
+					if (needsHashUpdate) {
+						this._fileHashUpdater.EnqueueHashUpdate(file.MediaFileId);
+					}
+					file.FileSize = fileInfo.Length;
+					file.CreationTime = fileInfo.CreationTime;
+					file.ModifiedTime = fileInfo.LastWriteTime;
+					file.LastAccessTime = fileInfo.LastAccessTime;
+				}
+				updateList.Add(file);
 			}
-			updateList.Add(file);
-		}
 
 		using var lockObject = await LockObjectConstants.DbLock.LockAsync();
 		using var transaction = await this._db.Database.BeginTransactionAsync();

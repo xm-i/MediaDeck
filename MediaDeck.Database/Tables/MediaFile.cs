@@ -120,6 +120,14 @@ public class MediaFile {
 	}
 
 	/// <summary>
+	/// ハッシュ更新日時
+	/// </summary>
+	public DateTime? HashUpdatedTime {
+		get;
+		set;
+	}
+
+	/// <summary>
 	/// 作成日時
 	/// </summary>
 	public DateTime CreationTime {
