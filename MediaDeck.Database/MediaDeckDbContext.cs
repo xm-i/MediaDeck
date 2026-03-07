@@ -174,6 +174,9 @@ public class MediaDeckDbContext(DbContextOptions dbContextOptions) : DbContext(d
 			.HasIndex(x => x.FilePath)
 			.IsUnique();
 
+		modelBuilder.Entity<MediaFile>()
+			.HasIndex(x => x.FullHash);
+
 		// Relation
 		modelBuilder.Entity<ImageFile>()
 			.HasOne(i => i.MediaFile)

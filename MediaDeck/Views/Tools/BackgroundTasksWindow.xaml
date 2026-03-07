@@ -43,5 +43,20 @@
 				<Run Text="{x:Bind ViewModel.FileHashUpdaterTargetCount.Value, Mode=OneWay}"/>
 			</TextBlock>
 		</Grid>
+		<Grid>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto"/>
+				<RowDefinition Height="Auto"/>
+			</Grid.RowDefinitions>
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="Auto"/>
+			</Grid.ColumnDefinitions>
+			<TextBlock Grid.Row="0" Grid.Column="0"  Text="Update full hash"/>
+			<TextBlock Grid.Row="1" Grid.Column="0">
+				<Run Text="{x:Bind ViewModel.FullHashUpdaterCompletedCount.Value, Mode=OneWay}"/>
+				<Run Text="/"/>
+				<Run Text="{x:Bind ViewModel.FullHashUpdaterTargetCount.Value, Mode=OneWay}"/>
+			</TextBlock>
+		</Grid>
 	</StackPanel>
 </Window>

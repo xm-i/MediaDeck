@@ -46,14 +46,14 @@ public class FileStatusUpdater {
 						file.CreationTime == fileInfo.CreationTime &&
 						file.ModifiedTime == fileInfo.LastWriteTime &&
 						file.LastAccessTime == fileInfo.LastAccessTime &&
-						file.HashUpdatedTime >= fileInfo.LastWriteTime &&
-						file.HashUpdatedTime != null
+						file.PreHashUpdatedTime >= fileInfo.LastWriteTime &&
+						file.PreHashUpdatedTime != null
 						)
 					)
 				) {
 				continue;
 			}
-			var needsHashUpdate = fileInfo.Exists && (file.HashUpdatedTime == null || file.HashUpdatedTime < fileInfo.LastWriteTime);
+			var needsHashUpdate = fileInfo.Exists && (file.PreHashUpdatedTime == null || file.PreHashUpdatedTime < fileInfo.LastWriteTime);
 
 			file.IsExists = fileInfo.Exists;
 
@@ -69,10 +69,14 @@ public class FileStatusUpdater {
 			updateList.Add(file);
 		}
 
-		using var lockObject = await LockObjectConstants.DbLock.LockAsync();
-		using var transaction = await this._db.Database.BeginTransactionAsync();
-		this._db.UpdateRange(updateList);
-		await this._db.SaveChangesAsync();
-		await transaction.CommitAsync();
+		using (var lockObject = await LockObjectConstants.DbLock.LockAsync()) {
+			using var transaction = await this._db.Database.BeginTransactionAsync();
+			this._db.UpdateRange(updateList);
+			await this._db.SaveChangesAsync();
+			await transaction.CommitAsync();
+		}
+
+		// PreHash更新がなかった場合もFullHashのチェックを行う
+		await this._fileHashUpdater.CheckAndEnqueueFullHashUpdatesAsync();
 	}
 }

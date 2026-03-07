@@ -14,6 +14,8 @@ public class BackgroundTasksViewModel: ViewModelBase {
 		this.FileStatusUpdaterCompletedCount = this._fileStatusUpdater.CompletedCount.ThrottleLast(TimeSpan.FromMilliseconds(100)).ObserveOnCurrentSynchronizationContext().ToBindableReactiveProperty();
 		this.FileHashUpdaterTargetCount = this._fileHashUpdater.TargetCount.ThrottleLast(TimeSpan.FromMilliseconds(100)).ObserveOnCurrentSynchronizationContext().ToBindableReactiveProperty();
 		this.FileHashUpdaterCompletedCount = this._fileHashUpdater.CompletedCount.ThrottleLast(TimeSpan.FromMilliseconds(100)).ObserveOnCurrentSynchronizationContext().ToBindableReactiveProperty();
+		this.FullHashUpdaterTargetCount = this._fileHashUpdater.FullHashTargetCount.ThrottleLast(TimeSpan.FromMilliseconds(100)).ObserveOnCurrentSynchronizationContext().ToBindableReactiveProperty();
+		this.FullHashUpdaterCompletedCount = this._fileHashUpdater.FullHashCompletedCount.ThrottleLast(TimeSpan.FromMilliseconds(100)).ObserveOnCurrentSynchronizationContext().ToBindableReactiveProperty();
 		this.Actions.Synchronize().ObserveOnThreadPool().Subscribe(action => action());
 	}
 
@@ -33,6 +35,14 @@ public class BackgroundTasksViewModel: ViewModelBase {
 	}
 
 	public BindableReactiveProperty<long> FileHashUpdaterCompletedCount {
+		get;
+	}
+
+	public BindableReactiveProperty<long> FullHashUpdaterTargetCount {
+		get;
+	}
+
+	public BindableReactiveProperty<long> FullHashUpdaterCompletedCount {
 		get;
 	}
 

@@ -112,17 +112,33 @@ public class MediaFile {
 	}
 
 	/// <summary>
-	/// ファイルハッシュ
+	/// ファイルハッシュ(先頭1MB)
 	/// </summary>
-	public string? Hash {
+	public string? PreHash {
 		get;
 		set;
 	}
 
 	/// <summary>
-	/// ハッシュ更新日時
+	/// PreHash更新日時
 	/// </summary>
-	public DateTime? HashUpdatedTime {
+	public DateTime? PreHashUpdatedTime {
+		get;
+		set;
+	}
+
+	/// <summary>
+	/// ファイルハッシュ(全体)
+	/// </summary>
+	public string? FullHash {
+		get;
+		set;
+	}
+
+	/// <summary>
+	/// FullHash更新日時
+	/// </summary>
+	public DateTime? FullHashUpdatedTime {
 		get;
 		set;
 	}
