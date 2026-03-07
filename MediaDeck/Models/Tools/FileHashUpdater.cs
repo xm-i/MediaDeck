@@ -49,15 +49,25 @@ public class FileHashUpdater {
 	private async Task UpdateHashAsync() {
 		while (this.HashUpdateQueue.TryDequeue(out var mediaFileId)) {
 			try {
-				using var lockObject = await LockObjectConstants.DbLock.LockAsync();
-				var mediaFile = await this._db.MediaFiles.FindAsync(mediaFileId);
-				if (mediaFile == null || !mediaFile.IsExists) {
-					continue;
+				string? filePath;
+				using (await LockObjectConstants.DbLock.LockAsync()) {
+					var mediaFile = await this._db.MediaFiles.FindAsync(mediaFileId);
+					if (mediaFile == null || !mediaFile.IsExists) {
+						continue;
+					}
+					filePath = mediaFile.FilePath;
 				}
 
-				mediaFile.Hash = FileHashUtility.ComputeFileHash(mediaFile.FilePath);
-				mediaFile.HashUpdatedTime = DateTime.Now;
-				await this._db.SaveChangesAsync();
+				var hash = FileHashUtility.ComputeFileHash(filePath);
+
+				using (await LockObjectConstants.DbLock.LockAsync()) {
+					var mediaFile = await this._db.MediaFiles.FindAsync(mediaFileId);
+					if (mediaFile != null) {
+						mediaFile.Hash = hash;
+						mediaFile.HashUpdatedTime = DateTime.Now;
+						await this._db.SaveChangesAsync();
+					}
+				}
 			} catch (Exception e) {
 				Console.WriteLine(e);
 			} finally {

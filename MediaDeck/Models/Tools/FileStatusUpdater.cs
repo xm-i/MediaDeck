@@ -39,35 +39,35 @@ public class FileStatusUpdater {
 				continue;
 			}
 			if(
-					file.IsExists == fileInfo.Exists &&
-						(!file.IsExists ||
-							(
-							file.FileSize == fileInfo.Length &&
-							file.CreationTime == fileInfo.CreationTime &&
-							file.ModifiedTime == fileInfo.LastWriteTime &&
-							file.LastAccessTime == fileInfo.LastAccessTime &&
-							file.HashUpdatedTime >= fileInfo.LastWriteTime &&
-							file.HashUpdatedTime != null
-							)
+				file.IsExists == fileInfo.Exists &&
+					(!file.IsExists ||
+						(
+						file.FileSize == fileInfo.Length &&
+						file.CreationTime == fileInfo.CreationTime &&
+						file.ModifiedTime == fileInfo.LastWriteTime &&
+						file.LastAccessTime == fileInfo.LastAccessTime &&
+						file.HashUpdatedTime >= fileInfo.LastWriteTime &&
+						file.HashUpdatedTime != null
 						)
-					) {
-					continue;
-				}
-				var needsHashUpdate = fileInfo.Exists && (file.HashUpdatedTime == null || file.HashUpdatedTime < fileInfo.LastWriteTime);
-
-				file.IsExists = fileInfo.Exists;
-
-				if (file.IsExists) {
-					if (needsHashUpdate) {
-						this._fileHashUpdater.EnqueueHashUpdate(file.MediaFileId);
-					}
-					file.FileSize = fileInfo.Length;
-					file.CreationTime = fileInfo.CreationTime;
-					file.ModifiedTime = fileInfo.LastWriteTime;
-					file.LastAccessTime = fileInfo.LastAccessTime;
-				}
-				updateList.Add(file);
+					)
+				) {
+				continue;
 			}
+			var needsHashUpdate = fileInfo.Exists && (file.HashUpdatedTime == null || file.HashUpdatedTime < fileInfo.LastWriteTime);
+
+			file.IsExists = fileInfo.Exists;
+
+			if (file.IsExists) {
+				if (needsHashUpdate) {
+					this._fileHashUpdater.EnqueueHashUpdate(file.MediaFileId);
+				}
+				file.FileSize = fileInfo.Length;
+				file.CreationTime = fileInfo.CreationTime;
+				file.ModifiedTime = fileInfo.LastWriteTime;
+				file.LastAccessTime = fileInfo.LastAccessTime;
+			}
+			updateList.Add(file);
+		}
 
 		using var lockObject = await LockObjectConstants.DbLock.LockAsync();
 		using var transaction = await this._db.Database.BeginTransactionAsync();
