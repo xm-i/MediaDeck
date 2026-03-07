@@ -1,7 +1,8 @@
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Threading.Tasks;
+
+using ObservableCollections;
 
 using MediaDeck.Composition.Bases;
 using MediaDeck.Database.Tables;
@@ -22,7 +23,7 @@ public class DuplicateDetectorViewModel : ViewModelBase {
 	/// <summary>
 	/// 重複ファイルグループリスト
 	/// </summary>
-	public ObservableCollection<DuplicateFileGroup> DuplicateGroups {
+	public INotifyCollectionChangedSynchronizedViewList<DuplicateFileGroup> DuplicateGroups {
 		get;
 	}
 
@@ -102,7 +103,7 @@ public class DuplicateDetectorViewModel : ViewModelBase {
 	public DuplicateDetectorViewModel(DuplicateFileDetector detector) {
 		this._detector = detector;
 
-		this.DuplicateGroups = this._detector.DuplicateGroups;
+		this.DuplicateGroups = this._detector.DuplicateGroups.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
 
 		this.IsDetecting = this._detector.IsDetecting.ToBindableReactiveProperty();
 		this.IsCompleted = this._detector.IsCompleted.ToBindableReactiveProperty();

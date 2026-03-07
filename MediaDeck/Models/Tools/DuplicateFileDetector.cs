@@ -1,12 +1,9 @@
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 
 using MediaDeck.Composition.Bases;
 using MediaDeck.Database;
 using MediaDeck.Database.Tables;
-
-using Microsoft.EntityFrameworkCore;
 
 namespace MediaDeck.Models.Tools;
 
@@ -50,7 +47,7 @@ public class DuplicateFileDetector : ModelBase {
 	/// <summary>
 	/// 重複ファイルグループリスト
 	/// </summary>
-	public ObservableCollection<DuplicateFileGroup> DuplicateGroups {
+	public ObservableList<DuplicateFileGroup> DuplicateGroups {
 		get;
 	} = [];
 
@@ -132,7 +129,7 @@ public class DuplicateFileDetector : ModelBase {
 					.ToListAsync();
 			}
 
-			foreach (var group in groups) {
+			foreach (var group in groups.OrderBy(x => x.RepresentativeFileName)) {
 				this.DuplicateGroups.Add(group);
 			}
 
