@@ -29,6 +29,9 @@ public sealed partial class NavigationMenu : NavigationMenuUserControl {
 			case "FolderManager":
 				window = Ioc.Default.GetRequiredService<FolderManagerWindow>();
 				break;
+			case "DuplicateDetector":
+				window = Ioc.Default.GetRequiredService<DuplicateDetectorWindow>();
+				break;
 			case "Config":
 				window = Ioc.Default.GetRequiredService<ConfigWindow>();
 				break;

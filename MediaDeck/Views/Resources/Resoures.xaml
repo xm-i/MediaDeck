@@ -7,6 +7,7 @@
 	xmlns:system="using:System" xmlns:specialized="using:System.Collections.Specialized">
 	<ctConverters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
 	<converters:LongToDoubleConverter x:Key="LongToDoubleConverter" />
+	<converters:NullToBooleanConverter x:Key="NullToBooleanConverter" />
 	<converters:ToVisibilityConverter
         x:Key="NullToCollapseConverter"
         Collapse="{x:Null}"
@@ -21,4 +22,5 @@
 	<converters:BinaryToImageSourceConverter x:Key="BinaryToImageSourceConverter"/>
 	<converters:TimeSpanToStringConverter x:Key="TimeSpanToStringConverter"/>
 	<converters:FileSizeConverter x:Key="FileSizeConverter"/>
+	<converters:TagListConverter x:Key="TagListConverter"/>
 </ResourceDictionary>

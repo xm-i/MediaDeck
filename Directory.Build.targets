@@ -5,6 +5,7 @@
     <PackageReference Update="CommunityToolkit.WinUI.Collections" Version="8.2.250402" />
     <PackageReference Update="CommunityToolkit.WinUI.Controls.Primitives" Version="8.2.250402" />
     <PackageReference Update="CommunityToolkit.WinUI.Controls.Segmented" Version="8.2.250402" />
+    <PackageReference Update="CommunityToolkit.WinUI.Controls.Sizers" Version="8.2.251219" />
     <PackageReference Update="CommunityToolkit.WinUI.Controls.TokenizingTextBox" Version="8.2.250402" />
     <PackageReference Update="CommunityToolkit.WinUI.Converters" Version="8.2.250402" />
     <PackageReference Update="FFMpegCore" Version="5.4.0" />
