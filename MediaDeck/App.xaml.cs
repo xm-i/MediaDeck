@@ -16,6 +16,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.UI.Xaml;
 
 using Serilog;
+using Serilog.Events;
 namespace MediaDeck;
 
 public partial class App : Application {
@@ -86,6 +87,7 @@ public partial class App : Application {
 			.Enrich.WithThreadId()
 #if DEBUG || DEBUG_UNPACKAGED
 			.MinimumLevel.Verbose()
+			.MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Information)
 #else
 			.MinimumLevel.Information()
 #endif
