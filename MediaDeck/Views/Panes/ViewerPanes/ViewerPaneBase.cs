@@ -7,7 +7,6 @@ using Microsoft.UI.Xaml.Input;
 
 using MediaDeck.Composition.Bases;
 using MediaDeck.Models.Files.SearchConditions;
-using MediaDeck.Utils.Tools;
 using MediaDeck.ViewModels.Panes.ViewerPanes;
 using MediaDeck.Views.Thumbnails;
 using MediaDeck.FileTypes.Base.ViewModels.Interfaces;
@@ -85,18 +84,22 @@ public class ViewerPaneBase : UserControlBase<ViewerSelectorViewModel> {
 				var message = targetFiles.Length == 1
 					? "Remove file from MediaDeck database?"
 					: $"Remove {targetFiles.Length} files from MediaDeck database?";
-				await DialogUtility.ConfirmDialogAndAction(
-					this.XamlRoot,
-					async () => {
-						await this.ViewModel.SelectedViewerPane.Value.RemoveFilesAsync(targetFiles);
-						await this.ViewModel.MediaContentLibraryViewModel.ReloadAsync();
-					},
-					message,
-					_ => targetFiles.Length == 1
-						? "File removed from MediaDeck database"
-						: $"{targetFiles.Length} files removed from MediaDeck database"
-					);
+				
+				var dialog = new ContentDialog {
+					XamlRoot = this.XamlRoot,
+					Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
+					Title = message,
+					PrimaryButtonText = "Yes",
+					SecondaryButtonText = "No",
+					CloseButtonText = "Cancel",
+					DefaultButton = ContentDialogButton.Primary
+				};
 
+				var result = await dialog.ShowAsync();
+				if (result == ContentDialogResult.Primary) {
+					await this.ViewModel.SelectedViewerPane.Value.RemoveFilesAsync(targetFiles);
+					await this.ViewModel.MediaContentLibraryViewModel.ReloadAsync();
+				}
 				break;
 			case "OpenFolder":
 				if (!string.IsNullOrEmpty(fvm.FilePath) && File.Exists(fvm.FilePath)) {

@@ -9,7 +9,6 @@
 	xmlns:controls="using:CommunityToolkit.WinUI.Controls"
 	xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
 	xmlns:behaviors="using:CommunityToolkit.WinUI.Behaviors"
-	xmlns:core="using:Microsoft.Xaml.Interactions.Core"
 	xmlns:vmIf="using:MediaDeck.FileTypes.Base.ViewModels.Interfaces"
 	xmlns:viewerpanes="using:MediaDeck.ViewModels.Panes.ViewerPanes"
 	mc:Ignorable="d">
