@@ -8,12 +8,15 @@ using MediaDeck.Utils.Notifications;
 using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Composition.Stores.State.Model.Objects;
 
+using Microsoft.Extensions.Logging;
+
 namespace MediaDeck.Models.Files;
 
 [Inject(InjectServiceLifetime.Singleton)]
 public class FileRegistrar {
 	private static readonly IFileOperator[] _fileOperators;
 	private readonly ConcurrentDictionary<string, FolderModel> _fileToFolderMap = new();
+	private readonly ILogger<FileRegistrar> _logger;
 
 	public ObservableQueue<string> RegistrationQueue {
 		get;
@@ -27,8 +30,9 @@ public class FileRegistrar {
 		_fileOperators = FileTypeUtility.CreateFileOperators();
 	}
 
-	public FileRegistrar(ConfigModel config) {
+	public FileRegistrar(ConfigModel config, ILogger<FileRegistrar> logger) {
 		this.Config = config;
+		this._logger = logger;
 		this.RegistrationQueue
 			.ObserveAdd()
 			.ThrottleFirst(TimeSpan.FromSeconds(0.1))
@@ -74,7 +78,7 @@ public class FileRegistrar {
 					FileNotifications.FileRegistered.OnNext(mf2);
 				}
 			} catch (Exception e) {
-				Console.WriteLine(e);
+				this._logger.LogError(e, "Error while registering file: {FilePath}", filePath);
 			} finally {
 				if (this._fileToFolderMap.TryRemove(filePath, out var folder)) {
 					folder.RemainingCount.Value--;

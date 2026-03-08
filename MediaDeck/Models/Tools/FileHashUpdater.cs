@@ -7,6 +7,7 @@ using MediaDeck.Utils.Constants;
 using MediaDeck.Utils.Tools;
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace MediaDeck.Models.Tools;
 
@@ -18,6 +19,7 @@ namespace MediaDeck.Models.Tools;
 [Inject(InjectServiceLifetime.Singleton)]
 public class FileHashUpdater {
 	private readonly MediaDeckDbContext _db;
+	private readonly ILogger<FileHashUpdater> _logger;
 
 	/// <summary>
 	/// PreHash更新待ちのメディアファイルIDを保持するキュー
@@ -66,8 +68,10 @@ public class FileHashUpdater {
 	/// キューの監視とハッシュ更新処理のサブスクリプションを設定する。
 	/// </summary>
 	/// <param name="db">データベースコンテキスト</param>
-	public FileHashUpdater(MediaDeckDbContext db) {
+	/// <param name="logger">ロガー</param>
+	public FileHashUpdater(MediaDeckDbContext db, ILogger<FileHashUpdater> logger) {
 		this._db = db;
+		this._logger = logger;
 		this.HashUpdateQueue
 			.ObserveAdd()
 			.ThrottleFirst(TimeSpan.FromSeconds(0.1))
@@ -147,7 +151,7 @@ public class FileHashUpdater {
 					}
 				}
 			} catch (Exception e) {
-				Console.WriteLine(e);
+				this._logger.LogError(e, "Error while updating PreHash for MediaFileId {MediaFileId}", mediaFileId);
 			} finally {
 				this.CompletedCount.Value++;
 			}
@@ -263,7 +267,7 @@ public class FileHashUpdater {
 					}
 				}
 			} catch (Exception e) {
-				Console.WriteLine(e);
+				this._logger.LogError(e, "Error while updating FullHash for MediaFileId {MediaFileId}", mediaFileId);
 			} finally {
 				this.FullHashCompletedCount.Value++;
 			}
