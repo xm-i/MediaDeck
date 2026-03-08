@@ -46,8 +46,8 @@ public class FileStatusUpdater {
 						file.CreationTime == fileInfo.CreationTime &&
 						file.ModifiedTime == fileInfo.LastWriteTime &&
 						file.LastAccessTime == fileInfo.LastAccessTime &&
-						file.PreHashUpdatedTime >= fileInfo.LastWriteTime &&
-						file.PreHashUpdatedTime != null
+						file.PreHashUpdatedTime != null &&
+						file.PreHashUpdatedTime >= fileInfo.LastWriteTime
 						)
 					)
 				) {

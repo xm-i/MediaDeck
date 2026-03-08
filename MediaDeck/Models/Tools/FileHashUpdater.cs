@@ -93,12 +93,14 @@ public class FileHashUpdater {
 
 				var hash = FileHashUtility.ComputeFileHash(filePath);
 
-				using (await LockObjectConstants.DbLock.LockAsync()) {
+				using (await LockObjectConstants.DbLock.LockAsync())
+				using (var transaction = await this._db.Database.BeginTransactionAsync()) {
 					var mediaFile = await this._db.MediaFiles.FindAsync(mediaFileId);
 					if (mediaFile != null) {
 						mediaFile.PreHash = hash;
 						mediaFile.PreHashUpdatedTime = DateTime.Now;
 						await this._db.SaveChangesAsync();
+						await transaction.CommitAsync();
 					}
 				}
 			} catch (Exception e) {
@@ -152,12 +154,14 @@ public class FileHashUpdater {
 
 				var fullHash = FileHashUtility.ComputeFullFileHash(filePath);
 
-				using (await LockObjectConstants.DbLock.LockAsync()) {
+				using (await LockObjectConstants.DbLock.LockAsync())
+				using (var transaction = await this._db.Database.BeginTransactionAsync()) {
 					var mediaFile = await this._db.MediaFiles.FindAsync(mediaFileId);
 					if (mediaFile != null) {
 						mediaFile.FullHash = fullHash;
 						mediaFile.FullHashUpdatedTime = DateTime.Now;
 						await this._db.SaveChangesAsync();
+						await transaction.CommitAsync();
 					}
 				}
 			} catch (Exception e) {
