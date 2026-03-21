@@ -3,8 +3,7 @@ using System.Collections.Concurrent;
 using System.IO;
 using System.Threading.Tasks;
 
-using CommunityToolkit.Mvvm.DependencyInjection;
-
+using MediaDeck.Composition.Interfaces;
 using MediaDeck.Database;
 using MediaDeck.Stores.State;
 using MediaDeck.Views;
@@ -19,10 +18,14 @@ public enum FileChangeType {
 }
 
 public class FileChangeItem {
-	public long MediaFileId { get; set; }
+	public long MediaFileId {
+		get; set;
+	}
 	public string OldPath { get; set; } = string.Empty;
 	public string NewPath { get; set; } = string.Empty;
-	public FileChangeType ChangeType { get; set; }
+	public FileChangeType ChangeType {
+		get; set;
+	}
 
 	public string ChangeTypeText {
 		get {
@@ -42,14 +45,16 @@ public class FileChangeMonitorService : IDisposable {
 	private readonly StateStore _stateStore;
 	private readonly IDbContextFactory<MediaDeckDbContext> _dbFactory;
 	private readonly ILogger<FileChangeMonitorService> _logger;
+	private readonly IDispatcherGate _dispatcherGate;
 	private readonly ConcurrentDictionary<string, FileSystemWatcher> _watchers = new();
 
 	public ObservableList<FileChangeItem> UnprocessedChanges { get; } = new();
 
-	public FileChangeMonitorService(StateStore stateStore, IDbContextFactory<MediaDeckDbContext> dbFactory, ILogger<FileChangeMonitorService> logger) {
+	public FileChangeMonitorService(StateStore stateStore, IDbContextFactory<MediaDeckDbContext> dbFactory, ILogger<FileChangeMonitorService> logger, IDispatcherGate dispatcherGate) {
 		this._stateStore = stateStore;
 		this._dbFactory = dbFactory;
 		this._logger = logger;
+		this._dispatcherGate = dispatcherGate;
 
 		foreach (var folder in this._stateStore.State.FolderManagerState.Folders) {
 			this.AddWatcher(folder.FolderPath);
@@ -139,7 +144,7 @@ public class FileChangeMonitorService : IDisposable {
 				ChangeType = changeType
 			};
 
-			this.RunOnUIThread(() => this.UnprocessedChanges.Add(model));
+			this._dispatcherGate.BeginInvoke(() => this.UnprocessedChanges.Add(model));
 		} catch (Exception ex) {
 			this._logger.LogError(ex, "Error handling file change: {Path}", oldPath);
 		}
@@ -149,7 +154,7 @@ public class FileChangeMonitorService : IDisposable {
 	/// 既存の変更アイテムを更新、または不要になった場合は削除します。
 	/// </summary>
 	private void UpdateOrRemoveChangeItem(FileChangeItem existing, string? nextNewPath, FileChangeType nextChangeType) {
-		this.RunOnUIThread(() => {
+		this._dispatcherGate.BeginInvoke(() => {
 			var index = this.UnprocessedChanges.IndexOf(existing);
 			if (index < 0) {
 				return;
@@ -172,18 +177,6 @@ public class FileChangeMonitorService : IDisposable {
 			};
 			this.UnprocessedChanges[index] = updated;
 		});
-	}
-
-	/// <summary>
-	/// 指定されたアクションを UI スレッドで実行します。
-	/// </summary>
-	private void RunOnUIThread(Action action) {
-		var mainWindow = Ioc.Default.GetService<MainWindow>();
-		if (mainWindow?.DispatcherQueue != null) {
-			mainWindow.DispatcherQueue.TryEnqueue(() => action());
-		} else {
-			action();
-		}
 	}
 
 	public void Dispose() {
@@ -225,7 +218,7 @@ public class FileChangeMonitorService : IDisposable {
 	/// リストから指定されたアイテムを削除します。
 	/// </summary>
 	private void RemoveItemsFromList(IEnumerable<FileChangeItem> items) {
-		this.RunOnUIThread(() => {
+		this._dispatcherGate.BeginInvoke(() => {
 			foreach (var item in items) {
 				var targetElement = this.UnprocessedChanges.FirstOrDefault(x => x.MediaFileId == item.MediaFileId);
 				if (targetElement != null) {
