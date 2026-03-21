@@ -1,5 +1,6 @@
 using MediaDeck.Composition.Bases;
 using MediaDeck.Composition.Interfaces.Files;
+using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.FileTypes.Base.ViewModels.Interfaces;
 using MediaDeck.Models.FileDetailManagers;
 using MediaDeck.Models.FileDetailManagers.Objects;
@@ -13,104 +14,73 @@ namespace MediaDeck.ViewModels.Panes.DetailPanes;
 
 [Inject(InjectServiceLifetime.Transient)]
 public class DetailSelectorViewModel : ViewModelBase {
-	private bool _isTargetChanging = false;
-	private readonly TagsManager _tagsManager;
-	
-	public DetailSelectorViewModel(TagsManager tagsManager, SearchConditionNotificationDispatcher searchConditionNotificationDispatcher) {
-		this._tagsManager = tagsManager;
-		this.TagCandidates = tagsManager.Tags.CreateView(x => x);
-		this.LoadTagCandidatesCommand.Subscribe(async _ => await tagsManager.Load());
+	private readonly DetailSelectorModel _model;
+
+	public DetailSelectorViewModel(DetailSelectorModel model, SearchConditionNotificationDispatcher searchConditionNotificationDispatcher) {
+		this._model = model;
+		this.RepresentativeFilePath = model.RepresentativeFilePath.ToBindableReactiveProperty(string.Empty);
+		this.Properties = model.Properties.ToBindableReactiveProperty([]);
+		this.Rate = model.Rate.ToBindableReactiveProperty();
+		this.Description = model.Description.ToBindableReactiveProperty(string.Empty);
+		this.UsageCount = model.UsageCount.ToBindableReactiveProperty();
+
+		this.TagCandidates = model.TagModels.CreateView(x => x);
 		this.FilteredTagCandidates = this.TagCandidates.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
-		this.RefreshFilteredTagCandidatesCommand.Subscribe(x => {
-			this.RefreshTagCandidateFilter();
-		});
-		this.TargetFiles.Where(x => x != null).Subscribe(x => {
-			this._isTargetChanging = true;
-			if (this.TargetFiles.Value.Length > 0) {
-				this.UpdateTags();
-				this.Properties.Value =
-					this.TargetFiles.Value
-						.SelectMany(x => x.Properties)
-						.GroupBy(x => x.Title)
-						.Select(x => new FileProperty(
-							x.Key,
-							x.GroupBy(g => g.Value).Select(g => new ValueCountPair<string?>(g.Key, g.Count()))
-						)).ToArray();
-				this.Rate.Value = this.TargetFiles.Value.Average(x => x.FileModel.Rate);
-				this.UsageCount.Value = this.TargetFiles.Value.Average(x => x.FileModel.UsageCount);
+		this.Tags = model.Tags.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
+
+		Observable.Merge(
+			this.TargetFiles.Where(x => x != null).Select(_ => Unit.Default),
+			model.ContentChanged.AsObservable()
+		).Subscribe(_ => this._model.Refresh(this.TargetFileModels));
+
+		this.Rate.Subscribe(async x => {
+			if (model.IsRefreshing || !double.IsInteger(x) || this.TargetFiles.Value is null) {
+				return;
 			}
-			if (this.TargetFiles.Value.Length == 1) {
-				this.RepresentativeFile.Value = this.TargetFiles.Value.First();
-				this.Description.Value = this.RepresentativeFile.Value.FileModel.Description;
-			} else {
-				this.RepresentativeFile.Value = null;
-				this.Description.Value = string.Empty;
-			}
-			this._isTargetChanging = false;
+			await model.UpdateRateAsync(this.TargetFileModels, (int)x);
 		});
 
+		this.LoadTagCandidatesCommand.Subscribe(async _ => await model.LoadTagCandidatesAsync());
+		this.RefreshFilteredTagCandidatesCommand.Subscribe(_ => this.RefreshTagCandidateFilter());
 		this.UpdateDescriptionCommand.Subscribe(async _ => {
-			await this.TargetFiles.Value.First().FileModel.UpdateDescriptionAsync(this.Description.Value);
+			await model.UpdateDescriptionAsync(this.TargetFileModels.First(), this.Description.Value);
 		});
-
 		this.RemoveTagCommand.Subscribe(async x => {
-			await tagsManager.RemoveTagAsync(this.TargetFiles.Value.Select(x => x.FileModel).ToArray(), x.Value.TagId);
-			this.UpdateTags();
+			await model.RemoveTagAsync(this.TargetFileModels, x.Value.TagId);
 		});
-
-		this.AddTagCommand.Subscribe(async x => {
+		this.AddTagCommand.Subscribe(async _ => {
 			if (string.IsNullOrEmpty(this.Text.Value)) {
 				return;
 			}
 
-			var tag = await tagsManager.FindTagByNameAsync(this.Text.Value);
-			
+			var tag = await model.FindTagByNameAsync(this.Text.Value);
 			if (tag is null) {
-				// 新規タグ作成リクエストを通知
-				this.NewTagRequested.OnNext(new NewTagRequestedContext(
-					this.Text.Value,
-					tagsManager.TagCategories
-				));
+				this.NewTagRequested.OnNext(new NewTagRequestedContext(this.Text.Value, model.TagCategories));
 				return;
 			}
-			
-			await tagsManager.AddTagAsync(this.TargetFiles.Value.Select(x => x.FileModel).ToArray(), tag);
+
+			await model.AddTagAsync(this.TargetFileModels, tag);
 			this.Text.Value = "";
-			this.UpdateTags();
 		});
 		this.SearchTaggedFilesCommand.Subscribe(x => {
 			searchConditionNotificationDispatcher.AddRequest.OnNext(new TagSearchCondition(x.Value));
 		});
-		this.Rate.Subscribe(async x => {
-			if(this._isTargetChanging) {
-				return;
-			}
-			if (!double.IsInteger(x)) {
-				return;
-			}
-			if (this.TargetFiles.Value is null) {
-				return;
-			}
-			foreach (var file in this.TargetFiles.Value) {
-				await file.FileModel.UpdateRateAsync((int)x);
-			}
-		});
-
-		this.Tags = this._tags.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
 	}
 
-	private readonly ObservableList<ValueCountPair<ITagModel>> _tags = [];
+	private IFileModel[] TargetFileModels {
+		get {
+			var files = this.TargetFiles.Value;
+			return files is null ? [] : [.. files.Select(x => x.FileModel)];
+		}
+	}
 
 	public BindableReactiveProperty<IFileViewModel[]> TargetFiles {
 		get;
-	} = new();
+	} = new([]);
 
-	/// <summary>
-	/// 代表ファイル 複数選択時はnull
-	/// </summary>
-	public BindableReactiveProperty<IFileViewModel?> RepresentativeFile {
+	public BindableReactiveProperty<string> RepresentativeFilePath {
 		get;
-	} = new();
+	}
 
 	public BindableReactiveProperty<string> Text {
 		get;
@@ -142,22 +112,19 @@ public class DetailSelectorViewModel : ViewModelBase {
 
 	public BindableReactiveProperty<FileProperty[]> Properties {
 		get;
-	} = new([]);
+	}
 
-	/// <summary>
-	/// 評価
-	/// </summary>
 	public BindableReactiveProperty<double> Rate {
 		get;
-	} = new();
+	}
 
 	public BindableReactiveProperty<string> Description {
 		get;
-	} = new();
+	}
 
 	public BindableReactiveProperty<double> UsageCount {
 		get;
-	} = new();
+	}
 
 	public ReactiveCommand UpdateDescriptionCommand {
 		get;
@@ -176,45 +143,19 @@ public class DetailSelectorViewModel : ViewModelBase {
 	} = new();
 
 	public async Task OnNewTagCreated(Tag tag) {
-		await this._tagsManager.AddTagAsync([.. this.TargetFiles.Value.Select(x => x.FileModel)], tag);
+		await this._model.AddTagAsync(this.TargetFileModels, tag);
 		this.Text.Value = "";
-		this.UpdateTags();
 	}
 
-	internal TagsManager GetTagsManager() => this._tagsManager;
-
-	private void UpdateTags() {
-		this._tags.Clear();
-		this._tags.AddRange(
-			this.TargetFiles
-				.Value
-				.SelectMany(x => x.FileModel.Tags)
-				.GroupBy(x => x.TagId)
-				.Select(x => new ValueCountPair<ITagModel>(x.First(), x.Count()))
-		);
+	internal TagsManager GetTagsManager() {
+		return this._model.TagsManager;
 	}
 
 	private void RefreshTagCandidateFilter() {
 		this.TagCandidates.AttachFilter(tag => {
-			var text = this.Text.Value ?? "";
-			if (text.Length == 0) {
-				return false;
-			}
-			if (tag.TagName.Contains(text)) {
-				tag.RepresentativeText.Value = null;
-				return true;
-			}
-			var result =
-				tag
-					.TagAliases
-					.FirstOrDefault(
-						x =>
-							x.Alias.Contains(text, StringComparison.CurrentCultureIgnoreCase) ||
-							(x.Ruby?.Contains(text) ?? false) ||
-							(x.Romaji?.Contains(text, StringComparison.CurrentCultureIgnoreCase) ?? false)
-					);
-			tag.RepresentativeText.Value = result?.Alias;
-			return result != null;
+			var matched = DetailSelectorModel.MatchesTagFilter(tag, this.Text.Value ?? "", out var representativeText);
+			tag.RepresentativeText.Value = representativeText;
+			return matched;
 		});
 	}
 }

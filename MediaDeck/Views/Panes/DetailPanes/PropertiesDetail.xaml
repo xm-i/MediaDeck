@@ -34,7 +34,7 @@
 					<ColumnDefinition Width="*"/>
 				</Grid.ColumnDefinitions>
 				<TextBlock Grid.Column="0" Text="File Path" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" VerticalAlignment="Top"/>
-				<TextBlock Grid.Column="1" Text="{x:Bind ViewModel.RepresentativeFile.Value.FileModel.FilePath, Mode=OneWay}" IsTextSelectionEnabled="True" TextWrapping="Wrap"/>
+				<TextBlock Grid.Column="1" Text="{x:Bind ViewModel.RepresentativeFilePath.Value, Mode=OneWay}" IsTextSelectionEnabled="True" TextWrapping="Wrap"/>
 			</Grid>
 		</StackPanel>
 
