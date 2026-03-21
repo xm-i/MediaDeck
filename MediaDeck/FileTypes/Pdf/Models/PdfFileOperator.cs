@@ -32,6 +32,7 @@ public partial class PdfFileOperator : BaseFileOperator {
 			File.WriteAllBytes(thumbPath, image);
 		} catch (Exception) {
 			thumbPath = null;
+			thumbRelativePath = null;
 		}
 
 		var pdfDocument = PdfDocument.Load(filePath);

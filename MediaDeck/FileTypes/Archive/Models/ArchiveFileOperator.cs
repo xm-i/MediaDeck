@@ -39,6 +39,7 @@ public partial class ArchiveFileOperator : BaseFileOperator {
 			}
 		} catch (Exception) {
 			thumbPath = null;
+			thumbRelativePath = null;
 		}
 
 		var fileInfo = new FileInfo(filePath);

@@ -50,6 +50,7 @@ public partial class VideoFileOperator : BaseFileOperator {
 			File.WriteAllBytes(thumbPath, image);
 		} catch (Exception) {
 			thumbPath = null;
+			thumbRelativePath = null;
 		}
 
 		var fileInfo = new FileInfo(filePath);

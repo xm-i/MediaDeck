@@ -37,6 +37,7 @@ public class ImageFileOperator : BaseFileOperator {
 			File.WriteAllBytes(thumbPath, image);
 		} catch {
 			thumbPath = null;
+			thumbRelativePath = null;
 		}
 
 		var fileInfo = new FileInfo(filePath);
