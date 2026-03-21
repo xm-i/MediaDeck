@@ -15,14 +15,27 @@ using MediaDeck.Utils.Tools;
 
 namespace MediaDeck.FileTypes.Base.Models;
 
-public abstract class BaseFileModel(long id, string filePath, IFileOperator fileOperator) : ModelBase, IFileModel {
+public abstract class BaseFileModel : ModelBase, IFileModel {
 	private static readonly ExecutionConfigModel executionConfig;
 	static BaseFileModel() {
 		executionConfig = Ioc.Default.GetRequiredService<ExecutionConfigModel>();
 	}
 	protected IFileOperator FileOperator {
 		get;
-	} = fileOperator;
+	}
+	private readonly Subject<Unit> _changed = new();
+	public Observable<Unit> Changed {
+		get {
+			return this._changed.AsObservable();
+		}
+	}
+
+	public BaseFileModel(long id, string filePath, IFileOperator fileOperator) : base() {
+		this.FileOperator = fileOperator;
+		this.Id = id;
+		this.FilePath = filePath;
+		this._changed.AddTo(this.CompositeDisposable);
+	}
 
 	public abstract MediaType MediaType {
 		get;
@@ -30,11 +43,11 @@ public abstract class BaseFileModel(long id, string filePath, IFileOperator file
 
 	public long Id {
 		get;
-	} = id;
+	}
 
 	public string FilePath {
 		get;
-	} = filePath;
+	}
 
 	public string? ThumbnailFilePath {
 		get;
@@ -154,16 +167,19 @@ public abstract class BaseFileModel(long id, string filePath, IFileOperator file
 	public async Task UpdateRateAsync(int rate) {
 		await this.FileOperator.UpdateRateAsync(this.Id, rate);
 		this.Rate = rate;
+		this._changed.OnNext(Unit.Default);
 	}
 
 	public async Task IncrementUsageCountAsync() {
 		await this.FileOperator.IncrementUsageCountAsync(this.Id);
 		this.UsageCount++;
+		this._changed.OnNext(Unit.Default);
 	}
 
 	public async Task UpdateDescriptionAsync(string description) {
 		await this.FileOperator.UpdateDescriptionAsync(this.Id, description);
 		this.Description = description;
+		this._changed.OnNext(Unit.Default);
 	}
 
 	public async Task ExecuteFileAsync() {

@@ -1,10 +1,10 @@
+using System.Threading.Tasks;
+
 using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Models.FileDetailManagers.Objects;
 using MediaDeck.Utils.Objects;
 using MediaDeck.Database.Tables;
-
-using System.Threading.Tasks;
 
 namespace MediaDeck.Models.FileDetailManagers;
 
@@ -12,7 +12,8 @@ namespace MediaDeck.Models.FileDetailManagers;
 /// 詳細セレクタのビジネスロジックを管理するモデル
 /// </summary>
 [Inject(InjectServiceLifetime.Transient)]
-public class DetailSelectorModel {
+public class DetailSelectorModel : IDisposable {
+	private readonly SerialDisposable _propertyChangedSubscription = new();
 	private readonly TagsManager _tagsManager;
 	private readonly ObservableList<ValueCountPair<ITagModel>> _tags = [];
 
@@ -94,14 +95,6 @@ public class DetailSelectorModel {
 		get;
 	} = new(string.Empty);
 
-	/// <summary>
-	/// Refresh処理中か
-	/// </summary>
-	public bool IsRefreshing {
-		get;
-		private set;
-	}
-
 	public DetailSelectorModel(TagsManager tagsManager) {
 		this._tagsManager = tagsManager;
 	}
@@ -110,37 +103,44 @@ public class DetailSelectorModel {
 	/// TargetFilesから各種状態を算出してプロパティを更新する
 	/// </summary>
 	public void Refresh(IFileModel[] files) {
-		this.IsRefreshing = true;
-		try {
-			if (files.Length > 0) {
-				this.Properties.Value =
-					files
-						.SelectMany(x => x.Properties)
-						.GroupBy(x => x.Title)
-						.Select(x => new FileProperty(
-							x.Key,
-							x.GroupBy(g => g.Value).Select(g => new ValueCountPair<string?>(g.Key, g.Count()))
-						)).ToArray();
-				this.Rate.Value = files.Average(x => x.Rate);
-				this.UsageCount.Value = files.Average(x => x.UsageCount);
-				this.RefreshTags(files);
-			} else {
-				this.Properties.Value = [];
-				this.Rate.Value = 0;
-				this.UsageCount.Value = 0;
-				this._tags.Clear();
-			}
-
-			if (files.Length == 1) {
-				this.RepresentativeFilePath.Value = files[0].FilePath;
-				this.Description.Value = files[0].Description;
-			} else {
-				this.RepresentativeFilePath.Value = string.Empty;
-				this.Description.Value = string.Empty;
-			}
-		} finally {
-			this.IsRefreshing = false;
+		if (files.Length > 0) {
+			this.Properties.Value =
+				files
+					.SelectMany(x => x.Properties)
+					.GroupBy(x => x.Title)
+					.Select(x => new FileProperty(
+						x.Key,
+						x.GroupBy(g => g.Value).Select(g => new ValueCountPair<string?>(g.Key, g.Count()))
+					)).ToArray();
+			this.Rate.Value = files.Average(x => x.Rate);
+			this.UsageCount.Value = files.Average(x => x.UsageCount);
+			this.RefreshTags(files);
+		} else {
+			this.Properties.Value = [];
+			this.Rate.Value = 0;
+			this.UsageCount.Value = 0;
+			this._tags.Clear();
 		}
+
+		if (files.Length == 1) {
+			this.RepresentativeFilePath.Value = files[0].FilePath;
+			this.Description.Value = files[0].Description;
+		} else {
+			this.RepresentativeFilePath.Value = string.Empty;
+			this.Description.Value = string.Empty;
+		}
+
+		this._propertyChangedSubscription.Disposable =
+			files
+				.Select(m => m.Changed)
+				.Merge()
+				.Subscribe(_ => {
+					this.Refresh(files);
+				});
+	}
+
+	public void Dispose() {
+		this._propertyChangedSubscription.Dispose();
 	}
 
 	/// <summary>

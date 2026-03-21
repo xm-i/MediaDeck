@@ -8,6 +8,12 @@ using MediaDeck.Composition.Objects;
 namespace MediaDeck.Composition.Interfaces.FileTypes.Models;
 
 public interface IFileModel {
+	/// <summary>
+	/// プロパティ変更通知
+	/// </summary>
+	public Observable<Unit> Changed {
+		get;
+	}
 	public MediaType MediaType {
 		get;
 	}

@@ -23,6 +23,7 @@ public class DetailSelectorViewModel : ViewModelBase {
 		this.Rate = model.Rate.ToBindableReactiveProperty();
 		this.Description = model.Description.ToBindableReactiveProperty(string.Empty);
 		this.UsageCount = model.UsageCount.ToBindableReactiveProperty();
+		this._model.AddTo(this.CompositeDisposable);
 
 		this.TagCandidates = model.TagModels.CreateView(x => x);
 		this.FilteredTagCandidates = this.TagCandidates.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
@@ -34,7 +35,7 @@ public class DetailSelectorViewModel : ViewModelBase {
 		).Subscribe(_ => this._model.Refresh(this.TargetFileModels));
 
 		this.Rate.Subscribe(async x => {
-			if (model.IsRefreshing || !double.IsInteger(x) || this.TargetFiles.Value is null) {
+			if (!double.IsInteger(x) || this.TargetFiles.Value is null) {
 				return;
 			}
 			await model.UpdateRateAsync(this.TargetFileModels, (int)x);
