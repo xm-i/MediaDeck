@@ -102,15 +102,33 @@ public class FileChangeMonitorService : IDisposable {
 		_ = this.HandleFileChangeAsync(e.OldFullPath, e.FullPath, FileChangeType.Moved);
 	}
 
+	/// <summary>
+	/// ファイルの変更イベントを処理します。
+	/// </summary>
+	/// <param name="oldPath">変更前のパス</param>
+	/// <param name="newPath">変更後のパス（移動の場合のみ。削除の場合はnull）</param>
+	/// <param name="changeType">変更の種類</param>
 	private async Task HandleFileChangeAsync(string oldPath, string? newPath, FileChangeType changeType) {
 		try {
+			// A -> B, then B -> C という2段階移動（または移動直後の削除）に対応するため、
+			// 既存の未処理キューの NewPath が今回の oldPath と一致するものがないか確認する
+			var existingByNewPath = this.UnprocessedChanges.FirstOrDefault(c => c.ChangeType == FileChangeType.Moved && c.NewPath == oldPath);
+			if (existingByNewPath != null) {
+				this.UpdateOrRemoveChangeItem(existingByNewPath, newPath, changeType);
+				return;
+			}
+
 			await using var db = await this._dbFactory.CreateDbContextAsync();
+			// EF Core 経由で DB 内のファイルを検索（oldPath は DB 上のパスと一致するはず）
 			var file = await db.MediaFiles.FirstOrDefaultAsync(mf => mf.FilePath == oldPath);
 			if (file == null) {
 				return;
 			}
 
-			if (this.UnprocessedChanges.Any(c => c.MediaFileId == file.MediaFileId)) {
+			// 同一ファイルの変更がすでにキューにあるか確認（IDで紐付け）
+			var existingById = this.UnprocessedChanges.FirstOrDefault(c => c.MediaFileId == file.MediaFileId);
+			if (existingById != null) {
+				this.UpdateOrRemoveChangeItem(existingById, newPath, changeType);
 				return;
 			}
 
@@ -121,16 +139,50 @@ public class FileChangeMonitorService : IDisposable {
 				ChangeType = changeType
 			};
 
-			var mainWindow = Ioc.Default.GetService<MainWindow>();
-			if (mainWindow?.DispatcherQueue != null) {
-				mainWindow.DispatcherQueue.TryEnqueue(() => {
-					this.UnprocessedChanges.Add(model);
-				});
-			} else {
-				this.UnprocessedChanges.Add(model);
-			}
+			this.RunOnUIThread(() => this.UnprocessedChanges.Add(model));
 		} catch (Exception ex) {
 			this._logger.LogError(ex, "Error handling file change: {Path}", oldPath);
+		}
+	}
+
+	/// <summary>
+	/// 既存の変更アイテムを更新、または不要になった場合は削除します。
+	/// </summary>
+	private void UpdateOrRemoveChangeItem(FileChangeItem existing, string? nextNewPath, FileChangeType nextChangeType) {
+		this.RunOnUIThread(() => {
+			var index = this.UnprocessedChanges.IndexOf(existing);
+			if (index < 0) {
+				return;
+			}
+
+			var combinedNewPath = nextChangeType == FileChangeType.Moved ? (nextNewPath ?? string.Empty) : string.Empty;
+
+			// 移動先が元のパスに戻った場合（A -> B -> A）はキューから削除する
+			if (nextChangeType == FileChangeType.Moved && existing.OldPath == combinedNewPath) {
+				this.UnprocessedChanges.RemoveAt(index);
+				return;
+			}
+
+			// アイテムを差し替えてUIに更新を通知する
+			var updated = new FileChangeItem {
+				MediaFileId = existing.MediaFileId,
+				OldPath = existing.OldPath,
+				NewPath = combinedNewPath,
+				ChangeType = nextChangeType
+			};
+			this.UnprocessedChanges[index] = updated;
+		});
+	}
+
+	/// <summary>
+	/// 指定されたアクションを UI スレッドで実行します。
+	/// </summary>
+	private void RunOnUIThread(Action action) {
+		var mainWindow = Ioc.Default.GetService<MainWindow>();
+		if (mainWindow?.DispatcherQueue != null) {
+			mainWindow.DispatcherQueue.TryEnqueue(() => action());
+		} else {
+			action();
 		}
 	}
 
@@ -169,21 +221,17 @@ public class FileChangeMonitorService : IDisposable {
 		this.RemoveItemsFromList(items);
 	}
 
+	/// <summary>
+	/// リストから指定されたアイテムを削除します。
+	/// </summary>
 	private void RemoveItemsFromList(IEnumerable<FileChangeItem> items) {
-		var mainWindow = Ioc.Default.GetService<MainWindow>();
-		Action action = () => {
+		this.RunOnUIThread(() => {
 			foreach (var item in items) {
 				var targetElement = this.UnprocessedChanges.FirstOrDefault(x => x.MediaFileId == item.MediaFileId);
 				if (targetElement != null) {
 					this.UnprocessedChanges.Remove(targetElement);
 				}
 			}
-		};
-
-		if (mainWindow?.DispatcherQueue != null) {
-			mainWindow.DispatcherQueue.TryEnqueue(() => action());
-		} else {
-			action();
-		}
+		});
 	}
 }
