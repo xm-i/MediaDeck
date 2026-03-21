@@ -29,6 +29,7 @@
 - **設定管理**: アプリケーション設定は `R3.JsonConfig` を利用して管理・永続化を行う。
 - **ロギング**: プロジェクト全体のログ出力には `Serilog` を使用する。
 - **DIとサービス管理**: `AutoDiAttributes` などを活用してDIの自動登録を行い、コンポーネント間は疎結合に保つ。
+- **R3/ObservableCollectionsのバインディング (非常に重要)**: `ObservableList<T>` や `ObservableDictionary<K, V>` はそのままでは WinUI 3 の UI にバインドできません。ViewModel では `.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current)` を使用して、UI スレッドへの同期を伴う `INotifyCollectionChangedSynchronizedViewList<T>` 等に変換して公開してください。
 
 ## 4. 拡張自動化ワークフローについて
 もし「定型的なビルド手順」「特定のテストの実行手順」「新規機能追加時の雛形作成手順」などをAIに自動で行わせたい場合は、プロジェクトルートに `.agents/workflows/` というディレクトリを作成し、その中に手順を書いたマークダウンファイル（例：`build_step.md`）を配置することができます。

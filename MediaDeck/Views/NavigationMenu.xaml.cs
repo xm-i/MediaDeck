@@ -4,7 +4,6 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
 using MediaDeck.Composition.Bases;
-using MediaDeck.Utils.Tools;
 using MediaDeck.ViewModels;
 using MediaDeck.Views.FolderManager;
 using MediaDeck.Views.Preferences;
@@ -15,6 +14,22 @@ namespace MediaDeck.Views;
 public sealed partial class NavigationMenu : NavigationMenuUserControl {
 	public NavigationMenu() {
 		this.InitializeComponent();
+		this.Loaded += this.NavigationMenu_Loaded;
+	}
+
+	private void NavigationMenu_Loaded(object sender, RoutedEventArgs e) {
+		if(this.ViewModel == null) {
+			return;
+		}
+		this.ViewModel.HasUnprocessedChanges.Subscribe(hasChanges => {
+			this.DispatcherQueue?.TryEnqueue(() => {
+				if (hasChanges) {
+					this.NotificationPulseStoryboard.Begin();
+				} else {
+					this.NotificationPulseStoryboard.Stop();
+				}
+			});
+		}).AddTo(this.ViewModel.CompositeDisposable);
 	}
 
 	private void MenuFlyoutItem_Click(object sender, RoutedEventArgs e) {
@@ -40,6 +55,11 @@ public sealed partial class NavigationMenu : NavigationMenuUserControl {
 				break;
 		}
 		window?.ActivateCenteredOnMainWindow();
+	}
+
+	private void SyncNotificationButton_Click(object sender, RoutedEventArgs e) {
+		var window = Ioc.Default.GetRequiredService<FileChangeSyncWindow>();
+		window.ActivateCenteredOnMainWindow();
 	}
 }
 

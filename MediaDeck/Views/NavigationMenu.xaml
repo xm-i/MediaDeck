@@ -9,8 +9,23 @@
     mc:Ignorable="d">
 
     <Grid>
+        <Grid.Resources>
+            <Storyboard x:Name="NotificationPulseStoryboard" RepeatBehavior="Forever">
+                <DoubleAnimation Storyboard.TargetName="NotificationIconTransform"
+                                 Storyboard.TargetProperty="ScaleX"
+                                 From="1.0" To="1.2" Duration="0:0:0.5" AutoReverse="True"/>
+                <DoubleAnimation Storyboard.TargetName="NotificationIconTransform"
+                                 Storyboard.TargetProperty="ScaleY"
+                                 From="1.0" To="1.2" Duration="0:0:0.5" AutoReverse="True"/>
+            </Storyboard>
+        </Grid.Resources>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        
 		<MenuBar
-			Grid.Row="0">
+			Grid.Column="0">
 			<MenuBarItem Title="Tools">
 				<MenuFlyoutItem Text="Tag Manager" Click="MenuFlyoutItem_Click" Tag="TagManager"/>
 				<MenuFlyoutItem Text="Folder Manager" Click="MenuFlyoutItem_Click" Tag="FolderManager"/>
@@ -22,5 +37,24 @@
 				<MenuFlyoutItem Text="Background Tasks" Click="MenuFlyoutItem_Click" Tag="BackgroundTasks"/>
 			</MenuBarItem>
 		</MenuBar>
+
+        <Button x:Name="SyncNotificationButton" 
+                Grid.Column="1" 
+                VerticalAlignment="Center" 
+                Margin="8,0"
+                Padding="8,4"
+                ToolTipService.ToolTip="未処理のファイル変更があります"
+                Click="SyncNotificationButton_Click"
+                Visibility="{x:Bind ViewModel.HasUnprocessedChanges.Value, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                Style="{ThemeResource AccentButtonStyle}">
+            <Button.Content>
+                <Grid>
+                    <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE89A;"/>
+                </Grid>
+            </Button.Content>
+            <Button.RenderTransform>
+                <ScaleTransform x:Name="NotificationIconTransform" CenterX="16" CenterY="16"/>
+            </Button.RenderTransform>
+        </Button>
     </Grid>
 </local:NavigationMenuUserControl>
