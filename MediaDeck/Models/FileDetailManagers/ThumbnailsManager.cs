@@ -5,10 +5,12 @@ using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Database;
 using MediaDeck.Utils.Constants;
 
+using Microsoft.Extensions.Logging;
+
 namespace MediaDeck.Models.FileDetailManagers;
 
 [Inject(InjectServiceLifetime.Singleton)]
-public class ThumbnailsManager(MediaDeckDbContext dbContext) {
+public class ThumbnailsManager(MediaDeckDbContext dbContext, ILogger<ThumbnailsManager> logger) {
 	private readonly MediaDeckDbContext _db = dbContext;
 
 	public async Task UpdateThumbnailAsync(IFileModel fileModel, byte[] thumbnail) {
@@ -33,6 +35,11 @@ public class ThumbnailsManager(MediaDeckDbContext dbContext) {
 		if (fileModel.ThumbnailFilePath is not { } path) {
 			return null;
 		}
-		return await File.ReadAllBytesAsync(path);
+		try {
+			return await File.ReadAllBytesAsync(path);
+		} catch (Exception ex) {
+			logger.LogError(ex, "Failed to load thumbnail for file {FileId} at path {ThumbnailPath}", fileModel.Id, path);
+			return null;
+		}
 	}
 }
