@@ -219,12 +219,8 @@ public class FileChangeMonitorService : IDisposable {
 	/// </summary>
 	private void RemoveItemsFromList(IEnumerable<FileChangeItem> items) {
 		this._dispatcherGate.BeginInvoke(() => {
-			foreach (var item in items) {
-				var targetElement = this.UnprocessedChanges.FirstOrDefault(x => x.MediaFileId == item.MediaFileId);
-				if (targetElement != null) {
-					this.UnprocessedChanges.Remove(targetElement);
-				}
-			}
+			var targetElement = this.UnprocessedChanges.Where(x => items.Any(i => i.MediaFileId == x.MediaFileId));
+			this.UnprocessedChanges.RemoveRange(targetElement);
 		});
 	}
 }

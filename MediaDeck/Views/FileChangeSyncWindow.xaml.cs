@@ -11,8 +11,8 @@ namespace MediaDeck.Views;
 [Inject(InjectServiceLifetime.Transient)]
 public sealed partial class FileChangeSyncWindow : Window {
 	public FileChangeSyncWindow(FileChangeSyncViewModel viewModel) {
-		this.InitializeComponent();
 		this.ViewModel = viewModel;
+		this.InitializeComponent();
 		this.AppWindow.Resize(new SizeInt32(700, 500));
 	}
 

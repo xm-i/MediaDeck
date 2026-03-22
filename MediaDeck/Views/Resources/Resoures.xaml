@@ -6,6 +6,7 @@
 	xmlns:converters="using:MediaDeck.Views.Resources.Converters"
 	xmlns:system="using:System" xmlns:specialized="using:System.Collections.Specialized">
 	<ctConverters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+	<converters:StringNotEmptyToVisibilityConverter x:Key="StringNotEmptyToVisibilityConverter" />
 	<converters:LongToDoubleConverter x:Key="LongToDoubleConverter" />
 	<converters:NullToBooleanConverter x:Key="NullToBooleanConverter" />
 	<converters:ToVisibilityConverter
@@ -23,4 +24,5 @@
 	<converters:TimeSpanToStringConverter x:Key="TimeSpanToStringConverter"/>
 	<converters:FileSizeConverter x:Key="FileSizeConverter"/>
 	<converters:TagListConverter x:Key="TagListConverter"/>
+	<converters:FileChangeFilterToDisplayNameConverter x:Key="FileChangeFilterToDisplayNameConverter"/>
 </ResourceDictionary>
