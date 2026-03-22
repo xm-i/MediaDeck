@@ -23,6 +23,7 @@ public class MediaContentLibraryViewModel : ViewModelBase {
 
 		this.SearchConditionCandidates = this._mediaContentLibrary.SearchConditionCandidates.CreateView(x => new SearchConditionViewModel(x));
 		this.FilteredSearchConditionCandidates = this.SearchConditionCandidates.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
+		this.SearchElapsedMilliseconds = mediaContentLibrary.SearchElapsedMilliseconds.ObserveOnCurrentSynchronizationContext().ToBindableReactiveProperty().AddTo(this.CompositeDisposable);
 
 		this.SearchConditionNotificationDispatcher = searchConditionNotificationDispatcher;
 	}
@@ -52,6 +53,10 @@ public class MediaContentLibraryViewModel : ViewModelBase {
 	public BindableReactiveProperty<IFileViewModel[]> SelectedFiles {
 		get;
 	} = new();
+
+	public BindableReactiveProperty<long> SearchElapsedMilliseconds {
+		get;
+	}
 
 	public SearchConditionNotificationDispatcher SearchConditionNotificationDispatcher {
 		get;

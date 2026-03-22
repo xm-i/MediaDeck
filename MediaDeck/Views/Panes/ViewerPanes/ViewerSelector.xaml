@@ -69,6 +69,9 @@
 			<TextBlock>
 				<Run Text="Count: "/>
 				<Run Text="{x:Bind ViewModel.MediaContentLibraryViewModel.Files.Count,Mode=OneWay}"/>
+				<Run Text="  /  Search: "/>
+				<Run Text="{x:Bind ViewModel.MediaContentLibraryViewModel.SearchElapsedMilliseconds.Value,Mode=OneWay}"/>
+				<Run Text=" ms"/>
 			</TextBlock>
 			<Slider
 				controls:DockPanel.Dock="Right"

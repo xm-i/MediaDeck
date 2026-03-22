@@ -1,3 +1,5 @@
+using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 
 using MediaDeck.Composition.Bases;
@@ -31,6 +33,7 @@ public class MediaContentLibrary: ModelBase {
 		});
 	}
 	private readonly FilesLoader _filesLoader;
+	private CancellationTokenSource? _searchCts;
 
 	public ObservableList<IFileModel> Files {
 		get;
@@ -44,9 +47,25 @@ public class MediaContentLibrary: ModelBase {
 		get;
 	} = [];
 
+	public ReactiveProperty<long> SearchElapsedMilliseconds {
+		get;
+	} = new();
+
 	public async Task SearchAsync() {
-		var files = await this._filesLoader.Load(this.SearchConditions);
-		this.Files.Clear();
-		this.Files.AddRange(files);
+		if (this._searchCts is { } oldCts) {
+			await oldCts.CancelAsync();
+		}
+		var cts = this._searchCts = new CancellationTokenSource();
+		try {
+			var stopwatch = Stopwatch.StartNew();
+			var files = await this._filesLoader.Load(this.SearchConditions, cts.Token);
+			cts.Token.ThrowIfCancellationRequested();
+			stopwatch.Stop();
+			this.Files.Clear();
+			this.Files.AddRange(files);
+			this.SearchElapsedMilliseconds.Value = stopwatch.ElapsedMilliseconds;
+		} catch (OperationCanceledException) when (cts.Token.IsCancellationRequested) {
+			// cancelled by a newer search
+		}
 	}
 }

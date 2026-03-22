@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 using MediaDeck.Composition.Interfaces.Files;
@@ -15,8 +16,8 @@ public class FilesLoader(IDbContextFactory<MediaDeckDbContext> dbFactory, SortSe
 	protected FilterSelector FilterSetter = filterSetter;
 	protected SortSelector SortSelector = sortSelector;
 
-	public async Task<IEnumerable<IFileModel>> Load(IEnumerable<ISearchCondition> searchConditions) {
-		await using var db = await dbFactory.CreateDbContextAsync();
+	public async Task<IEnumerable<IFileModel>> Load(IEnumerable<ISearchCondition> searchConditions, CancellationToken cancellationToken = default) {
+		await using var db = await dbFactory.CreateDbContextAsync(cancellationToken);
 		var files =
 			(await db
 				.MediaFiles
@@ -30,7 +31,8 @@ public class FilesLoader(IDbContextFactory<MediaDeckDbContext> dbFactory, SortSe
 				.ThenInclude(t => t.TagAliases)
 				.Include(mf => mf.Position)
 				.IncludeTables()
-				.ToArrayAsync())
+				.AsSplitQuery()
+				.ToArrayAsync(cancellationToken))
 				.Select(FileTypeUtility.CreateFileModelFromRecord)
 				.Where(searchConditions)
 				.Where(this.FilterSetter);
