@@ -1,5 +1,6 @@
-namespace MediaDeck.Utils.Objects;
+using System.Collections.Generic;
 
+namespace MediaDeck.Utils.Objects;
 
 /// <summary>
 /// 値と件数のペア
@@ -26,7 +27,7 @@ public readonly struct ValueCountPair<T> : IEquatable<ValueCountPair<T>> {
 	}
 
 	public bool Equals(ValueCountPair<T> other) {
-		if (other.Count == this.Count && other.Count == this.Count) {
+		if (EqualityComparer<T>.Default.Equals(this.Value, other.Value) && this.Count == other.Count) {
 			return true;
 		}
 		return false;

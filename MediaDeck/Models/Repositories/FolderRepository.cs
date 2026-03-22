@@ -31,7 +31,7 @@ public class FolderRepository : RepositoryBase {
 		get;
 	} = new();
 
-	public string[] _currentDirectoryPathList = [];
+	public ValueCountPair<string>[] _currentDirectoryStatusList = [];
 
 	public override async Task Load() {
 		await using var db = await this._dbFactory.CreateDbContextAsync();
@@ -43,12 +43,12 @@ public class FolderRepository : RepositoryBase {
 			.OrderBy(x => x.Value)
 			.ToList();
 
-		var directoryList = list.Select(x => x.Value).ToArray();
-		if (directoryList.SequenceEqual(this._currentDirectoryPathList)) {
+		var directoryStatusList = list.ToArray();
+		if (directoryStatusList.SequenceEqual(this._currentDirectoryStatusList)) {
 			this.RootFolder.Value ??= new FolderObject(null, "", []);
 			return;
 		}
-		this._currentDirectoryPathList = directoryList;
+		this._currentDirectoryStatusList = directoryStatusList;
 
 		var all = list.Select(x => (x.Value, x.Count, Split: x.Value.Split(Path.DirectorySeparatorChar))).ToArray();
 		var maxPathDepth = all.Length == 0 ? 0 : all.Max(x => x.Split.Length);
