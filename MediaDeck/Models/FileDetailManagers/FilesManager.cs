@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Composition.Objects;
 using MediaDeck.Database;
-using MediaDeck.Utils.Constants;
 using MediaDeck.Utils.Notifications;
 
 namespace MediaDeck.Models.FileDetailManagers;
@@ -15,16 +14,16 @@ namespace MediaDeck.Models.FileDetailManagers;
 /// </summary>
 [Inject(InjectServiceLifetime.Transient)]
 public class FilesManager {
-	private readonly MediaDeckDbContext _db;
+	private readonly IDbContextFactory<MediaDeckDbContext> _dbFactory;
 	private readonly AppNotificationDispatcher _notificationDispatcher;
 
 	/// <summary>
 	/// FilesManagerクラスの新しいインスタンスを初期化
 	/// </summary>
-	/// <param name="db">データベースコンテキスト</param>
+	/// <param name="dbFactory">データベースコンテキストファクトリー</param>
 	/// <param name="notificationDispatcher">通知ディスパッチャー</param>
-	public FilesManager(MediaDeckDbContext db, AppNotificationDispatcher notificationDispatcher) {
-		this._db = db;
+	public FilesManager(IDbContextFactory<MediaDeckDbContext> dbFactory, AppNotificationDispatcher notificationDispatcher) {
+		this._dbFactory = dbFactory;
 		this._notificationDispatcher = notificationDispatcher;
 	}
 
@@ -33,11 +32,11 @@ public class FilesManager {
 	/// </summary>
 	/// <param name="fileModels">削除するファイルモデルのコレクション</param>
 	public async Task RemoveFilesAsync(IEnumerable<IFileModel> fileModels) {
-		using var lockObject = await LockObjectConstants.DbLock.LockAsync();
-		using var transaction = await this._db.Database.BeginTransactionAsync();
+		await using var db = await this._dbFactory.CreateDbContextAsync();
+		using var transaction = await db.Database.BeginTransactionAsync();
 		var ids = fileModels.Select(x => x.Id).ToArray();
 		var targetFiles =
-			await this._db
+			await db
 				.MediaFiles
 				.Where(x => ids.Contains(x.MediaFileId))
 				.ToListAsync();
@@ -45,8 +44,8 @@ public class FilesManager {
 		if (targetFiles.Count == 0) {
 			return;
 		}
-		this._db.MediaFiles.RemoveRange(targetFiles);
-		await this._db.SaveChangesAsync();
+		db.MediaFiles.RemoveRange(targetFiles);
+		await db.SaveChangesAsync();
 		await transaction.CommitAsync();
 
 		var message = targetFiles.Count == 1

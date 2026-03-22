@@ -4,7 +4,6 @@ using MediaDeck.Models.Files.Metadata.Images;
 using MediaDeck.Models.Files.Metadata.Images.Formats;
 using ImageMagick;
 using MediaDeck.FileTypes.Base.Models;
-using MediaDeck.Utils.Constants;
 using System.Threading.Tasks;
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
@@ -17,9 +16,9 @@ public class ImageFileOperator : BaseFileOperator {
 	} = MediaType.Image;
 
 	public override async Task<MediaFile?> RegisterFileAsync(string filePath) {
-		using var lockObject = await LockObjectConstants.DbLock.LockAsync();
-		using var transaction = await this._db.Database.BeginTransactionAsync();
-		var isExists = await this._db.MediaFiles.AnyAsync(x => x.FilePath == filePath);
+		await using var db = await this._dbFactory.CreateDbContextAsync();
+		using var transaction = await db.Database.BeginTransactionAsync();
+		var isExists = await db.MediaFiles.AnyAsync(x => x.FilePath == filePath);
 		if (isExists) {
 			return null;
 		}
@@ -67,8 +66,8 @@ public class ImageFileOperator : BaseFileOperator {
 			mf.Altitude = meta.Altitude?.ToDouble() * (meta.AltitudeRef == 1 ? -1 : 1);
 			mf.Latitude = latitude;
 			mf.Longitude = longitude;
-			if (!this._db.Positions.Any(x => x.Latitude == latitude && x.Longitude == longitude)) {
-				this._db.Add(new Position() { Latitude = latitude, Longitude = longitude });
+			if (!db.Positions.Any(x => x.Latitude == latitude && x.Longitude == longitude)) {
+				db.Add(new Position() { Latitude = latitude, Longitude = longitude });
 			}
 		}
 
@@ -87,8 +86,8 @@ public class ImageFileOperator : BaseFileOperator {
 			mf.Heif = heif.CreateMetadataRecord();
 		}
 
-		await this._db.MediaFiles.AddAsync(mf);
-		await this._db.SaveChangesAsync();
+		await db.MediaFiles.AddAsync(mf);
+		await db.SaveChangesAsync();
 		await transaction.CommitAsync();
 
 		this._fileHashUpdater.EnqueueHashUpdate(mf.MediaFileId);

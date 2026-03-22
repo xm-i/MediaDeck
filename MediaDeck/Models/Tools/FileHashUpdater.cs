@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 
 using MediaDeck.Database;
-using MediaDeck.Utils.Constants;
 using MediaDeck.Utils.Tools;
 
 using Microsoft.EntityFrameworkCore;
@@ -18,7 +17,7 @@ namespace MediaDeck.Models.Tools;
 /// </summary>
 [Inject(InjectServiceLifetime.Singleton)]
 public class FileHashUpdater {
-	private readonly MediaDeckDbContext _db;
+	private readonly IDbContextFactory<MediaDeckDbContext> _dbFactory;
 	private readonly ILogger<FileHashUpdater> _logger;
 
 	/// <summary>
@@ -69,8 +68,8 @@ public class FileHashUpdater {
 	/// </summary>
 	/// <param name="db">データベースコンテキスト</param>
 	/// <param name="logger">ロガー</param>
-	public FileHashUpdater(MediaDeckDbContext db, ILogger<FileHashUpdater> logger) {
-		this._db = db;
+	public FileHashUpdater(IDbContextFactory<MediaDeckDbContext> dbFactory, ILogger<FileHashUpdater> logger) {
+		this._dbFactory = dbFactory;
 		this._logger = logger;
 		this.HashUpdateQueue
 			.ObserveAdd()
@@ -130,8 +129,8 @@ public class FileHashUpdater {
 		while (this.HashUpdateQueue.TryDequeue(out var mediaFileId)) {
 			try {
 				string? filePath;
-				using (await LockObjectConstants.DbLock.LockAsync()) {
-					var mediaFile = await this._db.MediaFiles.FindAsync(mediaFileId);
+				await using (var db = await this._dbFactory.CreateDbContextAsync()) {
+					var mediaFile = await db.MediaFiles.FindAsync(mediaFileId);
 					if (mediaFile == null || !mediaFile.IsExists) {
 						continue;
 					}
@@ -140,13 +139,13 @@ public class FileHashUpdater {
 
 				var hash = FileHashUtility.ComputeFileHash(filePath);
 
-				using (await LockObjectConstants.DbLock.LockAsync())
-				using (var transaction = await this._db.Database.BeginTransactionAsync()) {
-					var mediaFile = await this._db.MediaFiles.FindAsync(mediaFileId);
+				await using (var db = await this._dbFactory.CreateDbContextAsync())
+				using (var transaction = await db.Database.BeginTransactionAsync()) {
+					var mediaFile = await db.MediaFiles.FindAsync(mediaFileId);
 					if (mediaFile != null) {
 						mediaFile.PreHash = hash;
 						mediaFile.PreHashUpdatedTime = DateTime.Now;
-						await this._db.SaveChangesAsync();
+						await db.SaveChangesAsync();
 						await transaction.CommitAsync();
 					}
 				}
@@ -175,17 +174,17 @@ public class FileHashUpdater {
 	/// </summary>
 	private async Task EnqueueFullHashUpdatesForDuplicatePreHashAsync() {
 		List<long> duplicateIds;
-		using (await LockObjectConstants.DbLock.LockAsync()) {
+		await using (var db = await this._dbFactory.CreateDbContextAsync()) {
 			// PreHashが同一のレコードが2つ以上あるグループを見つけ、
 			// その中でFullHashが未設定またはPreHashより古いものを抽出
-			var duplicatePreHashes = await this._db.MediaFiles
+			var duplicatePreHashes = await db.MediaFiles
 				.Where(m => m.IsExists && m.PreHash != null)
 				.GroupBy(m => m.PreHash)
 				.Where(g => g.Count() >= 2)
 				.Select(g => g.Key)
 				.ToListAsync();
 
-			duplicateIds = await this._db.MediaFiles
+			duplicateIds = await db.MediaFiles
 				.Where(m => m.IsExists &&
 					duplicatePreHashes.Contains(m.PreHash) &&
 					(m.FullHash == null || m.PreHashUpdatedTime > m.FullHashUpdatedTime))
@@ -205,36 +204,37 @@ public class FileHashUpdater {
 	/// </summary>
 	private async Task ClearFullHashForNonDuplicatePreHashAsync() {
 		List<long> nonDuplicateIdsWithFullHash;
-		using var lockObject = await LockObjectConstants.DbLock.LockAsync();
-		using var transaction = await this._db.Database.BeginTransactionAsync();
+		await using (var db = await this._dbFactory.CreateDbContextAsync())
+		using (var transaction = await db.Database.BeginTransactionAsync()) {
 			// PreHashが重複しているグループを特定
-			var duplicatePreHashes = await this._db.MediaFiles
+			var duplicatePreHashes = await db.MediaFiles
 			.Where(m => m.IsExists && m.PreHash != null)
 			.GroupBy(m => m.PreHash)
 			.Where(g => g.Count() >= 2)
 			.Select(g => g.Key)
 			.ToListAsync();
 
-		// PreHashが重複していないのにFullHashが設定されているレコードを見つける
-		nonDuplicateIdsWithFullHash = await this._db.MediaFiles
-			.Where(m => m.IsExists &&
-				m.PreHash != null &&
-				!duplicatePreHashes.Contains(m.PreHash) &&
-				m.FullHash != null)
-			.Select(m => m.MediaFileId)
-			.ToListAsync();
+			// PreHashが重複していないのにFullHashが設定されているレコードを見つける
+			nonDuplicateIdsWithFullHash = await db.MediaFiles
+				.Where(m => m.IsExists &&
+					m.PreHash != null &&
+					!duplicatePreHashes.Contains(m.PreHash) &&
+					m.FullHash != null)
+				.Select(m => m.MediaFileId)
+				.ToListAsync();
 
-		// PreHashが重複していないレコードのFullHashをクリア
-		if (nonDuplicateIdsWithFullHash.Count > 0) {
-			foreach (var id in nonDuplicateIdsWithFullHash) {
-				var mediaFile = await this._db.MediaFiles.FindAsync(id);
-				if (mediaFile != null) {
-					mediaFile.FullHash = null;
-					mediaFile.FullHashUpdatedTime = null;
+			// PreHashが重複していないレコードのFullHashをクリア
+			if (nonDuplicateIdsWithFullHash.Count > 0) {
+				foreach (var id in nonDuplicateIdsWithFullHash) {
+					var mediaFile = await db.MediaFiles.FindAsync(id);
+					if (mediaFile != null) {
+						mediaFile.FullHash = null;
+						mediaFile.FullHashUpdatedTime = null;
+					}
 				}
+				await db.SaveChangesAsync();
+				await transaction.CommitAsync();
 			}
-			await this._db.SaveChangesAsync();
-			await transaction.CommitAsync();
 		}
 	}
 
@@ -246,8 +246,8 @@ public class FileHashUpdater {
 		while (this.FullHashUpdateQueue.TryDequeue(out var mediaFileId)) {
 			try {
 				string? filePath;
-				using (await LockObjectConstants.DbLock.LockAsync()) {
-					var mediaFile = await this._db.MediaFiles.FindAsync(mediaFileId);
+				await using (var db = await this._dbFactory.CreateDbContextAsync()) {
+					var mediaFile = await db.MediaFiles.FindAsync(mediaFileId);
 					if (mediaFile == null || !mediaFile.IsExists) {
 						continue;
 					}
@@ -256,13 +256,13 @@ public class FileHashUpdater {
 
 				var fullHash = FileHashUtility.ComputeFullFileHash(filePath);
 
-				using (await LockObjectConstants.DbLock.LockAsync())
-				using (var transaction = await this._db.Database.BeginTransactionAsync()) {
-					var mediaFile = await this._db.MediaFiles.FindAsync(mediaFileId);
+				await using (var db = await this._dbFactory.CreateDbContextAsync())
+				using (var transaction = await db.Database.BeginTransactionAsync()) {
+					var mediaFile = await db.MediaFiles.FindAsync(mediaFileId);
 					if (mediaFile != null) {
 						mediaFile.FullHash = fullHash;
 						mediaFile.FullHashUpdatedTime = DateTime.Now;
-						await this._db.SaveChangesAsync();
+						await db.SaveChangesAsync();
 						await transaction.CommitAsync();
 					}
 				}

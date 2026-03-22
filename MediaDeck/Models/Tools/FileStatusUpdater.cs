@@ -4,16 +4,15 @@ using System.Threading.Tasks;
 
 using MediaDeck.Database;
 using MediaDeck.Database.Tables;
-using MediaDeck.Utils.Constants;
 
 namespace MediaDeck.Models.Tools;
 [Inject(InjectServiceLifetime.Transient)]
 public class FileStatusUpdater {
-	public FileStatusUpdater(MediaDeckDbContext db, FileHashUpdater fileHashUpdater) {
-		this._db = db;
+	public FileStatusUpdater(IDbContextFactory<MediaDeckDbContext> dbFactory, FileHashUpdater fileHashUpdater) {
+		this._dbFactory = dbFactory;
 		this._fileHashUpdater = fileHashUpdater;
 	}
-	private readonly MediaDeckDbContext _db;
+	private readonly IDbContextFactory<MediaDeckDbContext> _dbFactory;
 	private readonly FileHashUpdater _fileHashUpdater;
 
 	public ReactiveProperty<long> TargetCount {
@@ -27,8 +26,8 @@ public class FileStatusUpdater {
 	public async Task UpdateFileInfo() {
 		var updateList = new List<MediaFile>();
 		var targetFiles = new List<MediaFile>();
-		using (await LockObjectConstants.DbLock.LockAsync()) {
-			targetFiles = await this._db.MediaFiles.ToListAsync();
+		await using (var db = await this._dbFactory.CreateDbContextAsync()) {
+			targetFiles = await db.MediaFiles.ToListAsync();
 		}
 		this.TargetCount.Value = targetFiles.Count;
 		this.CompletedCount.Value = 0;
@@ -69,10 +68,10 @@ public class FileStatusUpdater {
 			updateList.Add(file);
 		}
 
-		using (var lockObject = await LockObjectConstants.DbLock.LockAsync()) {
-			using var transaction = await this._db.Database.BeginTransactionAsync();
-			this._db.UpdateRange(updateList);
-			await this._db.SaveChangesAsync();
+		await using (var db = await this._dbFactory.CreateDbContextAsync()) {
+			using var transaction = await db.Database.BeginTransactionAsync();
+			db.UpdateRange(updateList);
+			await db.SaveChangesAsync();
 			await transaction.CommitAsync();
 		}
 

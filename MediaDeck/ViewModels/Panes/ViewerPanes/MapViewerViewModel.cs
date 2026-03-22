@@ -1,3 +1,4 @@
+#nullable enable
 using System.Collections.Generic;
 
 using MapControl;
@@ -21,7 +22,7 @@ public class MapViewerViewModel : ViewerPaneViewModelBase {
 		get;
 	}
 
-	public BindableReactiveProperty<GpsLocation> Center {
+	public BindableReactiveProperty<GpsLocation?> Center {
 		get;
 	}
 

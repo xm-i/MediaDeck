@@ -7,7 +7,6 @@ using MediaDeck.Database;
 using MediaDeck.Models.Files.SearchConditions;
 using MediaDeck.Models.NotificationDispatcher;
 using MediaDeck.Models.Repositories.Objects;
-using MediaDeck.Utils.Constants;
 using MediaDeck.Utils.Notifications;
 using MediaDeck.Utils.Objects;
 
@@ -16,8 +15,8 @@ namespace MediaDeck.Models.Repositories;
 [Inject(InjectServiceLifetime.Transient)]
 public class FolderRepository : RepositoryBase {
 	private readonly StateModel _state;
-	public FolderRepository(MediaDeckDbContext dbContext, SearchConditionNotificationDispatcher searchConditionNotificationDispatcher,StateModel state) {
-		this._db = dbContext;
+	public FolderRepository(IDbContextFactory<MediaDeckDbContext> dbFactory, SearchConditionNotificationDispatcher searchConditionNotificationDispatcher,StateModel state) {
+		this._dbFactory = dbFactory;
 		this._searchConditionNotificationDispatcher = searchConditionNotificationDispatcher;
 		this._state = state;
 		FileNotifications
@@ -26,7 +25,7 @@ public class FolderRepository : RepositoryBase {
 			.Subscribe(async _ => await this.Load());
 	}
 
-	private readonly MediaDeckDbContext _db;
+	private readonly IDbContextFactory<MediaDeckDbContext> _dbFactory;
 	private readonly SearchConditionNotificationDispatcher _searchConditionNotificationDispatcher;
 	public ReactiveProperty<FolderObject> RootFolder {
 		get;
@@ -35,8 +34,8 @@ public class FolderRepository : RepositoryBase {
 	public string[] _currentDirectoryPathList = [];
 
 	public override async Task Load() {
-		using var lockObject = await LockObjectConstants.DbLock.LockAsync();
-		var list = (await this._db
+		await using var db = await this._dbFactory.CreateDbContextAsync();
+		var list = (await db
 			.MediaFiles
 			.GroupBy(x => x.DirectoryPath)
 			.Select(x => new ValueCountPair<string>(x.Key, x.Count()))

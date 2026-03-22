@@ -7,7 +7,6 @@ using CommunityToolkit.Mvvm.DependencyInjection;
 using System.Drawing;
 using MediaDeck.FileTypes.Base.Models;
 using System.Threading.Tasks;
-using MediaDeck.Utils.Constants;
 using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
@@ -31,9 +30,9 @@ public partial class VideoFileOperator : BaseFileOperator {
 	}
 
 	public override async Task<MediaFile?> RegisterFileAsync(string filePath) {
-		using var lockObject = await LockObjectConstants.DbLock.LockAsync();
-		using var transaction = await this._db.Database.BeginTransactionAsync();
-		var isExists = await this._db.MediaFiles.AnyAsync(x => x.FilePath == filePath);
+		await using var db = await this._dbFactory.CreateDbContextAsync();
+		using var transaction = await db.Database.BeginTransactionAsync();
+		var isExists = await db.MediaFiles.AnyAsync(x => x.FilePath == filePath);
 		if (isExists) {
 			return null;
 		}
@@ -81,8 +80,8 @@ public partial class VideoFileOperator : BaseFileOperator {
 			}
 		};
 
-		await this._db.MediaFiles.AddAsync(mf);
-		await this._db.SaveChangesAsync();
+		await db.MediaFiles.AddAsync(mf);
+		await db.SaveChangesAsync();
 		await transaction.CommitAsync();
 
 		this._fileHashUpdater.EnqueueHashUpdate(mf.MediaFileId);

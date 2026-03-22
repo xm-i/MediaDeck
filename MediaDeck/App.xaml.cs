@@ -41,9 +41,11 @@ public partial class App : Application {
 		}
 		BuildConfigureServices();
 
-		var db = Ioc.Default.GetRequiredService<MediaDeckDbContext>();
-		db.Database.EnsureCreated();
-		InitialDataRegisterer.Register(db);
+		var dbFactory = Ioc.Default.GetRequiredService<IDbContextFactory<MediaDeckDbContext>>();
+		using (var db = dbFactory.CreateDbContext()) {
+			db.Database.EnsureCreated();
+			InitialDataRegisterer.Register(db);
+		}
 
 		this._configStore = Ioc.Default.GetRequiredService<ConfigStore>();
 		this._stateStore = Ioc.Default.GetRequiredService<StateStore>();

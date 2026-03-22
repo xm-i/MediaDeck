@@ -5,7 +5,6 @@ using Patagames.Pdf.Enums;
 using System.Drawing.Imaging;
 using MediaDeck.FileTypes.Base.Models;
 using System.Threading.Tasks;
-using MediaDeck.Utils.Constants;
 using MediaDeck.Composition.Enum;
 
 namespace MediaDeck.FileTypes.Pdf.Models;
@@ -17,9 +16,9 @@ public partial class PdfFileOperator : BaseFileOperator {
 	} = MediaType.Pdf;
 
 	public override async Task<MediaFile?> RegisterFileAsync(string filePath) {
-		using var lockObject = await LockObjectConstants.DbLock.LockAsync();
-		using var transaction = await this._db.Database.BeginTransactionAsync();
-		var isExists = await this._db.MediaFiles.AnyAsync(x => x.FilePath == filePath);
+		await using var db = await this._dbFactory.CreateDbContextAsync();
+		using var transaction = await db.Database.BeginTransactionAsync();
+		var isExists = await db.MediaFiles.AnyAsync(x => x.FilePath == filePath);
 		if (isExists) {
 			return null;
 		}
@@ -58,8 +57,8 @@ public partial class PdfFileOperator : BaseFileOperator {
 			}
 		};
 
-		await this._db.MediaFiles.AddAsync(mf);
-		await this._db.SaveChangesAsync();
+		await db.MediaFiles.AddAsync(mf);
+		await db.SaveChangesAsync();
 		await transaction.CommitAsync();
 
 		this._fileHashUpdater.EnqueueHashUpdate(mf.MediaFileId);

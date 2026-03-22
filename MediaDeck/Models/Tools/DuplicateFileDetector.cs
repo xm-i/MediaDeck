@@ -42,7 +42,7 @@ public class DuplicateFileGroup {
 /// </summary>
 [Inject(InjectServiceLifetime.Transient)]
 public class DuplicateFileDetector : ModelBase {
-	private readonly MediaDeckDbContext _db;
+	private readonly IDbContextFactory<MediaDeckDbContext> _dbFactory;
 
 	/// <summary>
 	/// 重複ファイルグループリスト
@@ -79,8 +79,8 @@ public class DuplicateFileDetector : ModelBase {
 		get;
 	} = new(0);
 
-	public DuplicateFileDetector(MediaDeckDbContext db) {
-		this._db = db;
+	public DuplicateFileDetector(IDbContextFactory<MediaDeckDbContext> dbFactory) {
+		this._dbFactory = dbFactory;
 	}
 
 	/// <summary>
@@ -96,7 +96,8 @@ public class DuplicateFileDetector : ModelBase {
 			List<DuplicateFileGroup> groups;
 
 			if (useFullHash) {
-				groups = await this._db.MediaFiles
+				await using var db = await this._dbFactory.CreateDbContextAsync();
+				groups = await db.MediaFiles
 					.Include(x => x.MediaFileTags)
 					.ThenInclude(x => x.Tag)
 					.ThenInclude(x => x.TagCategory)
@@ -112,7 +113,8 @@ public class DuplicateFileDetector : ModelBase {
 					})
 					.ToListAsync();
 			} else {
-				groups = await this._db.MediaFiles
+				await using var db = await this._dbFactory.CreateDbContextAsync();
+				groups = await db.MediaFiles
 					.Include(x => x.MediaFileTags)
 					.ThenInclude(x => x.Tag)
 					.ThenInclude(x => x.TagCategory)

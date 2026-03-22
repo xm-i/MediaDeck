@@ -8,7 +8,6 @@ using MediaDeck.Composition.Enum;
 using MediaDeck.Database.Tables;
 using MediaDeck.FileTypes.Base.Models;
 using MediaDeck.Models.Files.Metadata.Images;
-using MediaDeck.Utils.Constants;
 
 namespace MediaDeck.FileTypes.Archive.Models;
 [Inject(InjectServiceLifetime.Transient)]
@@ -19,9 +18,9 @@ public partial class ArchiveFileOperator : BaseFileOperator {
 	} = MediaType.Archive;
 
 	public override async Task<MediaFile?> RegisterFileAsync(string filePath) {
-		using var lockObject = await LockObjectConstants.DbLock.LockAsync();
-		using var transaction = await this._db.Database.BeginTransactionAsync();
-		var isExists = await this._db.MediaFiles.AnyAsync(x => x.FilePath == filePath);
+		await using var db = await this._dbFactory.CreateDbContextAsync();
+		using var transaction = await db.Database.BeginTransactionAsync();
+		var isExists = await db.MediaFiles.AnyAsync(x => x.FilePath == filePath);
 		if (isExists) {
 			return null;
 		}
@@ -77,8 +76,8 @@ public partial class ArchiveFileOperator : BaseFileOperator {
 			}
 		}
 
-		await this._db.MediaFiles.AddAsync(mf);
-		await this._db.SaveChangesAsync();
+		await db.MediaFiles.AddAsync(mf);
+		await db.SaveChangesAsync();
 		await transaction.CommitAsync();
 
 		this._fileHashUpdater.EnqueueHashUpdate(mf.MediaFileId);

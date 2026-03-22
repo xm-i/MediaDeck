@@ -3,15 +3,14 @@ using System.Threading.Tasks;
 
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Database;
-using MediaDeck.Utils.Constants;
 
 using Microsoft.Extensions.Logging;
 
 namespace MediaDeck.Models.FileDetailManagers;
 
 [Inject(InjectServiceLifetime.Singleton)]
-public class ThumbnailsManager(MediaDeckDbContext dbContext, ILogger<ThumbnailsManager> logger) {
-	private readonly MediaDeckDbContext _db = dbContext;
+public class ThumbnailsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ILogger<ThumbnailsManager> logger) {
+	private readonly IDbContextFactory<MediaDeckDbContext> _dbFactory = dbFactory;
 
 	public async Task UpdateThumbnailAsync(IFileModel fileModel, byte[] thumbnail) {
 		var thumbRelativePath = FilePathUtility.GetThumbnailRelativeFilePath(fileModel.FilePath);
@@ -21,13 +20,14 @@ public class ThumbnailsManager(MediaDeckDbContext dbContext, ILogger<ThumbnailsM
 		if (fileModel.ThumbnailFilePath == thumbPath) {
 			return;
 		}
-		using var lockObject = await LockObjectConstants.DbLock.LockAsync();
-		using var transaction = await this._db.Database.BeginTransactionAsync();
-		var mf = await this._db.MediaFiles.FirstAsync(x => x.MediaFileId== fileModel.Id);
+		
+		await using var db = await this._dbFactory.CreateDbContextAsync();
+		using var transaction = await db.Database.BeginTransactionAsync();
+		var mf = await db.MediaFiles.FirstAsync(x => x.MediaFileId== fileModel.Id);
 		mf.ThumbnailFileName = thumbPath;
-		this._db.MediaFiles.Update(mf);
+		db.MediaFiles.Update(mf);
 
-		await this._db.SaveChangesAsync();
+		await db.SaveChangesAsync();
 		await transaction.CommitAsync();
 	}
 

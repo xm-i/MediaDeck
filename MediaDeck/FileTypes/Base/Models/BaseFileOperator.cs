@@ -7,57 +7,56 @@ using MediaDeck.Database;
 using MediaDeck.Database.Tables;
 using MediaDeck.FileTypes.Base.Models.Interfaces;
 using MediaDeck.Models.Tools;
-using MediaDeck.Utils.Constants;
 
 namespace MediaDeck.FileTypes.Base.Models;
 
 public abstract class BaseFileOperator : IFileOperator {
-	protected readonly MediaDeckDbContext _db;
+	protected readonly IDbContextFactory<MediaDeckDbContext> _dbFactory;
 	protected readonly FileHashUpdater _fileHashUpdater;
 
 	protected BaseFileOperator() {
-		this._db = Ioc.Default.GetRequiredService<MediaDeckDbContext>();
+		this._dbFactory = Ioc.Default.GetRequiredService<IDbContextFactory<MediaDeckDbContext>>();
 		this._fileHashUpdater = Ioc.Default.GetRequiredService<FileHashUpdater>();
 	}
 
 	public virtual async Task<MediaFile?> UpdateRateAsync(long mediaFileId, int rate) {
-		using var lockObject = await LockObjectConstants.DbLock.LockAsync();
-		using var transaction = await this._db.Database.BeginTransactionAsync();
-		var file = await this._db.MediaFiles.FirstOrDefaultAsync(x => x.MediaFileId == mediaFileId);
+		await using var db = await this._dbFactory.CreateDbContextAsync();
+		using var transaction = await db.Database.BeginTransactionAsync();
+		var file = await db.MediaFiles.FirstOrDefaultAsync(x => x.MediaFileId == mediaFileId);
 		if (file is not { } mediaFile) {
 			return null;
 		}
 		mediaFile.Rate = rate;
-		this._db.Update(mediaFile);
-		await this._db.SaveChangesAsync();
+		db.Update(mediaFile);
+		await db.SaveChangesAsync();
 		await transaction.CommitAsync();
 		return mediaFile;
 	}
 
 	public virtual async Task<MediaFile?> IncrementUsageCountAsync(long mediaFileId) {
-		using var lockObject = await LockObjectConstants.DbLock.LockAsync();
-		using var transaction = await this._db.Database.BeginTransactionAsync();
-		var file = await this._db.MediaFiles.FirstOrDefaultAsync(x => x.MediaFileId == mediaFileId);
+		await using var db = await this._dbFactory.CreateDbContextAsync();
+		using var transaction = await db.Database.BeginTransactionAsync();
+		var file = await db.MediaFiles.FirstOrDefaultAsync(x => x.MediaFileId == mediaFileId);
 		if (file is not { } mediaFile) {
 			return null;
 		}
 		mediaFile.UsageCount++;
-		this._db.Update(mediaFile);
-		await this._db.SaveChangesAsync();
+		db.Update(mediaFile);
+		await db.SaveChangesAsync();
 		await transaction.CommitAsync();
 		return mediaFile;
 	}
 
 	public virtual async Task<MediaFile?> UpdateDescriptionAsync(long mediaFileId, string description) {
-		using var lockObject = await LockObjectConstants.DbLock.LockAsync();
-		using var transaction = await this._db.Database.BeginTransactionAsync();
-		var file = await this._db.MediaFiles.FirstOrDefaultAsync(x => x.MediaFileId == mediaFileId);
+		await using var db = await this._dbFactory.CreateDbContextAsync();
+		using var transaction = await db.Database.BeginTransactionAsync();
+		var file = await db.MediaFiles.FirstOrDefaultAsync(x => x.MediaFileId == mediaFileId);
 		if (file is not { } mediaFile) {
 			return null;
 		}
 		mediaFile.Description = description;
-		this._db.Update(mediaFile);
-		await this._db.SaveChangesAsync();
+		db.Update(mediaFile);
+		await db.SaveChangesAsync();
 		await transaction.CommitAsync();
 		return mediaFile;
 	}
