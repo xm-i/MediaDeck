@@ -30,12 +30,12 @@ public class FileChangeSyncViewModel : ViewModelBase {
 
 		this.ApplyAllCommand = new ReactiveCommand();
 		this.ApplyAllCommand.SubscribeAwait(async (_, ct) => {
-			await this._service.ApplyChangesAsync(this.Changes.ToArray(), false);
+			await this._service.ApplyChangesAsync(this._service.UnprocessedChanges, false);
 		}).AddTo(this.CompositeDisposable);
 
 		this.DiscardAllCommand = new ReactiveCommand();
 		this.DiscardAllCommand.Subscribe(_ => {
-			this._service.DiscardChanges(this.Changes.ToArray());
+			this._service.DiscardChanges(this._service.UnprocessedChanges);
 		}).AddTo(this.CompositeDisposable);
 
 		this.ApplySingleCommand = new ReactiveCommand<FileChangeItem>();
