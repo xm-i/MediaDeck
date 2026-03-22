@@ -143,7 +143,7 @@ public class DetailSelectorViewModel : ViewModelBase {
 		get;
 	} = new();
 
-	public async Task OnNewTagCreated(Tag tag) {
+	public async Task OnNewTagCreated(ITagModel tag) {
 		await this._model.AddTagAsync(this.TargetFileModels, tag);
 		this.Text.Value = "";
 	}

@@ -22,13 +22,12 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory) {
 		get;
 	} = [];
 
-	public async Task<Tag?> FindTagByNameAsync(string tagName) {
-		await using var db = await this._dbFactory.CreateDbContextAsync();
-		var tag = await db.Tags.FirstOrDefaultAsync(x => x.TagName == tagName);
+	public async Task<ITagModel?> FindTagByNameAsync(string tagName) {
+		var tag = this.Tags.FirstOrDefault(x => x.TagName == tagName);
 		return tag;
 	}
 
-	public async Task<Tag> CreateTagAsync(int tagCategoryId, string tagName, string detail, IEnumerable<TagAlias> aliases) {
+	public async Task<ITagModel?> CreateTagAsync(int tagCategoryId, string tagName, string detail, IEnumerable<TagAlias> aliases) {
 		await using var db = await this._dbFactory.CreateDbContextAsync();
 		using var transaction = await db.Database.BeginTransactionAsync();
 		var tag = new Tag {
@@ -54,10 +53,10 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory) {
 		}
 		
 		await transaction.CommitAsync();
-		return tag;
+		return new TagModel(tag);
 	}
 
-	public async Task AddTagAsync(IFileModel[] fileModels, Tag tag) {
+	public async Task AddTagAsync(IFileModel[] fileModels, ITagModel tag) {
 		var target = fileModels.Where(x => !x.Tags.Any(t => t.TagId == tag.TagId)).ToArray();
 		if (target.IsEmpty()) {
 			return;
@@ -76,7 +75,7 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory) {
 		}));
 		await db.SaveChangesAsync();
 		foreach(var file in target) {
-			file.Tags.Add(new TagModel(tag));
+			file.Tags.Add(tag);
 		}
 		await transaction.CommitAsync();
 	}

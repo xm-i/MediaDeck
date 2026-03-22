@@ -159,7 +159,7 @@ public class DetailSelectorModel : IDisposable {
 	/// <summary>
 	/// ファイルにタグを追加する
 	/// </summary>
-	public async Task AddTagAsync(IFileModel[] files, Tag tag) {
+	public async Task AddTagAsync(IFileModel[] files, ITagModel tag) {
 		await this._tagsManager.AddTagAsync(files, tag);
 		this.RefreshTags(files);
 	}
@@ -175,7 +175,7 @@ public class DetailSelectorModel : IDisposable {
 	/// <summary>
 	/// タグを名前で検索する
 	/// </summary>
-	public Task<Tag?> FindTagByNameAsync(string tagName) {
+	public Task<ITagModel?> FindTagByNameAsync(string tagName) {
 		return this._tagsManager.FindTagByNameAsync(tagName);
 	}
 

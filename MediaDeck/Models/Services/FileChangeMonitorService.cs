@@ -79,7 +79,6 @@ public class FileChangeMonitorService : IDisposable {
 				IncludeSubdirectories = true,
 				NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName
 			};
-
 			watcher.Deleted += this.OnFileDeleted;
 			watcher.Renamed += this.OnFileRenamed;
 			watcher.EnableRaisingEvents = true;

@@ -1,4 +1,5 @@
 using MediaDeck.Composition.Bases;
+using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Database.Tables;
 using MediaDeck.Models.FileDetailManagers;
 
@@ -28,7 +29,7 @@ public class NewTagDialogViewModel : ViewModelBase {
 	public BindableReactiveProperty<string> Detail { get; } = new("");
 	public BindableReactiveProperty<TagCategory?> SelectedCategory { get; } = new();
 	public BindableReactiveProperty<DialogResult> Result { get; } = new(DialogResult.None);
-	public BindableReactiveProperty<Tag?> CreatedTag { get; } = new();
+	public BindableReactiveProperty<ITagModel?> CreatedTag { get; } = new();
 
 	public TagCategory[] TagCategories { get; private set; } = [];
 
