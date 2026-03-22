@@ -9,8 +9,6 @@
 	xmlns:controls="using:CommunityToolkit.WinUI.Controls"
 	xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
 	xmlns:behaviors="using:CommunityToolkit.WinUI.Behaviors"
-	xmlns:core="using:Microsoft.Xaml.Interactions.Core"
-	xmlns:viewerControls="using:MediaDeck.Views.Panes.ViewerPanes.Controls"
 	xmlns:vmIf="using:MediaDeck.FileTypes.Base.ViewModels.Interfaces"
 	xmlns:viewerpanes="using:MediaDeck.ViewModels.Panes.ViewerPanes"
 	mc:Ignorable="d">
@@ -86,14 +84,14 @@
 							<RowDefinition Height="Auto"/>
 						</Grid.RowDefinitions>
 						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="60"/>
+							<ColumnDefinition Width="Auto" MinWidth="60"/>
 							<ColumnDefinition Width="*" MinWidth="200"/>
 							<ColumnDefinition Width="100"/>
 							<ColumnDefinition Width="100"/>
 							<ColumnDefinition Width="150"/>
 							<ColumnDefinition Width="60"/>
 						</Grid.ColumnDefinitions>
-						<Image Grid.Column="0" Stretch="Uniform" Height="40" Source="{x:Bind ThumbnailFilePath.Value, Mode=OneWay}"/>
+						<Image Grid.Column="0" Stretch="Uniform" Margin="4" Height="{Binding DataContext.ItemSize.Value, Mode=OneWay, ElementName=List}" Width="{Binding DataContext.ItemSize.Value, Mode=OneWay, ElementName=List}" Source="{x:Bind ThumbnailFilePath.Value, Mode=OneWay}"/>
 						<TextBlock Grid.Column="1" Text="{x:Bind FilePath}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
 						<TextBlock Grid.Column="2" Text="{x:Bind FileModel.Resolution}" VerticalAlignment="Center"/>
 						<TextBlock Grid.Column="3" Text="{x:Bind FileModel.FileSize, Converter={StaticResource FileSizeConverter}}" VerticalAlignment="Center"/>

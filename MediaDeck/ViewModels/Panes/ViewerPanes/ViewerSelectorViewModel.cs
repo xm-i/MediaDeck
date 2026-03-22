@@ -5,6 +5,7 @@ namespace MediaDeck.ViewModels.Panes.ViewerPanes;
 [Inject(InjectServiceLifetime.Transient)]
 public class ViewerSelectorViewModel : ViewModelBase {
 	public ViewerSelectorViewModel(
+		MediaDeck.Stores.State.StateStore stateStore,
 		MediaContentLibraryViewModel mediaContentLibraryViewModel,
 		WrapViewerViewModel wrapViewerViewModel,
 		ListViewerViewModel listViewerViewModel,
@@ -24,6 +25,8 @@ public class ViewerSelectorViewModel : ViewModelBase {
 		this.DetailViewerViewModel = detailViewerViewModel;
 		this.MapViewerViewModel = mapViewerViewModel;
 		this.SortSelectorViewModel = sortSelectorViewModel;
+
+		this.ItemSize = stateStore.State.ViewerState.ItemSize.ToTwoWayBindableReactiveProperty(stateStore.State.ViewerState.ItemSize.Value).AddTo(this.CompositeDisposable);
 	}
 
 	public MediaContentLibraryViewModel MediaContentLibraryViewModel {

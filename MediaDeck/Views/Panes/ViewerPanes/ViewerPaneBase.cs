@@ -13,6 +13,8 @@ using MediaDeck.FileTypes.Base.ViewModels.Interfaces;
 
 using System.Diagnostics;
 using System.IO;
+using Microsoft.UI.Input;
+using Windows.UI.Core;
 
 namespace MediaDeck.Views.Panes.ViewerPanes;
 
@@ -128,6 +130,22 @@ public class ViewerPaneBase : UserControlBase<ViewerSelectorViewModel> {
 	protected void TokenizingTextBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args) {
 		if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput) {
 			this.ViewModel?.MediaContentLibraryViewModel.RefreshSearchTokenCandidates(sender.Text);
+		}
+	}
+
+	protected void HandleListPointerWheelChanged(object sender, PointerRoutedEventArgs e) {
+		var ctrlKeyState = InputKeyboardSource.GetKeyStateForCurrentThread(Windows.System.VirtualKey.Control);
+		if (ctrlKeyState.HasFlag(CoreVirtualKeyStates.Down)) {
+			var delta = e.GetCurrentPoint(sender as UIElement).Properties.MouseWheelDelta;
+			if (this.ViewModel != null) {
+				var step = 20;
+				if (delta > 0) {
+					this.ViewModel.ItemSize.Value = Math.Min(500, this.ViewModel.ItemSize.Value + step);
+				} else if (delta < 0) {
+					this.ViewModel.ItemSize.Value = Math.Max(20, this.ViewModel.ItemSize.Value - step);
+				}
+			}
+			e.Handled = true;
 		}
 	}
 }

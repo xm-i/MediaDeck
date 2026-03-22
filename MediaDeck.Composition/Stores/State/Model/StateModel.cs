@@ -7,7 +7,7 @@ namespace MediaDeck.Composition.Stores.State.Model;
 
 [Inject(InjectServiceLifetime.Singleton)]
 [GenerateR3JsonConfigDto]
-public class StateModel(SearchStateModel searchState, FolderManagerStateModel folderManagerState) {
+public class StateModel(SearchStateModel searchState, FolderManagerStateModel folderManagerState, ViewerStateModel viewerState) {
 
 	public SearchStateModel SearchState {
 		get;
@@ -18,4 +18,9 @@ public class StateModel(SearchStateModel searchState, FolderManagerStateModel fo
 		get;
 		set;
 	} = folderManagerState;
+
+	public ViewerStateModel ViewerState {
+		get;
+		set;
+	} = viewerState;
 }
