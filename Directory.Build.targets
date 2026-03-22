@@ -9,7 +9,7 @@
     <PackageReference Update="CommunityToolkit.WinUI.Controls.TokenizingTextBox" Version="8.2.250402" />
     <PackageReference Update="CommunityToolkit.WinUI.Converters" Version="8.2.250402" />
     <PackageReference Update="FFMpegCore" Version="5.4.0" />
-    <PackageReference Update="Magick.NET-Q16-AnyCPU" Version="14.10.0" />
+    <PackageReference Update="Magick.NET-Q16-AnyCPU" Version="14.11.0" />
     <PackageReference Update="MetadataExtractor" Version="2.9.0" />
     <PackageReference Update="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.1" />
     <PackageReference Update="Microsoft.Extensions.DependencyInjection" Version="10.0.3" />
