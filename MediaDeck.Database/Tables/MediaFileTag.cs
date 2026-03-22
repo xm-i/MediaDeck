@@ -3,8 +3,6 @@ namespace MediaDeck.Database.Tables;
 /// メディアファイル・タグ中間テーブル
 /// </summary>
 public class MediaFileTag {
-	private MediaFile? _mediaFile;
-	private Tag? _tag;
 
 	/// <summary>
 	/// メディアファイルID
@@ -19,11 +17,9 @@ public class MediaFileTag {
 	/// </summary>
 	public MediaFile MediaFile {
 		get {
-			return this._mediaFile ?? throw new InvalidOperationException();
+			return field ?? throw new InvalidOperationException();
 		}
-		set {
-			this._mediaFile = value;
-		}
+		set;
 	}
 
 	/// <summary>
@@ -39,10 +35,8 @@ public class MediaFileTag {
 	/// </summary>
 	public Tag Tag {
 		get {
-			return this._tag ?? throw new InvalidOperationException();
+			return field ?? throw new InvalidOperationException();
 		}
-		set {
-			this._tag = value;
-		}
+		set;
 	}
 }

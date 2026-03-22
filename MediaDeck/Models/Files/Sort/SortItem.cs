@@ -94,7 +94,7 @@ public interface ISortItem {
 	/// <summary>
 	/// 保存時のキー値
 	/// </summary>
-	SortItemKey Key {
+	public SortItemKey Key {
 		get;
 		set;
 	}
@@ -102,7 +102,7 @@ public interface ISortItem {
 	/// <summary>
 	/// ソートの方向
 	/// </summary>
-	ListSortDirection Direction {
+	public ListSortDirection Direction {
 		get;
 		set;
 	}
@@ -112,12 +112,12 @@ public interface ISortItem {
 	/// </summary>
 	/// <param name="items">ソートを適用するアイテムリスト</param>
 	/// <returns>整列されたアイテムリスト</returns>
-	IOrderedEnumerable<IFileModel> ApplySort(IEnumerable<IFileModel> items, bool reverse);
+	public IOrderedEnumerable<IFileModel> ApplySort(IEnumerable<IFileModel> items, bool reverse);
 
 	/// <summary>
 	/// ソートされたアイテムリストに対して、追加のソート条件適用
 	/// </summary>
 	/// <param name="items">ソートを適用するアイテムリスト</param>
 	/// <returns>整列されたアイテムリスト</returns>
-	IOrderedEnumerable<IFileModel> ApplyThenBySort(IOrderedEnumerable<IFileModel> items, bool reverse);
+	public IOrderedEnumerable<IFileModel> ApplyThenBySort(IOrderedEnumerable<IFileModel> items, bool reverse);
 }

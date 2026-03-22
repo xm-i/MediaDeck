@@ -3,7 +3,7 @@ namespace MediaDeck.Database.Tables;
 /// タグ別名テーブル
 /// </summary>
 public class TagAlias {
-	private string? _alias;
+
 
 	/// <summary>
 	/// タグ別名ID
@@ -26,11 +26,9 @@ public class TagAlias {
 	/// </summary>
 	public string Alias {
 		get {
-			return this._alias ?? throw new InvalidOperationException();
+			return field ?? throw new InvalidOperationException();
 		}
-		set {
-			this._alias = value;
-		}
+		set;
 	}
 
 	/// <summary>

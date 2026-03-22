@@ -3,7 +3,6 @@ namespace MediaDeck.Database.Tables;
 /// 画像ファイルテーブル
 /// </summary>
 public class ImageFile {
-	private MediaFile? _mediaFile;
 
 	/// <summary>
 	/// メディアファイルID
@@ -18,11 +17,9 @@ public class ImageFile {
 	/// </summary>
 	public MediaFile MediaFile {
 		get {
-			return this._mediaFile ?? throw new InvalidOperationException();
+			return field ?? throw new InvalidOperationException();
 		}
-		set {
-			this._mediaFile = value;
-		}
+		set;
 	}
 
 	/// <summary>

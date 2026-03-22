@@ -5,7 +5,7 @@ namespace MediaDeck.Database.Tables;
 /// メディアファイルテーブル
 /// </summary>
 public class MediaFile {
-	private ICollection<MediaFileTag>? _mediaFileTags;
+
 
 	/// <summary>
 	/// メディアファイルID
@@ -204,11 +204,9 @@ public class MediaFile {
 	/// </summary>
 	public virtual ICollection<MediaFileTag> MediaFileTags {
 		get {
-			return this._mediaFileTags ?? throw new InvalidOperationException();
+			return field ?? throw new InvalidOperationException();
 		}
-		set {
-			this._mediaFileTags = value;
-		}
+		set;
 	}
 
 	/// <summary>

@@ -3,8 +3,7 @@ namespace MediaDeck.Database.Tables;
 /// タグテーブル
 /// </summary>
 public class Tag {
-	private ICollection<MediaFileTag>? _mediaFileTags;
-	private ICollection<TagAlias>? _tagAliases;
+
 
 	/// <summary>
 	/// タグID
@@ -43,11 +42,9 @@ public class Tag {
 	/// </summary>
 	public virtual ICollection<MediaFileTag> MediaFileTags {
 		get {
-			return this._mediaFileTags ?? throw new InvalidOperationException();
+			return field ?? throw new InvalidOperationException();
 		}
-		set {
-			this._mediaFileTags = value;
-		}
+		set;
 	}
 
 	/// <summary>
@@ -55,11 +52,9 @@ public class Tag {
 	/// </summary>
 	public virtual ICollection<TagAlias> TagAliases {
 		get {
-			return this._tagAliases ?? throw new InvalidOperationException();
+			return field ?? throw new InvalidOperationException();
 		}
-		set {
-			this._tagAliases = value;
-		}
+		set;
 	}
 
 	/// <summary>

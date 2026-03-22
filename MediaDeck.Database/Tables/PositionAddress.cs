@@ -1,8 +1,6 @@
 namespace MediaDeck.Database.Tables; 
 public class PositionAddress {
-	private string? _type;
-	private string? _name;
-	private Position? _position;
+
 
 	/// <summary>
 	/// 緯度
@@ -25,11 +23,9 @@ public class PositionAddress {
 	/// </summary>
 	public string Type {
 		get {
-			return this._type ?? throw new InvalidOperationException();
+			return field ?? throw new InvalidOperationException();
 		}
-		set {
-			this._type = value;
-		}
+		set;
 	}
 
 	/// <summary>
@@ -37,11 +33,9 @@ public class PositionAddress {
 	/// </summary>
 	public string Name {
 		get {
-			return this._name ?? throw new InvalidOperationException();
+			return field ?? throw new InvalidOperationException();
 		}
-		set {
-			this._name = value;
-		}
+		set;
 	}
 
 	/// <summary>
@@ -57,10 +51,8 @@ public class PositionAddress {
 	/// </summary>
 	public Position Position {
 		get {
-			return this._position ?? throw new InvalidOperationException();
+			return field ?? throw new InvalidOperationException();
 		}
-		set {
-			this._position = value;
-		}
+		set;
 	}
 }

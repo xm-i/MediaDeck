@@ -15,14 +15,14 @@ public class MapViewerViewModel : ViewerPaneViewModelBase {
 	public MapViewerViewModel(FilesManager filesManager,MapModel mapModel) : base ("Map", filesManager){
 		this._mapModel = mapModel;
 		this.MapPins = this._mapModel.MapPins.ToBindableReactiveProperty();
-		this.Center = this._mapModel.Center.ToBindableReactiveProperty();
+		this.Center = this._mapModel.Center.ToBindableReactiveProperty(new(35, 135));
 	}
 
 	public BindableReactiveProperty<IEnumerable<MapPin>?> MapPins {
 		get;
 	}
 
-	public BindableReactiveProperty<GpsLocation?> Center {
+	public BindableReactiveProperty<GpsLocation> Center {
 		get;
 	}
 

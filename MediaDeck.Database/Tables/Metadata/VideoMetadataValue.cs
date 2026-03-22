@@ -1,8 +1,6 @@
 namespace MediaDeck.Database.Tables.Metadata; 
 public class VideoMetadataValue {
-	private VideoFile? _videoFile;
-	private string? _key;
-	private string? _value;
+
 
 	/// <summary>
 	/// メディアファイルID
@@ -17,11 +15,9 @@ public class VideoMetadataValue {
 	/// </summary>
 	public VideoFile VideoFile {
 		get {
-			return this._videoFile ?? throw new InvalidOperationException();
+			return field ?? throw new InvalidOperationException();
 		}
-		set {
-			this._videoFile = value;
-		}
+		set;
 	}
 
 	/// <summary>
@@ -29,11 +25,9 @@ public class VideoMetadataValue {
 	/// </summary>
 	public string Key {
 		get {
-			return this._key ?? throw new InvalidOperationException();
+			return field ?? throw new InvalidOperationException();
 		}
-		set {
-			this._key = value;
-		}
+		set;
 	}
 
 	/// <summary>
@@ -41,10 +35,8 @@ public class VideoMetadataValue {
 	/// </summary>
 	public string Value {
 		get {
-			return this._value ?? throw new InvalidOperationException();
+			return field ?? throw new InvalidOperationException();
 		}
-		set {
-			this._value = value;
-		}
+		set;
 	}
 }

@@ -5,8 +5,7 @@ namespace MediaDeck.Database.Tables;
 /// 動画ファイルテーブル
 /// </summary>
 public class VideoFile {
-	private ICollection<VideoMetadataValue>? _videoMetadataValues;
-	private MediaFile? _mediaFile;
+
 
 	/// <summary>
 	/// メディアファイルID
@@ -21,11 +20,9 @@ public class VideoFile {
 	/// </summary>
 	public MediaFile MediaFile {
 		get {
-			return this._mediaFile ?? throw new InvalidOperationException();
+			return field ?? throw new InvalidOperationException();
 		}
-		set {
-			this._mediaFile = value;
-		}
+		set;
 	}
 
 	/// <summary>
@@ -46,10 +43,8 @@ public class VideoFile {
 
 	public virtual ICollection<VideoMetadataValue> VideoMetadataValues {
 		get {
-			return this._videoMetadataValues ?? throw new InvalidOperationException();
+			return field ?? throw new InvalidOperationException();
 		}
-		set {
-			this._videoMetadataValues = value;
-		}
+		set;
 	}
 }

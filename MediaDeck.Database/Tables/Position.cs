@@ -1,8 +1,6 @@
 namespace MediaDeck.Database.Tables; 
 public class Position {
-	private ICollection<PositionAddress>? _addresses;
-	private ICollection<PositionNameDetail>? _nameDetails;
-	private ICollection<MediaFile>? _mediaFiles;
+
 
 	/// <summary>
 	/// 緯度
@@ -33,11 +31,9 @@ public class Position {
 	/// </summary>
 	public virtual ICollection<PositionAddress> Addresses {
 		get {
-			return this._addresses ?? throw new InvalidOperationException();
+			return field ?? throw new InvalidOperationException();
 		}
-		set {
-			this._addresses = value;
-		}
+		set;
 	}
 
 	/// <summary>
@@ -45,11 +41,9 @@ public class Position {
 	/// </summary>
 	public virtual ICollection<PositionNameDetail> NameDetails {
 		get {
-			return this._nameDetails ?? throw new InvalidOperationException();
+			return field ?? throw new InvalidOperationException();
 		}
-		set {
-			this._nameDetails = value;
-		}
+		set;
 	}
 
 	/// <summary>
@@ -97,10 +91,8 @@ public class Position {
 	/// </summary>
 	public ICollection<MediaFile> MediaFiles {
 		get {
-			return this._mediaFiles ?? throw new InvalidOperationException();
+			return field ?? throw new InvalidOperationException();
 		}
-		set {
-			this._mediaFiles = value;
-		}
+		set;
 	}
 }
