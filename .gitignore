@@ -261,4 +261,5 @@ __pycache__/
 *.pyc
 # MediaDeck AI Assistant generated logs
 build_output.txt
+build_output_full.txt
 build_final*.log

@@ -4,5 +4,6 @@
     <LangVersion>preview</LangVersion>
     <Nullable>enable</Nullable>
     <AnalysisLevel>preview</AnalysisLevel>
+    <NoWarn>$(NoWarn);8305</NoWarn>
   </PropertyGroup>
 </Project>
