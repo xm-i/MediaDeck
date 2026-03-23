@@ -1,225 +1,153 @@
-using System.Collections.Generic;
+#nullable enable
+using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-
+using R3;
+using MediaDeck.Composition.Bases;
 using MediaDeck.Composition.Interfaces;
+using MediaDeck.Composition.Objects;
 using MediaDeck.Database;
 using MediaDeck.Stores.State;
-using MediaDeck.Views;
+using MediaDeck.Utils.Notifications;
+using MediaDeck.Utils.Tools;
+using MediaDeck.Models.Files;
 
 using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
 
 namespace MediaDeck.Models.Services;
 
-public enum FileChangeType {
-	Deleted,
-	Moved
-}
-
-public class FileChangeItem {
-	public long MediaFileId {
-		get; set;
-	}
-	public string OldPath { get; set; } = string.Empty;
-	public string NewPath { get; set; } = string.Empty;
-	public FileChangeType ChangeType {
-		get; set;
-	}
-
-	public string ChangeTypeText {
-		get {
-			return this.ChangeType == FileChangeType.Deleted ? "削除" : "移動";
-		}
-	}
-
-	public string PathText {
-		get {
-			return this.ChangeType == FileChangeType.Deleted ? this.OldPath : $"{this.OldPath} ➔ {this.NewPath}";
-		}
-	}
-}
-
+/// <summary>
+/// ファイルシステムの変更を監視し、DBとの同期を管理するサービスです。
+/// FileSystemWatcherManager / FileChangeTracker に責務を委譲するオーケストレーターとして機能します。
+/// </summary>
 [Inject(InjectServiceLifetime.Singleton)]
-public class FileChangeMonitorService : IDisposable {
-	private readonly StateStore _stateStore;
+public class FileChangeMonitorService : ModelBase {
 	private readonly IDbContextFactory<MediaDeckDbContext> _dbFactory;
 	private readonly ILogger<FileChangeMonitorService> _logger;
 	private readonly IDispatcherGate _dispatcherGate;
-	private readonly ConcurrentDictionary<string, FileSystemWatcher> _watchers = new();
+	private readonly AppNotificationDispatcher _appNotificationDispatcher;
+	private readonly FileRegistrar _fileRegistrar;
+	private readonly FileSystemWatcherManager _watcherManager;
 
-	public ObservableList<FileChangeItem> UnprocessedChanges { get; } = new();
+	/// <summary>
+	/// 未処理の変更リストを管理するトラッカー
+	/// </summary>
+	public FileChangeTracker Tracker {
+		get;
+	}
 
-	public FileChangeMonitorService(StateStore stateStore, IDbContextFactory<MediaDeckDbContext> dbFactory, ILogger<FileChangeMonitorService> logger, IDispatcherGate dispatcherGate) {
-		this._stateStore = stateStore;
+	/// <summary>
+	/// FileChangeMonitorServiceクラスの新しいインスタンスを初期化します。
+	/// </summary>
+	/// <param name="stateStore">状態管理ストア</param>
+	/// <param name="dbFactory">DBコンテキストファクトリー</param>
+	/// <param name="tracker">ファイル変更トラッカー</param>
+	/// <param name="logger">ロガー</param>
+	/// <param name="dispatcherGate">UIスレッドディスパッチャー</param>
+	/// <param name="appNotificationDispatcher">通知送信クラス</param>
+	/// <param name="fileRegistrar">ファイル登録クラス</param>
+	public FileChangeMonitorService(StateStore stateStore, IDbContextFactory<MediaDeckDbContext> dbFactory, FileChangeTracker tracker, ILogger<FileChangeMonitorService> logger, IDispatcherGate dispatcherGate, AppNotificationDispatcher appNotificationDispatcher, FileRegistrar fileRegistrar) {
 		this._dbFactory = dbFactory;
 		this._logger = logger;
 		this._dispatcherGate = dispatcherGate;
+		this._appNotificationDispatcher = appNotificationDispatcher;
+		this._fileRegistrar = fileRegistrar;
 
-		foreach (var folder in this._stateStore.State.FolderManagerState.Folders) {
-			this.AddWatcher(folder.FolderPath);
+		this.Tracker = tracker;
+		this.Tracker.AddTo(this.CompositeDisposable);
+
+		this._watcherManager = new FileSystemWatcherManager(
+			logger,
+			onFileDeleted: path => this.Tracker.OnDeleted(path),
+			onFileRenamed: (oldPath, newPath) => this.Tracker.OnRenamed(oldPath, newPath),
+			onFileCreated: path => this.Tracker.OnCreated(path),
+			onFileChanged: path => this.Tracker.OnChanged(path),
+			onError: this.HandleWatcherError
+		);
+
+		// 初期フォルダーの監視を開始
+		foreach (var folder in stateStore.State.FolderManagerState.Folders) {
+			this._watcherManager.AddWatcher(folder.FolderPath);
 		}
 
-		this._stateStore.State.FolderManagerState.Folders.ObserveAdd().Subscribe(ev => {
-			this.AddWatcher(ev.Value.FolderPath);
-		});
+		// フォルダー追加の購読
+		stateStore.State.FolderManagerState.Folders.ObserveAdd().Subscribe(ev => {
+			this._watcherManager.AddWatcher(ev.Value.FolderPath);
+		}).AddTo(this.CompositeDisposable);
 
-		this._stateStore.State.FolderManagerState.Folders.ObserveRemove().Subscribe(ev => {
-			this.RemoveWatcher(ev.Value.FolderPath);
-		});
-	}
-
-	private void AddWatcher(string path) {
-		if (string.IsNullOrWhiteSpace(path) || !Directory.Exists(path) || this._watchers.ContainsKey(path)) {
-			return;
-		}
-
-		try {
-			var watcher = new FileSystemWatcher(path) {
-				IncludeSubdirectories = true,
-				NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName
-			};
-			watcher.Deleted += this.OnFileDeleted;
-			watcher.Renamed += this.OnFileRenamed;
-			watcher.EnableRaisingEvents = true;
-
-			this._watchers.TryAdd(path, watcher);
-		} catch (Exception ex) {
-			this._logger.LogError(ex, "Failed to start watching {Path}", path);
-		}
-	}
-
-	private void RemoveWatcher(string path) {
-		if (this._watchers.TryRemove(path, out var watcher)) {
-			watcher.EnableRaisingEvents = false;
-			watcher.Deleted -= this.OnFileDeleted;
-			watcher.Renamed -= this.OnFileRenamed;
-			watcher.Dispose();
-		}
-	}
-
-	private void OnFileDeleted(object sender, FileSystemEventArgs e) {
-		_ = this.HandleFileChangeAsync(e.FullPath, null, FileChangeType.Deleted);
-	}
-
-	private void OnFileRenamed(object sender, RenamedEventArgs e) {
-		_ = this.HandleFileChangeAsync(e.OldFullPath, e.FullPath, FileChangeType.Moved);
+		// フォルダー削除の購読
+		stateStore.State.FolderManagerState.Folders.ObserveRemove().Subscribe(ev => {
+			this._watcherManager.RemoveWatcher(ev.Value.FolderPath);
+		}).AddTo(this.CompositeDisposable);
 	}
 
 	/// <summary>
-	/// ファイルの変更イベントを処理します。
+	/// Watcherエラーを処理します。バッファオーバーフロー時にユーザーへ通知します。
 	/// </summary>
-	/// <param name="oldPath">変更前のパス</param>
-	/// <param name="newPath">変更後のパス（移動の場合のみ。削除の場合はnull）</param>
-	/// <param name="changeType">変更の種類</param>
-	private async Task HandleFileChangeAsync(string oldPath, string? newPath, FileChangeType changeType) {
-		try {
-			// A -> B, then B -> C という2段階移動（または移動直後の削除）に対応するため、
-			// 既存の未処理キューの NewPath が今回の oldPath と一致するものがないか確認する
-			var existingByNewPath = this.UnprocessedChanges.FirstOrDefault(c => c.ChangeType == FileChangeType.Moved && c.NewPath == oldPath);
-			if (existingByNewPath != null) {
-				this.UpdateOrRemoveChangeItem(existingByNewPath, newPath, changeType);
-				return;
-			}
-
-			await using var db = await this._dbFactory.CreateDbContextAsync();
-			// EF Core 経由で DB 内のファイルを検索（oldPath は DB 上のパスと一致するはず）
-			var file = await db.MediaFiles.FirstOrDefaultAsync(mf => mf.FilePath == oldPath);
-			if (file == null) {
-				return;
-			}
-
-			// 同一ファイルの変更がすでにキューにあるか確認（IDで紐付け）
-			var existingById = this.UnprocessedChanges.FirstOrDefault(c => c.MediaFileId == file.MediaFileId);
-			if (existingById != null) {
-				this.UpdateOrRemoveChangeItem(existingById, newPath, changeType);
-				return;
-			}
-
-			var model = new FileChangeItem {
-				MediaFileId = file.MediaFileId,
-				OldPath = oldPath,
-				NewPath = newPath ?? string.Empty,
-				ChangeType = changeType
-			};
-
-			this._dispatcherGate.BeginInvoke(() => this.UnprocessedChanges.Add(model));
-		} catch (Exception ex) {
-			this._logger.LogError(ex, "Error handling file change: {Path}", oldPath);
+	/// <param name="ex">発生した例外</param>
+	private void HandleWatcherError(Exception ex) {
+		if (ex is InternalBufferOverflowException) {
+			this._dispatcherGate.BeginInvoke(() => {
+				var notif = AppNotification.Warning("ファイルの変更監視が追いつきませんでした。最新状態を反映するには、手動でフォルダの再読み込みを実行してください。", "監視エラー", 10000);
+				this._appNotificationDispatcher.Notify.OnNext(notif);
+			});
 		}
 	}
+
 
 	/// <summary>
-	/// 既存の変更アイテムを更新、または不要になった場合は削除します。
+	/// 変更内容をデータベースに反映します。
 	/// </summary>
-	private void UpdateOrRemoveChangeItem(FileChangeItem existing, string? nextNewPath, FileChangeType nextChangeType) {
-		this._dispatcherGate.BeginInvoke(() => {
-			var index = this.UnprocessedChanges.IndexOf(existing);
-			if (index < 0) {
-				return;
-			}
-
-			var combinedNewPath = nextChangeType == FileChangeType.Moved ? (nextNewPath ?? string.Empty) : string.Empty;
-
-			// 移動先が元のパスに戻った場合（A -> B -> A）はキューから削除する
-			if (nextChangeType == FileChangeType.Moved && existing.OldPath == combinedNewPath) {
-				this.UnprocessedChanges.RemoveAt(index);
-				return;
-			}
-
-			// アイテムを差し替えてUIに更新を通知する
-			var updated = new FileChangeItem {
-				MediaFileId = existing.MediaFileId,
-				OldPath = existing.OldPath,
-				NewPath = combinedNewPath,
-				ChangeType = nextChangeType
-			};
-			this.UnprocessedChanges[index] = updated;
-		});
-	}
-
-	public void Dispose() {
-		foreach (var watcher in this._watchers.Values) {
-			watcher.EnableRaisingEvents = false;
-			watcher.Deleted -= this.OnFileDeleted;
-			watcher.Renamed -= this.OnFileRenamed;
-			watcher.Dispose();
-		}
-		this._watchers.Clear();
-	}
-
-	public async Task ApplyChangesAsync(IEnumerable<FileChangeItem> items, bool deleteFromDb) {
+	/// <param name="items">反映対象のアイテム一覧</param>
+	/// <param name="deleteFromDb">強制的に削除するかどうか</param>
+	public async Task ApplyChangesAsync(System.Collections.Generic.IEnumerable<FileChangeItem> items, bool deleteFromDb) {
 		try {
 			await using var db = await this._dbFactory.CreateDbContextAsync();
 			foreach (var item in items) {
-				var file = await db.MediaFiles.FirstOrDefaultAsync(mf => mf.MediaFileId == item.MediaFileId);
-				if (file != null) {
-					if (deleteFromDb || item.ChangeType == FileChangeType.Deleted) {
-						db.MediaFiles.Remove(file);
-					} else if (item.ChangeType == FileChangeType.Moved) {
-						file.FilePath = item.NewPath;
+				if (item.ChangeType == FileChangeType.Added) {
+					// 新規追加アイテムが承認された場合はFileRegistrarへ回す
+					this._fileRegistrar.RegistrationQueue.Enqueue(item.NewPath);
+					continue;
+				}
+
+				if (item.MediaFileId.HasValue) {
+					var file = await db.MediaFiles.FirstOrDefaultAsync(mf => mf.MediaFileId == item.MediaFileId.Value);
+					if (file != null) {
+						if (deleteFromDb || item.ChangeType == FileChangeType.Deleted) {
+							db.MediaFiles.Remove(file);
+						} else if (item.ChangeType == FileChangeType.Moved || item.ChangeType == FileChangeType.Renamed) {
+							file.FilePath = item.NewPath;
+						}
 					}
 				}
 			}
 			await db.SaveChangesAsync();
 
-			this.RemoveItemsFromList(items);
+			this.Tracker.RemoveItems(items);
 		} catch (Exception ex) {
 			this._logger.LogError(ex, "Error applying file changes to DB");
 		}
 	}
 
-	public void DiscardChanges(IEnumerable<FileChangeItem> items) {
-		this.RemoveItemsFromList(items);
+	/// <summary>
+	/// 未処理変更として提示された内容を破棄（無視）します。
+	/// </summary>
+	/// <param name="items">破棄対象のアイテム一覧</param>
+	public void DiscardChanges(System.Collections.Generic.IEnumerable<FileChangeItem> items) {
+		this.Tracker.RemoveItems(items);
 	}
 
 	/// <summary>
-	/// リストから指定されたアイテムを削除します。
+	/// リソースを破棄します。
 	/// </summary>
-	private void RemoveItemsFromList(IEnumerable<FileChangeItem> items) {
-		this._dispatcherGate.BeginInvoke(() => {
-			var targetElement = this.UnprocessedChanges.Where(x => items.Any(i => i.MediaFileId == x.MediaFileId));
-			this.UnprocessedChanges.RemoveRange(targetElement);
-		});
+	/// <param name="disposing">マネージドリソースを破棄するかどうか</param>
+	protected override void Dispose(bool disposing) {
+		if (disposing) {
+			this._watcherManager.Dispose();
+		}
+		base.Dispose(disposing);
 	}
 }

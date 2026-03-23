@@ -78,10 +78,6 @@
     <RuntimeHostConfigurationOption Include="System.Text.Json.Serialization.EnableSourceGenReflectionFallback" Value="true" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Models\Preferences\CustomStates\" />
-  </ItemGroup>
-
   <!-- .NET 10 で System.Text.Json のリフレクションベースのシリアライゼーションがデフォルトで無効になったことにFFMpegCoreが対応するまでの暫定対応 -->
   <ItemGroup>
     <RuntimeHostConfigurationOption Include="System.Text.Json.JsonSerializer.IsReflectionEnabledByDefault" Value="true" />

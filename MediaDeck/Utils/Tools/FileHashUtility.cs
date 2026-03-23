@@ -14,7 +14,7 @@ internal static class FileHashUtility {
 	private const int MaxBytesToHash = 1024 * 1024;
 
 	/// <summary>
-	/// ファイルの先頭1MB + ファイルサイズからSHA256ハッシュを計算する
+	/// ファイルの先頭1MBからSHA256ハッシュを計算する
 	/// </summary>
 	/// <param name="filePath">ファイルパス</param>
 	/// <returns>ハッシュ文字列（16進数）</returns>
@@ -24,7 +24,7 @@ internal static class FileHashUtility {
 	}
 
 	/// <summary>
-	/// ストリームの先頭1MB + ファイルサイズからSHA256ハッシュを計算する
+	/// ストリームの先頭1MBからSHA256ハッシュを計算する
 	/// </summary>
 	/// <param name="stream">ストリーム</param>
 	/// <returns>ハッシュ文字列（16進数）</returns>
