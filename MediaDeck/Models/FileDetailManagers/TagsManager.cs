@@ -39,6 +39,7 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory) {
 		};
 		await db.AddAsync(tag);
 		await db.SaveChangesAsync();
+		await db.Entry(tag).Reference(x => x.TagCategory).LoadAsync();
 
 		var aliasList = aliases.Select((x, i) => new TagAlias {
 			TagId = tag.TagId,
