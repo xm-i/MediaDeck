@@ -9,9 +9,7 @@
 	xmlns:controls="using:CommunityToolkit.WinUI.Controls"
 	xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
 	xmlns:behaviors="using:CommunityToolkit.WinUI.Behaviors"
-	xmlns:core="using:Microsoft.Xaml.Interactions.Core"
-	xmlns:viewerControls="using:MediaDeck.Views.Panes.ViewerPanes.Controls"
-	xmlns:vmIf="using:MediaDeck.FileTypes.Base.ViewModels.Interfaces"
+	xmlns:vmIf="using:MediaDeck.Composition.Interfaces.FileTypes.ViewModels"
 	xmlns:viewerpanes="using:MediaDeck.ViewModels.Panes.ViewerPanes"
 	mc:Ignorable="d">
 	<Grid>

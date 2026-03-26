@@ -2,7 +2,7 @@ using System.Threading.Tasks;
 
 using MediaDeck.Composition.Bases;
 using MediaDeck.Composition.Interfaces.Files;
-using MediaDeck.FileTypes.Base.ViewModels.Interfaces;
+using MediaDeck.Composition.Interfaces.FileTypes.ViewModels;
 using MediaDeck.Models.Files;
 using MediaDeck.Models.NotificationDispatcher;
 

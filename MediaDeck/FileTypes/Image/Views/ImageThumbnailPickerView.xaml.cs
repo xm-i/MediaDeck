@@ -1,5 +1,5 @@
 using MediaDeck.Composition.Bases;
-using MediaDeck.FileTypes.Base.Views.Interfaces;
+using MediaDeck.Composition.Interfaces.FileTypes.Views;
 using MediaDeck.FileTypes.Image.ViewModels;
 
 namespace MediaDeck.FileTypes.Image.Views;

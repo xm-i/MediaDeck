@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.DependencyInjection;
 
 using MediaDeck.Composition.Enum;
+using MediaDeck.Composition.Interfaces.FileTypes;
 using MediaDeck.Database.Tables;
 using MediaDeck.FileTypes.Base;
 using MediaDeck.FileTypes.Pdf.Models;

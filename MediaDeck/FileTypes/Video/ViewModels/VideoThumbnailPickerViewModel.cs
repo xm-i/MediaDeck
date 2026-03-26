@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 
+using MediaDeck.Composition.Interfaces.FileTypes.ViewModels;
 using MediaDeck.FileTypes.Base.ViewModels;
-using MediaDeck.FileTypes.Base.ViewModels.Interfaces;
 using MediaDeck.FileTypes.Video.Models;
 using MediaDeck.Models.FileDetailManagers;
 

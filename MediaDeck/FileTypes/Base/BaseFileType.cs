@@ -4,13 +4,13 @@ using CommunityToolkit.Mvvm.DependencyInjection;
 
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.Files;
+using MediaDeck.Composition.Interfaces.FileTypes;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
+using MediaDeck.Composition.Interfaces.FileTypes.ViewModels;
+using MediaDeck.Composition.Interfaces.FileTypes.Views;
 using MediaDeck.Composition.Objects;
 using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Database.Tables;
-using MediaDeck.FileTypes.Base.Models.Interfaces;
-using MediaDeck.FileTypes.Base.ViewModels.Interfaces;
-using MediaDeck.FileTypes.Base.Views.Interfaces;
 
 namespace MediaDeck.FileTypes.Base;
 public abstract class BaseFileType<TFileOperator, TFileModel, TFileViewModel, TDetailViewerPreviewControlView, TThumbnailPickerViewModel, TThumbnailPickerView> : IFileType<TFileOperator, TFileModel, TFileViewModel, TDetailViewerPreviewControlView, TThumbnailPickerViewModel, TThumbnailPickerView>

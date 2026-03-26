@@ -3,7 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using MediaDeck.Composition.Bases;
-using MediaDeck.FileTypes.Base.ViewModels.Interfaces;
+using MediaDeck.Composition.Interfaces.FileTypes.ViewModels;
 using MediaDeck.Models.FileDetailManagers;
 
 namespace MediaDeck.ViewModels.Panes.ViewerPanes;

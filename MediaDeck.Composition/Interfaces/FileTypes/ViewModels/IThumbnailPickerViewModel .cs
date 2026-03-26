@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace MediaDeck.FileTypes.Base.ViewModels.Interfaces;
+namespace MediaDeck.Composition.Interfaces.FileTypes.ViewModels;
 
 public interface IThumbnailPickerViewModel {
 	public BindableReactiveProperty<byte[]?> OriginalThumbnail {

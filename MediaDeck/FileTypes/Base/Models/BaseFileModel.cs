@@ -9,9 +9,6 @@ using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Composition.Objects;
 using MediaDeck.Composition.Stores.Config.Model;
-using MediaDeck.FileTypes.Base.Models.Interfaces;
-using MediaDeck.Models.Files;
-using MediaDeck.Utils.Tools;
 
 namespace MediaDeck.FileTypes.Base.Models;
 

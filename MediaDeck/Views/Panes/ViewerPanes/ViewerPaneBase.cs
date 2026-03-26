@@ -9,12 +9,12 @@ using MediaDeck.Composition.Bases;
 using MediaDeck.Models.Files.SearchConditions;
 using MediaDeck.ViewModels.Panes.ViewerPanes;
 using MediaDeck.Views.Thumbnails;
-using MediaDeck.FileTypes.Base.ViewModels.Interfaces;
 
 using System.Diagnostics;
 using System.IO;
 using Microsoft.UI.Input;
 using Windows.UI.Core;
+using MediaDeck.Composition.Interfaces.FileTypes.ViewModels;
 
 namespace MediaDeck.Views.Panes.ViewerPanes;
 

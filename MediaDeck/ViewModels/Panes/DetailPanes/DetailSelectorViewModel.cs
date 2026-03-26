@@ -1,7 +1,6 @@
 using MediaDeck.Composition.Bases;
 using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
-using MediaDeck.FileTypes.Base.ViewModels.Interfaces;
 using MediaDeck.Models.FileDetailManagers;
 using MediaDeck.Models.FileDetailManagers.Objects;
 using MediaDeck.Models.Files.SearchConditions;
@@ -9,6 +8,7 @@ using MediaDeck.Models.NotificationDispatcher;
 using MediaDeck.Utils.Objects;
 using MediaDeck.Database.Tables;
 using System.Threading.Tasks;
+using MediaDeck.Composition.Interfaces.FileTypes.ViewModels;
 
 namespace MediaDeck.ViewModels.Panes.DetailPanes;
 

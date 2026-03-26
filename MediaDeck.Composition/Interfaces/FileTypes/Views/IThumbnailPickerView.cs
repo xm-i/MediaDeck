@@ -1,4 +1,4 @@
-namespace MediaDeck.FileTypes.Base.Views.Interfaces;
+namespace MediaDeck.Composition.Interfaces.FileTypes.Views;
 public interface IThumbnailPickerView {
 	public object DataContext {
 		get;

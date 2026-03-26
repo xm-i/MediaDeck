@@ -6,6 +6,7 @@ using MediaDeck.FileTypes.Archive.Models;
 using MediaDeck.FileTypes.Archive.ViewModels;
 using MediaDeck.FileTypes.Archive.Views;
 using MediaDeck.Composition.Enum;
+using MediaDeck.Composition.Interfaces.FileTypes;
 
 namespace MediaDeck.FileTypes.Archive;
 [Inject(InjectServiceLifetime.Transient, typeof(IFileType))]

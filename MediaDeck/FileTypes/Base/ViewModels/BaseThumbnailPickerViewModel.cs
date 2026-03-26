@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-using MediaDeck.FileTypes.Base.ViewModels.Interfaces;
+using MediaDeck.Composition.Interfaces.FileTypes.ViewModels;
 using MediaDeck.Models.FileDetailManagers;
 
 namespace MediaDeck.FileTypes.Base.ViewModels;

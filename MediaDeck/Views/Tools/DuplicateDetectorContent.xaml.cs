@@ -1,8 +1,8 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
-using MediaDeck.FileTypes.Base.ViewModels.Interfaces;
 using MediaDeck.ViewModels.Tools;
+using MediaDeck.Composition.Interfaces.FileTypes.ViewModels;
 
 namespace MediaDeck.Views.Tools;
 

@@ -1,14 +1,13 @@
 using System.Collections.Concurrent;
 using System.IO;
-using System.Threading;
 using System.Threading.Tasks;
 
-using MediaDeck.FileTypes.Base.Models.Interfaces;
 using MediaDeck.Utils.Notifications;
 using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Composition.Stores.State.Model.Objects;
 
 using Microsoft.Extensions.Logging;
+using MediaDeck.Composition.Interfaces.FileTypes.Models;
 
 namespace MediaDeck.Models.Files;
 

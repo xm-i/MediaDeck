@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using MediaDeck.Composition.Enum;
 using MediaDeck.Database.Tables;
 
-namespace MediaDeck.FileTypes.Base.Models.Interfaces;
+namespace MediaDeck.Composition.Interfaces.FileTypes.Models;
 public interface IFileOperator {
 	public MediaType TargetMediaType {
 		get;

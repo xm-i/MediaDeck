@@ -4,11 +4,10 @@ using Microsoft.Extensions.DependencyInjection;
 
 using MediaDeck.Composition.Enum;
 using MediaDeck.Database.Tables;
-using MediaDeck.FileTypes.Base;
-using MediaDeck.FileTypes.Base.Models.Interfaces;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
-using MediaDeck.FileTypes.Base.Views.Interfaces;
-using MediaDeck.FileTypes.Base.ViewModels.Interfaces;
+using MediaDeck.Composition.Interfaces.FileTypes.ViewModels;
+using MediaDeck.Composition.Interfaces.FileTypes.Views;
+using MediaDeck.Composition.Interfaces.FileTypes;
 
 namespace MediaDeck.Utils.Tools;
 public static class FileTypeUtility {

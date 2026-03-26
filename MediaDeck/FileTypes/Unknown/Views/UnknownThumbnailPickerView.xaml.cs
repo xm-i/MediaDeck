@@ -1,6 +1,6 @@
 using MediaDeck.Composition.Bases;
 using MediaDeck.FileTypes.Unknown.ViewModels;
-using MediaDeck.FileTypes.Base.Views.Interfaces;
+using MediaDeck.Composition.Interfaces.FileTypes.Views;
 
 namespace MediaDeck.FileTypes.Unknown.Views;
 public sealed partial class UnknownThumbnailPickerView : UnknownThumbnailPickerViewUserControl, IThumbnailPickerView {

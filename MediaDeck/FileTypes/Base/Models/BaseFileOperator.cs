@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.DependencyInjection;
 
 using MediaDeck.Composition.Enum;
+using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Database;
 using MediaDeck.Database.Tables;
-using MediaDeck.FileTypes.Base.Models.Interfaces;
 using MediaDeck.Models.Tools;
 
 namespace MediaDeck.FileTypes.Base.Models;

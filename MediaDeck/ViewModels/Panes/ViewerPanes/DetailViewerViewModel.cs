@@ -1,4 +1,4 @@
-using MediaDeck.FileTypes.Base.Views.Interfaces;
+using MediaDeck.Composition.Interfaces.FileTypes.Views;
 using MediaDeck.Models.FileDetailManagers;
 
 namespace MediaDeck.ViewModels.Panes.ViewerPanes;

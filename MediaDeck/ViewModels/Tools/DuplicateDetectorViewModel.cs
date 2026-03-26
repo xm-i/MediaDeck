@@ -1,15 +1,10 @@
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Threading.Tasks;
-
-using ObservableCollections;
 
 using MediaDeck.Composition.Bases;
-using MediaDeck.Database.Tables;
-using MediaDeck.FileTypes.Base.ViewModels.Interfaces;
 using MediaDeck.Models.Tools;
 using MediaDeck.Utils.Objects;
-using MediaDeck.Utils.Tools;
+using MediaDeck.Composition.Interfaces.FileTypes.ViewModels;
 
 namespace MediaDeck.ViewModels.Tools;
 
