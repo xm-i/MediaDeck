@@ -15,6 +15,7 @@ namespace MediaDeck.FileTypes.Video.Models;
 [Inject(InjectServiceLifetime.Transient)]
 public partial class VideoFileOperator : BaseFileOperator {
 	private readonly ConfigModel _config;
+	private readonly IFilePathService _filePathService;
 
 	public override MediaType TargetMediaType {
 		get;
@@ -25,8 +26,9 @@ public partial class VideoFileOperator : BaseFileOperator {
 			"TAG:com.apple.quicktime.location.ISO6709"
 		];
 
-	public VideoFileOperator() {
+	public VideoFileOperator(IFilePathService filePathService) {
 		this._config = Ioc.Default.GetRequiredService<ConfigModel>();
+		this._filePathService = filePathService;
 	}
 
 	public override async Task<MediaFile?> RegisterFileAsync(string filePath) {
@@ -38,8 +40,8 @@ public partial class VideoFileOperator : BaseFileOperator {
 		}
 		var metadata = FFProbe.Analyse(filePath);
 
-		var thumbRelativePath = FilePathUtility.GetThumbnailRelativeFilePath(filePath);
-		var thumbPath = FilePathUtility.GetThumbnailAbsoluteFilePath(thumbRelativePath);
+		var thumbRelativePath = this._filePathService.GetThumbnailRelativeFilePath(filePath);
+		var thumbPath = this._filePathService.GetThumbnailAbsoluteFilePath(thumbRelativePath);
 		try {
 			if (metadata.PrimaryVideoStream is not { } videoStream) {
 				throw new Exception("PrimaryVideoStream is null");

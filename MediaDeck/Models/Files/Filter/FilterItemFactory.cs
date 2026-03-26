@@ -1,4 +1,5 @@
 using System.IO;
+using CommunityToolkit.Mvvm.DependencyInjection;
 
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.Files;
@@ -6,6 +7,11 @@ using MediaDeck.Models.Files.Filter.FilterItemObjects;
 
 namespace MediaDeck.Models.Files.Filter;
 public static class FilterItemFactory {
+	private static readonly IFilePathService _filePathService;
+
+	static FilterItemFactory() {
+		_filePathService = Ioc.Default.GetRequiredService<IFilePathService>();
+	}
 
 	public static FilterItem Create<T>(T filterItemObject) where T : IFilterItemObject {
 		switch (filterItemObject) {
@@ -45,8 +51,8 @@ public static class FilterItemFactory {
 				return new FilterItem(x => false, x => false, true);
 			case MediaTypeFilterItemObject mtf:
 				return new FilterItem(
-					x => x.FilePath.IsVideoFile() == mtf.IsVideo,
-					x => x.FilePath.IsVideoFile() == mtf.IsVideo,
+					x => _filePathService.IsVideoFile(x.FilePath) == mtf.IsVideo,
+					x => _filePathService.IsVideoFile(x.FilePath) == mtf.IsVideo,
 					false);
 			case RateFilterItemObject rf:
 				var op = SearchTypeConverters.SearchTypeToFunc<int>(rf.SearchType);

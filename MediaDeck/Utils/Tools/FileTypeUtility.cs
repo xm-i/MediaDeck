@@ -14,9 +14,11 @@ public static class FileTypeUtility {
 	static FileTypeUtility() {
 		_fileTypes = Ioc.Default.GetServices<IFileType>().ToArray();
 		_unknownFileType = _fileTypes.First(x => x.MediaType == MediaType.Unknown);
+		_filePathService = Ioc.Default.GetRequiredService<IFilePathService>();
 	}
 	private static readonly IFileType[] _fileTypes;
 	private static readonly IFileType _unknownFileType;
+	private static readonly IFilePathService _filePathService;
 	public static IFileModel CreateFileModelFromRecord(MediaFile mediaFile) {
 		return GetFileType(mediaFile).CreateFileModelFromRecord(mediaFile);
 	}
@@ -42,7 +44,7 @@ public static class FileTypeUtility {
 	}
 
 	private static IFileType GetFileType(MediaFile mediaFile) {
-		return _fileTypes.FirstOrDefault(x => x.MediaType == mediaFile.FilePath.GetMediaType()) ?? _unknownFileType;
+		return _fileTypes.FirstOrDefault(x => x.MediaType == _filePathService.GetMediaType(mediaFile.FilePath)) ?? _unknownFileType;
 	}
 	private static IFileType GetFileType(IFileModel fileModel) {
 		return _fileTypes.FirstOrDefault(x => x.MediaType == fileModel.MediaType) ?? _unknownFileType;

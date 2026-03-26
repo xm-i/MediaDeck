@@ -12,16 +12,22 @@ namespace MediaDeck.FileTypes.Pdf;
 [Inject(InjectServiceLifetime.Transient, typeof(IFileType))]
 public class PdfFileType: BaseFileType<PdfFileOperator, PdfFileModel, PdfFileViewModel, PdfDetailViewerPreviewControlView, PdfThumbnailPickerViewModel, PdfThumbnailPickerView> {
 	private PdfDetailViewerPreviewControlView? _pdfDetailViewerPreviewControlView;
+	private readonly PdfFileOperator _pdfFileOperator;
+
+	public PdfFileType(PdfFileOperator pdfFileOperator) {
+		this._pdfFileOperator = pdfFileOperator;
+	}
+
 	public override MediaType MediaType {
 		get;
 	} = MediaType.Pdf;
 
 	public override PdfFileOperator CreateFileOperator() {
-		return new PdfFileOperator();
+		return this._pdfFileOperator;
 	}
 
 	public override PdfFileModel CreateFileModelFromRecord(MediaFile mediaFile) {
-		var ifm = new PdfFileModel(mediaFile.MediaFileId, mediaFile.FilePath);
+		var ifm = new PdfFileModel(mediaFile.MediaFileId, mediaFile.FilePath, this._pdfFileOperator);
 		this.SetModelProperties(ifm, mediaFile);
 		return ifm;
 	}

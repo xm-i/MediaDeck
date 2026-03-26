@@ -12,16 +12,22 @@ namespace MediaDeck.FileTypes.Video;
 [Inject(InjectServiceLifetime.Transient, typeof(IFileType))]
 public class VideoFileType: BaseFileType<VideoFileOperator, VideoFileModel, VideoFileViewModel, VideoDetailViewerPreviewControlView, VideoThumbnailPickerViewModel, VideoThumbnailPickerView> {
 	private VideoDetailViewerPreviewControlView? _videoDetailViewerPreviewControlView;
+	private readonly VideoFileOperator _videoFileOperator;
+
+	public VideoFileType(VideoFileOperator videoFileOperator) {
+		this._videoFileOperator = videoFileOperator;
+	}
+
 	public override MediaType MediaType {
 		get;
 	} = MediaType.Video;
 
 	public override VideoFileOperator CreateFileOperator() {
-		return new VideoFileOperator();
+		return this._videoFileOperator;
 	}
 
 	public override VideoFileModel CreateFileModelFromRecord(MediaFile mediaFile) {
-		var ifm = new VideoFileModel(mediaFile.MediaFileId, mediaFile.FilePath);
+		var ifm = new VideoFileModel(mediaFile.MediaFileId, mediaFile.FilePath, this._videoFileOperator);
 		this.SetModelProperties(ifm, mediaFile);
 		return ifm;
 	}

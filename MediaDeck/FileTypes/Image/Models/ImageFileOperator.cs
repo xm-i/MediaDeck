@@ -11,6 +11,12 @@ using MediaDeck.Composition.Interfaces.FileTypes.Models;
 namespace MediaDeck.FileTypes.Image.Models;
 [Inject(InjectServiceLifetime.Transient)]
 public class ImageFileOperator : BaseFileOperator {
+	private readonly IFilePathService _filePathService;
+
+	public ImageFileOperator(IFilePathService filePathService) {
+		this._filePathService = filePathService;
+	}
+
 	public override MediaType TargetMediaType {
 		get;
 	} = MediaType.Image;
@@ -28,8 +34,8 @@ public class ImageFileOperator : BaseFileOperator {
 			fileFs.CopyTo(fileMs);
 			fileMs.Position = 0;
 		}
-		var thumbRelativePath = FilePathUtility.GetThumbnailRelativeFilePath(filePath);
-		var thumbPath = FilePathUtility.GetThumbnailAbsoluteFilePath(thumbRelativePath);
+		var thumbRelativePath = this._filePathService.GetThumbnailRelativeFilePath(filePath);
+		var thumbPath = this._filePathService.GetThumbnailAbsoluteFilePath(thumbRelativePath);
 		try {
 			var image = this.CreateThumbnail(fileMs, 300, 300);
 			new FileInfo(thumbPath).Directory?.Create();

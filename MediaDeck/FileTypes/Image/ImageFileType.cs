@@ -12,16 +12,22 @@ namespace MediaDeck.FileTypes.Image;
 [Inject(InjectServiceLifetime.Transient, typeof(IFileType))]
 public class ImageFileType : BaseFileType<ImageFileOperator, ImageFileModel, ImageFileViewModel, ImageDetailViewerPreviewControlView, ImageThumbnailPickerViewModel, ImageThumbnailPickerView> {
 	private ImageDetailViewerPreviewControlView? _imageDetailViewerPreviewControlView;
+	private readonly ImageFileOperator _imageFileOperator;
+
+	public ImageFileType(ImageFileOperator imageFileOperator) {
+		this._imageFileOperator = imageFileOperator;
+	}
+
 	public override MediaType MediaType {
 		get;
 	} = MediaType.Image;
 
 	public override ImageFileOperator CreateFileOperator() {
-		return new ImageFileOperator();
+		return this._imageFileOperator;
 	}
 
 	public override ImageFileModel CreateFileModelFromRecord(MediaFile mediaFile) {
-		var ifm = new ImageFileModel(mediaFile.MediaFileId, mediaFile.FilePath);
+		var ifm = new ImageFileModel(mediaFile.MediaFileId, mediaFile.FilePath, this._imageFileOperator);
 		this.SetModelProperties(ifm, mediaFile);
 		return ifm;
 	}

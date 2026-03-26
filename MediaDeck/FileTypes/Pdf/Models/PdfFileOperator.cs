@@ -10,6 +10,11 @@ using MediaDeck.Composition.Enum;
 namespace MediaDeck.FileTypes.Pdf.Models;
 [Inject(InjectServiceLifetime.Transient)]
 public partial class PdfFileOperator : BaseFileOperator {
+	private readonly IFilePathService _filePathService;
+
+	public PdfFileOperator(IFilePathService filePathService) {
+		this._filePathService = filePathService;
+	}
 
 	public override MediaType TargetMediaType {
 		get;
@@ -23,8 +28,8 @@ public partial class PdfFileOperator : BaseFileOperator {
 			return null;
 		}
 
-		var thumbRelativePath = FilePathUtility.GetThumbnailRelativeFilePath(filePath);
-		var thumbPath = FilePathUtility.GetThumbnailAbsoluteFilePath(thumbRelativePath);
+		var thumbRelativePath = this._filePathService.GetThumbnailRelativeFilePath(filePath);
+		var thumbPath = this._filePathService.GetThumbnailAbsoluteFilePath(thumbRelativePath);
 		try {
 			var image = this.CreateThumbnail(filePath, 300, 300, 1);
 			new FileInfo(thumbPath).Directory?.Create();

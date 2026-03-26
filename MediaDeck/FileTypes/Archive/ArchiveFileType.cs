@@ -12,16 +12,22 @@ namespace MediaDeck.FileTypes.Archive;
 [Inject(InjectServiceLifetime.Transient, typeof(IFileType))]
 public class ArchiveFileType: BaseFileType<ArchiveFileOperator, ArchiveFileModel, ArchiveFileViewModel, ArchiveDetailViewerPreviewControlView, ArchiveThumbnailPickerViewModel, ArchiveThumbnailPickerView> {
 	private ArchiveDetailViewerPreviewControlView? _archiveDetailViewerPreviewControlView;
+	private readonly ArchiveFileOperator _archiveFileOperator;
+
+	public ArchiveFileType(ArchiveFileOperator archiveFileOperator) {
+		this._archiveFileOperator = archiveFileOperator;
+	}
+
 	public override MediaType MediaType {
 		get;
 	} = MediaType.Archive;
 
 	public override ArchiveFileOperator CreateFileOperator() {
-		return new ArchiveFileOperator();
+		return this._archiveFileOperator;
 	}
 
 	public override ArchiveFileModel CreateFileModelFromRecord(MediaFile mediaFile) {
-		var ifm = new ArchiveFileModel(mediaFile.MediaFileId, mediaFile.FilePath);
+		var ifm = new ArchiveFileModel(mediaFile.MediaFileId, mediaFile.FilePath, this._archiveFileOperator);
 		this.SetModelProperties(ifm, mediaFile);
 		return ifm;
 	}

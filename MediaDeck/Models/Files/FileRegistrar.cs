@@ -16,6 +16,7 @@ public class FileRegistrar {
 	private static readonly IFileOperator[] _fileOperators;
 	private readonly ConcurrentDictionary<string, FolderModel> _fileToFolderMap = new();
 	private readonly ILogger<FileRegistrar> _logger;
+	private readonly IFilePathService _filePathService;
 
 	public ObservableQueue<string> RegistrationQueue {
 		get;
@@ -29,9 +30,10 @@ public class FileRegistrar {
 		_fileOperators = FileTypeUtility.CreateFileOperators();
 	}
 
-	public FileRegistrar(ConfigModel config, ILogger<FileRegistrar> logger) {
+	public FileRegistrar(ConfigModel config, ILogger<FileRegistrar> logger, IFilePathService filePathService) {
 		this.Config = config;
 		this._logger = logger;
+		this._filePathService = filePathService;
 		this.RegistrationQueue
 			.ObserveAdd()
 			.ThrottleFirst(TimeSpan.FromSeconds(0.1))
@@ -48,7 +50,7 @@ public class FileRegistrar {
 
 		var files = await Task.Run(() =>
 			Directory.EnumerateFiles(folder.FolderPath, "*", SearchOption.AllDirectories)
-				.Where(x => x.IsTargetFile())
+				.Where(x => this._filePathService.IsTargetFile(x))
 				.ToList()
 		);
 
@@ -70,7 +72,7 @@ public class FileRegistrar {
 	private async Task RegisterFilesAsync() {
 		while (this.RegistrationQueue.TryDequeue(out var filePath)) {
 			try {
-				var type = filePath.GetMediaType();
+				var type = this._filePathService.GetMediaType(filePath);
 				var fileOperator = _fileOperators.First(x => x.TargetMediaType == type);
 				var mf = await fileOperator.RegisterFileAsync(filePath).ConfigureAwait(false);
 				if (mf is { } mf2) {

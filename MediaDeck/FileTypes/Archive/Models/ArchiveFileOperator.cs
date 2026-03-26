@@ -12,6 +12,11 @@ using MediaDeck.Models.Files.Metadata.Images;
 namespace MediaDeck.FileTypes.Archive.Models;
 [Inject(InjectServiceLifetime.Transient)]
 public partial class ArchiveFileOperator : BaseFileOperator {
+	private readonly IFilePathService _filePathService;
+
+	public ArchiveFileOperator(IFilePathService filePathService) {
+		this._filePathService = filePathService;
+	}
 
 	public override MediaType TargetMediaType {
 		get;
@@ -24,12 +29,12 @@ public partial class ArchiveFileOperator : BaseFileOperator {
 		if (isExists) {
 			return null;
 		}
-		var thumbRelativePath = FilePathUtility.GetThumbnailRelativeFilePath(filePath);
-		var thumbPath = FilePathUtility.GetThumbnailAbsoluteFilePath(thumbRelativePath);
+		var thumbRelativePath = this._filePathService.GetThumbnailRelativeFilePath(filePath);
+		var thumbPath = this._filePathService.GetThumbnailAbsoluteFilePath(thumbRelativePath);
 
 		using var archiveFile = ZipFile.Open(filePath, ZipArchiveMode.Read);
 
-		var first = archiveFile.Entries.FirstOrDefault(x => FilePathUtility.IsImageFile(x.Name));
+		var first = archiveFile.Entries.FirstOrDefault(x => this._filePathService.IsImageFile(x.Name));
 		try {
 			if (first != null) {
 				var image = this.CreateThumbnail(archiveFile, 300, 300, first.FullName);
@@ -57,7 +62,7 @@ public partial class ArchiveFileOperator : BaseFileOperator {
 			RegisteredTime = DateTime.Now,
 			IsExists = fileInfo.Exists,
 			Container = new() {
-				PageCount = archiveFile.Entries.Count(x => FilePathUtility.IsImageFile(x.Name)),
+				PageCount = archiveFile.Entries.Count(x => this._filePathService.IsImageFile(x.Name)),
 			}
 		};
 

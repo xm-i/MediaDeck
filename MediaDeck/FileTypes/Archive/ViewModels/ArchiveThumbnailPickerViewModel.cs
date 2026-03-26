@@ -10,9 +10,11 @@ namespace MediaDeck.FileTypes.Archive.ViewModels;
 [Inject(InjectServiceLifetime.Transient)]
 public class ArchiveThumbnailPickerViewModel : BaseThumbnailPickerViewModel {
 	private readonly ArchiveFileOperator _archiveFileOperator;
+	private readonly IFilePathService _filePathService;
 
-	public ArchiveThumbnailPickerViewModel(ThumbnailsManager thumbnailsManager, ArchiveFileOperator pdfFileOperator) : base(thumbnailsManager) {
+	public ArchiveThumbnailPickerViewModel(ThumbnailsManager thumbnailsManager, ArchiveFileOperator pdfFileOperator, IFilePathService filePathService) : base(thumbnailsManager) {
 		this._archiveFileOperator = pdfFileOperator;
+		this._filePathService = filePathService;
 		this.SelectedEntry.Subscribe(x => {
 			if (x is null) {
 				this.FileName.Value = null;
@@ -60,6 +62,6 @@ public class ArchiveThumbnailPickerViewModel : BaseThumbnailPickerViewModel {
 		await base.LoadAsync(fileViewModel);
 		this.Entries.Clear();
 		using var archive = ZipFile.OpenRead(fileViewModel.FileModel.FilePath);
-		this.Entries.AddRange(archive.Entries.Where(x => FilePathUtility.IsImageFile(x.Name)).Select(x => x.FullName).ToList());
+		this.Entries.AddRange(archive.Entries.Where(x => this._filePathService.IsImageFile(x.Name)).Select(x => x.FullName).ToList());
 	}
 }

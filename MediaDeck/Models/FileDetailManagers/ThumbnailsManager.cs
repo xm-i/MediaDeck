@@ -9,12 +9,13 @@ using Microsoft.Extensions.Logging;
 namespace MediaDeck.Models.FileDetailManagers;
 
 [Inject(InjectServiceLifetime.Singleton)]
-public class ThumbnailsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ILogger<ThumbnailsManager> logger) {
+public class ThumbnailsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ILogger<ThumbnailsManager> logger, IFilePathService filePathService) {
 	private readonly IDbContextFactory<MediaDeckDbContext> _dbFactory = dbFactory;
+	private readonly IFilePathService _filePathService = filePathService;
 
 	public async Task UpdateThumbnailAsync(IFileModel fileModel, byte[] thumbnail) {
-		var thumbRelativePath = FilePathUtility.GetThumbnailRelativeFilePath(fileModel.FilePath);
-		var thumbPath = FilePathUtility.GetThumbnailAbsoluteFilePath(thumbRelativePath);
+		var thumbRelativePath = this._filePathService.GetThumbnailRelativeFilePath(fileModel.FilePath);
+		var thumbPath = this._filePathService.GetThumbnailAbsoluteFilePath(thumbRelativePath);
 		await File.WriteAllBytesAsync(thumbPath, thumbnail);
 
 		if (fileModel.ThumbnailFilePath == thumbPath) {
