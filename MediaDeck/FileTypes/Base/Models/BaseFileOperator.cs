@@ -4,19 +4,19 @@ using CommunityToolkit.Mvvm.DependencyInjection;
 
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
+using MediaDeck.Composition.Interfaces.Services;
 using MediaDeck.Database;
 using MediaDeck.Database.Tables;
-using MediaDeck.Models.Tools;
 
 namespace MediaDeck.FileTypes.Base.Models;
 
 public abstract class BaseFileOperator : IFileOperator {
 	protected readonly IDbContextFactory<MediaDeckDbContext> _dbFactory;
-	protected readonly FileHashUpdater _fileHashUpdater;
+	protected readonly IUpdateFileHashBackgroundService _updateFileHashBackgroundService;
 
 	protected BaseFileOperator() {
 		this._dbFactory = Ioc.Default.GetRequiredService<IDbContextFactory<MediaDeckDbContext>>();
-		this._fileHashUpdater = Ioc.Default.GetRequiredService<FileHashUpdater>();
+		this._updateFileHashBackgroundService = Ioc.Default.GetRequiredService<IUpdateFileHashBackgroundService>();
 	}
 
 	public virtual async Task<MediaFile?> UpdateRateAsync(long mediaFileId, int rate) {

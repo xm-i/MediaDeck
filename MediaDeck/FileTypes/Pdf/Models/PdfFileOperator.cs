@@ -61,7 +61,7 @@ public partial class PdfFileOperator : BaseFileOperator {
 		await db.SaveChangesAsync();
 		await transaction.CommitAsync();
 
-		this._fileHashUpdater.EnqueueHashUpdate(mf.MediaFileId);
+		this._updateFileHashBackgroundService.EnqueueHashUpdate(mf.MediaFileId);
 
 		return mf;
 	}

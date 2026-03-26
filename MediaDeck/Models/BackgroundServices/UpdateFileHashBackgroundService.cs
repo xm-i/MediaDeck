@@ -1,24 +1,22 @@
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using System.Linq;
 
 using MediaDeck.Database;
-using MediaDeck.Utils.Tools;
 
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using MediaDeck.Composition.Interfaces.Services;
 
-namespace MediaDeck.Models.Tools;
+namespace MediaDeck.Models.BackgroundServices;
 
 /// <summary>
 /// メディアファイルのハッシュ値（PreHashおよびFullHash）を管理し、更新するクラス。
 /// PreHashは高速な部分ハッシュで、FullHashは完全なファイルハッシュ。
 /// PreHashが重複する場合にのみFullHashを計算し、重複がなくなった場合はFullHashをクリアする。
 /// </summary>
-[Inject(InjectServiceLifetime.Singleton)]
-public class FileHashUpdater {
+[Inject(InjectServiceLifetime.Singleton, typeof(IUpdateFileHashBackgroundService))]
+public class UpdateFileHashBackgroundService : IUpdateFileHashBackgroundService {
 	private readonly IDbContextFactory<MediaDeckDbContext> _dbFactory;
-	private readonly ILogger<FileHashUpdater> _logger;
+	private readonly ILogger<UpdateFileHashBackgroundService> _logger;
 
 	/// <summary>
 	/// PreHash更新待ちのメディアファイルIDを保持するキュー
@@ -63,12 +61,12 @@ public class FileHashUpdater {
 	} = new();
 
 	/// <summary>
-	/// FileHashUpdaterクラスの新しいインスタンスを初期化する。
+	/// UpdateFileHashBackgroundServiceクラスの新しいインスタンスを初期化する。
 	/// キューの監視とハッシュ更新処理のサブスクリプションを設定する。
 	/// </summary>
 	/// <param name="db">データベースコンテキスト</param>
 	/// <param name="logger">ロガー</param>
-	public FileHashUpdater(IDbContextFactory<MediaDeckDbContext> dbFactory, ILogger<FileHashUpdater> logger) {
+	public UpdateFileHashBackgroundService(IDbContextFactory<MediaDeckDbContext> dbFactory, ILogger<UpdateFileHashBackgroundService> logger) {
 		this._dbFactory = dbFactory;
 		this._logger = logger;
 		this.HashUpdateQueue

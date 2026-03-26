@@ -38,9 +38,9 @@
 			</Grid.ColumnDefinitions>
 			<TextBlock Grid.Row="0" Grid.Column="0"  Text="Update file hash"/>
 			<TextBlock Grid.Row="1" Grid.Column="0">
-				<Run Text="{x:Bind ViewModel.FileHashUpdaterCompletedCount.Value, Mode=OneWay}"/>
+				<Run Text="{x:Bind ViewModel.UpdateFileHashBackgroundServiceCompletedCount.Value, Mode=OneWay}"/>
 				<Run Text="/"/>
-				<Run Text="{x:Bind ViewModel.FileHashUpdaterTargetCount.Value, Mode=OneWay}"/>
+				<Run Text="{x:Bind ViewModel.UpdateFileHashBackgroundServiceTargetCount.Value, Mode=OneWay}"/>
 			</TextBlock>
 		</Grid>
 		<Grid>
