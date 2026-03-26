@@ -11,8 +11,9 @@ using MediaDeck.Models.Files;
 namespace MediaDeck.Models.FileDetailManagers;
 
 [Inject(InjectServiceLifetime.Singleton)]
-public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory) {
+public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagModelFactory tagModelFactory) {
 	private readonly IDbContextFactory<MediaDeckDbContext> _dbFactory = dbFactory;
+	private readonly ITagModelFactory _tagModelFactory = tagModelFactory;
 
 	public ObservableList<TagCategory> TagCategories {
 		get;
@@ -54,7 +55,7 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory) {
 		}
 		
 		await transaction.CommitAsync();
-		return new TagModel(tag);
+		return this._tagModelFactory.Create(tag);
 	}
 
 	public async Task AddTagAsync(IFileModel[] fileModels, ITagModel tag) {
@@ -156,7 +157,7 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory) {
 					.ThenInclude(x => x.MediaFileTags)
 					.ToArrayAsync();
 		foreach (var tag in tagCategories.SelectMany(x => x.Tags).OrderByDescending(x => x.MediaFileTags.Count)) {
-			var newTag = new TagModel(tag);
+			var newTag = this._tagModelFactory.Create(tag);
 			this.Tags.Add(newTag);
 		}
 		this.TagCategories.AddRange(tagCategories);

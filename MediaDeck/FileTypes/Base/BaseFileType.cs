@@ -11,7 +11,6 @@ using MediaDeck.Database.Tables;
 using MediaDeck.FileTypes.Base.Models.Interfaces;
 using MediaDeck.FileTypes.Base.ViewModels.Interfaces;
 using MediaDeck.FileTypes.Base.Views.Interfaces;
-using MediaDeck.Models.Files;
 
 namespace MediaDeck.FileTypes.Base;
 public abstract class BaseFileType<TFileOperator, TFileModel, TFileViewModel, TDetailViewerPreviewControlView, TThumbnailPickerViewModel, TThumbnailPickerView> : IFileType<TFileOperator, TFileModel, TFileViewModel, TDetailViewerPreviewControlView, TThumbnailPickerViewModel, TThumbnailPickerView>
@@ -50,7 +49,8 @@ public abstract class BaseFileType<TFileOperator, TFileModel, TFileViewModel, TD
 		if (mediaFile.Latitude is { } lat && mediaFile.Longitude is { } lon ) {
 			fileModel.Location = new GpsLocation(lat, lon, mediaFile.Altitude);
 		}
-		fileModel.Tags = [.. mediaFile.MediaFileTags.Select(mft => new TagModel(mft.Tag) as ITagModel)];
+		var tagModelFactory = Ioc.Default.GetRequiredService<ITagModelFactory>();
+		fileModel.Tags = [.. mediaFile.MediaFileTags.Select(mft => tagModelFactory.Create(mft.Tag))];
 	}
 
 	IFileOperator IFileType.CreateFileOperator() {
