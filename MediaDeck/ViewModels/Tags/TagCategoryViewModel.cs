@@ -1,3 +1,4 @@
+using MediaDeck.Composition.Utils;
 using MediaDeck.Database.Tables;
 using MediaDeck.Models.FileDetailManagers;
 

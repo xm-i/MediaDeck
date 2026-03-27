@@ -33,9 +33,6 @@
     <PackageReference Include="CommunityToolkit.WinUI.Controls.Sizers" />
     <PackageReference Include="CommunityToolkit.WinUI.Controls.TokenizingTextBox" />
     <PackageReference Include="CommunityToolkit.WinUI.Converters" />
-    <PackageReference Include="FFMpegCore" />
-    <PackageReference Include="Magick.NET-Q16-AnyCPU" />
-    <PackageReference Include="MetadataExtractor" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
     <PackageReference Include="Microsoft.Extensions.Logging" />
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" />
@@ -47,7 +44,6 @@
     <PackageReference Include="Microsoft.WindowsAppSDK" />
     <PackageReference Include="ObservableCollections" />
     <PackageReference Include="ObservableCollections.R3" />
-    <PackageReference Include="Pdfium.Net.SDK" />
     <PackageReference Include="R3" />
     <PackageReference Include="R3Extensions.WinUI3" />
     <PackageReference Include="System.Interactive" />
@@ -60,6 +56,7 @@
     <ProjectReference Include="..\lib\AutoDiAttributes\AutoDiAttributes.Generator\AutoDiAttributes.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     <ProjectReference Include="..\MediaDeck.Composition\MediaDeck.Composition.csproj" />
     <ProjectReference Include="..\MediaDeck.Database\MediaDeck.Database.csproj" />
+    <ProjectReference Include="..\MediaDeck.FileTypes\MediaDeck.FileTypes.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -84,7 +81,8 @@
     <RuntimeHostConfigurationOption Include="System.Text.Json.Serialization.EnableSourceGenReflectionFallback" Value="true" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="FileTypes\Base\Views\" />
+    <Folder Include="FileTypes\" />
+    <Folder Include="Models\Files\Metadata\" />
   </ItemGroup>
   <PropertyGroup>
     <JsonSerializerIsReflectionEnabledByDefault>true</JsonSerializerIsReflectionEnabledByDefault>

@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 
 using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
+using MediaDeck.Composition.Utils;
 using MediaDeck.Database.Tables;
 
 namespace MediaDeck.Models.Files.SearchConditions;
