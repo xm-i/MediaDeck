@@ -1,6 +1,6 @@
 using MediaDeck.Composition.Bases;
+using MediaDeck.Composition.Interfaces.FileTypes.ViewModels;
 using MediaDeck.Composition.Interfaces.FileTypes.Views;
-using MediaDeck.ViewModels.Panes.ViewerPanes;
 
 namespace MediaDeck.FileTypes.Archive.Views;
 public sealed partial class ArchiveDetailViewerPreviewControlView : ArchiveDetailViewerPreviewControlViewUserControl, IDetailViewerPreviewControlView {
@@ -9,6 +9,6 @@ public sealed partial class ArchiveDetailViewerPreviewControlView : ArchiveDetai
 	}
 }
 
-public class ArchiveDetailViewerPreviewControlViewUserControl : UserControlBase<DetailViewerViewModel> {
+public class ArchiveDetailViewerPreviewControlViewUserControl : UserControlBase<IDetailViewerViewModel> {
 }
 

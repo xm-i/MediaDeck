@@ -8,6 +8,7 @@
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="CommunityToolkit.WinUI.Controls.Primitives" />
     <PackageReference Include="FFMpegCore" />
     <PackageReference Include="Magick.NET-Q16-AnyCPU" />
     <PackageReference Include="MetadataExtractor" />

@@ -1,6 +1,6 @@
 using MediaDeck.Composition.Bases;
+using MediaDeck.Composition.Interfaces.FileTypes.ViewModels;
 using MediaDeck.Composition.Interfaces.FileTypes.Views;
-using MediaDeck.ViewModels.Panes.ViewerPanes;
 
 namespace MediaDeck.FileTypes.Pdf.Views;
 public sealed partial class PdfDetailViewerPreviewControlView : PdfDetailViewerPreviewControlViewUserControl, IDetailViewerPreviewControlView {
@@ -9,6 +9,6 @@ public sealed partial class PdfDetailViewerPreviewControlView : PdfDetailViewerP
 	}
 }
 
-public class PdfDetailViewerPreviewControlViewUserControl : UserControlBase<DetailViewerViewModel> {
+public class PdfDetailViewerPreviewControlViewUserControl : UserControlBase<IDetailViewerViewModel> {
 }
 

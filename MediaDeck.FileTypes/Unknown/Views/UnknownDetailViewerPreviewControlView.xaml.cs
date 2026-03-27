@@ -1,6 +1,6 @@
 using MediaDeck.Composition.Bases;
+using MediaDeck.Composition.Interfaces.FileTypes.ViewModels;
 using MediaDeck.Composition.Interfaces.FileTypes.Views;
-using MediaDeck.ViewModels.Panes.ViewerPanes;
 
 namespace MediaDeck.FileTypes.Unknown.Views;
 public sealed partial class UnknownDetailViewerPreviewControlView : UnknownDetailViewerPreviewControlViewUserControl, IDetailViewerPreviewControlView {
@@ -9,5 +9,5 @@ public sealed partial class UnknownDetailViewerPreviewControlView : UnknownDetai
 	}
 }
 
-public class UnknownDetailViewerPreviewControlViewUserControl : UserControlBase<DetailViewerViewModel> {
+public class UnknownDetailViewerPreviewControlViewUserControl : UserControlBase<IDetailViewerViewModel> {
 }

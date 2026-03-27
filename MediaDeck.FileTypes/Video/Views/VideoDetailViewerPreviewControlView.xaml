@@ -13,7 +13,7 @@
 		</Grid.RowDefinitions>
 		<MediaPlayerElement
 			Grid.Row="0"
-			Source="{x:Bind ViewModel.MediaContentLibraryViewModel.SelectedFile.Value.FilePath, Mode=OneWay, Converter={StaticResource PathToMediaPlaybackSourceConverter}}"
+			Source="{x:Bind ViewModel.SelectedFilePath.Value, Mode=OneWay, Converter={StaticResource PathToMediaPlaybackSourceConverter}}"
 			AreTransportControlsEnabled="True"/>
 	</Grid>
 </local:VideoDetailViewerPreviewControlViewUserControl>
