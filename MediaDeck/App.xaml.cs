@@ -110,6 +110,7 @@ public partial class App : Application {
 		serviceCollection.AddGeneratedServices();
 		Composition.DIRegistration.AddGeneratedServices(serviceCollection);
 		FileTypes.DIRegistration.AddGeneratedServices(serviceCollection);
+		ViewModels.DIRegistration.AddGeneratedServices(serviceCollection);
 		Core.DIRegistration.AddGeneratedServices(serviceCollection);
 
 		// DataBase

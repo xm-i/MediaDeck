@@ -1,7 +1,6 @@
 using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Database.Tables;
-using System.Threading.Tasks;
 using MediaDeck.Composition.Interfaces.FileTypes.ViewModels;
 using MediaDeck.Common.Base;
 using MediaDeck.Core.Models.FileDetailManagers.Objects;
@@ -148,7 +147,7 @@ public class DetailSelectorViewModel : ViewModelBase {
 		this.Text.Value = "";
 	}
 
-	internal TagsManager GetTagsManager() {
+	public TagsManager GetTagsManager() {
 		return this._model.TagsManager;
 	}
 
