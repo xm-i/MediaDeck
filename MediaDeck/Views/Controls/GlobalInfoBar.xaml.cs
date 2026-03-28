@@ -2,11 +2,12 @@ using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 
+using MediaDeck.Composition.Objects;
+using MediaDeck.Core.Models.NotificationDispatcher;
+
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-
-using MediaDeck.Utils.Notifications;
 
 namespace MediaDeck.Views.Controls;
 
@@ -62,7 +63,13 @@ public sealed partial class GlobalInfoBar : UserControl {
 
 		this.NotificationInfoBar.Title = notification.Title;
 		this.NotificationInfoBar.Message = notification.Message;
-		this.NotificationInfoBar.Severity = notification.Severity;
+		this.NotificationInfoBar.Severity = notification.Severity switch {
+			NotificationSeverity.Informational => InfoBarSeverity.Informational,
+			NotificationSeverity.Success => InfoBarSeverity.Success,
+			NotificationSeverity.Warning => InfoBarSeverity.Warning,
+			NotificationSeverity.Error => InfoBarSeverity.Error,
+			_ => InfoBarSeverity.Informational
+		};
 		this.NotificationInfoBar.IsOpen = true;
 
 		if (notification.AutoCloseMilliseconds > 0) {

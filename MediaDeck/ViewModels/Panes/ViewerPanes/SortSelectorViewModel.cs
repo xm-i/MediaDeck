@@ -1,9 +1,9 @@
 using System.ComponentModel;
 
-using MediaDeck.Models.Files;
-using MediaDeck.Models.Files.Sort;
-using MediaDeck.Stores.State;
 using MediaDeck.Common.Base;
+using MediaDeck.Core.Models.Files.Sort;
+using MediaDeck.Core.Models.Files;
+using MediaDeck.Core.Stores.State;
 
 namespace MediaDeck.ViewModels.Panes.ViewerPanes;
 

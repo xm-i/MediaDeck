@@ -1,6 +1,6 @@
 using MediaDeck.Common.Extensions;
-using MediaDeck.Models.Repositories;
-using MediaDeck.Models.Repositories.Objects;
+using MediaDeck.Core.Models.Repositories;
+using MediaDeck.Core.Models.Repositories.Objects;
 
 namespace MediaDeck.ViewModels.Panes.RepositoryPanes;
 

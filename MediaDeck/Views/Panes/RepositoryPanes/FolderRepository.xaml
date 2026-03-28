@@ -6,7 +6,7 @@
     xmlns:local="using:MediaDeck.Views.Panes.RepositoryPanes"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-	xmlns:objects="using:MediaDeck.Models.Repositories.Objects"
+	xmlns:objects="using:MediaDeck.Core.Models.Repositories.Objects"
 	mc:Ignorable="d">
 
 	<Grid>

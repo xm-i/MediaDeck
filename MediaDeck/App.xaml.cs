@@ -6,9 +6,9 @@ using FFMpegCore;
 
 using MediaDeck.Composition.Constants;
 using MediaDeck.Composition.Interfaces;
+using MediaDeck.Core.Stores.Config;
+using MediaDeck.Core.Stores.State;
 using MediaDeck.Database;
-using MediaDeck.Stores.Config;
-using MediaDeck.Stores.State;
 using MediaDeck.Views;
 
 using Microsoft.Data.Sqlite;
@@ -110,6 +110,7 @@ public partial class App : Application {
 		serviceCollection.AddGeneratedServices();
 		Composition.DIRegistration.AddGeneratedServices(serviceCollection);
 		FileTypes.DIRegistration.AddGeneratedServices(serviceCollection);
+		Core.DIRegistration.AddGeneratedServices(serviceCollection);
 
 		// DataBase
 		var sb = new SqliteConnectionStringBuilder {

@@ -1,12 +1,13 @@
 using MediaDeck.Common.Base;
 using MediaDeck.Common.Extensions;
+using MediaDeck.Core.Stores.State;
 
 namespace MediaDeck.ViewModels.Panes.ViewerPanes;
 
 [Inject(InjectServiceLifetime.Transient)]
 public class ViewerSelectorViewModel : ViewModelBase {
 	public ViewerSelectorViewModel(
-		MediaDeck.Stores.State.StateStore stateStore,
+		StateStore stateStore,
 		MediaContentLibraryViewModel mediaContentLibraryViewModel,
 		WrapViewerViewModel wrapViewerViewModel,
 		ListViewerViewModel listViewerViewModel,

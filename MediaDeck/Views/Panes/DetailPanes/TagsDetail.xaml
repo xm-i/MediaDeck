@@ -9,7 +9,7 @@
 	xmlns:controls="using:CommunityToolkit.WinUI.Controls"
 	xmlns:ui="using:CommunityToolkit.WinUI"
 	xmlns:tags="using:MediaDeck.ViewModels.Tags"
-	xmlns:files="using:MediaDeck.Models.Files"
+	xmlns:files="using:MediaDeck.Core.Models.Files"
 	mc:Ignorable="d">
 
 	<StackPanel x:Name="ControlRoot" Spacing="8">

@@ -1,5 +1,5 @@
-using MediaDeck.Models.Services;
 using MediaDeck.Common.Base;
+using MediaDeck.Core.Models.Services;
 
 namespace MediaDeck.ViewModels;
 

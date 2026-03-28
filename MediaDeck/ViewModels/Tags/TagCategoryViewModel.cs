@@ -1,6 +1,6 @@
 using MediaDeck.Common.Utilities;
+using MediaDeck.Core.Models.FileDetailManagers;
 using MediaDeck.Database.Tables;
-using MediaDeck.Models.FileDetailManagers;
 
 namespace MediaDeck.ViewModels.Tags;
 

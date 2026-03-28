@@ -4,7 +4,6 @@ using CommunityToolkit.WinUI.Controls;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
-using MediaDeck.Models.Files.SearchConditions;
 using MediaDeck.ViewModels.Panes.ViewerPanes;
 using MediaDeck.Views.Thumbnails;
 
@@ -13,6 +12,7 @@ using System.IO;
 using Microsoft.UI.Input;
 using Windows.UI.Core;
 using MediaDeck.Composition.Interfaces.FileTypes.ViewModels;
+using MediaDeck.Core.Models.Files.SearchConditions;
 
 namespace MediaDeck.Views.Panes.ViewerPanes;
 

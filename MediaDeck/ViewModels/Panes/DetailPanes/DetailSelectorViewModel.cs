@@ -1,14 +1,14 @@
 using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
-using MediaDeck.Models.FileDetailManagers;
-using MediaDeck.Models.FileDetailManagers.Objects;
-using MediaDeck.Models.Files.SearchConditions;
-using MediaDeck.Models.NotificationDispatcher;
-using MediaDeck.Utils.Objects;
 using MediaDeck.Database.Tables;
 using System.Threading.Tasks;
 using MediaDeck.Composition.Interfaces.FileTypes.ViewModels;
 using MediaDeck.Common.Base;
+using MediaDeck.Core.Models.FileDetailManagers.Objects;
+using MediaDeck.Core.Models.FileDetailManagers;
+using MediaDeck.Core.Models.NotificationDispatcher;
+using MediaDeck.Core.Primitives;
+using MediaDeck.Core.Models.Files.SearchConditions;
 
 namespace MediaDeck.ViewModels.Panes.DetailPanes;
 

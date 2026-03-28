@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\lib\R3.JsonConfig\R3.JsonConfig\R3.JsonConfig.csproj" />
+    <ProjectReference Include="..\lib\R3.JsonConfig\R3.JsonConfig.Generators\R3.JsonConfig.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\lib\AutoDiAttributes\AutoDiAttributes\AutoDiAttributes.csproj" />
+    <ProjectReference Include="..\lib\AutoDiAttributes\AutoDiAttributes.Generator\AutoDiAttributes.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\MediaDeck.Common\MediaDeck.Common.csproj" />
+    <ProjectReference Include="..\MediaDeck.Composition\MediaDeck.Composition.csproj" />
+    <PackageReference Include="ObservableCollections" />
+    <PackageReference Include="ObservableCollections.R3" />
+    <PackageReference Include="Portable.Xaml" />
+    <PackageReference Include="R3" />
+  </ItemGroup>
+  
+</Project>

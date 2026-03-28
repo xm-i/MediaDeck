@@ -2,9 +2,10 @@ using System.Threading.Tasks;
 
 using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Interfaces.FileTypes.ViewModels;
-using MediaDeck.Models.Files;
-using MediaDeck.Models.NotificationDispatcher;
 using MediaDeck.Common.Base;
+using MediaDeck.Core.Utils;
+using MediaDeck.Core.Models.Files;
+using MediaDeck.Core.Models.NotificationDispatcher;
 
 namespace MediaDeck.ViewModels.Panes.ViewerPanes;
 

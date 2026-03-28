@@ -1,4 +1,4 @@
-using MediaDeck.Models.Repositories;
+using MediaDeck.Core.Models.Repositories;
 
 namespace MediaDeck.ViewModels.Panes.RepositoryPanes;
 
