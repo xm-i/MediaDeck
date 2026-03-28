@@ -4,6 +4,7 @@ using MapControl;
 
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
+using MediaDeck.Composition.Interfaces.Primitives;
 using MediaDeck.Composition.Objects;
 
 namespace MediaDeck.Composition.Interfaces.FileTypes.ViewModels;
@@ -36,7 +37,7 @@ public interface IFileViewModel {
 		get;
 	}
 
-	public Location? Location {
+	public IGpsLocation? Location {
 		get;
 	}
 

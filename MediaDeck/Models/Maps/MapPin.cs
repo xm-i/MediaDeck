@@ -1,4 +1,6 @@
+using MapControl;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
+using MediaDeck.Composition.Interfaces.Primitives;
 using MediaDeck.Composition.Objects;
 
 namespace MediaDeck.Models.Maps;
@@ -42,7 +44,7 @@ public class MapPin {
 		get;
 	} = [];
 
-	public GpsLocation? Location {
+	public IGpsLocation? Location {
 		get;
 	}
 

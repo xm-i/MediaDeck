@@ -6,6 +6,7 @@ using MediaDeck.Composition.Constants;
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Composition.Interfaces.FileTypes.ViewModels;
+using MediaDeck.Composition.Interfaces.Primitives;
 using MediaDeck.Composition.Objects;
 
 namespace MediaDeck.FileTypes.Base.ViewModels;
@@ -32,7 +33,7 @@ public abstract class BaseFileViewModel : IFileViewModel {
 	public Attributes<string> Properties { get; }
 	public abstract MediaType MediaType { get; }
 
-	public Location? Location {
+	public IGpsLocation? Location {
 		get;
 	}
 

@@ -1,6 +1,5 @@
-using System.ComponentModel;
-
 using MediaDeck.Composition.Enum;
+using MediaDeck.Composition.Interfaces.Primitives;
 using MediaDeck.Composition.Objects;
 using MediaDeck.Composition.Stores.State.Model.Objects;
 
@@ -16,7 +15,7 @@ public static class SortItemFactory {
 			SortItemKey.RegisteredTime => new SortItem<DateTime>(sortItemObject.SortItemKey, x => x.RegisteredTime, sortItemObject.Direction),
 			SortItemKey.FileSize => new SortItem<long>(sortItemObject.SortItemKey, x => x.FileSize, sortItemObject.Direction),
 			SortItemKey.Rate => new SortItem<double>(sortItemObject.SortItemKey, x => x.Rate, sortItemObject.Direction),
-			SortItemKey.Location => new SortItem<GpsLocation?>(sortItemObject.SortItemKey, x => x.Location, sortItemObject.Direction),
+			SortItemKey.Location => new SortItem<IGpsLocation?>(sortItemObject.SortItemKey, x => x.Location, sortItemObject.Direction),
 			SortItemKey.Resolution => new SortItem<ComparableSize?>(sortItemObject.SortItemKey, x => x.Resolution, sortItemObject.Direction),
 			SortItemKey.UsageCount => new SortItem<int>(sortItemObject.SortItemKey, x => x.UsageCount, sortItemObject	.Direction),
 			_ => throw new ArgumentException(),

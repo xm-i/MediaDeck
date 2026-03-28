@@ -45,7 +45,7 @@ public static class FilterItemFactory {
 						x.Latitude > lf.RightBottom.Latitude &&
 						lf.LeftTop.Longitude < x.Longitude &&
 						lf.RightBottom.Longitude > x.Longitude,
-						x => lf.LeftTop > x.Location && x.Location > lf.RightBottom,
+						x => x.Location != null && lf.LeftTop.CompareTo(x.Location) > 0 && x.Location.CompareTo(lf.RightBottom) > 0,
 						true);
 				}
 				return new FilterItem(x => false, x => false, true);

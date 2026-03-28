@@ -25,4 +25,5 @@
 	<converters:FileSizeConverter x:Key="FileSizeConverter"/>
 	<converters:TagListConverter x:Key="TagListConverter"/>
 	<converters:FileChangeFilterToDisplayNameConverter x:Key="FileChangeFilterToDisplayNameConverter"/>
+	<converters:GpsLocationToLocationConverter x:Key="GpsLocationToLocationConverter"/>
 </ResourceDictionary>

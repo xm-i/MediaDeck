@@ -1,4 +1,5 @@
 using MediaDeck.Composition.Interfaces.Files;
+using MediaDeck.Composition.Interfaces.Primitives;
 using MediaDeck.Composition.Objects;
 
 namespace MediaDeck.Models.Files.Filter.FilterItemObjects;
@@ -50,7 +51,7 @@ public class LocationFilterItemObject : IFilterItemObject {
 	/// <summary>
 	/// 左上座標
 	/// </summary>
-	public GpsLocation? LeftTop {
+	public IGpsLocation? LeftTop {
 		get;
 		set;
 	}
@@ -58,7 +59,7 @@ public class LocationFilterItemObject : IFilterItemObject {
 	/// <summary>
 	/// 右上座標
 	/// </summary>
-	public GpsLocation? RightBottom {
+	public IGpsLocation? RightBottom {
 		get;
 		set;
 	}

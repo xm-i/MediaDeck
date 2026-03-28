@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.Files;
+using MediaDeck.Composition.Interfaces.Primitives;
 using MediaDeck.Composition.Objects;
 
 namespace MediaDeck.Composition.Interfaces.FileTypes.Models;
@@ -39,7 +40,7 @@ public interface IFileModel {
 	/// <summary>
 	/// 座標
 	/// </summary>
-	public GpsLocation? Location {
+	public IGpsLocation? Location {
 		get;
 		set;
 	}

@@ -9,7 +9,6 @@
 	xmlns:controls="using:CommunityToolkit.WinUI.Controls"
 	xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
 	xmlns:behaviors="using:CommunityToolkit.WinUI.Behaviors"
-	xmlns:vmIf="using:MediaDeck.FileTypes.Base.ViewModels.Interfaces"
 	xmlns:viewerpanes="using:MediaDeck.ViewModels.Panes.ViewerPanes"
 	xmlns:map="using:MapControl" xmlns:maps="using:MediaDeck.Models.Maps"
 	mc:Ignorable="d">
@@ -40,15 +39,19 @@
 		</controls:TokenizingTextBox>
 		<map:Map
 			x:Name="Map"
-			Center="{x:Bind ViewModel.MapViewerViewModel.Center.Value, Mode=OneWay}"
+			Center="{x:Bind ViewModel.MapViewerViewModel.Center.Value, Mode=OneWay, Converter={StaticResource GpsLocationToLocationConverter}}"
 			MinZoomLevel="2" MaxZoomLevel="21" ZoomLevel="11"
 			ManipulationMode="All"
 			Grid.Row="2"
 			Loaded="Map_Loaded">
 			<map:MapItemsControl
 				ItemsSource="{x:Bind ViewModel.MapViewerViewModel.MapPins.Value, Mode=OneWay}"
-				SelectionMode="Multiple"
-				LocationMemberPath="Location">
+				SelectionMode="Multiple">
+				<map:MapItemsControl.ItemContainerStyle>
+					<Style TargetType="map:MapItem">
+						<Setter Property="Location" Value="{Binding Location, Converter={StaticResource GpsLocationToLocationConverter}}"/>
+					</Style>
+				</map:MapItemsControl.ItemContainerStyle>
 				<map:MapItemsControl.ItemTemplate>
 					<DataTemplate x:DataType="maps:MapPin">
 						<Grid RenderTransformOrigin="0,0">

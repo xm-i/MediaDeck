@@ -7,6 +7,7 @@ using MediaDeck.Composition.Bases;
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
+using MediaDeck.Composition.Interfaces.Primitives;
 using MediaDeck.Composition.Objects;
 using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Composition.Utils;
@@ -60,7 +61,7 @@ public abstract class BaseFileModel : ModelBase, IFileModel {
 	/// <summary>
 	/// 座標
 	/// </summary>
-	public GpsLocation? Location {
+	public IGpsLocation? Location {
 		get;
 		set;
 	}

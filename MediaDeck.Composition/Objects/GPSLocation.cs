@@ -1,5 +1,7 @@
 using MapControl;
 
+using MediaDeck.Composition.Interfaces.Primitives;
+
 namespace MediaDeck.Composition.Objects;
 /// <summary>
 /// 場所、座標クラス
@@ -10,15 +12,21 @@ namespace MediaDeck.Composition.Objects;
 /// <param name="latitude">緯度</param>
 /// <param name="longitude">経度</param>
 /// <param name="altitude">高度</param>
-public class GpsLocation(double latitude, double longitude, double? altitude = null) : Location(latitude, longitude), IComparable<GpsLocation>, IComparable {
-	/// <summary>
-	/// 高度
-	/// </summary>
+public class GpsLocation(double latitude, double longitude, double? altitude = null) : IGpsLocation {
+	/// <inheritdoc/>
+	public double Latitude {
+		get;
+	} = latitude;
+	/// <inheritdoc/>
+	public double Longitude {
+		get;
+	} = longitude;
+	/// <inheritdoc/>
 	public double? Altitude {
 		get;
 	} = altitude;
 
-	public int CompareTo(GpsLocation? other) {
+	public int CompareTo(IGpsLocation? other) {
 		if (other is null) {
 			return -1;
 		}
@@ -46,7 +54,7 @@ public class GpsLocation(double latitude, double longitude, double? altitude = n
 	}
 
 	public int CompareTo(object? obj) {
-		if (obj is GpsLocation gl) {
+		if (obj is IGpsLocation gl) {
 			return this.CompareTo(gl);
 		} else {
 			return -1;
@@ -106,7 +114,7 @@ public class GpsLocation(double latitude, double longitude, double? altitude = n
 	}
 
 	public override bool Equals(object? obj) {
-		if (obj is not GpsLocation loc) {
+		if (obj is not IGpsLocation loc) {
 			return false;
 		}
 		return base.Equals(obj) &&
