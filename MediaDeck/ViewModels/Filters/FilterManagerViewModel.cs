@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 using MediaDeck.Models.Files.Filter;
-using MediaDeck.Utilities.Base;
+using MediaDeck.Common.Base;
 using MediaDeck.ViewModels.Filters.FilterItemCreators;
 
 namespace MediaDeck.ViewModels.Filters;

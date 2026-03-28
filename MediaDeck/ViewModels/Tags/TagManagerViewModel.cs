@@ -1,5 +1,5 @@
 using MediaDeck.Models.FileDetailManagers;
-using MediaDeck.Utilities.Base;
+using MediaDeck.Common.Base;
 
 namespace MediaDeck.ViewModels.Tags;
 [Inject(InjectServiceLifetime.Transient)]

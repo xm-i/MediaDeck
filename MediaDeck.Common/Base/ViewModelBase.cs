@@ -1,12 +1,10 @@
-using System.Threading;
-
 using CommunityToolkit.Mvvm.ComponentModel;
 
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces;
 using MediaDeck.Composition.Objects;
 
-namespace MediaDeck.Utilities.Base; 
+namespace MediaDeck.Common.Base; 
 /// <summary>
 /// ViewModel基底クラス
 /// </summary>

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using R3;
 
 using ObservableCollections;
-using MediaDeck.Utilities.Base;
+using MediaDeck.Common.Base;
 
 namespace MediaDeck.ViewModels;
 

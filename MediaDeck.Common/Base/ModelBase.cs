@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Collections.Concurrent;
 using MediaDeck.Composition.Interfaces;
 
-namespace MediaDeck.Utilities.Base;
+namespace MediaDeck.Common.Base;
 public class ModelBase : ObservableObject, IModelBase {
 	/// <summary>
 	/// Dispose用Lockオブジェクト

@@ -1,7 +1,7 @@
 using System.IO;
 using System.Threading.Tasks;
 
-using MediaDeck.Utilities.Base;
+using MediaDeck.Common.Base;
 using MediaDeck.Composition.Interfaces;
 using MediaDeck.Database;
 

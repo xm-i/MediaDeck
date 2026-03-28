@@ -2,7 +2,7 @@ using System.Linq.Expressions;
 
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Database.Tables;
-using MediaDeck.Utilities.Base;
+using MediaDeck.Common.Base;
 
 namespace MediaDeck.Models.Files.Filter;
 /// <summary>

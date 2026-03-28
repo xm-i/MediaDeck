@@ -2,7 +2,7 @@ using System.Threading.Tasks;
 
 using MediaDeck.Composition.Interfaces.Services;
 using MediaDeck.Models.Tools;
-using MediaDeck.Utilities.Base;
+using MediaDeck.Common.Base;
 
 namespace MediaDeck.ViewModels.Tools;
 [Inject(InjectServiceLifetime.Singleton)]

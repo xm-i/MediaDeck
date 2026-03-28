@@ -8,7 +8,7 @@ using MediaDeck.Utils.Objects;
 using MediaDeck.Database.Tables;
 using System.Threading.Tasks;
 using MediaDeck.Composition.Interfaces.FileTypes.ViewModels;
-using MediaDeck.Utilities.Base;
+using MediaDeck.Common.Base;
 
 namespace MediaDeck.ViewModels.Panes.DetailPanes;
 

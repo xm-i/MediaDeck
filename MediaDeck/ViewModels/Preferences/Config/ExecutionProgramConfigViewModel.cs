@@ -1,6 +1,6 @@
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Stores.Config.Model.Objects;
-using MediaDeck.Utilities.Base;
+using MediaDeck.Common.Base;
 
 namespace MediaDeck.ViewModels.Preferences.Config;
 

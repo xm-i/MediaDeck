@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Database.Tables;
-using MediaDeck.Utilities.Base;
+using MediaDeck.Common.Base;
 
 namespace MediaDeck.Models.Files.Filter;
 /// <summary>

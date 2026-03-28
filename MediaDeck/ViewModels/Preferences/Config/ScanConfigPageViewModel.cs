@@ -1,5 +1,5 @@
 using MediaDeck.Composition.Stores.Config.Model;
-using MediaDeck.Utilities.Base;
+using MediaDeck.Common.Base;
 
 using Microsoft.Extensions.DependencyInjection;
 

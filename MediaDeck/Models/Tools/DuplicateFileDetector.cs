@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 using MediaDeck.Database;
 using MediaDeck.Database.Tables;
-using MediaDeck.Utilities.Base;
+using MediaDeck.Common.Base;
 
 namespace MediaDeck.Models.Tools;
 

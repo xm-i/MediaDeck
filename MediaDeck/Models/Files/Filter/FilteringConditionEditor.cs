@@ -3,7 +3,7 @@ using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Objects;
 using MediaDeck.Composition.Stores.State.Model.Objects;
 using MediaDeck.Models.Files.Filter.FilterItemObjects;
-using MediaDeck.Utilities.Base;
+using MediaDeck.Common.Base;
 
 namespace MediaDeck.Models.Files.Filter;
 /// <summary>

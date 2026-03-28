@@ -3,7 +3,7 @@ using System.ComponentModel;
 using MediaDeck.Models.Files;
 using MediaDeck.Models.Files.Sort;
 using MediaDeck.Stores.State;
-using MediaDeck.Utilities.Base;
+using MediaDeck.Common.Base;
 
 namespace MediaDeck.ViewModels.Panes.ViewerPanes;
 

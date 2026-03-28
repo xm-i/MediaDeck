@@ -17,7 +17,7 @@ using MediaDeck.Models.Files;
 
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
-using MediaDeck.Utilities.Base;
+using MediaDeck.Common.Base;
 
 namespace MediaDeck.Models.Services;
 

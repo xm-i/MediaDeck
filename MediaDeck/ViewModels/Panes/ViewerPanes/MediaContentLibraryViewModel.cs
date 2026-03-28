@@ -4,7 +4,7 @@ using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Interfaces.FileTypes.ViewModels;
 using MediaDeck.Models.Files;
 using MediaDeck.Models.NotificationDispatcher;
-using MediaDeck.Utilities.Base;
+using MediaDeck.Common.Base;
 
 namespace MediaDeck.ViewModels.Panes.ViewerPanes;
 

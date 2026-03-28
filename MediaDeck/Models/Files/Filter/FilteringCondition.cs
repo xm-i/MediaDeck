@@ -4,7 +4,7 @@ using MediaDeck.Database.Tables;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Stores.State.Model.Objects;
-using MediaDeck.Utilities.Base;
+using MediaDeck.Common.Base;
 
 namespace MediaDeck.Models.Files.Filter;
 /// <summary>

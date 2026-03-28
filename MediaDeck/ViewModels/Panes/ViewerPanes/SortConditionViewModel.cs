@@ -1,5 +1,5 @@
 using MediaDeck.Composition.Stores.State.Model.Objects;
-using MediaDeck.Utilities.Base;
+using MediaDeck.Common.Base;
 
 namespace MediaDeck.ViewModels.Panes.ViewerPanes;
 

@@ -10,7 +10,7 @@ using MediaDeck.Models.Files.Loaders;
 using MediaDeck.Models.Files.SearchConditions;
 using MediaDeck.Models.NotificationDispatcher;
 using MediaDeck.Models.Repositories;
-using MediaDeck.Utilities.Base;
+using MediaDeck.Common.Base;
 
 namespace MediaDeck.Models.Files;
 

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 using MediaDeck.Composition.Interfaces.FileTypes.ViewModels;
 using MediaDeck.Models.FileDetailManagers;
-using MediaDeck.Utilities.Base;
+using MediaDeck.Common.Base;
 
 namespace MediaDeck.ViewModels.Panes.ViewerPanes;
 

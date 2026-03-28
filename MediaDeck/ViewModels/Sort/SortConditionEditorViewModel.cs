@@ -2,7 +2,7 @@ using System.ComponentModel;
 
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Stores.State.Model.Objects;
-using MediaDeck.Utilities.Base;
+using MediaDeck.Common.Base;
 
 namespace MediaDeck.ViewModels.Sort;
 
