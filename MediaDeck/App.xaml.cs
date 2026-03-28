@@ -110,6 +110,7 @@ public partial class App : Application {
 
 		serviceCollection.AddGeneratedServices();
 		Composition.DIRegistration.AddGeneratedServices(serviceCollection);
+		FileTypes.DIRegistration.AddGeneratedServices(serviceCollection);
 
 		// DataBase
 		var sb = new SqliteConnectionStringBuilder {
