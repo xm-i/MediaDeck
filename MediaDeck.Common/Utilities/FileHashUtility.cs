@@ -1,13 +1,12 @@
 using System.Buffers;
-using System.IO;
 using System.Security.Cryptography;
 
-namespace MediaDeck.Utils.Tools;
+namespace MediaDeck.Common.Utilities;
 
 /// <summary>
 /// ファイルハッシュ計算ユーティリティ
 /// </summary>
-internal static class FileHashUtility {
+public static class FileHashUtility {
 	/// <summary>
 	/// ハッシュ計算に使用する最大バイト数 (1MB)
 	/// </summary>

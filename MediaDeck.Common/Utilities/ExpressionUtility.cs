@@ -1,7 +1,6 @@
-using System.Collections.Generic;
 using System.Linq.Expressions;
 
-namespace MediaDeck.Utils.Tools;
+namespace MediaDeck.Common.Utilities;
 
 /// <summary>
 /// パラメータ上書きクラス

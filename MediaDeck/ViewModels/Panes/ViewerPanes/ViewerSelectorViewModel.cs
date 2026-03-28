@@ -1,4 +1,5 @@
 using MediaDeck.Common.Base;
+using MediaDeck.Common.Extensions;
 
 namespace MediaDeck.ViewModels.Panes.ViewerPanes;
 

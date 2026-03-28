@@ -1,6 +1,6 @@
 using MediaDeck.Composition.Objects;
 
-namespace MediaDeck.Utils.Tools;
+namespace MediaDeck.Common.Extensions;
 
 /// <summary>
 /// <see cref="Attributes{T}"/>の拡張メソッドクラス

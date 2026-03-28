@@ -1,6 +1,4 @@
-using System.Collections.Generic;
-
-namespace MediaDeck.Composition.Utils;
+namespace MediaDeck.Common.Utilities;
 
 public static class StringUtility {
 	private static readonly int offset = beginKatakana - beginHiragana;

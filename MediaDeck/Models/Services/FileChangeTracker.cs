@@ -2,6 +2,8 @@ using System.IO;
 using System.Threading.Tasks;
 
 using MediaDeck.Common.Base;
+using MediaDeck.Common.Extensions;
+using MediaDeck.Common.Utilities;
 using MediaDeck.Composition.Interfaces;
 using MediaDeck.Database;
 

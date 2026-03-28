@@ -5,7 +5,7 @@ using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Composition.Stores.State.Model.Objects;
 using MediaDeck.Common.Base;
-using MediaDeck.Utils.Tools;
+using MediaDeck.Common.Extensions;
 
 namespace MediaDeck.Models.Files.Sort;
 

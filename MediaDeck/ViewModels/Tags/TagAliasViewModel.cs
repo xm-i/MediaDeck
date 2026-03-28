@@ -1,3 +1,4 @@
+using MediaDeck.Common.Extensions;
 using MediaDeck.Database.Tables;
 
 namespace MediaDeck.ViewModels.Tags;

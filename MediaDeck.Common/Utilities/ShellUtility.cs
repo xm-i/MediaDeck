@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
-namespace MediaDeck.Composition.Utils;
+namespace MediaDeck.Common.Utilities;
 
 public static class ShellUtility {
 	[DllImport("user32.dll")]

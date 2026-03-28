@@ -7,6 +7,7 @@ using MediaDeck.Composition.Objects;
 using MediaDeck.Models.Files.Filter.FilterItemObjects;
 using MediaDeck.Common.Base;
 using MediaDeck.Utils.Objects;
+using MediaDeck.Common.Extensions;
 
 namespace MediaDeck.ViewModels.Filters.FilterItemCreators;
 /// <summary>

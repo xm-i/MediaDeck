@@ -1,14 +1,8 @@
 using System.ComponentModel;
 
-using Microsoft.Web.WebView2.Core;
+namespace MediaDeck.Common.Extensions;
 
-using R3;
-
-using Windows.Foundation;
-
-namespace MediaDeck.Utils.Tools;
-
-public static class R3Utility
+public static class R3Ex
 {
 	public static Observable<Unit> ToUnit<T>(this Observable<T> observable) {
 		return observable.Select(_ => Unit.Default);

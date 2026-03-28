@@ -4,13 +4,13 @@ using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.DependencyInjection;
 
 using MediaDeck.Common.Base;
+using MediaDeck.Common.Utilities;
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Composition.Interfaces.Primitives;
 using MediaDeck.Composition.Objects;
 using MediaDeck.Composition.Stores.Config.Model;
-using MediaDeck.Composition.Utils;
 
 namespace MediaDeck.FileTypes.Base.Models;
 

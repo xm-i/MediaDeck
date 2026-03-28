@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 
 using MediaDeck.Database;
+using MediaDeck.Common.Utilities;
 
 using Microsoft.Extensions.Logging;
 using MediaDeck.Composition.Interfaces.Services;

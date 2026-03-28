@@ -1,6 +1,4 @@
-using System.Collections.Generic;
-
-namespace MediaDeck.Utils.Tools;
+namespace MediaDeck.Common.Extensions;
 /// <summary>
 /// コレクション拡張メソッドクラス
 /// </summary>
