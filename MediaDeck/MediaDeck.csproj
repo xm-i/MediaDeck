@@ -80,10 +80,6 @@
     <RuntimeHostConfigurationOption Include="System.Text.Json.JsonSerializer.IsReflectionEnabledByDefault" Value="true" />
     <RuntimeHostConfigurationOption Include="System.Text.Json.Serialization.EnableSourceGenReflectionFallback" Value="true" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="FileTypes\" />
-    <Folder Include="Models\Files\Metadata\" />
-  </ItemGroup>
   <PropertyGroup>
     <JsonSerializerIsReflectionEnabledByDefault>true</JsonSerializerIsReflectionEnabledByDefault>
   </PropertyGroup>
