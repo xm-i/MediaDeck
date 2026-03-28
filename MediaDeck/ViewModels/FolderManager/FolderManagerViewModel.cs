@@ -1,5 +1,5 @@
-using MediaDeck.Composition.Bases;
 using MediaDeck.Models.FolderManager;
+using MediaDeck.Utilities.Base;
 
 namespace MediaDeck.ViewModels.FolderManager;
 

@@ -2,7 +2,6 @@ using CommunityToolkit.Mvvm.DependencyInjection;
 
 using Microsoft.UI.Xaml;
 
-using MediaDeck.Composition.Bases;
 using MediaDeck.Utils.Tools;
 using MediaDeck.ViewModels.Panes.FilterPanes;
 using MediaDeck.Views.Filters;

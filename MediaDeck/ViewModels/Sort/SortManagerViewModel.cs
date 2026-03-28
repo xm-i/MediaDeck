@@ -1,5 +1,5 @@
-using MediaDeck.Composition.Bases;
 using MediaDeck.Models.Files.Sort;
+using MediaDeck.Utilities.Base;
 
 namespace MediaDeck.ViewModels.Sort;
 

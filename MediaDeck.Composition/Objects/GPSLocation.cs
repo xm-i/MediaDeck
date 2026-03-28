@@ -1,5 +1,3 @@
-using MapControl;
-
 using MediaDeck.Composition.Interfaces.Primitives;
 
 namespace MediaDeck.Composition.Objects;

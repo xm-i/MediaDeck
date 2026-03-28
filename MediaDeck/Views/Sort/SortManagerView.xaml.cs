@@ -1,4 +1,3 @@
-using MediaDeck.Composition.Bases;
 using MediaDeck.Composition.Stores.State.Model.Objects;
 using MediaDeck.ViewModels.Sort;
 

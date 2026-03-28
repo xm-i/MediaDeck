@@ -1,16 +1,11 @@
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Objects;
-using System.Threading;
-using System;
 using CommunityToolkit.Mvvm.ComponentModel;
-using R3;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using System.ComponentModel;
 using System.Collections.Concurrent;
 using MediaDeck.Composition.Interfaces;
 
-namespace MediaDeck.Composition.Bases;
+namespace MediaDeck.Utilities.Base;
 public class ModelBase : ObservableObject, IModelBase {
 	/// <summary>
 	/// Dispose用Lockオブジェクト

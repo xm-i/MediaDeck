@@ -1,4 +1,3 @@
-using MediaDeck.Composition.Bases;
 using MediaDeck.ViewModels.Panes.RepositoryPanes;
 
 namespace MediaDeck.Views.Panes.RepositoryPanes;

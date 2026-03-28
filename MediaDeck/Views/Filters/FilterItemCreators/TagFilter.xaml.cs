@@ -1,4 +1,3 @@
-using MediaDeck.Composition.Bases;
 using MediaDeck.ViewModels.Filters.FilterItemCreators;
 
 namespace MediaDeck.Views.Filters.FilterItemCreators;

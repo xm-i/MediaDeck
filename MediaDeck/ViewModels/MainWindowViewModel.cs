@@ -1,4 +1,4 @@
-using MediaDeck.Composition.Bases;
+using MediaDeck.Utilities.Base;
 using MediaDeck.ViewModels.Panes.DetailPanes;
 using MediaDeck.ViewModels.Panes.FilterPanes;
 using MediaDeck.ViewModels.Panes.RepositoryPanes;

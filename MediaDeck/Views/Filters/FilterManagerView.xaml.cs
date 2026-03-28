@@ -1,6 +1,5 @@
 using Microsoft.UI.Xaml.Controls;
 
-using MediaDeck.Composition.Bases;
 using MediaDeck.ViewModels.Filters;
 using MediaDeck.ViewModels.Filters.FilterItemCreators;
 using MediaDeck.Views.Filters.FilterItemCreators;

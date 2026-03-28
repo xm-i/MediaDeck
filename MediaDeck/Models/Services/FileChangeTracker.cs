@@ -1,7 +1,7 @@
 using System.IO;
 using System.Threading.Tasks;
 
-using MediaDeck.Composition.Bases;
+using MediaDeck.Utilities.Base;
 using MediaDeck.Composition.Interfaces;
 using MediaDeck.Database;
 
@@ -93,7 +93,7 @@ public class FileChangeTracker : IDisposable {
 		// Addedアイテムが既にあれば時間をリセットしてハッシュ計算を遅らせる
 		var existing = this.UnprocessedChanges.FirstOrDefault(c => c.ChangeType == FileChangeType.Added && c.NewPath == path);
 		existing?.CreatedAt = DateTime.UtcNow;
-		
+
 	}
 
 	/// <summary>

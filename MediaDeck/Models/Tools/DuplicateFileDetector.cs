@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-using MediaDeck.Composition.Bases;
 using MediaDeck.Database;
 using MediaDeck.Database.Tables;
+using MediaDeck.Utilities.Base;
 
 namespace MediaDeck.Models.Tools;
 

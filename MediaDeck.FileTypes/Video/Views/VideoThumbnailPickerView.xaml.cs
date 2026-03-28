@@ -1,8 +1,9 @@
-using MediaDeck.Composition.Bases;
 using MediaDeck.Composition.Interfaces.FileTypes.Views;
 using MediaDeck.FileTypes.Video.ViewModels;
+using MediaDeck.FileTypes.Base.Views;
 
 namespace MediaDeck.FileTypes.Video.Views;
+
 public sealed partial class VideoThumbnailPickerView : VideoThumbnailPickerViewUserControl, IThumbnailPickerView {
 	public VideoThumbnailPickerView() {
 		this.InitializeComponent();

@@ -1,7 +1,7 @@
-using MediaDeck.Composition.Bases;
 using MediaDeck.Models.Files;
 using MediaDeck.Models.Files.Filter;
 using MediaDeck.Stores.State;
+using MediaDeck.Utilities.Base;
 
 namespace MediaDeck.ViewModels.Panes.FilterPanes;
 

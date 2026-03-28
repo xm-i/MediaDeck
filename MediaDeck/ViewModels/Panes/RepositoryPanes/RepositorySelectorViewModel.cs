@@ -1,5 +1,5 @@
-using MediaDeck.Composition.Bases;
 using MediaDeck.Models.Repositories;
+using MediaDeck.Utilities.Base;
 
 namespace MediaDeck.ViewModels.Panes.RepositoryPanes;
 

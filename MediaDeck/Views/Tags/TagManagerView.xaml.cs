@@ -1,4 +1,3 @@
-using MediaDeck.Composition.Bases;
 using MediaDeck.ViewModels.Tags;
 
 namespace MediaDeck.Views.Tags;

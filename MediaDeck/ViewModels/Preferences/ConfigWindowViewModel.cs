@@ -1,5 +1,5 @@
-using MediaDeck.Composition.Bases;
 using MediaDeck.Stores.Config;
+using MediaDeck.Utilities.Base;
 using MediaDeck.ViewModels.Preferences.Config;
 
 namespace MediaDeck.ViewModels.Preferences;

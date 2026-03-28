@@ -1,7 +1,3 @@
-using System.Threading.Tasks;
-
-using MapControl;
-
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Composition.Interfaces.Primitives;

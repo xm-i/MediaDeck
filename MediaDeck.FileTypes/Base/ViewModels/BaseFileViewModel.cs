@@ -1,7 +1,5 @@
 using System.Threading.Tasks;
 
-using MapControl;
-
 using MediaDeck.Composition.Constants;
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;

@@ -1,5 +1,5 @@
-using MediaDeck.Composition.Bases;
 using MediaDeck.Stores.State;
+using MediaDeck.Utilities.Base;
 
 namespace MediaDeck.Models.Files.Filter;
 /// <summary>

@@ -1,6 +1,5 @@
 using CommunityToolkit.Mvvm.DependencyInjection;
 
-using MediaDeck.Composition.Bases;
 using MediaDeck.Utils.Tools;
 using MediaDeck.ViewModels.Panes.ViewerPanes;
 using MediaDeck.Views.Sort;

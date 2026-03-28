@@ -1,9 +1,9 @@
-using MediaDeck.Composition.Bases;
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Objects;
 using MediaDeck.Composition.Stores.State.Model.Objects;
 using MediaDeck.Models.Files.Filter.FilterItemObjects;
+using MediaDeck.Utilities.Base;
 
 namespace MediaDeck.Models.Files.Filter;
 /// <summary>

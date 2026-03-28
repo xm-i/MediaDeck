@@ -4,8 +4,9 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+
 using R3;
-using MediaDeck.Composition.Bases;
+
 using MediaDeck.Composition.Interfaces;
 using MediaDeck.Composition.Objects;
 using MediaDeck.Database;
@@ -16,6 +17,7 @@ using MediaDeck.Models.Files;
 
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
+using MediaDeck.Utilities.Base;
 
 namespace MediaDeck.Models.Services;
 
@@ -27,7 +29,6 @@ namespace MediaDeck.Models.Services;
 public class FileChangeMonitorService : ModelBase {
 	private readonly IDbContextFactory<MediaDeckDbContext> _dbFactory;
 	private readonly ILogger<FileChangeMonitorService> _logger;
-	private readonly IDispatcherGate _dispatcherGate;
 	private readonly AppNotificationDispatcher _appNotificationDispatcher;
 	private readonly FileRegistrar _fileRegistrar;
 	private readonly FileSystemWatcherManager _watcherManager;
@@ -49,10 +50,9 @@ public class FileChangeMonitorService : ModelBase {
 	/// <param name="dispatcherGate">UIスレッドディスパッチャー</param>
 	/// <param name="appNotificationDispatcher">通知送信クラス</param>
 	/// <param name="fileRegistrar">ファイル登録クラス</param>
-	public FileChangeMonitorService(StateStore stateStore, IDbContextFactory<MediaDeckDbContext> dbFactory, FileChangeTracker tracker, ILogger<FileChangeMonitorService> logger, IDispatcherGate dispatcherGate, AppNotificationDispatcher appNotificationDispatcher, FileRegistrar fileRegistrar) {
+	public FileChangeMonitorService(StateStore stateStore, IDbContextFactory<MediaDeckDbContext> dbFactory, FileChangeTracker tracker, ILogger<FileChangeMonitorService> logger, AppNotificationDispatcher appNotificationDispatcher, FileRegistrar fileRegistrar) {
 		this._dbFactory = dbFactory;
 		this._logger = logger;
-		this._dispatcherGate = dispatcherGate;
 		this._appNotificationDispatcher = appNotificationDispatcher;
 		this._fileRegistrar = fileRegistrar;
 
@@ -90,10 +90,8 @@ public class FileChangeMonitorService : ModelBase {
 	/// <param name="ex">発生した例外</param>
 	private void HandleWatcherError(Exception ex) {
 		if (ex is InternalBufferOverflowException) {
-			this._dispatcherGate.BeginInvoke(() => {
-				var notif = AppNotification.Warning("ファイルの変更監視が追いつきませんでした。最新状態を反映するには、手動でフォルダの再読み込みを実行してください。", "監視エラー", 10000);
-				this._appNotificationDispatcher.Notify.OnNext(notif);
-			});
+			var notif = AppNotification.Warning("ファイルの変更監視が追いつきませんでした。最新状態を反映するには、手動でフォルダの再読み込みを実行してください。", "監視エラー", 10000);
+			this._appNotificationDispatcher.Notify.OnNext(notif);
 		}
 	}
 

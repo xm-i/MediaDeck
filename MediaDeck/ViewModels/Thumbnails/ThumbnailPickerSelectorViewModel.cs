@@ -1,6 +1,6 @@
-using MediaDeck.Composition.Bases;
 using MediaDeck.Composition.Interfaces.FileTypes.ViewModels;
 using MediaDeck.Composition.Interfaces.FileTypes.Views;
+using MediaDeck.Utilities.Base;
 
 namespace MediaDeck.ViewModels.Thumbnails;
 [Inject(InjectServiceLifetime.Transient)]

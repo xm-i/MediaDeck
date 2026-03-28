@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-using MediaDeck.Composition.Bases;
 using MediaDeck.Composition.Interfaces.FileTypes.ViewModels;
 using MediaDeck.Models.FileDetailManagers;
+using MediaDeck.Utilities.Base;
 
 namespace MediaDeck.ViewModels.Panes.ViewerPanes;
 

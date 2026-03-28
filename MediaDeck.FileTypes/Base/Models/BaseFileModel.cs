@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 using CommunityToolkit.Mvvm.DependencyInjection;
 
-using MediaDeck.Composition.Bases;
+using MediaDeck.Utilities.Base;
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;

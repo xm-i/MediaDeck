@@ -1,4 +1,4 @@
-using MediaDeck.Composition.Bases;
+using MediaDeck.Utilities.Base;
 
 namespace MediaDeck.ViewModels.Panes.ViewerPanes;
 

@@ -36,6 +36,10 @@
     <File Path="LICENSE" />
     <File Path="README.md" />
   </Folder>
+  <Project Path="MediaDeck.Composition.UI/MediaDeck.Composition.UI.csproj" Id="ebb8a239-363f-4f60-ad4f-0ebec15394f5">
+    <BuildType Solution="Debug-Unpackaged|*" Project="Debug" />
+    <BuildType Solution="Release-Unpackaged|*" Project="Release" />
+  </Project>
   <Project Path="MediaDeck.Composition/MediaDeck.Composition.csproj">
     <BuildType Solution="Debug-Unpackaged|*" Project="Debug" />
     <BuildType Solution="Release-Unpackaged|*" Project="Release" />
@@ -45,6 +49,10 @@
     <BuildType Solution="Release-Unpackaged|*" Project="Release" />
   </Project>
   <Project Path="MediaDeck.FileTypes/MediaDeck.FileTypes.csproj" Id="6acd5318-707a-477f-b4d2-08f227591ca0">
+    <BuildType Solution="Debug-Unpackaged|*" Project="Debug" />
+    <BuildType Solution="Release-Unpackaged|*" Project="Release" />
+  </Project>
+  <Project Path="MediaDeck.Utilities/MediaDeck.Utilities.csproj" Id="a4fa147f-96da-4dbf-b176-c855c0796a93">
     <BuildType Solution="Debug-Unpackaged|*" Project="Debug" />
     <BuildType Solution="Release-Unpackaged|*" Project="Release" />
   </Project>

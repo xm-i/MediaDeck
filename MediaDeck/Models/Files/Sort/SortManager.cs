@@ -1,6 +1,6 @@
-using MediaDeck.Composition.Bases;
 using MediaDeck.Composition.Stores.State.Model.Objects;
 using MediaDeck.Stores.State;
+using MediaDeck.Utilities.Base;
 
 namespace MediaDeck.Models.Files.Sort;
 /// <summary>

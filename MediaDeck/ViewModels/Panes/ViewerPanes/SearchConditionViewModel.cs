@@ -1,5 +1,5 @@
-using MediaDeck.Composition.Bases;
 using MediaDeck.Composition.Interfaces.Files;
+using MediaDeck.Utilities.Base;
 
 namespace MediaDeck.ViewModels.Panes.ViewerPanes;
 public class SearchConditionViewModel : ViewModelBase {

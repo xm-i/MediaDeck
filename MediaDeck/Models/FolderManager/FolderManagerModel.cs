@@ -1,9 +1,9 @@
 using System.Threading.Tasks;
 
-using MediaDeck.Composition.Bases;
 using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Composition.Stores.State.Model.Objects;
 using MediaDeck.Models.Files;
+using MediaDeck.Utilities.Base;
 
 namespace MediaDeck.Models.FolderManager;
 

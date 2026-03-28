@@ -63,7 +63,6 @@ public partial class App : Application {
 	/// <param name="args">Details about the launch request and process.</param>
 	protected override void OnLaunched(LaunchActivatedEventArgs args) {
 		this._window = Ioc.Default.GetRequiredService<MainWindow>();
-		Ioc.Default.GetRequiredService<IDispatcherGate>().Initialize(this._window.DispatcherQueue);
 
 		this._window.Closed += (_, _) => {
 			this._stateStore.Save();

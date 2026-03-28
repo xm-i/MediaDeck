@@ -1,6 +1,6 @@
 using Microsoft.UI.Xaml.Controls;
 
-namespace MediaDeck.Composition.Bases;
+namespace MediaDeck.Views;
 public abstract class UserControlBase<T>:UserControl where T:class {
 	public T? ViewModel {
 		get; set;

@@ -2,7 +2,6 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
-using MediaDeck.Composition.Bases;
 using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Composition.Stores.State.Model;
@@ -11,6 +10,7 @@ using MediaDeck.Models.Files.Loaders;
 using MediaDeck.Models.Files.SearchConditions;
 using MediaDeck.Models.NotificationDispatcher;
 using MediaDeck.Models.Repositories;
+using MediaDeck.Utilities.Base;
 
 namespace MediaDeck.Models.Files;
 
