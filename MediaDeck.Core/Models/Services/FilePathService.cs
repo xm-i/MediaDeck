@@ -1,11 +1,10 @@
 using System.Text;
 using System.Security.Cryptography;
-using System.IO;
 
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Stores.Config.Model;
 
-namespace MediaDeck.Utils.Tools;
+namespace MediaDeck.Core.Models.Services;
 
 [Inject(InjectServiceLifetime.Singleton, typeof(IFilePathService))]
 public class FilePathService : IFilePathService {

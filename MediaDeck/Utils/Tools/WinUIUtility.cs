@@ -5,8 +5,6 @@ using Microsoft.UI.Xaml;
 
 using MediaDeck.Views;
 
-using Windows.Graphics;
-
 namespace MediaDeck.Utils.Tools;
 
 public static class WinUIUtility {
