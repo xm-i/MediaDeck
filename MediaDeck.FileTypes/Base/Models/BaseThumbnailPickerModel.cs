@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
@@ -11,6 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace MediaDeck.FileTypes.Base.Models;
 
+[Inject(InjectServiceLifetime.Transient)]
 public class BaseThumbnailPickerModel(IDbContextFactory<MediaDeckDbContext> dbFactory, ILogger<BaseThumbnailPickerModel> logger, IFilePathService filePathService) {
 	private readonly IDbContextFactory<MediaDeckDbContext> _dbFactory = dbFactory;
 	private readonly IFilePathService _filePathService = filePathService;
