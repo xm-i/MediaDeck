@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 
 namespace MediaDeck.Composition.Enum;
+
 /// <summary>
 /// 検索タイプ(含む/含まない)
 /// </summary>
@@ -10,6 +11,7 @@ public enum SearchTypeInclude {
 	/// 含むものを検索
 	/// </summary>
 	Include,
+
 	/// <summary>
 	/// 含まないものを検索
 	/// </summary>
@@ -24,18 +26,22 @@ public enum SearchTypeComparison {
 	/// 超
 	/// </summary>
 	GreaterThan,
+
 	/// <summary>
 	/// 以上
 	/// </summary>
 	GreaterThanOrEqual,
+
 	/// <summary>
 	/// 同値
 	/// </summary>
 	Equal,
+
 	/// <summary>
 	/// 以下
 	/// </summary>
 	LessThanOrEqual,
+
 	/// <summary>
 	/// 未満
 	/// </summary>
@@ -51,12 +57,13 @@ public static class SearchTypeConverters {
 	/// <returns>比較用メソッド</returns>
 	public static Func<T, T, bool> SearchTypeToFunc<T>(SearchTypeComparison searchType) {
 		var op = new Dictionary<SearchTypeComparison, Func<Expression, Expression, BinaryExpression>> {
-			{SearchTypeComparison.GreaterThan, Expression.GreaterThan},
-			{SearchTypeComparison.GreaterThanOrEqual,Expression.GreaterThanOrEqual},
-			{SearchTypeComparison.Equal, Expression.Equal},
-			{SearchTypeComparison.LessThanOrEqual,Expression.LessThanOrEqual},
-			{SearchTypeComparison.LessThan, Expression.LessThan}
-		}.First(x => x.Key == searchType).Value;
+				{ SearchTypeComparison.GreaterThan, Expression.GreaterThan },
+				{ SearchTypeComparison.GreaterThanOrEqual, Expression.GreaterThanOrEqual },
+				{ SearchTypeComparison.Equal, Expression.Equal },
+				{ SearchTypeComparison.LessThanOrEqual, Expression.LessThanOrEqual },
+				{ SearchTypeComparison.LessThan, Expression.LessThan }
+			}.First(x => x.Key == searchType)
+			.Value;
 
 		var p1 = Expression.Parameter(typeof(T));
 		var p2 = Expression.Parameter(typeof(T));

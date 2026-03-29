@@ -1,6 +1,7 @@
 using MetadataExtractor;
 
-namespace MediaDeck.FileTypes.Image.Utils.Formats; 
+namespace MediaDeck.FileTypes.Image.Utils.Formats;
+
 /// <summary>
 /// 画像ファイルメタデータ取得インターフェイス
 /// </summary>

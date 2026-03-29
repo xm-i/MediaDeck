@@ -10,5 +10,4 @@ public sealed partial class UnknownThumbnailPickerView : UnknownThumbnailPickerV
 	}
 }
 
-public class UnknownThumbnailPickerViewUserControl : UserControlBase<UnknownThumbnailPickerViewModel> {
-}
+public class UnknownThumbnailPickerViewUserControl : UserControlBase<UnknownThumbnailPickerViewModel> { }

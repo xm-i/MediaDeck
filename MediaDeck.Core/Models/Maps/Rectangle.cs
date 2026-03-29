@@ -1,6 +1,7 @@
 using System.Drawing;
 
 namespace MediaDeck.Core.Models.Maps;
+
 /// <summary>
 /// 矩形クラス
 /// </summary>

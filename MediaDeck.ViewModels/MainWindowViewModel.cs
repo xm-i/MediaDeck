@@ -40,9 +40,11 @@ public class MainWindowViewModel : ViewModelBase {
 	public FilterSelectorViewModel FilterSelectorViewModel {
 		get;
 	}
+
 	public DetailSelectorViewModel DetailSelectorViewModel {
 		get;
 	}
+
 	public RepositorySelectorViewModel RepositorySelectorViewModel {
 		get;
 	}

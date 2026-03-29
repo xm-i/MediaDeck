@@ -3,6 +3,7 @@ using MediaDeck.Composition.Interfaces.Primitives;
 using MediaDeck.Composition.Objects;
 
 namespace MediaDeck.Core.Models.Files.Filter.FilterItemObjects;
+
 /// <summary>
 /// 座標に関するフィルターアイテムオブジェクト
 /// </summary>
@@ -65,8 +66,7 @@ public class LocationFilterItemObject : IFilterItemObject {
 	}
 
 	[Obsolete("for serialize")]
-	public LocationFilterItemObject() {
-	}
+	public LocationFilterItemObject() { }
 
 	/// <summary>
 	/// コンストラクタ

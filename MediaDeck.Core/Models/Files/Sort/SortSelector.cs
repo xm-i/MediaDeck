@@ -9,7 +9,7 @@ using MediaDeck.Common.Extensions;
 namespace MediaDeck.Core.Models.Files.Sort;
 
 [Inject(InjectServiceLifetime.Singleton)]
-public class SortSelector: ModelBase {
+public class SortSelector : ModelBase {
 	/// <summary>
 	/// コンストラクタ
 	/// </summary>
@@ -24,7 +24,8 @@ public class SortSelector: ModelBase {
 			.Merge(this.Direction.Select(_ => Unit.Default))
 			.Subscribe(_ => {
 				this._onUpdateSortConditionChanged.OnNext(Unit.Default);
-			}).AddTo(this.CompositeDisposable);
+			})
+			.AddTo(this.CompositeDisposable);
 
 		IDisposable? before = null;
 		this.CurrentSortCondition.Subscribe(x => {

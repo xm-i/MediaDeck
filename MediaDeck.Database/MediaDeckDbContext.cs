@@ -1,14 +1,15 @@
 using Microsoft.EntityFrameworkCore;
+
 using MediaDeck.Database.Tables;
 using MediaDeck.Database.Tables.Metadata;
 
 namespace MediaDeck.Database;
+
 /// <summary>
 /// コンストラクタ
 /// </summary>
 /// <param name="dbConnection"></param>
 public class MediaDeckDbContext(DbContextOptions dbContextOptions) : DbContext(dbContextOptions) {
-
 	/// <summary>
 	/// メディアファイルテーブル
 	/// </summary>
@@ -269,6 +270,7 @@ public class MediaDeckDbContext(DbContextOptions dbContextOptions) : DbContext(d
 
 	protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
 		base.OnConfiguring(optionsBuilder);
-//		optionsBuilder.LogTo(x => Debug.WriteLine(x), LogLevel.Information,DbContextLoggerOptions.SingleLine);
+
+		//		optionsBuilder.LogTo(x => Debug.WriteLine(x), LogLevel.Information,DbContextLoggerOptions.SingleLine);
 	}
 }

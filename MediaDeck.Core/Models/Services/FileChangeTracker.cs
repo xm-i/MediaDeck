@@ -20,7 +20,9 @@ public class FileChangeTracker : IDisposable {
 	/// <summary>
 	/// 未処理の変更リスト
 	/// </summary>
-	public ObservableList<FileChangeItem> UnprocessedChanges { get; } = new();
+	public ObservableList<FileChangeItem> UnprocessedChanges {
+		get;
+	} = new();
 
 	/// <summary>
 	/// FileChangeTrackerクラスの新しいインスタンスを初期化します。
@@ -34,8 +36,9 @@ public class FileChangeTracker : IDisposable {
 		this.UnprocessedChanges
 			.ObserveAdd()
 			.SubscribeAwait(async (_, ct) => {
-				await this.ProcessPendingChangesAsync();
-			}, AwaitOperation.ThrottleFirstLast)
+					await this.ProcessPendingChangesAsync();
+				},
+				AwaitOperation.ThrottleFirstLast)
 			.AddTo(this._compositeDisposable);
 	}
 
@@ -45,11 +48,7 @@ public class FileChangeTracker : IDisposable {
 	/// <param name="path">作成されたファイルのパス</param>
 	public void OnCreated(string path) {
 		this._logger.LogDebug("File created (Pending): {Path}", path);
-		var model = new FileChangeItem {
-			ChangeType = FileChangeType.Added,
-			NewPath = path,
-			IsPending = true
-		};
+		var model = new FileChangeItem { ChangeType = FileChangeType.Added, NewPath = path, IsPending = true };
 		this.UnprocessedChanges.Add(model);
 	}
 
@@ -59,11 +58,7 @@ public class FileChangeTracker : IDisposable {
 	/// <param name="path">削除されたファイルのパス</param>
 	public void OnDeleted(string path) {
 		this._logger.LogDebug("File deleted (Pending): {Path}", path);
-		var model = new FileChangeItem {
-			ChangeType = FileChangeType.Deleted,
-			OldPath = path,
-			IsPending = true
-		};
+		var model = new FileChangeItem { ChangeType = FileChangeType.Deleted, OldPath = path, IsPending = true };
 		this.UnprocessedChanges.Add(model);
 	}
 
@@ -74,12 +69,7 @@ public class FileChangeTracker : IDisposable {
 	/// <param name="newPath">変更後のパス</param>
 	public void OnRenamed(string oldPath, string newPath) {
 		this._logger.LogDebug("File renamed (Pending): {OldPath} -> {NewPath}", oldPath, newPath);
-		var model = new FileChangeItem {
-			ChangeType = FileChangeType.Renamed,
-			OldPath = oldPath,
-			NewPath = newPath,
-			IsPending = true
-		};
+		var model = new FileChangeItem { ChangeType = FileChangeType.Renamed, OldPath = oldPath, NewPath = newPath, IsPending = true };
 		this.UnprocessedChanges.Add(model);
 	}
 
@@ -89,10 +79,10 @@ public class FileChangeTracker : IDisposable {
 	/// <param name="path">変更されたファイルのパス</param>
 	public void OnChanged(string path) {
 		this._logger.LogDebug("File changed (Pending): {Path}", path);
+
 		// Addedアイテムが既にあれば時間をリセットしてハッシュ計算を遅らせる
 		var existing = this.UnprocessedChanges.FirstOrDefault(c => c.ChangeType == FileChangeType.Added && c.NewPath == path);
 		existing?.CreatedAt = DateTime.UtcNow;
-
 	}
 
 	/// <summary>
@@ -214,13 +204,17 @@ public class FileChangeTracker : IDisposable {
 		if (item.MediaFileId != null && item.MediaFileId == next.MediaFileId) {
 			match = true;
 		}
+
 		// 2. パス鎖によるマッチ (A->B, B->C)
 		else if (!string.IsNullOrEmpty(item.NewPath) && item.NewPath == next.OldPath) {
 			match = true;
 		}
+
 		// 3. ハッシュによる同一性のマッチ (削除+追加のペアによる移動検知)
-		else if (item.ChangeType == FileChangeType.Deleted && next.ChangeType == FileChangeType.Added &&
-				 !string.IsNullOrEmpty(item.OldHash) && item.OldHash == next.NewHash) {
+		else if (item.ChangeType == FileChangeType.Deleted &&
+			next.ChangeType == FileChangeType.Added &&
+			!string.IsNullOrEmpty(item.OldHash) &&
+			item.OldHash == next.NewHash) {
 			match = true;
 		}
 

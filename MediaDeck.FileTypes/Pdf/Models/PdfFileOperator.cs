@@ -1,13 +1,20 @@
 using MediaDeck.Database.Tables;
+
 using System.IO;
+
 using Patagames.Pdf.Net;
 using Patagames.Pdf.Enums;
+
 using System.Drawing.Imaging;
+
 using MediaDeck.FileTypes.Base.Models;
+
 using System.Threading.Tasks;
+
 using MediaDeck.Composition.Enum;
 
 namespace MediaDeck.FileTypes.Pdf.Models;
+
 [Inject(InjectServiceLifetime.Transient)]
 public partial class PdfFileOperator : BaseFileOperator {
 	private readonly IFilePathService _filePathService;
@@ -57,9 +64,7 @@ public partial class PdfFileOperator : BaseFileOperator {
 			IsExists = fileInfo.Exists,
 			Width = (int)pdfDocument.Pages[0].Width,
 			Height = (int)pdfDocument.Pages[1].Height,
-			Container = new() {
-				PageCount = pdfDocument.Pages.Count
-			}
+			Container = new() { PageCount = pdfDocument.Pages.Count }
 		};
 
 		await db.MediaFiles.AddAsync(mf);
@@ -80,7 +85,6 @@ public partial class PdfFileOperator : BaseFileOperator {
 	/// <param name="pageNumber">サムネイルにするページ番号</param>
 	/// <returns>作成されたサムネイルファイル名</returns>
 	public byte[] CreateThumbnail(string filePath, int width, int height, int pageNumber = 1) {
-
 		var pdfDoc = PdfDocument.Load(filePath);
 		var page = pdfDoc.Pages[pageNumber - 1];
 		using var pdfBitmap = new PdfBitmap(width, height, true);

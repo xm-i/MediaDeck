@@ -3,7 +3,6 @@ using MediaDeck.Database.Tables;
 
 namespace MediaDeck.Core.Models.Files.Tags;
 
-
 [Inject(InjectServiceLifetime.Singleton, typeof(ITagModelFactory))]
 public class TagModelFactory : ITagModelFactory {
 	public ITagModel Create(Tag tag) {

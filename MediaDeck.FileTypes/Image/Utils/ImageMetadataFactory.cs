@@ -5,6 +5,7 @@ using MetadataExtractor.Util;
 using MediaDeck.FileTypes.Image.Utils.Formats;
 
 namespace MediaDeck.FileTypes.Image.Utils;
+
 /// <summary>
 /// 画像メタデータクラス
 /// </summary>

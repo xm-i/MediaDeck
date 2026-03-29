@@ -11,6 +11,7 @@ namespace MediaDeck.Views.Resources.Converters;
 /// </remarks>
 public class ToVisibilityConverter : IValueConverter {
 	private static readonly object _defaultValue = new();
+
 	/// <summary>
 	/// Visibleの場合の値
 	/// </summary>

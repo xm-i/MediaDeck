@@ -1,9 +1,9 @@
-namespace MediaDeck.Database.Tables.Metadata; 
+namespace MediaDeck.Database.Tables.Metadata;
+
 /// <summary>
 /// Bmpメタデータテーブル
 /// </summary>
 public class Bmp : MetadataBase {
-
 	/// <summary>
 	/// 色ビット数
 	/// </summary>

@@ -1,17 +1,22 @@
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Objects;
+
 using CommunityToolkit.Mvvm.ComponentModel;
+
 using System.Runtime.CompilerServices;
 using System.Collections.Concurrent;
+
 using MediaDeck.Composition.Interfaces;
 
 namespace MediaDeck.Common.Base;
+
 public class ModelBase : ObservableObject, IModelBase {
 	/// <summary>
 	/// Dispose用Lockオブジェクト
 	/// 処理を行っている途中でDisposeされるとマズイ場合、このオブジェクトでロックしておく。
 	/// </summary>
 	protected readonly DisposableLock DisposeLock = new(LockRecursionPolicy.SupportsRecursion);
+
 	/// <summary>
 	/// まとめてDispose
 	/// </summary>

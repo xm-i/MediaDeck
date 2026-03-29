@@ -1,12 +1,11 @@
 using MediaDeck.Database.Tables.Metadata;
 
-namespace MediaDeck.Database.Tables; 
+namespace MediaDeck.Database.Tables;
+
 /// <summary>
 /// メディアファイルテーブル
 /// </summary>
 public class MediaFile {
-
-
 	/// <summary>
 	/// メディアファイルID
 	/// </summary>

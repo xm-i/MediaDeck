@@ -1,9 +1,11 @@
 using Microsoft.UI.Xaml.Controls;
 
 namespace MediaDeck.Views;
-public abstract class PageBase<T>:Page where T:class {
+
+public abstract class PageBase<T> : Page where T : class {
 	public T? ViewModel {
-		get; set;
+		get;
+		set;
 	}
 
 	protected PageBase() {

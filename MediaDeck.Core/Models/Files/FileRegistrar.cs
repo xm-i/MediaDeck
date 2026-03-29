@@ -1,11 +1,14 @@
 using System.Collections.Concurrent;
+
 using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Composition.Stores.State.Model.Objects;
 
 using Microsoft.Extensions.Logging;
+
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Core.Utils;
 using MediaDeck.Core.Models.NotificationDispatcher;
+
 using System.IO;
 
 namespace MediaDeck.Core.Models.Files;
@@ -37,11 +40,10 @@ public class FileRegistrar {
 			.ObserveAdd()
 			.ThrottleFirst(TimeSpan.FromSeconds(0.1))
 			.ObserveOnThreadPool()
-			.SubscribeAwait(
-				async (x, ct) =>
+			.SubscribeAwait(async (x, ct) =>
 					await this.RegisterFilesAsync().ConfigureAwait(false),
-					AwaitOperation.Sequential,
-					false);
+				AwaitOperation.Sequential,
+				false);
 	}
 
 	public async Task ScanFolderAsync(FolderModel folder) {
@@ -50,8 +52,7 @@ public class FileRegistrar {
 		var files = await Task.Run(() =>
 			Directory.EnumerateFiles(folder.FolderPath, "*", SearchOption.AllDirectories)
 				.Where(x => this._filePathService.IsTargetFile(x))
-				.ToList()
-		);
+				.ToList());
 
 		folder.TotalCount.Value = files.Count;
 		folder.RemainingCount.Value = files.Count;

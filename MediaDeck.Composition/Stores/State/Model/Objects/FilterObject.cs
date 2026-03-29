@@ -3,6 +3,7 @@ using MediaDeck.Composition.Interfaces.Files;
 using R3.JsonConfig.Attributes;
 
 namespace MediaDeck.Composition.Stores.State.Model.Objects;
+
 /// <summary>
 /// フィルター設定復元用オブジェクト
 /// </summary>

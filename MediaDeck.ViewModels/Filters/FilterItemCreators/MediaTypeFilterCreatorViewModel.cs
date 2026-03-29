@@ -5,6 +5,7 @@ using MediaDeck.Core.Primitives;
 using MediaDeck.Core.Models.Files.Filter.FilterItemObjects;
 
 namespace MediaDeck.ViewModels.Filters.FilterItemCreators;
+
 /// <summary>
 /// メディアタイプフィルター作成ViewModel
 /// </summary>
@@ -38,8 +39,8 @@ public class MediaTypeFilterCreatorViewModel : ViewModelBase, IFilterCreatorView
 	public IEnumerable<DisplayObject<bool>> MediaTypeList {
 		get;
 	} = [
-		new DisplayObject<bool>("画像",false),
-		new DisplayObject<bool>("動画",true)
+		new DisplayObject<bool>("画像", false),
+		new DisplayObject<bool>("動画", true)
 	];
 
 	public MediaTypeFilterCreatorViewModel(ReactiveProperty<FilteringConditionEditorViewModel?> target) {
@@ -48,6 +49,5 @@ public class MediaTypeFilterCreatorViewModel : ViewModelBase, IFilterCreatorView
 			var filter = new MediaTypeFilterItemObject(this.MediaType.Value.Value);
 			target.Value?.AddFilter(filter);
 		});
-
 	}
 }

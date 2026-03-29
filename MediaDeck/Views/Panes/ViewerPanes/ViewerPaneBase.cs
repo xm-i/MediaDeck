@@ -4,13 +4,17 @@ using CommunityToolkit.WinUI.Controls;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
+
 using MediaDeck.ViewModels.Panes.ViewerPanes;
 using MediaDeck.Views.Thumbnails;
 
 using System.Diagnostics;
 using System.IO;
+
 using Microsoft.UI.Input;
+
 using Windows.UI.Core;
+
 using MediaDeck.Composition.Interfaces.FileTypes.ViewModels;
 using MediaDeck.Core.Models.Files.SearchConditions;
 
@@ -78,13 +82,9 @@ public class ViewerPaneBase : UserControlBase<ViewerSelectorViewModel> {
 				break;
 			case "RemoveFile":
 				var selectedFiles = this.ViewModel.MediaContentLibraryViewModel.SelectedFiles.Value;
-				var targetFiles = selectedFiles is { Length: > 0 } && selectedFiles.Contains(fvm)
-					? selectedFiles
-					: [fvm];
-				var message = targetFiles.Length == 1
-					? "Remove file from MediaDeck database?"
-					: $"Remove {targetFiles.Length} files from MediaDeck database?";
-				
+				var targetFiles = selectedFiles is { Length: > 0 } && selectedFiles.Contains(fvm) ? selectedFiles : [fvm];
+				var message = targetFiles.Length == 1 ? "Remove file from MediaDeck database?" : $"Remove {targetFiles.Length} files from MediaDeck database?";
+
 				var dialog = new ContentDialog {
 					XamlRoot = this.XamlRoot,
 					Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
@@ -103,11 +103,7 @@ public class ViewerPaneBase : UserControlBase<ViewerSelectorViewModel> {
 				break;
 			case "OpenFolder":
 				if (!string.IsNullOrEmpty(fvm.FilePath) && File.Exists(fvm.FilePath)) {
-					Process.Start(new ProcessStartInfo {
-						FileName = "explorer.exe",
-						Arguments = $"/select, \"{fvm.FilePath}\"",
-						UseShellExecute = true
-					});
+					Process.Start(new ProcessStartInfo { FileName = "explorer.exe", Arguments = $"/select, \"{fvm.FilePath}\"", UseShellExecute = true });
 				}
 				break;
 		}
@@ -125,6 +121,7 @@ public class ViewerPaneBase : UserControlBase<ViewerSelectorViewModel> {
 		}
 		this.ViewModel?.MediaContentLibraryViewModel.SearchConditionNotificationDispatcher.RemoveRequest.OnNext(condition.SearchCondition);
 	}
+
 	protected void TokenizingTextBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args) {
 		if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput) {
 			this.ViewModel?.MediaContentLibraryViewModel.RefreshSearchTokenCandidates(sender.Text);

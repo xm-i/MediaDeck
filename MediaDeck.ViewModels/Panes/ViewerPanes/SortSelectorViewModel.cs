@@ -31,6 +31,7 @@ public class SortSelectorViewModel : ViewModelBase {
 	}
 
 	private readonly StateStore _stateStore;
+
 	/// <summary>
 	/// カレント条件
 	/// </summary>

@@ -1,9 +1,9 @@
-namespace MediaDeck.Database.Tables; 
+namespace MediaDeck.Database.Tables;
+
 /// <summary>
 /// メディアファイル・タグ中間テーブル
 /// </summary>
 public class MediaFileTag {
-
 	/// <summary>
 	/// メディアファイルID
 	/// </summary>

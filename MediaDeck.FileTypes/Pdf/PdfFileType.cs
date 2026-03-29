@@ -9,8 +9,9 @@ using MediaDeck.FileTypes.Pdf.ViewModels;
 using MediaDeck.FileTypes.Pdf.Views;
 
 namespace MediaDeck.FileTypes.Pdf;
+
 [Inject(InjectServiceLifetime.Transient, typeof(IFileType))]
-public class PdfFileType: BaseFileType<PdfFileOperator, PdfFileModel, PdfFileViewModel, PdfDetailViewerPreviewControlView, PdfThumbnailPickerViewModel, PdfThumbnailPickerView> {
+public class PdfFileType : BaseFileType<PdfFileOperator, PdfFileModel, PdfFileViewModel, PdfDetailViewerPreviewControlView, PdfThumbnailPickerViewModel, PdfThumbnailPickerView> {
 	private PdfDetailViewerPreviewControlView? _pdfDetailViewerPreviewControlView;
 	private readonly PdfFileOperator _pdfFileOperator;
 
@@ -35,6 +36,7 @@ public class PdfFileType: BaseFileType<PdfFileOperator, PdfFileModel, PdfFileVie
 	public override PdfFileViewModel CreateFileViewModel(PdfFileModel fileModel) {
 		return new PdfFileViewModel(fileModel);
 	}
+
 	public override PdfDetailViewerPreviewControlView CreateDetailViewerPreviewControlView(PdfFileViewModel fileViewModel) {
 		return this._pdfDetailViewerPreviewControlView ??= new PdfDetailViewerPreviewControlView();
 	}
@@ -46,6 +48,7 @@ public class PdfFileType: BaseFileType<PdfFileOperator, PdfFileModel, PdfFileVie
 	public override PdfThumbnailPickerView CreateThumbnailPickerView() {
 		return new PdfThumbnailPickerView();
 	}
+
 	public override IQueryable<MediaFile> IncludeTables(IQueryable<MediaFile> mediaFiles) {
 		return mediaFiles
 			.Include(mf => mf.Container);

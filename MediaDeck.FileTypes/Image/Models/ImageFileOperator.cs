@@ -1,14 +1,20 @@
 using MediaDeck.Database.Tables;
+
 using System.IO;
+
 using ImageMagick;
+
 using MediaDeck.FileTypes.Base.Models;
+
 using System.Threading.Tasks;
+
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.FileTypes.Image.Utils;
 using MediaDeck.FileTypes.Image.Utils.Formats;
 
 namespace MediaDeck.FileTypes.Image.Models;
+
 [Inject(InjectServiceLifetime.Transient)]
 public class ImageFileOperator : BaseFileOperator {
 	private readonly IFilePathService _filePathService;
@@ -100,6 +106,7 @@ public class ImageFileOperator : BaseFileOperator {
 
 		return mf;
 	}
+
 	public byte[] CreateThumbnail(IFileModel fileModel, uint width, uint height) {
 		using var fileFs = File.OpenRead(fileModel.FilePath);
 		using var ms = new MemoryStream();

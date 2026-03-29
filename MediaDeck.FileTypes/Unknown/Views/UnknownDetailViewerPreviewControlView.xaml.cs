@@ -10,5 +10,4 @@ public sealed partial class UnknownDetailViewerPreviewControlView : UnknownDetai
 	}
 }
 
-public class UnknownDetailViewerPreviewControlViewUserControl : UserControlBase<IDetailViewerViewModel> {
-}
+public class UnknownDetailViewerPreviewControlViewUserControl : UserControlBase<IDetailViewerViewModel> { }

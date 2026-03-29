@@ -1,7 +1,6 @@
-namespace MediaDeck.Database.Tables; 
+namespace MediaDeck.Database.Tables;
+
 public class PositionNameDetail {
-
-
 	/// <summary>
 	/// 緯度
 	/// </summary>

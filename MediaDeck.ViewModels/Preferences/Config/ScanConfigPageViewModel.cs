@@ -12,6 +12,7 @@ public class ScanConfigPageViewModel : ViewModelBase, IConfigPageViewModel {
 	} = "Scan";
 
 	private readonly ScanConfigModel _scanConfig;
+
 	public ScanConfigPageViewModel(ScanConfigModel scanConfig) {
 		this._scanConfig = scanConfig;
 		this.AddExtensionCommand.Subscribe(_ => {

@@ -1,6 +1,7 @@
 using Microsoft.UI.Xaml.Input;
 
 namespace MediaDeck.Views.Panes.ViewerPanes;
+
 public sealed partial class ListViewer : ViewerPaneBase {
 	public ListViewer() {
 		this.InitializeComponent();
@@ -9,4 +10,3 @@ public sealed partial class ListViewer : ViewerPaneBase {
 		};
 	}
 }
-

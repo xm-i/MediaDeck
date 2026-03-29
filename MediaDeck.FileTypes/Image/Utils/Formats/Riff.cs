@@ -4,6 +4,7 @@ using MetadataExtractor;
 using MetadataExtractor.Formats.WebP;
 
 namespace MediaDeck.FileTypes.Image.Utils.Formats;
+
 /// <summary>
 /// Riffメタデータ取得クラス
 /// </summary>

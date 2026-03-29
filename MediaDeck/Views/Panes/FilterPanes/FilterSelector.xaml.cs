@@ -7,6 +7,7 @@ using MediaDeck.ViewModels.Panes.FilterPanes;
 using MediaDeck.Views.Filters;
 
 namespace MediaDeck.Views.Panes.FilterPanes;
+
 public sealed partial class FilterSelector : FilterSelectorUserControl {
 	public FilterSelector() {
 		this.InitializeComponent();
@@ -17,5 +18,5 @@ public sealed partial class FilterSelector : FilterSelectorUserControl {
 		window.ActivateCenteredOnMainWindow();
 	}
 }
-public abstract class FilterSelectorUserControl : UserControlBase<FilterSelectorViewModel>;
 
+public abstract class FilterSelectorUserControl : UserControlBase<FilterSelectorViewModel>;

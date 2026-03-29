@@ -5,10 +5,11 @@ using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Common.Base;
 
 namespace MediaDeck.Core.Models.Files.Sort;
+
 /// <summary>
 /// ソート条件
 /// </summary>
-public class SortItem<TKey> : ModelBase, ISortItem{
+public class SortItem<TKey> : ModelBase, ISortItem {
 	/// <summary>
 	/// 保存時のキー値
 	/// </summary>

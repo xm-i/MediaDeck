@@ -44,12 +44,7 @@ public record AppNotification {
 	/// <param name="autoCloseMs">自動クローズ時間（ミリ秒）。デフォルトは5000ms</param>
 	/// <returns>情報レベルの通知</returns>
 	public static AppNotification Info(string message, string? title = null, int autoCloseMs = 5000) {
-		return new() {
-			Message = message,
-			Title = title,
-			Severity = NotificationSeverity.Informational,
-			AutoCloseMilliseconds = autoCloseMs
-		};
+		return new() { Message = message, Title = title, Severity = NotificationSeverity.Informational, AutoCloseMilliseconds = autoCloseMs };
 	}
 
 	/// <summary>
@@ -60,12 +55,7 @@ public record AppNotification {
 	/// <param name="autoCloseMs">自動クローズ時間（ミリ秒）。デフォルトは5000ms</param>
 	/// <returns>成功レベルの通知</returns>
 	public static AppNotification Success(string message, string? title = null, int autoCloseMs = 5000) {
-		return new() {
-			Message = message,
-			Title = title,
-			Severity = NotificationSeverity.Success,
-			AutoCloseMilliseconds = autoCloseMs
-		};
+		return new() { Message = message, Title = title, Severity = NotificationSeverity.Success, AutoCloseMilliseconds = autoCloseMs };
 	}
 
 	/// <summary>
@@ -76,12 +66,7 @@ public record AppNotification {
 	/// <param name="autoCloseMs">自動クローズ時間（ミリ秒）。デフォルトは5000ms</param>
 	/// <returns>警告レベルの通知</returns>
 	public static AppNotification Warning(string message, string? title = null, int autoCloseMs = 5000) {
-		return new() {
-			Message = message,
-			Title = title,
-			Severity = NotificationSeverity.Warning,
-			AutoCloseMilliseconds = autoCloseMs
-		};
+		return new() { Message = message, Title = title, Severity = NotificationSeverity.Warning, AutoCloseMilliseconds = autoCloseMs };
 	}
 
 	/// <summary>
@@ -92,11 +77,6 @@ public record AppNotification {
 	/// <param name="autoCloseMs">自動クローズ時間（ミリ秒）。デフォルトは0（自動で閉じない）</param>
 	/// <returns>エラーレベルの通知</returns>
 	public static AppNotification Error(string message, string? title = null, int autoCloseMs = 0) {
-		return new() {
-			Message = message,
-			Title = title,
-			Severity = NotificationSeverity.Error,
-			AutoCloseMilliseconds = autoCloseMs
-		};
+		return new() { Message = message, Title = title, Severity = NotificationSeverity.Error, AutoCloseMilliseconds = autoCloseMs };
 	}
 }

@@ -13,11 +13,12 @@ using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Database.Tables;
 
 namespace MediaDeck.FileTypes.Base;
+
 public abstract class BaseFileType<TFileOperator, TFileModel, TFileViewModel, TDetailViewerPreviewControlView, TThumbnailPickerViewModel, TThumbnailPickerView> : IFileType<TFileOperator, TFileModel, TFileViewModel, TDetailViewerPreviewControlView, TThumbnailPickerViewModel, TThumbnailPickerView>
 	where TFileOperator : IFileOperator
 	where TFileModel : IFileModel
 	where TFileViewModel : IFileViewModel
-	where TDetailViewerPreviewControlView: IDetailViewerPreviewControlView
+	where TDetailViewerPreviewControlView : IDetailViewerPreviewControlView
 	where TThumbnailPickerViewModel : IThumbnailPickerViewModel
 	where TThumbnailPickerView : IThumbnailPickerView {
 	public abstract MediaType MediaType {
@@ -46,7 +47,7 @@ public abstract class BaseFileType<TFileOperator, TFileModel, TFileViewModel, TD
 		fileModel.ModifiedTime = mediaFile.ModifiedTime;
 		fileModel.LastAccessTime = mediaFile.LastAccessTime;
 		fileModel.RegisteredTime = mediaFile.RegisteredTime;
-		if (mediaFile.Latitude is { } lat && mediaFile.Longitude is { } lon ) {
+		if (mediaFile.Latitude is { } lat && mediaFile.Longitude is { } lon) {
 			fileModel.Location = new GpsLocation(lat, lon, mediaFile.Altitude);
 		}
 		var tagModelFactory = Ioc.Default.GetRequiredService<ITagModelFactory>();

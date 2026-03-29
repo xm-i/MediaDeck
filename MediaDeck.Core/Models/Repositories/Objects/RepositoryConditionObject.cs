@@ -2,7 +2,8 @@ using MediaDeck.Database.Tables;
 
 using System.Linq.Expressions;
 
-namespace MediaDeck.Core.Models.Repositories.Objects; 
+namespace MediaDeck.Core.Models.Repositories.Objects;
+
 public abstract class RepositoryConditionObject {
 	/// <summary>
 	/// 読み込み条件絞り込み

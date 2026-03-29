@@ -1,10 +1,12 @@
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
+
 using MediaDeck.ViewModels.Preferences;
 using MediaDeck.ViewModels.Preferences.Config;
 using MediaDeck.Composition.Enum;
 
 namespace MediaDeck.Views.Preferences.Config;
+
 public sealed partial class ExecutionConfigPage : Page {
 	public ExecutionConfigPage() {
 		this.InitializeComponent();
@@ -29,5 +31,4 @@ public sealed partial class ExecutionConfigPage : Page {
 	public MediaType[] MediaTypeConditions {
 		get;
 	} = Enum.GetValues<MediaType>();
-
 }

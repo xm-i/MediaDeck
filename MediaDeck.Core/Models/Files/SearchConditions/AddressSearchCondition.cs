@@ -7,11 +7,13 @@ using MediaDeck.Core.Models.Maps;
 using MediaDeck.Database.Tables;
 
 namespace MediaDeck.Core.Models.Files.SearchConditions;
-public class AddressSearchCondition: ISearchCondition {
+
+public class AddressSearchCondition : ISearchCondition {
 	[Obsolete("for serialize")]
 	public AddressSearchCondition() {
 		this.Address = null!;
 	}
+
 	public AddressSearchCondition(Address address) {
 		this.Address = address;
 	}
@@ -42,18 +44,16 @@ public class AddressSearchCondition: ISearchCondition {
 				var current = this.Address;
 				while (current is { } c && c.Type != null) {
 					Expression<Func<MediaFile, bool>> exp2 = mediaFile =>
-					mediaFile.Position!.Addresses!.Any(a => a.Type == c.Type && a.Name == c.Name);
+						mediaFile.Position!.Addresses!.Any(a => a.Type == c.Type && a.Name == c.Name);
 					exp = Expression.AndAlso(exp, visitor.Visit(exp2.Body));
 					current = current.Parent;
 				}
 			} else {
 				Expression<Func<MediaFile, bool>> exp2 = mediaFile =>
 					mediaFile.Latitude != null && mediaFile.Position!.IsAcquired != this.Address.IsYet && !mediaFile.Position.Addresses!.Any();
-				exp = Expression.AndAlso(exp, visitor.Visit(exp2.Body)
-					);
+				exp = Expression.AndAlso(exp, visitor.Visit(exp2.Body));
 			}
-			return Expression.Lambda<Func<MediaFile, bool>>(
-				exp,
+			return Expression.Lambda<Func<MediaFile, bool>>(exp,
 				visitor.Parameters);
 		}
 	}

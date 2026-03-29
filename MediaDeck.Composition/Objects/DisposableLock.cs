@@ -13,8 +13,7 @@ public sealed class DisposableLock : ReaderWriterLockSlim {
 	/// コンストラクタ
 	/// </summary>
 	/// <param name="recursionPolicy">同じスレッドが複数回ロックに入ることができるかどうかを指定します。</param>
-	public DisposableLock(LockRecursionPolicy recursionPolicy) : base(recursionPolicy) {
-	}
+	public DisposableLock(LockRecursionPolicy recursionPolicy) : base(recursionPolicy) { }
 
 	/// <summary>
 	/// 読み取りモードでロックに入ることを試みます。

@@ -9,6 +9,7 @@ namespace MediaDeck.Core.Models.FolderManager;
 public class FolderManagerModel : ModelBase {
 	private readonly FileRegistrar _fileRegistrar;
 	private readonly FolderManagerStateModel _folderManagerStates;
+
 	public FolderManagerModel(FileRegistrar fileRegistrar, FolderManagerStateModel folderManagerStates) {
 		this._fileRegistrar = fileRegistrar;
 		this._folderManagerStates = folderManagerStates;

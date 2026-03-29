@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 
-namespace MediaDeck.Composition.Interfaces.Files; 
+namespace MediaDeck.Composition.Interfaces.Files;
+
 public interface ITagModel {
 	/// <summary>
 	/// タグID

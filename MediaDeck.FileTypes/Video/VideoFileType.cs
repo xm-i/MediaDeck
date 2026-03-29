@@ -9,8 +9,9 @@ using MediaDeck.FileTypes.Video.ViewModels;
 using MediaDeck.FileTypes.Video.Views;
 
 namespace MediaDeck.FileTypes.Video;
+
 [Inject(InjectServiceLifetime.Transient, typeof(IFileType))]
-public class VideoFileType: BaseFileType<VideoFileOperator, VideoFileModel, VideoFileViewModel, VideoDetailViewerPreviewControlView, VideoThumbnailPickerViewModel, VideoThumbnailPickerView> {
+public class VideoFileType : BaseFileType<VideoFileOperator, VideoFileModel, VideoFileViewModel, VideoDetailViewerPreviewControlView, VideoThumbnailPickerViewModel, VideoThumbnailPickerView> {
 	private VideoDetailViewerPreviewControlView? _videoDetailViewerPreviewControlView;
 	private readonly VideoFileOperator _videoFileOperator;
 
@@ -47,6 +48,7 @@ public class VideoFileType: BaseFileType<VideoFileOperator, VideoFileModel, Vide
 	public override VideoThumbnailPickerView CreateThumbnailPickerView() {
 		return new VideoThumbnailPickerView();
 	}
+
 	public override IQueryable<MediaFile> IncludeTables(IQueryable<MediaFile> mediaFiles) {
 		return mediaFiles
 			.Include(mf => mf.VideoFile);

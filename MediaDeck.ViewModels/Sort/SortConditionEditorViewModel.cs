@@ -17,13 +17,14 @@ public class SortConditionEditorViewModel : ViewModelBase {
 		this.SortItemObjects = this.Model.SortItemObjects.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
 
 		this.AddSortItemCommand.Subscribe(x => {
-			if (x is not { } sortItemKey) {
-				return;
-			}
-			var si = this.Model.AddSortItemObject();
-			si.SortItemKey = sortItemKey;
-			si.Direction = this.Direction.Value;
-		}).AddTo(this.CompositeDisposable);
+				if (x is not { } sortItemKey) {
+					return;
+				}
+				var si = this.Model.AddSortItemObject();
+				si.SortItemKey = sortItemKey;
+				si.Direction = this.Direction.Value;
+			})
+			.AddTo(this.CompositeDisposable);
 		this.RemoveSortItemCommand.Subscribe(this.Model.RemoveSortItemObject).AddTo(this.CompositeDisposable);
 		this.CandidateSortItemKeys.Value = Enum.GetValues<SortItemKey>();
 	}
@@ -54,26 +55,26 @@ public class SortConditionEditorViewModel : ViewModelBase {
 	/// </summary>
 	public ReactiveProperty<SortItemKey[]> CandidateSortItemKeys {
 		get;
-	} = new ();
+	} = new();
 
 	/// <summary>
 	/// 設定用ソート方向
 	/// </summary>
 	public BindableReactiveProperty<ListSortDirection> Direction {
 		get;
-	} = new (ListSortDirection.Ascending);
+	} = new(ListSortDirection.Ascending);
 
 	/// <summary>
 	/// ソート条件削除コマンド
 	/// </summary>
 	public ReactiveCommand<SortItemObject> RemoveSortItemCommand {
 		get;
-	} = new ();
+	} = new();
 
 	/// <summary>
 	/// ソート条件追加コマンド
 	/// </summary>
 	public ReactiveCommand<SortItemKey?> AddSortItemCommand {
 		get;
-	} = new ();
+	} = new();
 }

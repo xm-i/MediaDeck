@@ -5,6 +5,7 @@ using MediaDeck.ViewModels.Sort;
 using Windows.Graphics;
 
 namespace MediaDeck.Views.Sort;
+
 [Inject(InjectServiceLifetime.Transient)]
 public sealed partial class SortManagerWindow : Window {
 	public SortManagerWindow(SortManagerViewModel sortManagerViewModel) {

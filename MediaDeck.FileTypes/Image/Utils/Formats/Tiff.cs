@@ -1,6 +1,7 @@
 using System.IO;
 
-namespace MediaDeck.FileTypes.Image.Utils.Formats; 
+namespace MediaDeck.FileTypes.Image.Utils.Formats;
+
 /// <summary>
 /// Tiffメタデータ取得クラス
 /// </summary>
@@ -23,6 +24,5 @@ public class Tiff : ImageBase {
 	/// コンストラクタ
 	/// </summary>
 	/// <param name="stream">画像ファイルストリーム</param>
-	internal Tiff(Stream stream) : base(stream) {
-	}
+	internal Tiff(Stream stream) : base(stream) { }
 }

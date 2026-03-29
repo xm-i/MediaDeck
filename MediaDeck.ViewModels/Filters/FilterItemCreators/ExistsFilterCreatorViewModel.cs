@@ -5,6 +5,7 @@ using MediaDeck.Core.Primitives;
 using MediaDeck.Core.Models.Files.Filter.FilterItemObjects;
 
 namespace MediaDeck.ViewModels.Filters.FilterItemCreators;
+
 /// <summary>
 /// 存在フィルター作成ViewModel
 /// </summary>
@@ -31,8 +32,8 @@ public class ExistsFilterCreatorViewModel : ViewModelBase, IFilterCreatorViewMod
 	public IEnumerable<DisplayObject<bool>> ExistsList {
 		get;
 	} = [
-		new DisplayObject<bool>("ファイルが存在する",true),
-		new DisplayObject<bool>("ファイルが存在しない",false)
+		new DisplayObject<bool>("ファイルが存在する", true),
+		new DisplayObject<bool>("ファイルが存在しない", false)
 	];
 
 	/// <summary>

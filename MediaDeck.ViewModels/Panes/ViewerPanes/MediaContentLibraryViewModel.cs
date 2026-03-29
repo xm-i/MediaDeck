@@ -17,9 +17,8 @@ public class MediaContentLibraryViewModel : ViewModelBase {
 		this.SearchConditions =
 			mediaContentLibrary
 				.SearchConditions
-				.ToWritableNotifyCollectionChanged(
-					x => new SearchConditionViewModel(x),
-					(SearchConditionViewModel scvm, ISearchCondition sc,ref bool setValue) => scvm.SearchCondition,
+				.ToWritableNotifyCollectionChanged(x => new SearchConditionViewModel(x),
+					(SearchConditionViewModel scvm, ISearchCondition sc, ref bool setValue) => scvm.SearchCondition,
 					SynchronizationContextCollectionEventDispatcher.Current);
 
 		this.SearchConditionCandidates = this._mediaContentLibrary.SearchConditionCandidates.CreateView(x => new SearchConditionViewModel(x));

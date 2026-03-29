@@ -3,6 +3,7 @@ using System.IO;
 using MetadataExtractor;
 
 namespace MediaDeck.FileTypes.Image.Utils.Formats;
+
 /// <summary>
 /// 各種イメージフォーマットの基底クラス
 /// </summary>

@@ -37,18 +37,13 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 		await db.SaveChangesAsync();
 		await db.Entry(tag).Reference(x => x.TagCategory).LoadAsync();
 
-		var aliasList = aliases.Select((x, i) => new TagAlias {
-			TagId = tag.TagId,
-			TagAliasId = i,
-			Alias = x.Alias,
-			Ruby = x.Ruby
-		}).ToArray();
-		
+		var aliasList = aliases.Select((x, i) => new TagAlias { TagId = tag.TagId, TagAliasId = i, Alias = x.Alias, Ruby = x.Ruby }).ToArray();
+
 		if (aliasList.Length > 0) {
 			await db.TagAliases.AddRangeAsync(aliasList);
 			await db.SaveChangesAsync();
 		}
-		
+
 		await transaction.CommitAsync();
 		return this._tagModelFactory.Create(tag);
 	}
@@ -58,20 +53,17 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 		if (!target.Any()) {
 			return;
 		}
-		
+
 		await using var db = await this._dbFactory.CreateDbContextAsync();
 		using var transaction = await db.Database.BeginTransactionAsync();
 		if (tag == null) {
 			await transaction.RollbackAsync();
 			return;
 		}
-		
-		await db.MediaFileTags.AddRangeAsync(target.Select(x => new MediaFileTag {
-			MediaFileId = x.Id,
-			TagId = tag.TagId
-		}));
+
+		await db.MediaFileTags.AddRangeAsync(target.Select(x => new MediaFileTag { MediaFileId = x.Id, TagId = tag.TagId }));
 		await db.SaveChangesAsync();
-		foreach(var file in target) {
+		foreach (var file in target) {
 			file.Tags.Add(tag);
 		}
 		await transaction.CommitAsync();
@@ -83,15 +75,15 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 		using var transaction = await db.Database.BeginTransactionAsync();
 		var rel =
 			await
-			db
-				.MediaFileTags
-				.Where(x => ids.Contains(x.MediaFileId) && x.Tag.TagId == tagId)
-				.ToArrayAsync();
+				db
+					.MediaFileTags
+					.Where(x => ids.Contains(x.MediaFileId) && x.Tag.TagId == tagId)
+					.ToArrayAsync();
 		if (rel.Any()) {
 			db.MediaFileTags.RemoveRange(rel);
 			await db.SaveChangesAsync();
 			foreach (var file in fileModels) {
-				file.Tags.RemoveAll(x => x.TagId== tagId);
+				file.Tags.RemoveAll(x => x.TagId == tagId);
 			}
 			await transaction.CommitAsync();
 		}
@@ -107,12 +99,7 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 		db.Tags.Update(tag);
 
 		db.TagAliases.RemoveRange(db.TagAliases.Where(x => x.TagId == tagId));
-		await db.TagAliases.AddRangeAsync(aliases.Select((x,i) => new TagAlias {
-			TagId = tagId,
-			TagAliasId = i,
-			Alias = x.Alias,
-			Ruby = x.Ruby
-		}));
+		await db.TagAliases.AddRangeAsync(aliases.Select((x, i) => new TagAlias { TagId = tagId, TagAliasId = i, Alias = x.Alias, Ruby = x.Ruby }));
 
 		await db.SaveChangesAsync();
 		await transaction.CommitAsync();
@@ -127,12 +114,7 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 			tagCategory.Detail = detail;
 			db.TagCategories.Update(tagCategory);
 		} else {
-			tagCategory = new TagCategory() {
-				TagCategoryId = tagCategoryId,
-				TagCategoryName = tagCategoryName,
-				Detail = detail,
-				Tags = []
-			};
+			tagCategory = new TagCategory() { TagCategoryId = tagCategoryId, TagCategoryName = tagCategoryName, Detail = detail, Tags = [] };
 			await db.TagCategories.AddAsync(tagCategory);
 		}
 		await db.SaveChangesAsync();

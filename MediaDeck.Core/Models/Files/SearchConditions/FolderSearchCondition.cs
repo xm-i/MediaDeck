@@ -7,16 +7,18 @@ using MediaDeck.Core.Models.Repositories.Objects;
 using MediaDeck.Database.Tables;
 
 namespace MediaDeck.Core.Models.Files.SearchConditions;
-public class FolderSearchCondition: ISearchCondition {
+
+public class FolderSearchCondition : ISearchCondition {
 	[Obsolete("for serialize")]
 	public FolderSearchCondition() {
 		this.FolderPath = null!;
 	}
+
 	public FolderSearchCondition(FolderObject folderObject) {
 		this.FolderPath = folderObject.FolderPath;
 	}
 
-	public string FolderPath{
+	public string FolderPath {
 		get;
 		set;
 	}
@@ -43,6 +45,7 @@ public class FolderSearchCondition: ISearchCondition {
 			}
 		}
 	}
+
 	public Func<IFileModel, bool>? Filter {
 		get;
 	} = null;

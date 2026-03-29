@@ -9,7 +9,7 @@ using MediaDeck.Database;
 namespace MediaDeck.Core.Models.Files.Loaders;
 
 [Inject(InjectServiceLifetime.Transient)]
-public class FilesLoader(IDbContextFactory<MediaDeckDbContext> dbFactory, SortSelector sortSelector,FilterSelector filterSetter) {
+public class FilesLoader(IDbContextFactory<MediaDeckDbContext> dbFactory, SortSelector sortSelector, FilterSelector filterSetter) {
 	protected FilterSelector FilterSetter = filterSetter;
 	protected SortSelector SortSelector = sortSelector;
 
@@ -30,11 +30,10 @@ public class FilesLoader(IDbContextFactory<MediaDeckDbContext> dbFactory, SortSe
 				.IncludeTables()
 				.AsSplitQuery()
 				.ToArrayAsync(cancellationToken))
-				.Select(FileTypeUtility.CreateFileModelFromRecord)
-				.Where(searchConditions)
-				.Where(this.FilterSetter);
+			.Select(FileTypeUtility.CreateFileModelFromRecord)
+			.Where(searchConditions)
+			.Where(this.FilterSetter);
 
 		return this.SortSelector.SetSortConditions(files);
 	}
 }
-

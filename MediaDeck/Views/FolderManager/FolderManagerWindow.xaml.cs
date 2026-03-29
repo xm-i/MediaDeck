@@ -11,6 +11,7 @@ public sealed partial class FolderManagerWindow : Window {
 	public FolderManagerViewModel ViewModel {
 		get;
 	}
+
 	public FolderManagerWindow(FolderManagerViewModel viewModel) {
 		this.InitializeComponent();
 		this.ViewModel = viewModel;

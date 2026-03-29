@@ -1,7 +1,6 @@
 namespace MediaDeck.Core.Primitives;
 
 public class ProgressCount {
-
 	public ReactiveProperty<long> Current {
 		get;
 	} = new(0);
@@ -23,17 +22,20 @@ public class ProgressCount {
 	}
 
 	public ProgressCount() {
-		this.Progress = this.Current.CombineLatest(this.Total, (current, total) => {
-			if (total is not {} ltotal || ltotal == 0) {
-				return 0;
-			}
-			return 100d * current / ltotal;
-		}).ToReadOnlyReactiveProperty();
+		this.Progress = this.Current.CombineLatest(this.Total,
+				(current, total) => {
+					if (total is not { } ltotal || ltotal == 0) {
+						return 0;
+					}
+					return 100d * current / ltotal;
+				})
+			.ToReadOnlyReactiveProperty();
 
 		this.IsIndeterminate = this.Total.Select(x => x == null).ToReadOnlyReactiveProperty();
 
-		this.Progress.Where(x => x == 100).Subscribe(_ => {
-			this.InProgress.Value = false;
-		});
+		this.Progress.Where(x => x == 100)
+			.Subscribe(_ => {
+				this.InProgress.Value = false;
+			});
 	}
 }

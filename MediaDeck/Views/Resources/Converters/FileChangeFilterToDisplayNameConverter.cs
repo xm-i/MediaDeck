@@ -1,5 +1,7 @@
 using Microsoft.UI.Xaml.Data;
+
 using MediaDeck.ViewModels;
+
 using System;
 
 namespace MediaDeck.Views.Resources.Converters;

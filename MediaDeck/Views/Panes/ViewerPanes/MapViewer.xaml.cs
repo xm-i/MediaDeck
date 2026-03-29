@@ -8,6 +8,7 @@ using MediaDeck.Core.Models.Maps;
 using Microsoft.UI.Xaml;
 
 namespace MediaDeck.Views.Panes.ViewerPanes;
+
 public sealed partial class MapViewer : ViewerPaneBase {
 	public double North {
 		get;
@@ -35,7 +36,7 @@ public sealed partial class MapViewer : ViewerPaneBase {
 
 	public BindableReactiveProperty<GpsLocation> Center {
 		get;
-	} = new(new (135,35));
+	} = new(new(135, 35));
 
 
 	public ReactiveProperty<int> MapPinSize {
@@ -47,7 +48,7 @@ public sealed partial class MapViewer : ViewerPaneBase {
 	}
 
 	private void Map_Loaded(object sender, RoutedEventArgs e) {
-		if(this.ViewModel is not { } vm) {
+		if (this.ViewModel is not { } vm) {
 			return;
 		}
 		this.UpdateMapControl();
@@ -69,7 +70,7 @@ public sealed partial class MapViewer : ViewerPaneBase {
 				this.South > location.Latitude ||
 				this.West > location.Longitude ||
 				this.East < location.Longitude
-				) {
+			) {
 				continue;
 			}
 
@@ -80,10 +81,8 @@ public sealed partial class MapViewer : ViewerPaneBase {
 
 			// 座標とピンサイズから矩形を生成
 			var rect =
-				new Rectangle(
-					new System.Drawing.Point((int)viewPoint.X, (int)viewPoint.Y),
-					new System.Drawing.Size(this.MapPinSize.Value, this.MapPinSize.Value)
-				);
+				new Rectangle(new System.Drawing.Point((int)viewPoint.X, (int)viewPoint.Y),
+					new System.Drawing.Size(this.MapPinSize.Value, this.MapPinSize.Value));
 
 			// 生成した矩形が既に存在するピンとかぶる位置にあるかを確かめて、被るようであれば
 			// 被るピンのうち、最も矩形に近いピンに含める。

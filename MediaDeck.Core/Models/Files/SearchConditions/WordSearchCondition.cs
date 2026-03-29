@@ -1,4 +1,3 @@
-
 using System.Linq.Expressions;
 
 using MediaDeck.Common.Utilities;
@@ -7,11 +6,13 @@ using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Database.Tables;
 
 namespace MediaDeck.Core.Models.Files.SearchConditions;
-public class WordSearchCondition: ISearchCondition {
+
+public class WordSearchCondition : ISearchCondition {
 	[Obsolete("for serialize")]
 	public WordSearchCondition() {
 		this.Word = null!;
 	}
+
 	public WordSearchCondition(string word) {
 		this.Word = word;
 	}
@@ -30,14 +31,13 @@ public class WordSearchCondition: ISearchCondition {
 	public Expression<Func<MediaFile, bool>>? WherePredicate {
 		get {
 			Expression<Func<MediaFile, bool>> exp1 =
-			mediaFile =>
-				EF.Functions.Like(mediaFile.FilePath, $"%{this.Word}%") ||
-				EF.Functions.Like(mediaFile.Position!.DisplayName!, $"%{this.Word}%");
+				mediaFile =>
+					EF.Functions.Like(mediaFile.FilePath, $"%{this.Word}%") ||
+					EF.Functions.Like(mediaFile.Position!.DisplayName!, $"%{this.Word}%");
 			var exp = exp1.Body;
 			var visitor = new ParameterVisitor(exp1.Parameters);
 
-			return Expression.Lambda<Func<MediaFile, bool>>(
-				exp,
+			return Expression.Lambda<Func<MediaFile, bool>>(exp,
 				visitor.Parameters);
 		}
 	}

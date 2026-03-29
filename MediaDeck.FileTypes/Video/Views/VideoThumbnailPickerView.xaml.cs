@@ -22,5 +22,4 @@ public sealed partial class VideoThumbnailPickerView : VideoThumbnailPickerViewU
 	}
 }
 
-public class VideoThumbnailPickerViewUserControl : UserControlBase<VideoThumbnailPickerViewModel> {
-}
+public class VideoThumbnailPickerViewUserControl : UserControlBase<VideoThumbnailPickerViewModel> { }

@@ -17,7 +17,7 @@ public static class SortItemFactory {
 			SortItemKey.Rate => new SortItem<double>(sortItemObject.SortItemKey, x => x.Rate, sortItemObject.Direction),
 			SortItemKey.Location => new SortItem<IGpsLocation?>(sortItemObject.SortItemKey, x => x.Location, sortItemObject.Direction),
 			SortItemKey.Resolution => new SortItem<ComparableSize?>(sortItemObject.SortItemKey, x => x.Resolution, sortItemObject.Direction),
-			SortItemKey.UsageCount => new SortItem<int>(sortItemObject.SortItemKey, x => x.UsageCount, sortItemObject	.Direction),
+			SortItemKey.UsageCount => new SortItem<int>(sortItemObject.SortItemKey, x => x.UsageCount, sortItemObject.Direction),
 			_ => throw new ArgumentException(),
 		};
 	}

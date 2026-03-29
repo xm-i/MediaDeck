@@ -13,8 +13,8 @@ using MediaDeck.Core.Models.Repositories;
 namespace MediaDeck.Core.Models.Files;
 
 [Inject(InjectServiceLifetime.Singleton)]
-public class MediaContentLibrary: ModelBase {
-	public MediaContentLibrary(FilesLoader filesLoader, SearchConditionNotificationDispatcher searchConditionNotificationDispatcher,TagsManager tagsManager, FolderRepository folderRepository, StateModel states) {
+public class MediaContentLibrary : ModelBase {
+	public MediaContentLibrary(FilesLoader filesLoader, SearchConditionNotificationDispatcher searchConditionNotificationDispatcher, TagsManager tagsManager, FolderRepository folderRepository, StateModel states) {
 		this._filesLoader = filesLoader;
 		this.SearchConditions.ObserveChanged().ThrottleLast(TimeSpan.FromMilliseconds(100)).Subscribe(async _ => await this.SearchAsync());
 		tagsManager.Load().Wait();
@@ -25,11 +25,13 @@ public class MediaContentLibrary: ModelBase {
 		searchConditionNotificationDispatcher.UpdateRequest.Subscribe(x => x(this.SearchConditions));
 
 		this.SearchConditions.AddRange(states.SearchState.SearchCondition.ToArray());
-		this.SearchConditions.ObserveChanged().Subscribe(_ => {
-			states.SearchState.SearchCondition.Clear();
-			states.SearchState.SearchCondition.AddRange(this.SearchConditions.ToArray());
-		});
+		this.SearchConditions.ObserveChanged()
+			.Subscribe(_ => {
+				states.SearchState.SearchCondition.Clear();
+				states.SearchState.SearchCondition.AddRange(this.SearchConditions.ToArray());
+			});
 	}
+
 	private readonly FilesLoader _filesLoader;
 	private CancellationTokenSource? _searchCts;
 

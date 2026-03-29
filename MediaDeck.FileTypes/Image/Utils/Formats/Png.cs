@@ -5,11 +5,13 @@ using MetadataExtractor;
 using MetadataExtractor.Formats.Png;
 
 namespace MediaDeck.FileTypes.Image.Utils.Formats;
+
 /// <summary>
 /// Pngメタデータ取得クラス
 /// </summary>
 public class Png : ImageBase {
 	private readonly IReadOnlyList<MetadataExtractor.Directory> _reader;
+
 	/// <summary>
 	/// 幅
 	/// </summary>

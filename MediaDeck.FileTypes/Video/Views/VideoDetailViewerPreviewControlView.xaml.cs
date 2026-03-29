@@ -10,6 +10,4 @@ public sealed partial class VideoDetailViewerPreviewControlView : VideoDetailVie
 	}
 }
 
-public class VideoDetailViewerPreviewControlViewUserControl : UserControlBase<IDetailViewerViewModel> {
-}
-
+public class VideoDetailViewerPreviewControlViewUserControl : UserControlBase<IDetailViewerViewModel> { }

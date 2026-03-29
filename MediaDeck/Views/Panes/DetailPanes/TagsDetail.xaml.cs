@@ -1,12 +1,14 @@
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
+
 using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Views.Tags;
 using MediaDeck.ViewModels.Tags;
 using MediaDeck.ViewModels.Panes.DetailPanes;
 
 using System.Threading.Tasks;
+
 using MediaDeck.Core.Primitives;
 
 namespace MediaDeck.Views.Panes.DetailPanes;
@@ -17,7 +19,7 @@ public sealed partial class TagsDetail : DetailPaneBase {
 	public TagsDetail() {
 		this.InitializeComponent();
 	}
-	
+
 
 	protected override void OnViewModelChanged(DetailSelectorViewModel? oldViewModel, DetailSelectorViewModel? newViewModel) {
 		base.OnViewModelChanged(oldViewModel, newViewModel);
@@ -35,9 +37,7 @@ public sealed partial class TagsDetail : DetailPaneBase {
 
 		var tagsManager = this.ViewModel.GetTagsManager();
 		var newTagDialogViewModel = new NewTagDialogViewModel(tagsManager);
-		var dialog = new NewTagDialog(newTagDialogViewModel) {
-			XamlRoot = this.XamlRoot
-		};
+		var dialog = new NewTagDialog(newTagDialogViewModel) { XamlRoot = this.XamlRoot };
 		dialog.ViewModel.TagName.Value = context.TagName;
 		dialog.ViewModel.SelectedCategory.Value = context.TagCategories.FirstOrDefault();
 
@@ -65,7 +65,7 @@ public sealed partial class TagsDetail : DetailPaneBase {
 			return;
 		}
 		this.ViewModel?.SearchTaggedFilesCommand.Execute(tag);
-    }
+	}
 
 	private void TagGrid_RightTapped(object sender, RightTappedRoutedEventArgs e) {
 		if (sender is Grid grid) {

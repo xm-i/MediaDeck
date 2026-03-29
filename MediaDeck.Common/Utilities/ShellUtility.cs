@@ -16,19 +16,26 @@ public static class ShellUtility {
 		public int cbSize;
 		public uint fMask;
 		public nint hwnd;
+
 		[MarshalAs(UnmanagedType.LPWStr)]
 		public string lpVerb;
+
 		[MarshalAs(UnmanagedType.LPWStr)]
 		public string lpFile;
+
 		[MarshalAs(UnmanagedType.LPWStr)]
 		public string? lpParameters;
+
 		[MarshalAs(UnmanagedType.LPWStr)]
 		public string? lpDirectory;
+
 		public int nShow;
 		public nint hInstApp;
 		public nint lpIDList;
+
 		[MarshalAs(UnmanagedType.LPWStr)]
 		public string? lpClass;
+
 		public nint hkeyClass;
 		public uint dwHotKey;
 		public nint hIcon;
@@ -54,11 +61,7 @@ public static class ShellUtility {
 
 		if (!ShellExecuteExW(ref info)) {
 			// フォールバック: 通常のProcess.Startを使用
-			var psi = new ProcessStartInfo {
-				FileName = filePath,
-				Arguments = arguments ?? "",
-				UseShellExecute = true
-			};
+			var psi = new ProcessStartInfo { FileName = filePath, Arguments = arguments ?? "", UseShellExecute = true };
 			Process.Start(psi);
 		}
 	}

@@ -70,20 +70,21 @@ public class FilterManagerViewModel : ViewModelBase {
 		this.RemoveFilteringConditionCommand.Where(x => x != null).Subscribe(this.Remove);
 
 		this.SaveCommand.Subscribe(_ => {
-			this.Save();
-		}).AddTo(this.CompositeDisposable);
+				this.Save();
+			})
+			.AddTo(this.CompositeDisposable);
 
 		this.FilteringConditions = filterManager.FilteringConditions.CreateView(x => new FilteringConditionEditorViewModel(x)).ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
 
 		this.FilterCreatorViewModels = [
-				new ExistsFilterCreatorViewModel(this.CurrentCondition),
-				new FilePathFilterCreatorViewModel(this.CurrentCondition),
-				new LocationFilterCreatorViewModel(this.CurrentCondition),
-				new MediaTypeFilterCreatorViewModel(this.CurrentCondition),
-				new RateFilterCreatorViewModel(this.CurrentCondition),
-				new ResolutionFilterCreatorViewModel(this.CurrentCondition),
-				new TagFilterCreatorViewModel(this.CurrentCondition)
-			];
+			new ExistsFilterCreatorViewModel(this.CurrentCondition),
+			new FilePathFilterCreatorViewModel(this.CurrentCondition),
+			new LocationFilterCreatorViewModel(this.CurrentCondition),
+			new MediaTypeFilterCreatorViewModel(this.CurrentCondition),
+			new RateFilterCreatorViewModel(this.CurrentCondition),
+			new ResolutionFilterCreatorViewModel(this.CurrentCondition),
+			new TagFilterCreatorViewModel(this.CurrentCondition)
+		];
 		this.SelectedFilterCreatorViewModel.Value = this.FilterCreatorViewModels.First();
 	}
 

@@ -8,13 +8,15 @@ namespace MediaDeck.ViewModels.Panes.RepositoryPanes;
 public class FolderRepositoryViewModel : RepositoryViewModelBase {
 	public FolderRepositoryViewModel(FolderRepository folderRepository) : base("Folder", folderRepository) {
 		this.RootFolder = folderRepository.RootFolder.ObserveOnCurrentSynchronizationContext().ToBindableReactiveProperty(null!);
-		this.SetRepositoryConditionCommand.Merge(this.IncludeSubDirectories.ToUnit()).Subscribe(_ => {
-			if(this.SelectedFolder.Value is not { } folder) {
-				return;
-			}
-			folderRepository.SetRepositoryCandidate(folder, this.IncludeSubDirectories.Value);
-		});
+		this.SetRepositoryConditionCommand.Merge(this.IncludeSubDirectories.ToUnit())
+			.Subscribe(_ => {
+				if (this.SelectedFolder.Value is not { } folder) {
+					return;
+				}
+				folderRepository.SetRepositoryCandidate(folder, this.IncludeSubDirectories.Value);
+			});
 	}
+
 	public BindableReactiveProperty<FolderObject> RootFolder {
 		get;
 	}

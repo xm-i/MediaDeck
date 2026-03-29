@@ -1,6 +1,7 @@
 using MediaDeck.Composition.Interfaces.Files;
 
 namespace MediaDeck.Core.Models.Files.Filter.FilterItemObjects;
+
 /// <summary>
 /// ファイル存在フィルターアイテムオブジェクト
 /// </summary>
@@ -13,6 +14,7 @@ public class ExistsFilterItemObject : IFilterItemObject {
 			return $"File {(this.Exists ? "exists" : "does not exist")}";
 		}
 	}
+
 	/// <summary>
 	/// ファイルが存在するか否か
 	/// </summary>
@@ -22,8 +24,7 @@ public class ExistsFilterItemObject : IFilterItemObject {
 	}
 
 	[Obsolete("for serialize")]
-	public ExistsFilterItemObject() {
-	}
+	public ExistsFilterItemObject() { }
 
 	/// <summary>
 	/// コンストラクタ

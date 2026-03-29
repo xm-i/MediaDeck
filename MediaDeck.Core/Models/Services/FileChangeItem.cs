@@ -8,59 +8,81 @@ public class FileChangeItem {
 	/// 既存のメディアファイルID（新規追加の場合はnull）
 	/// </summary>
 	public long? MediaFileId {
-		get; set;
+		get;
+		set;
 	}
 
 	/// <summary>
 	/// イベント発生時刻
 	/// </summary>
-	public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+	public DateTime CreatedAt {
+		get;
+		set;
+	} = DateTime.UtcNow;
 
 	/// <summary>
 	/// DB検索やハッシュ計算が未完了かどうか
 	/// </summary>
-	public bool IsPending { get; set; }
+	public bool IsPending {
+		get;
+		set;
+	}
 
 	/// <summary>
 	/// 変更前のパス
 	/// </summary>
-	public string OldPath { get; set; } = string.Empty;
+	public string OldPath {
+		get;
+		set;
+	} = string.Empty;
 
 	/// <summary>
 	/// 変更後のパス
 	/// </summary>
-	public string NewPath { get; set; } = string.Empty;
+	public string NewPath {
+		get;
+		set;
+	} = string.Empty;
 
 	/// <summary>
 	/// 変更の種類
 	/// </summary>
 	public FileChangeType ChangeType {
-		get; set;
+		get;
+		set;
 	}
 
 	/// <summary>
 	/// 現在ハッシュ計算中かどうか
 	/// </summary>
 	public bool IsHashing {
-		get; set;
+		get;
+		set;
 	}
 
 	/// <summary>
 	/// ファイルサイズ（マッチングに使用）
 	/// </summary>
 	public long FileSize {
-		get; set;
+		get;
+		set;
 	}
 
 	/// <summary>
 	/// 変更前のハッシュ値
 	/// </summary>
-	public string OldHash { get; set; } = string.Empty;
+	public string OldHash {
+		get;
+		set;
+	} = string.Empty;
 
 	/// <summary>
 	/// 変更後のハッシュ値
 	/// </summary>
-	public string NewHash { get; set; } = string.Empty;
+	public string NewHash {
+		get;
+		set;
+	} = string.Empty;
 
 	/// <summary>
 	/// UI表示用の変更種別テキスト

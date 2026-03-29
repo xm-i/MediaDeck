@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 namespace MediaDeck.Composition.Objects;
+
 /// <summary>
 /// 属性リスト
 /// </summary>
@@ -12,8 +13,7 @@ public class Attributes<T> : IEnumerable<TitleValuePair<T>> {
 	/// <summary>
 	/// コンストラクタ
 	/// </summary>
-	public Attributes() {
-	}
+	public Attributes() { }
 
 	/// <summary>
 	/// コンストラクタ
@@ -70,7 +70,6 @@ public class Attributes<T> : IEnumerable<TitleValuePair<T>> {
 /// <param name="title">タイトル</param>
 /// <param name="value">値</param>
 public struct TitleValuePair<T>(string title, T value) {
-
 	/// <summary>
 	/// タイトル
 	/// </summary>
@@ -111,7 +110,6 @@ public static class AttributesEx {
 	public static Attributes<T> ToAttributes<T>(this IEnumerable<TitleValuePair<T>> source) {
 		return new Attributes<T>(source);
 	}
-
 
 
 	/// <summary>

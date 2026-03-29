@@ -4,12 +4,14 @@ using MediaDeck.Database;
 using MediaDeck.Database.Tables;
 
 namespace MediaDeck.Core.Models.Tools;
+
 [Inject(InjectServiceLifetime.Transient)]
 public class FileStatusUpdater {
 	public FileStatusUpdater(IDbContextFactory<MediaDeckDbContext> dbFactory, IUpdateFileHashBackgroundService updateFileHashBackgroundService) {
 		this._dbFactory = dbFactory;
 		this._updateFileHashBackgroundService = updateFileHashBackgroundService;
 	}
+
 	private readonly IDbContextFactory<MediaDeckDbContext> _dbFactory;
 	private readonly IUpdateFileHashBackgroundService _updateFileHashBackgroundService;
 
@@ -35,19 +37,19 @@ public class FileStatusUpdater {
 			if (fileInfo == null) {
 				continue;
 			}
-			if(
+			if (
 				file.IsExists == fileInfo.Exists &&
-					(!file.IsExists ||
-						(
+				(!file.IsExists ||
+					(
 						file.FileSize == fileInfo.Length &&
 						file.CreationTime == fileInfo.CreationTime &&
 						file.ModifiedTime == fileInfo.LastWriteTime &&
 						file.LastAccessTime == fileInfo.LastAccessTime &&
 						file.PreHashUpdatedTime != null &&
 						file.PreHashUpdatedTime >= fileInfo.LastWriteTime
-						)
 					)
-				) {
+				)
+			) {
 				continue;
 			}
 			var needsHashUpdate = fileInfo.Exists && (file.PreHashUpdatedTime == null || file.PreHashUpdatedTime < fileInfo.LastWriteTime);

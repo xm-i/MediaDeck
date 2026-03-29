@@ -22,8 +22,7 @@ public sealed partial class DuplicateDetectorContent : UserControl {
 	}
 
 	public static readonly DependencyProperty ViewModelProperty =
-		DependencyProperty.Register(
-			nameof(ViewModel),
+		DependencyProperty.Register(nameof(ViewModel),
 			typeof(DuplicateDetectorViewModel),
 			typeof(DuplicateDetectorContent),
 			new PropertyMetadata(null));

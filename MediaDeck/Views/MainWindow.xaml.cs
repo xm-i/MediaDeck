@@ -7,6 +7,7 @@ namespace MediaDeck.Views;
 [Inject(InjectServiceLifetime.Singleton)]
 public sealed partial class MainWindow : Window {
 	private readonly MainWindowViewModel ViewModel;
+
 	public MainWindow(MainWindowViewModel viewModel) {
 		this.ViewModel = viewModel;
 		this.InitializeComponent();

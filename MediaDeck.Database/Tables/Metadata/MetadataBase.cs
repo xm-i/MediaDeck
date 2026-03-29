@@ -1,10 +1,9 @@
 namespace MediaDeck.Database.Tables.Metadata;
+
 /// <summary>
 /// メタデータテーブル共通部
 /// </summary>
 public abstract class MetadataBase {
-
-
 	/// <summary>
 	/// メディアファイルID
 	/// </summary>

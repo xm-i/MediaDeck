@@ -5,11 +5,13 @@ using MetadataExtractor;
 using MetadataExtractor.Formats.Bmp;
 
 namespace MediaDeck.FileTypes.Image.Utils.Formats;
+
 /// <summary>
 /// Bmpメタデータ取得クラス
 /// </summary>
 public class Bmp : ImageBase {
 	private readonly IReadOnlyList<MetadataExtractor.Directory> _reader;
+
 	/// <summary>
 	/// 幅
 	/// </summary>
@@ -47,6 +49,5 @@ public class Bmp : ImageBase {
 		metadata.PaletteColorCount = this.GetInt(b, BmpHeaderDirectory.TagPaletteColourCount);
 		metadata.ImportantColorCount = this.GetInt(b, BmpHeaderDirectory.TagImportantColourCount);
 		return metadata;
-
 	}
 }

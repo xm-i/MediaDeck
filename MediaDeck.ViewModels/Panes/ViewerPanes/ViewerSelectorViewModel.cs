@@ -42,18 +42,23 @@ public class ViewerSelectorViewModel : ViewModelBase {
 	public ViewerPaneViewModelBase[] ViewerPaneViewModels {
 		get;
 	}
+
 	public WrapViewerViewModel WrapViewerViewModel {
 		get;
 	}
+
 	public ListViewerViewModel ListViewerViewModel {
 		get;
 	}
+
 	public DetailViewerViewModel DetailViewerViewModel {
 		get;
 	}
+
 	public MapViewerViewModel MapViewerViewModel {
 		get;
 	}
+
 	public SortSelectorViewModel SortSelectorViewModel {
 		get;
 	}

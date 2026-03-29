@@ -14,12 +14,12 @@ public class TagAliasViewModel {
 			});
 	}
 
-	public TagAliasViewModel() {
-	}
+	public TagAliasViewModel() { }
 
 	public BindableReactiveProperty<string> Alias {
 		get;
 	} = new();
+
 	public BindableReactiveProperty<string?> Ruby {
 		get;
 	} = new();

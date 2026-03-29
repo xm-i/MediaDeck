@@ -1,10 +1,9 @@
-namespace MediaDeck.Database.Tables; 
+namespace MediaDeck.Database.Tables;
+
 /// <summary>
 /// タグテーブル
 /// </summary>
 public class Tag {
-
-
 	/// <summary>
 	/// タグID
 	/// </summary>

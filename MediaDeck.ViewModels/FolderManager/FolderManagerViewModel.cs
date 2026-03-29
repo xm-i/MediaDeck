@@ -4,7 +4,7 @@ using MediaDeck.Core.Models.FolderManager;
 namespace MediaDeck.ViewModels.FolderManager;
 
 [Inject(InjectServiceLifetime.Transient)]
-public class FolderManagerViewModel: ViewModelBase {
+public class FolderManagerViewModel : ViewModelBase {
 	private readonly FolderManagerModel _folderManager;
 
 	public INotifyCollectionChangedSynchronizedViewList<FolderViewModel> Folders {
@@ -18,6 +18,7 @@ public class FolderManagerViewModel: ViewModelBase {
 	public ReactiveCommand<string> AddFolderCommand {
 		get;
 	} = new();
+
 	public ReactiveCommand<FolderViewModel> RemoveFolderCommand {
 		get;
 	} = new();
@@ -37,9 +38,10 @@ public class FolderManagerViewModel: ViewModelBase {
 		this.RemoveFolderCommand.Subscribe(x => this._folderManager.RemoveFolder(x.GetModel())).AddTo(this.CompositeDisposable);
 		this.ScanCommand.Subscribe(async x => await this._folderManager.Scan()).AddTo(this.CompositeDisposable);
 		this.ScanSelectedFolderCommand.Subscribe(async x => {
-			if (x is not null) {
-				await this._folderManager.ScanFolder(x.GetModel());
-			}
-		}).AddTo(this.CompositeDisposable);
+				if (x is not null) {
+					await this._folderManager.ScanFolder(x.GetModel());
+				}
+			})
+			.AddTo(this.CompositeDisposable);
 	}
 }

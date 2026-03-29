@@ -5,11 +5,13 @@ using MetadataExtractor;
 using MetadataExtractor.Formats.Gif;
 
 namespace MediaDeck.FileTypes.Image.Utils.Formats;
+
 /// <summary>
 /// Gifメタデータ取得クラス
 /// </summary>
 public class Gif : ImageBase {
 	private readonly IReadOnlyList<MetadataExtractor.Directory> _reader;
+
 	/// <summary>
 	/// 幅
 	/// </summary>

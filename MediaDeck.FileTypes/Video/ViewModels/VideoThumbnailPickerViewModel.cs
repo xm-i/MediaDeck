@@ -15,9 +15,11 @@ public class VideoThumbnailPickerViewModel : BaseThumbnailPickerViewModel {
 		this._videoFileOperator = videoFileOperator;
 		this._updateTimeSubject.ObserveOnCurrentSynchronizationContext().Subscribe(x => this.Time.Value = x);
 	}
+
 	private readonly VideoFileOperator _videoFileOperator;
 
 	private readonly Subject<TimeSpan> _updateTimeSubject = new();
+
 	public BindableReactiveProperty<TimeSpan> Time {
 		get;
 	} = new();

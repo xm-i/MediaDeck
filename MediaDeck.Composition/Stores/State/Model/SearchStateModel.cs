@@ -9,14 +9,15 @@ using Microsoft.Extensions.DependencyInjection;
 using R3.JsonConfig.Attributes;
 
 namespace MediaDeck.Composition.Stores.State.Model;
+
 /// <summary>
 /// 検索状態
 /// </summary>
-
 [Inject(InjectServiceLifetime.Singleton)]
 [GenerateR3JsonConfigDto]
 public class SearchStateModel {
 	private readonly IServiceProvider _serviceProvider;
+
 	/// <summary>
 	/// カレント検索条件
 	/// </summary>
@@ -68,12 +69,14 @@ public class SearchStateModel {
 			("Usage Count", [SortItemKey.UsageCount]),
 			("File Size", [SortItemKey.FileSize])
 		];
-		this.SortConditions = [.. sc.Select(x => {
-			var model = serviceProvider.CreateScope().ServiceProvider.GetRequiredService<SortObject>();
-			model.DisplayName.Value = x.Item1;
-			model.SortItemObjects.AddRange(x.Item2.Select(sik =>  new SortItemObject(){ SortItemKey= sik}));
-			return model;
-		})];
+		this.SortConditions = [
+			.. sc.Select(x => {
+				var model = serviceProvider.CreateScope().ServiceProvider.GetRequiredService<SortObject>();
+				model.DisplayName.Value = x.Item1;
+				model.SortItemObjects.AddRange(x.Item2.Select(sik => new SortItemObject() { SortItemKey = sik }));
+				return model;
+			})
+		];
 	}
 
 	public SortObject AddSortCondition() {

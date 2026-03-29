@@ -1,9 +1,13 @@
 using Microsoft.UI.Xaml.Controls;
+
 using MediaDeck.ViewModels.Preferences.Config;
+
 using Microsoft.UI.Xaml.Navigation;
+
 using MediaDeck.Composition.Enum;
 
 namespace MediaDeck.Views.Preferences.Config;
+
 public sealed partial class ScanConfigPage : Page {
 	public ScanConfigPage() {
 		this.InitializeComponent();
@@ -28,5 +32,4 @@ public sealed partial class ScanConfigPage : Page {
 	public MediaType[] MediaTypeConditions {
 		get;
 	} = Enum.GetValues<MediaType>();
-
 }

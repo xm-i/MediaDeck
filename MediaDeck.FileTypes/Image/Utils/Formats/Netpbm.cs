@@ -3,7 +3,8 @@ using System.IO;
 using MetadataExtractor;
 using MetadataExtractor.Formats.Netpbm;
 
-namespace MediaDeck.FileTypes.Image.Utils.Formats; 
+namespace MediaDeck.FileTypes.Image.Utils.Formats;
+
 /// <summary>
 /// Netpbmメタデータ取得クラス
 /// </summary>

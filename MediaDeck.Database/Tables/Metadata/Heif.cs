@@ -1,4 +1,5 @@
-namespace MediaDeck.Database.Tables.Metadata; 
+namespace MediaDeck.Database.Tables.Metadata;
+
 /// <summary>
 /// Heifメタデータテーブル
 /// </summary>

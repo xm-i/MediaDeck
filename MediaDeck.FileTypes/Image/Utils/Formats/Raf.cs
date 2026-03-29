@@ -5,7 +5,8 @@ using MetadataExtractor;
 using MetadataExtractor.Formats.Jpeg;
 using MetadataExtractor.Formats.Raf;
 
-namespace MediaDeck.FileTypes.Image.Utils.Formats; 
+namespace MediaDeck.FileTypes.Image.Utils.Formats;
+
 /// <summary>
 /// Rafメタデータ取得クラス
 /// </summary>
@@ -28,7 +29,6 @@ public class Raf : ImageBase {
 	/// コンストラクタ
 	/// </summary>
 	/// <param name="stream">画像ファイルストリーム</param>
-
 	internal Raf(Stream stream) : base(stream) {
 		var reader = RafMetadataReader.ReadMetadata(stream);
 		var d = reader.First(x => x is JpegDirectory);

@@ -3,8 +3,8 @@ using MediaDeck.ViewModels.Panes.DetailPanes;
 namespace MediaDeck.Views.Panes.DetailPanes;
 
 public sealed partial class DetailSelector : DetailSelectorUserControl {
-    public DetailSelector() {
-        this.InitializeComponent();
+	public DetailSelector() {
+		this.InitializeComponent();
 	}
 
 	protected override void OnViewModelChanged(DetailSelectorViewModel? oldViewModel, DetailSelectorViewModel? newViewModel) {

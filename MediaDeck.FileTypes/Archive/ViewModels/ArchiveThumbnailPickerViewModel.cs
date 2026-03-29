@@ -1,7 +1,9 @@
 using MediaDeck.FileTypes.Base.ViewModels;
 using MediaDeck.FileTypes.Archive.Models;
+
 using System.IO.Compression;
 using System.Threading.Tasks;
+
 using MediaDeck.Composition.Interfaces.FileTypes.ViewModels;
 using MediaDeck.FileTypes.Base.Models;
 
@@ -42,11 +44,11 @@ public class ArchiveThumbnailPickerViewModel : BaseThumbnailPickerViewModel {
 		if (this.targetFileViewModel is null) {
 			return;
 		}
-		if(this.FileName.Value is null) {
+		if (this.FileName.Value is null) {
 			this.CandidateThumbnail.Value = null;
 			return;
 		}
-		if(!archive.Entries.Any(x => x.FullName == this.FileName.Value)) {
+		if (!archive.Entries.Any(x => x.FullName == this.FileName.Value)) {
 			this.CandidateThumbnail.Value = null;
 			return;
 		}

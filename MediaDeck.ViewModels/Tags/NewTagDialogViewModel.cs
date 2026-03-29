@@ -12,12 +12,10 @@ public class NewTagDialogViewModel : ViewModelBase {
 		this.SelectedCategory.Value = this.TagCategories.FirstOrDefault();
 		this.ConfirmCommand.Subscribe(async _ => {
 			// タグを作成
-			this.CreatedTag.Value = await tagsManager.CreateTagAsync(
-				this.SelectedCategory.Value?.TagCategoryId ?? 0,
+			this.CreatedTag.Value = await tagsManager.CreateTagAsync(this.SelectedCategory.Value?.TagCategoryId ?? 0,
 				this.TagName.Value,
 				this.Detail.Value,
-				[]
-			);
+				[]);
 			await tagsManager.Load();
 			this.Result.Value = DialogResult.Confirmed;
 		});
@@ -25,16 +23,39 @@ public class NewTagDialogViewModel : ViewModelBase {
 			this.Result.Value = DialogResult.Canceled;
 		});
 	}
-	public BindableReactiveProperty<string> TagName { get; } = new("");
-	public BindableReactiveProperty<string> Detail { get; } = new("");
-	public BindableReactiveProperty<TagCategory?> SelectedCategory { get; } = new();
-	public BindableReactiveProperty<DialogResult> Result { get; } = new(DialogResult.None);
-	public BindableReactiveProperty<ITagModel?> CreatedTag { get; } = new();
 
-	public TagCategory[] TagCategories { get; private set; } = [];
+	public BindableReactiveProperty<string> TagName {
+		get;
+	} = new("");
 
-	public ReactiveCommand ConfirmCommand { get; } = new();
-	public ReactiveCommand CancelCommand { get; } = new();
+	public BindableReactiveProperty<string> Detail {
+		get;
+	} = new("");
+
+	public BindableReactiveProperty<TagCategory?> SelectedCategory {
+		get;
+	} = new();
+
+	public BindableReactiveProperty<DialogResult> Result {
+		get;
+	} = new(DialogResult.None);
+
+	public BindableReactiveProperty<ITagModel?> CreatedTag {
+		get;
+	} = new();
+
+	public TagCategory[] TagCategories {
+		get;
+		private set;
+	} = [];
+
+	public ReactiveCommand ConfirmCommand {
+		get;
+	} = new();
+
+	public ReactiveCommand CancelCommand {
+		get;
+	} = new();
 }
 
 public enum DialogResult {

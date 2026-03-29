@@ -4,6 +4,7 @@ using MetadataExtractor;
 using MetadataExtractor.Formats.Photoshop;
 
 namespace MediaDeck.FileTypes.Image.Utils.Formats;
+
 /// <summary>
 /// Psdメタデータ取得クラス
 /// </summary>
@@ -26,7 +27,6 @@ public class Psd : ImageBase {
 	/// コンストラクタ
 	/// </summary>
 	/// <param name="stream">画像ファイルストリーム</param>
-
 	internal Psd(Stream stream) : base(stream) {
 		var reader = PsdMetadataReader.ReadMetadata(stream);
 		var d = reader.First(x => x is PsdHeaderDirectory);

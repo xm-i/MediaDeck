@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using R3.JsonConfig.Attributes;
 
 namespace MediaDeck.Composition.Stores.State.Model.Objects;
+
 /// <summary>
 /// ソート設定復元用オブジェクト
 /// </summary>

@@ -2,6 +2,7 @@ using MediaDeck.Common.Base;
 using MediaDeck.Core.Models.FileDetailManagers;
 
 namespace MediaDeck.ViewModels.Tags;
+
 [Inject(InjectServiceLifetime.Transient)]
 public class TagManagerViewModel : ViewModelBase {
 	public TagManagerViewModel(TagsManager tagsManager) {
@@ -17,16 +18,13 @@ public class TagManagerViewModel : ViewModelBase {
 			this._tagCategories.AddRange(tagsManager.TagCategories.Select(x => new TagCategoryViewModel(x, tagsManager)));
 		});
 		this.AddTagCategoryCommand.Subscribe(_ => {
-			this._tagCategories.Add(new(new() {
-				TagCategoryName = "",
-				Tags = [],
-				Detail = ""
-			}, tagsManager));
+			this._tagCategories.Add(new(new() { TagCategoryName = "", Tags = [], Detail = "" }, tagsManager));
 		});
 	}
 
 
 	private readonly ObservableList<TagCategoryViewModel> _tagCategories = [];
+
 	public INotifyCollectionChangedSynchronizedViewList<TagCategoryViewModel> TagCategories {
 		get;
 	}
@@ -42,6 +40,7 @@ public class TagManagerViewModel : ViewModelBase {
 	public ReactiveCommand SaveCommand {
 		get;
 	} = new();
+
 	public ReactiveCommand AddTagCategoryCommand {
 		get;
 	} = new();

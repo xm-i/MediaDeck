@@ -52,9 +52,7 @@ public class FileSystemWatcherManager : IDisposable {
 
 		try {
 			var watcher = new FileSystemWatcher(path) {
-				IncludeSubdirectories = true,
-				NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName | NotifyFilters.LastWrite | NotifyFilters.Size,
-				InternalBufferSize = 65536 // OS最大値 (64KB) を設定してイベント溢れを防ぐ
+				IncludeSubdirectories = true, NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName | NotifyFilters.LastWrite | NotifyFilters.Size, InternalBufferSize = 65536 // OS最大値 (64KB) を設定してイベント溢れを防ぐ
 			};
 			watcher.Deleted += this.OnFileDeleted;
 			watcher.Renamed += this.OnFileRenamed;

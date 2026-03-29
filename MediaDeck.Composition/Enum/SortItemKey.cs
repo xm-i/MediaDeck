@@ -1,4 +1,5 @@
 namespace MediaDeck.Composition.Enum;
+
 public enum SortItemKey {
 	FilePath,
 	CreationTime,

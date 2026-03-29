@@ -6,6 +6,7 @@ using MediaDeck.Common.Base;
 using MediaDeck.Core.Models.Files.Filter;
 
 namespace MediaDeck.Core.Models.Files.Filter;
+
 /// <summary>
 /// フィルタリング条件
 /// </summary>
@@ -25,9 +26,11 @@ public class FilteringCondition : ModelBase {
 
 		this._filterItems = this.FilterItemObjects.CreateView(FilterItemFactory.Create);
 
-		this.FilterItemObjects.ObserveChanged().Subscribe(_ => {
-			this._onUpdateFilteringConditions.OnNext(Unit.Default);
-		}).AddTo(this.CompositeDisposable);
+		this.FilterItemObjects.ObserveChanged()
+			.Subscribe(_ => {
+				this._onUpdateFilteringConditions.OnNext(Unit.Default);
+			})
+			.AddTo(this.CompositeDisposable);
 	}
 
 	/// <summary>
@@ -62,6 +65,7 @@ public class FilteringCondition : ModelBase {
 			return this._onUpdateFilteringConditions.AsObservable();
 		}
 	}
+
 	/// <summary>
 	/// フィルター保存用オブジェクト
 	/// </summary>

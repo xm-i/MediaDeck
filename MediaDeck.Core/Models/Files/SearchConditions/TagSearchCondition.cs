@@ -6,11 +6,13 @@ using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Database.Tables;
 
 namespace MediaDeck.Core.Models.Files.SearchConditions;
-public class TagSearchCondition: ISearchCondition {
+
+public class TagSearchCondition : ISearchCondition {
 	[Obsolete("for serialize")]
 	public TagSearchCondition() {
 		this.TargetTag = null!;
 	}
+
 	public TagSearchCondition(ITagModel targetTag) {
 		this.TargetTag = targetTag;
 	}
@@ -33,11 +35,11 @@ public class TagSearchCondition: ISearchCondition {
 			var exp = exp1.Body;
 			var visitor = new ParameterVisitor(exp1.Parameters);
 
-			return Expression.Lambda<Func<MediaFile, bool>>(
-				exp,
+			return Expression.Lambda<Func<MediaFile, bool>>(exp,
 				visitor.Parameters);
 		}
 	}
+
 	public Func<IFileModel, bool>? Filter {
 		get;
 	} = null;
@@ -52,8 +54,7 @@ public class TagSearchCondition: ISearchCondition {
 			.FirstOrDefault(x =>
 				x.Alias.Contains(searchWord, StringComparison.CurrentCultureIgnoreCase) ||
 				(x.Ruby?.Contains(searchWord) ?? false) ||
-				((x.Ruby ?? x.Alias.KatakanaToHiragana()).HiraganaToRomaji()?.Contains(searchWord, StringComparison.CurrentCultureIgnoreCase) ?? false)
-			);
+				((x.Ruby ?? x.Alias.KatakanaToHiragana()).HiraganaToRomaji()?.Contains(searchWord, StringComparison.CurrentCultureIgnoreCase) ?? false));
 		this.TargetTag.RepresentativeText.Value = result?.Alias;
 		return result != null;
 	}

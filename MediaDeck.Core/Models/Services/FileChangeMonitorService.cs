@@ -3,10 +3,12 @@ using MediaDeck.Composition.Objects;
 using MediaDeck.Database;
 
 using Microsoft.Extensions.Logging;
+
 using MediaDeck.Common.Base;
 using MediaDeck.Core.Models.Files;
 using MediaDeck.Core.Models.NotificationDispatcher;
 using MediaDeck.Core.Stores.State;
+
 using System.IO;
 
 namespace MediaDeck.Core.Models.Services;
@@ -49,14 +51,12 @@ public class FileChangeMonitorService : ModelBase {
 		this.Tracker = tracker;
 		this.Tracker.AddTo(this.CompositeDisposable);
 
-		this._watcherManager = new FileSystemWatcherManager(
-			logger,
+		this._watcherManager = new FileSystemWatcherManager(logger,
 			onFileDeleted: path => this.Tracker.OnDeleted(path),
 			onFileRenamed: (oldPath, newPath) => this.Tracker.OnRenamed(oldPath, newPath),
 			onFileCreated: path => this.Tracker.OnCreated(path),
 			onFileChanged: path => this.Tracker.OnChanged(path),
-			onError: this.HandleWatcherError
-		);
+			onError: this.HandleWatcherError);
 
 		// 初期フォルダーの監視を開始
 		foreach (var folder in stateStore.State.FolderManagerState.Folders) {
@@ -64,14 +64,18 @@ public class FileChangeMonitorService : ModelBase {
 		}
 
 		// フォルダー追加の購読
-		stateStore.State.FolderManagerState.Folders.ObserveAdd().Subscribe(ev => {
-			this._watcherManager.AddWatcher(ev.Value.FolderPath);
-		}).AddTo(this.CompositeDisposable);
+		stateStore.State.FolderManagerState.Folders.ObserveAdd()
+			.Subscribe(ev => {
+				this._watcherManager.AddWatcher(ev.Value.FolderPath);
+			})
+			.AddTo(this.CompositeDisposable);
 
 		// フォルダー削除の購読
-		stateStore.State.FolderManagerState.Folders.ObserveRemove().Subscribe(ev => {
-			this._watcherManager.RemoveWatcher(ev.Value.FolderPath);
-		}).AddTo(this.CompositeDisposable);
+		stateStore.State.FolderManagerState.Folders.ObserveRemove()
+			.Subscribe(ev => {
+				this._watcherManager.RemoveWatcher(ev.Value.FolderPath);
+			})
+			.AddTo(this.CompositeDisposable);
 	}
 
 	/// <summary>

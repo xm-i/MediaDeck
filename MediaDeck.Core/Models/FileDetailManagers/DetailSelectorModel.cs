@@ -106,10 +106,9 @@ public class DetailSelectorModel : IDisposable {
 				files
 					.SelectMany(x => x.Properties)
 					.GroupBy(x => x.Title)
-					.Select(x => new FileProperty(
-						x.Key,
-						x.GroupBy(g => g.Value).Select(g => new ValueCountPair<string?>(g.Key, g.Count()))
-					)).ToArray();
+					.Select(x => new FileProperty(x.Key,
+						x.GroupBy(g => g.Value).Select(g => new ValueCountPair<string?>(g.Key, g.Count()))))
+					.ToArray();
 			this.Rate.Value = files.Average(x => x.Rate);
 			this.UsageCount.Value = files.Average(x => x.UsageCount);
 			this.RefreshTags(files);
@@ -146,12 +145,10 @@ public class DetailSelectorModel : IDisposable {
 	/// </summary>
 	public void RefreshTags(IFileModel[] files) {
 		this._tags.Clear();
-		this._tags.AddRange(
-			files
-				.SelectMany(x => x.Tags)
-				.GroupBy(x => x.TagId)
-				.Select(x => new ValueCountPair<ITagModel>(x.First(), x.Count()))
-		);
+		this._tags.AddRange(files
+			.SelectMany(x => x.Tags)
+			.GroupBy(x => x.TagId)
+			.Select(x => new ValueCountPair<ITagModel>(x.First(), x.Count())));
 	}
 
 	/// <summary>
@@ -218,12 +215,10 @@ public class DetailSelectorModel : IDisposable {
 		var result =
 			tag
 				.TagAliases
-				.FirstOrDefault(
-					x =>
-						x.Alias.Contains(text, StringComparison.CurrentCultureIgnoreCase) ||
-						(x.Ruby?.Contains(text) ?? false) ||
-						(x.Romaji?.Contains(text, StringComparison.CurrentCultureIgnoreCase) ?? false)
-				);
+				.FirstOrDefault(x =>
+					x.Alias.Contains(text, StringComparison.CurrentCultureIgnoreCase) ||
+					(x.Ruby?.Contains(text) ?? false) ||
+					(x.Romaji?.Contains(text, StringComparison.CurrentCultureIgnoreCase) ?? false));
 		representativeText = result?.Alias;
 		return result != null;
 	}

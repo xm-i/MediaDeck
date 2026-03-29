@@ -3,7 +3,8 @@ using System.IO;
 using MetadataExtractor;
 using MetadataExtractor.Formats.Ico;
 
-namespace MediaDeck.FileTypes.Image.Utils.Formats; 
+namespace MediaDeck.FileTypes.Image.Utils.Formats;
+
 /// <summary>
 /// Icoメタデータ取得クラス
 /// </summary>
@@ -26,7 +27,6 @@ public class Ico : ImageBase {
 	/// コンストラクタ
 	/// </summary>
 	/// <param name="stream">画像ファイルストリーム</param>
-
 	internal Ico(Stream stream) : base(stream) {
 		var reader = IcoMetadataReader.ReadMetadata(stream);
 		var d = reader.First(x => x is IcoDirectory);

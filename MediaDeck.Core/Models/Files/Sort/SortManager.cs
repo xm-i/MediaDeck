@@ -3,6 +3,7 @@ using MediaDeck.Common.Base;
 using MediaDeck.Core.Stores.State;
 
 namespace MediaDeck.Core.Models.Files.Sort;
+
 /// <summary>
 /// ソートマネージャー
 /// </summary>

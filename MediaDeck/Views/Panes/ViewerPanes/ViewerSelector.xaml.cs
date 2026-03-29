@@ -5,6 +5,7 @@ using MediaDeck.ViewModels.Panes.ViewerPanes;
 using MediaDeck.Views.Sort;
 
 namespace MediaDeck.Views.Panes.ViewerPanes;
+
 public sealed partial class ViewerSelector : ViewerSelectorUserControl {
 	public ViewerSelector() {
 		this.InitializeComponent();
@@ -15,4 +16,5 @@ public sealed partial class ViewerSelector : ViewerSelectorUserControl {
 		window.ActivateCenteredOnMainWindow();
 	}
 }
-public abstract class ViewerSelectorUserControl: UserControlBase<ViewerSelectorViewModel>;
+
+public abstract class ViewerSelectorUserControl : UserControlBase<ViewerSelectorViewModel>;

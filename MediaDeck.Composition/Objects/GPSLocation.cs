@@ -1,6 +1,7 @@
 using MediaDeck.Composition.Interfaces.Primitives;
 
 namespace MediaDeck.Composition.Objects;
+
 /// <summary>
 /// 場所、座標クラス
 /// </summary>
@@ -15,10 +16,12 @@ public class GpsLocation(double latitude, double longitude, double? altitude = n
 	public double Latitude {
 		get;
 	} = latitude;
+
 	/// <inheritdoc/>
 	public double Longitude {
 		get;
 	} = longitude;
+
 	/// <inheritdoc/>
 	public double? Altitude {
 		get;

@@ -2,6 +2,7 @@ using System.IO;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
 using Portable.Xaml;
 
 using MediaDeck.Composition.Interfaces.Files;
@@ -11,7 +12,7 @@ namespace MediaDeck.Core.Stores.Converters;
 public class FilterItemObjectJsonConverter : JsonConverter<IFilterItemObject?> {
 	public override IFilterItemObject? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) {
 		var xml = reader.GetString();
-		if(xml is null) {
+		if (xml is null) {
 			return null;
 		}
 

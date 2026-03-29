@@ -104,10 +104,7 @@ public class DuplicateFileDetector : ModelBase {
 					.Where(x => x.FullHash != null)
 					.GroupBy(x => x.FullHash!)
 					.Where(g => g.Count() > 1)
-					.Select(g => new DuplicateFileGroup {
-						Hash = g.Key,
-						Files = g.OrderBy(f => f.FilePath).ToList()
-					})
+					.Select(g => new DuplicateFileGroup { Hash = g.Key, Files = g.OrderBy(f => f.FilePath).ToList() })
 					.ToListAsync();
 			} else {
 				await using var db = await this._dbFactory.CreateDbContextAsync();
@@ -121,10 +118,7 @@ public class DuplicateFileDetector : ModelBase {
 					.Where(x => x.PreHash != null)
 					.GroupBy(x => x.PreHash!)
 					.Where(g => g.Count() > 1)
-					.Select(g => new DuplicateFileGroup {
-						Hash = g.Key,
-						Files = g.OrderBy(f => f.FilePath).ToList()
-					})
+					.Select(g => new DuplicateFileGroup { Hash = g.Key, Files = g.OrderBy(f => f.FilePath).ToList() })
 					.ToListAsync();
 			}
 

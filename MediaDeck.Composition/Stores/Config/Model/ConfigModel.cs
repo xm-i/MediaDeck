@@ -2,11 +2,9 @@ using R3.JsonConfig.Attributes;
 
 namespace MediaDeck.Composition.Stores.Config.Model;
 
-
 [Inject(InjectServiceLifetime.Singleton)]
 [GenerateR3JsonConfigDto]
 public class ConfigModel(PathConfigModel pathConfigModel, ScanConfigModel scanConfigModel, ExecutionConfigModel executionConfigModel) {
-
 	/// <summary>
 	/// パス設定
 	/// </summary>

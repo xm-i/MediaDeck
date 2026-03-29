@@ -4,6 +4,7 @@ using MediaDeck.Composition.Enum;
 using MediaDeck.Database.Tables;
 
 namespace MediaDeck.Composition.Interfaces.FileTypes.Models;
+
 public interface IFileOperator {
 	public MediaType TargetMediaType {
 		get;

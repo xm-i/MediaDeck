@@ -11,13 +11,12 @@ public class TagCategoryViewModel {
 		this.Detail.Value = tagCategory.Detail;
 		this.Tags = this._tags.CreateView(x => x);
 		this.FilteredTags = this.Tags.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
-		
+
 		this._tags.AddRange(tagCategory.Tags.Select(x => new TagViewModel(this, x, tagsManager)));
 		this.UpdateTagCategoryCommand = this.TagCategoryName.CombineLatest(this.Detail, (x, y) => !string.IsNullOrWhiteSpace(x) && !string.IsNullOrWhiteSpace(y)).ToReactiveCommand();
 		this.UpdateTagCategoryCommand.Subscribe(async _ => {
 			if (tagCategory.TagCategoryId != -1) {
-				await tagsManager.UpdateTagCategoryAsync(
-					tagCategory.TagCategoryId,
+				await tagsManager.UpdateTagCategoryAsync(tagCategory.TagCategoryId,
 					this.TagCategoryName.Value,
 					this.Detail.Value);
 			}
@@ -26,9 +25,10 @@ public class TagCategoryViewModel {
 			}
 		});
 
-		this.FilterText.ThrottleLast(TimeSpan.FromMilliseconds(300)).Subscribe(_ => {
-			this.RefreshTagCandidateFilter();
-		});
+		this.FilterText.ThrottleLast(TimeSpan.FromMilliseconds(300))
+			.Subscribe(_ => {
+				this.RefreshTagCandidateFilter();
+			});
 	}
 
 	private readonly ObservableList<TagViewModel> _tags = [];
@@ -72,19 +72,17 @@ public class TagCategoryViewModel {
 				return true;
 			}
 			if (tag.TagName.Value.Contains(text) ||
-				(tag.TagName.Value.KatakanaToHiragana().HiraganaToRomaji()?.Contains(text, StringComparison.CurrentCultureIgnoreCase) ?? false)){
+				(tag.TagName.Value.KatakanaToHiragana().HiraganaToRomaji()?.Contains(text, StringComparison.CurrentCultureIgnoreCase) ?? false)) {
 				tag.RepresentativeTextForSearch.Value = null;
 				return true;
 			}
 			var result =
 				tag
 					.TagAliases
-					.FirstOrDefault(
-						x =>
-							x.Alias.Value.Contains(text, StringComparison.CurrentCultureIgnoreCase) ||
-							(x.Ruby.Value?.Contains(text) ?? false) ||
-							((x.Ruby.Value ?? x.Alias.Value.KatakanaToHiragana()).HiraganaToRomaji()?.Contains(text, StringComparison.CurrentCultureIgnoreCase) ?? false)
-					);
+					.FirstOrDefault(x =>
+						x.Alias.Value.Contains(text, StringComparison.CurrentCultureIgnoreCase) ||
+						(x.Ruby.Value?.Contains(text) ?? false) ||
+						((x.Ruby.Value ?? x.Alias.Value.KatakanaToHiragana()).HiraganaToRomaji()?.Contains(text, StringComparison.CurrentCultureIgnoreCase) ?? false));
 			tag.RepresentativeTextForSearch.Value = result?.Alias.Value;
 			return result != null;
 		});

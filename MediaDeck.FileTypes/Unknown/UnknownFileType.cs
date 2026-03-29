@@ -9,9 +9,11 @@ using MediaDeck.FileTypes.Unknown.ViewModels;
 using MediaDeck.FileTypes.Unknown.Views;
 
 namespace MediaDeck.FileTypes.Unknown;
+
 [Inject(InjectServiceLifetime.Transient, typeof(IFileType))]
 public class UnknownFileType : BaseFileType<UnknownFileOperator, UnknownFileModel, UnknownFileViewModel, UnknownDetailViewerPreviewControlView, UnknownThumbnailPickerViewModel, UnknownThumbnailPickerView> {
 	private UnknownDetailViewerPreviewControlView? _unknownDetailViewerPreviewControlView;
+
 	public override MediaType MediaType {
 		get;
 	} = MediaType.Unknown;
@@ -29,6 +31,7 @@ public class UnknownFileType : BaseFileType<UnknownFileOperator, UnknownFileMode
 	public override UnknownFileViewModel CreateFileViewModel(UnknownFileModel fileModel) {
 		return new UnknownFileViewModel(fileModel);
 	}
+
 	public override UnknownDetailViewerPreviewControlView CreateDetailViewerPreviewControlView(UnknownFileViewModel fileViewModel) {
 		return this._unknownDetailViewerPreviewControlView ??= new UnknownDetailViewerPreviewControlView();
 	}

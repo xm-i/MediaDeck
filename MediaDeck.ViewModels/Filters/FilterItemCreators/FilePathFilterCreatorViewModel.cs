@@ -6,6 +6,7 @@ using MediaDeck.Core.Primitives;
 using MediaDeck.Core.Models.Files.Filter.FilterItemObjects;
 
 namespace MediaDeck.ViewModels.Filters.FilterItemCreators;
+
 /// <summary>
 /// ファイルパスフィルター作成ViewModel
 /// </summary>
@@ -17,7 +18,6 @@ public class FilePathFilterCreatorViewModel : ViewModelBase, IFilterCreatorViewM
 		get {
 			return "ファイルパスフィルター";
 		}
-
 	}
 
 	/// <summary>
@@ -40,8 +40,8 @@ public class FilePathFilterCreatorViewModel : ViewModelBase, IFilterCreatorViewM
 	public IEnumerable<DisplayObject<SearchTypeInclude>> SearchTypeList {
 		get;
 	} = [
-		new DisplayObject<SearchTypeInclude>("含む",SearchTypeInclude.Include),
-		new DisplayObject<SearchTypeInclude>("含まない",SearchTypeInclude.Exclude)
+		new DisplayObject<SearchTypeInclude>("含む", SearchTypeInclude.Include),
+		new DisplayObject<SearchTypeInclude>("含まない", SearchTypeInclude.Exclude)
 	];
 
 	/// <summary>
@@ -55,8 +55,9 @@ public class FilePathFilterCreatorViewModel : ViewModelBase, IFilterCreatorViewM
 		this.SearchType.Value = this.SearchTypeList.First();
 		this.AddFilterCommand = this.FilePath.Select(x => !string.IsNullOrEmpty(x)).ToReactiveCommand();
 		this.AddFilterCommand.Subscribe(vm => {
-			var filter = new FilePathFilterItemObject(this.FilePath.Value, this.SearchType.Value.Value);
-			target.Value?.AddFilter(filter);
-		}).AddTo(this.CompositeDisposable);
+				var filter = new FilePathFilterItemObject(this.FilePath.Value, this.SearchType.Value.Value);
+				target.Value?.AddFilter(filter);
+			})
+			.AddTo(this.CompositeDisposable);
 	}
 }

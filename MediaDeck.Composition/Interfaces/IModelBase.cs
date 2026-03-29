@@ -1,3 +1,3 @@
-namespace MediaDeck.Composition.Interfaces; 
-public interface IModelBase {
-}
+namespace MediaDeck.Composition.Interfaces;
+
+public interface IModelBase { }

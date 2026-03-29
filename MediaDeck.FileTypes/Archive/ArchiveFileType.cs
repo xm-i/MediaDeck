@@ -9,8 +9,9 @@ using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.FileTypes;
 
 namespace MediaDeck.FileTypes.Archive;
+
 [Inject(InjectServiceLifetime.Transient, typeof(IFileType))]
-public class ArchiveFileType: BaseFileType<ArchiveFileOperator, ArchiveFileModel, ArchiveFileViewModel, ArchiveDetailViewerPreviewControlView, ArchiveThumbnailPickerViewModel, ArchiveThumbnailPickerView> {
+public class ArchiveFileType : BaseFileType<ArchiveFileOperator, ArchiveFileModel, ArchiveFileViewModel, ArchiveDetailViewerPreviewControlView, ArchiveThumbnailPickerViewModel, ArchiveThumbnailPickerView> {
 	private ArchiveDetailViewerPreviewControlView? _archiveDetailViewerPreviewControlView;
 	private readonly ArchiveFileOperator _archiveFileOperator;
 
@@ -35,6 +36,7 @@ public class ArchiveFileType: BaseFileType<ArchiveFileOperator, ArchiveFileModel
 	public override ArchiveFileViewModel CreateFileViewModel(ArchiveFileModel fileModel) {
 		return new ArchiveFileViewModel(fileModel);
 	}
+
 	public override ArchiveDetailViewerPreviewControlView CreateDetailViewerPreviewControlView(ArchiveFileViewModel fileViewModel) {
 		return this._archiveDetailViewerPreviewControlView ??= new ArchiveDetailViewerPreviewControlView();
 	}
@@ -46,6 +48,7 @@ public class ArchiveFileType: BaseFileType<ArchiveFileOperator, ArchiveFileModel
 	public override ArchiveThumbnailPickerView CreateThumbnailPickerView() {
 		return new ArchiveThumbnailPickerView();
 	}
+
 	public override IQueryable<MediaFile> IncludeTables(IQueryable<MediaFile> mediaFiles) {
 		return mediaFiles
 			.Include(mf => mf.Container);

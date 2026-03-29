@@ -46,17 +46,19 @@ public class ScanConfigModel {
 			(".pdf", MediaType.Pdf),
 			(".zip", MediaType.Archive)
 		];
-		this.TargetExtensions = [.. extensions.Select(x => {
-			var model = this.ScopedServiceProvider.CreateScope().ServiceProvider.GetRequiredService<ExtensionObjectModel>();
-			model.Extension.Value = x.Item1;
-			model.MediaType.Value = x.Item2;
-			return model;
-		})];
+		this.TargetExtensions = [
+			.. extensions.Select(x => {
+				var model = this.ScopedServiceProvider.CreateScope().ServiceProvider.GetRequiredService<ExtensionObjectModel>();
+				model.Extension.Value = x.Item1;
+				model.MediaType.Value = x.Item2;
+				return model;
+			})
+		];
 	}
 
 	public void AddTargetExtension() {
 		var scope = this.ScopedServiceProvider.CreateScope();
-		var config= scope.ServiceProvider.GetRequiredService<ExtensionObjectModel>();
+		var config = scope.ServiceProvider.GetRequiredService<ExtensionObjectModel>();
 		this.TargetExtensions.Add(config);
 	}
 

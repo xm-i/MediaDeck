@@ -1,10 +1,9 @@
 namespace MediaDeck.Database.Tables;
+
 /// <summary>
 /// タグ別名テーブル
 /// </summary>
 public class TagAlias {
-
-
 	/// <summary>
 	/// タグ別名ID
 	/// </summary>

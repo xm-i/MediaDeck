@@ -70,21 +70,19 @@ public class UpdateFileHashBackgroundService : IUpdateFileHashBackgroundService 
 			.ObserveAdd()
 			.ThrottleFirst(TimeSpan.FromSeconds(0.1))
 			.ObserveOnThreadPool()
-			.SubscribeAwait(
-				async (x, ct) =>
+			.SubscribeAwait(async (x, ct) =>
 					await this.UpdateHashAsync().ConfigureAwait(false),
-					AwaitOperation.Sequential,
-					false);
+				AwaitOperation.Sequential,
+				false);
 
 		this.FullHashUpdateQueue
 			.ObserveAdd()
 			.ThrottleFirst(TimeSpan.FromSeconds(0.1))
 			.ObserveOnThreadPool()
-			.SubscribeAwait(
-				async (x, ct) =>
+			.SubscribeAwait(async (x, ct) =>
 					await this.UpdateFullHashAsync().ConfigureAwait(false),
-					AwaitOperation.Sequential,
-					false);
+				AwaitOperation.Sequential,
+				false);
 	}
 
 	/// <summary>
@@ -203,11 +201,11 @@ public class UpdateFileHashBackgroundService : IUpdateFileHashBackgroundService 
 		using (var transaction = await db.Database.BeginTransactionAsync()) {
 			// PreHashが重複しているグループを特定
 			var duplicatePreHashes = await db.MediaFiles
-			.Where(m => m.IsExists && m.PreHash != null)
-			.GroupBy(m => m.PreHash)
-			.Where(g => g.Count() >= 2)
-			.Select(g => g.Key)
-			.ToListAsync();
+				.Where(m => m.IsExists && m.PreHash != null)
+				.GroupBy(m => m.PreHash)
+				.Where(g => g.Count() >= 2)
+				.Select(g => g.Key)
+				.ToListAsync();
 
 			// PreHashが重複していないのにFullHashが設定されているレコードを見つける
 			nonDuplicateIdsWithFullHash = await db.MediaFiles

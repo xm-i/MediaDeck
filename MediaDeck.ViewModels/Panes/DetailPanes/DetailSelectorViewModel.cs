@@ -28,10 +28,9 @@ public class DetailSelectorViewModel : ViewModelBase {
 		this.FilteredTagCandidates = this.TagCandidates.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
 		this.Tags = model.Tags.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
 
-		Observable.Merge(
-			this.TargetFiles.Where(x => x != null).Select(_ => Unit.Default),
-			model.ContentChanged.AsObservable()
-		).Subscribe(_ => this._model.Refresh(this.TargetFileModels));
+		Observable.Merge(this.TargetFiles.Where(x => x != null).Select(_ => Unit.Default),
+				model.ContentChanged.AsObservable())
+			.Subscribe(_ => this._model.Refresh(this.TargetFileModels));
 
 		this.Rate.Subscribe(async x => {
 			if (!double.IsInteger(x) || this.TargetFiles.Value is null) {

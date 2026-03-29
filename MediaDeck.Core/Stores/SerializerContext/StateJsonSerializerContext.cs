@@ -5,10 +5,11 @@ using MediaDeck.Core.Stores.Converters;
 
 namespace MediaDeck.Stores.SerializerContext;
 
-[JsonSourceGenerationOptions(WriteIndented = true,Converters = [
-			typeof(GuidJsonConverter),
-			typeof(FilterItemObjectJsonConverter),
-			typeof(SearchConditionJsonConverter)])]
+[JsonSourceGenerationOptions(WriteIndented = true,
+	Converters = [
+		typeof(GuidJsonConverter),
+		typeof(FilterItemObjectJsonConverter),
+		typeof(SearchConditionJsonConverter)
+	])]
 [JsonSerializable(typeof(StateModelForJson))]
-public partial class StateJsonSerializerContext : JsonSerializerContext {
-}
+public partial class StateJsonSerializerContext : JsonSerializerContext { }

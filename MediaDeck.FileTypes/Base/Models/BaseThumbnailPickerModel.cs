@@ -9,7 +9,8 @@ using MediaDeck.Database;
 
 using Microsoft.Extensions.Logging;
 
-namespace MediaDeck.FileTypes.Base.Models; 
+namespace MediaDeck.FileTypes.Base.Models;
+
 public class BaseThumbnailPickerModel(IDbContextFactory<MediaDeckDbContext> dbFactory, ILogger<BaseThumbnailPickerModel> logger, IFilePathService filePathService) {
 	private readonly IDbContextFactory<MediaDeckDbContext> _dbFactory = dbFactory;
 	private readonly IFilePathService _filePathService = filePathService;

@@ -10,6 +10,4 @@ public sealed partial class ImageDetailViewerPreviewControlView : ImageDetailVie
 	}
 }
 
-public class ImageDetailViewerPreviewControlViewUserControl : UserControlBase<IDetailViewerViewModel> {
-}
-
+public class ImageDetailViewerPreviewControlViewUserControl : UserControlBase<IDetailViewerViewModel> { }

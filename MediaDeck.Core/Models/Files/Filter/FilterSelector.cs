@@ -4,6 +4,7 @@ using MediaDeck.Database.Tables;
 using MediaDeck.Common.Base;
 
 namespace MediaDeck.Core.Models.Files.Filter;
+
 /// <summary>
 /// フィルターマネージャー
 /// </summary>
@@ -29,11 +30,12 @@ public class FilterSelector : ModelBase {
 			})
 			.AddTo(this.CompositeDisposable);
 
-		state.SearchState.FilteringConditions.ObserveChanged().Subscribe(x => {
-			this.FilteringConditions.Clear();
-			this.FilteringConditions.AddRange(state.SearchState.FilteringConditions.Select(x => new FilteringCondition(x)));
-			this.CurrentFilteringCondition.Value = this.FilteringConditions.FirstOrDefault(x => x.DisplayName == this.CurrentFilteringCondition.Value?.DisplayName);
-		});
+		state.SearchState.FilteringConditions.ObserveChanged()
+			.Subscribe(x => {
+				this.FilteringConditions.Clear();
+				this.FilteringConditions.AddRange(state.SearchState.FilteringConditions.Select(x => new FilteringCondition(x)));
+				this.CurrentFilteringCondition.Value = this.FilteringConditions.FirstOrDefault(x => x.DisplayName == this.CurrentFilteringCondition.Value?.DisplayName);
+			});
 	}
 
 	/// <summary>

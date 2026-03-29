@@ -12,6 +12,7 @@ public class ExecutionConfigPageViewModel : ViewModelBase, IConfigPageViewModel 
 	} = "Execution";
 
 	private readonly ExecutionConfigModel _executionConfig;
+
 	public ExecutionConfigPageViewModel(ExecutionConfigModel executionConfig) {
 		this._executionConfig = executionConfig;
 		this.AddExecutionProgramCommand.Subscribe(_ => {

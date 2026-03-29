@@ -5,6 +5,7 @@ using MediaDeck.Database.Tables;
 using MediaDeck.Common.Base;
 
 namespace MediaDeck.Core.Models.Files.Filter;
+
 /// <summary>
 /// フィルター条件
 /// </summary>

@@ -1,9 +1,9 @@
-namespace MediaDeck.Database.Tables; 
+namespace MediaDeck.Database.Tables;
+
 /// <summary>
 /// タグ分類テーブル
 /// </summary>
 public class TagCategory {
-
 	/// <summary>
 	/// タグ分類ID
 	/// </summary>

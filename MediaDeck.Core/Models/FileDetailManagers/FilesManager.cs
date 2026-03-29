@@ -44,9 +44,7 @@ public class FilesManager {
 		await db.SaveChangesAsync();
 		await transaction.CommitAsync();
 
-		var message = targetFiles.Count == 1
-			? "File removed from MediaDeck database"
-			: $"{targetFiles.Count} files removed from MediaDeck database";
+		var message = targetFiles.Count == 1 ? "File removed from MediaDeck database" : $"{targetFiles.Count} files removed from MediaDeck database";
 		this._notificationDispatcher.Notify.OnNext(AppNotification.Success(message));
 	}
 }

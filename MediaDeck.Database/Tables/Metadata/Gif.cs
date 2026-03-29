@@ -1,9 +1,9 @@
-namespace MediaDeck.Database.Tables.Metadata; 
+namespace MediaDeck.Database.Tables.Metadata;
+
 /// <summary>
 /// Gifメタデータテーブル
 /// </summary>
 public class Gif : MetadataBase {
-
 	/// <summary>
 	/// カラーテーブルサイズ
 	/// </summary>

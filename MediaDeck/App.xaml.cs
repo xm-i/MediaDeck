@@ -18,6 +18,7 @@ using Microsoft.UI.Xaml;
 
 using Serilog;
 using Serilog.Events;
+
 namespace MediaDeck;
 
 public partial class App : Application {
@@ -96,8 +97,7 @@ public partial class App : Application {
 			.MinimumLevel.Information()
 #endif
 			.WriteTo.Debug(outputTemplate: string.Join("｜", logFields))
-			.WriteTo.File(
-				Path.Combine(FilePathConstants.BaseDirectory, "log", ".log"),
+			.WriteTo.File(Path.Combine(FilePathConstants.BaseDirectory, "log", ".log"),
 				rollingInterval: RollingInterval.Month,
 				outputTemplate: string.Join("\t", logFields))
 			.CreateLogger();
@@ -114,15 +114,12 @@ public partial class App : Application {
 		Core.DIRegistration.AddGeneratedServices(serviceCollection);
 
 		// DataBase
-		var sb = new SqliteConnectionStringBuilder {
-			DataSource = Path.Combine(FilePathConstants.BaseDirectory, "pix.db")
-		};
+		var sb = new SqliteConnectionStringBuilder { DataSource = Path.Combine(FilePathConstants.BaseDirectory, "pix.db") };
 		serviceCollection.AddDbContextFactory<MediaDeckDbContext>(x => {
-			x.UseSqlite(sb.ConnectionString);
-		}, ServiceLifetime.Transient);
+				x.UseSqlite(sb.ConnectionString);
+			},
+			ServiceLifetime.Transient);
 
-		Ioc.Default.ConfigureServices(
-			serviceCollection.BuildServiceProvider()
-		);
+		Ioc.Default.ConfigureServices(serviceCollection.BuildServiceProvider());
 	}
 }

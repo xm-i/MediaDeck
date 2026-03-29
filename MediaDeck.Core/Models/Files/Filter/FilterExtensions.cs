@@ -2,6 +2,7 @@ using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Database.Tables;
 
 namespace MediaDeck.Core.Models.Files.Filter;
+
 public static class FilterExtensions {
 	/// <summary>
 	/// フィルターマネージャーで選択したフィルターを引数に渡されたクエリに適用して返却する。

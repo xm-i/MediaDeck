@@ -13,7 +13,7 @@ public class TimeSpanToStringConverter : IValueConverter {
 	/// <param name="language">未使用</param>
 	/// <returns>変換後値(<see cref="Visibility"/>)</returns>
 	public object? Convert(object value, Type targetType, object parameter, string language) {
-		if(value is TimeSpan timeSpan) {
+		if (value is TimeSpan timeSpan) {
 			return timeSpan.ToString(@"hh\:mm\:ss");
 		}
 		return null;
@@ -21,7 +21,7 @@ public class TimeSpanToStringConverter : IValueConverter {
 
 	public object? ConvertBack(object value, Type targetType, object parameter, string language) {
 		if (value is string str) {
-			if(TimeSpan.TryParse(str, out var timeSpan)) {
+			if (TimeSpan.TryParse(str, out var timeSpan)) {
 				return timeSpan;
 			}
 		}

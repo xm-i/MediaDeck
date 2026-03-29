@@ -6,6 +6,7 @@ using MediaDeck.Core.Primitives;
 using MediaDeck.Core.Models.Files.Filter.FilterItemObjects;
 
 namespace MediaDeck.ViewModels.Filters.FilterItemCreators;
+
 /// <summary>
 /// タグフィルター作成ViewModel
 /// </summary>
@@ -39,8 +40,8 @@ public class TagFilterCreatorViewModel : ViewModelBase, IFilterCreatorViewModel 
 	public IEnumerable<DisplayObject<SearchTypeInclude>> SearchTypeList {
 		get;
 	} = [
-		new DisplayObject<SearchTypeInclude>("含む",SearchTypeInclude.Include),
-		new DisplayObject<SearchTypeInclude>("含まない",SearchTypeInclude.Exclude)
+		new DisplayObject<SearchTypeInclude>("含む", SearchTypeInclude.Include),
+		new DisplayObject<SearchTypeInclude>("含まない", SearchTypeInclude.Exclude)
 	];
 
 	/// <summary>
@@ -54,8 +55,9 @@ public class TagFilterCreatorViewModel : ViewModelBase, IFilterCreatorViewModel 
 		this.SearchType.Value = this.SearchTypeList.First();
 		this.AddFilterCommand = this.TagName.Select(x => !string.IsNullOrEmpty(x)).ToReactiveCommand();
 		this.AddFilterCommand.Subscribe(_ => {
-			var filter = new TagFilterItemObject(this.TagName.Value, this.SearchType.Value.Value);
-			target.Value?.AddFilter(filter);
-		}).AddTo(this.CompositeDisposable);
+				var filter = new TagFilterItemObject(this.TagName.Value, this.SearchType.Value.Value);
+				target.Value?.AddFilter(filter);
+			})
+			.AddTo(this.CompositeDisposable);
 	}
 }

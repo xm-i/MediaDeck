@@ -8,6 +8,7 @@ using MediaDeck.Core.Primitives;
 using MediaDeck.Core.Models.Files.Filter.FilterItemObjects;
 
 namespace MediaDeck.ViewModels.Filters.FilterItemCreators;
+
 /// <summary>
 /// 評価フィルター作成ViewModel
 /// </summary>
@@ -42,11 +43,11 @@ public class RateFilterCreatorViewModel : ViewModelBase, IFilterCreatorViewModel
 	public IEnumerable<DisplayObject<SearchTypeComparison>> SearchTypeList {
 		get;
 	} = [
-		new DisplayObject<SearchTypeComparison>("を超える",SearchTypeComparison.GreaterThan),
-		new DisplayObject<SearchTypeComparison>("以上",SearchTypeComparison.GreaterThanOrEqual),
-		new DisplayObject<SearchTypeComparison>("と等しい",SearchTypeComparison.Equal),
-		new DisplayObject<SearchTypeComparison>("以下",SearchTypeComparison.LessThanOrEqual),
-		new DisplayObject<SearchTypeComparison>("未満",SearchTypeComparison.LessThan)
+		new DisplayObject<SearchTypeComparison>("を超える", SearchTypeComparison.GreaterThan),
+		new DisplayObject<SearchTypeComparison>("以上", SearchTypeComparison.GreaterThanOrEqual),
+		new DisplayObject<SearchTypeComparison>("と等しい", SearchTypeComparison.Equal),
+		new DisplayObject<SearchTypeComparison>("以下", SearchTypeComparison.LessThanOrEqual),
+		new DisplayObject<SearchTypeComparison>("未満", SearchTypeComparison.LessThan)
 	];
 
 	/// <summary>
@@ -71,6 +72,5 @@ public class RateFilterCreatorViewModel : ViewModelBase, IFilterCreatorViewModel
 					target.Value?.AddFilter(filter);
 				}
 			});
-
 	}
 }

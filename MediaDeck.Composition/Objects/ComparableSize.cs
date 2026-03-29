@@ -6,6 +6,7 @@ namespace MediaDeck.Composition.Objects;
 public struct ComparableSize : IComparable<ComparableSize>, IComparable {
 	private double _width;
 	private double _height;
+
 	/// <summary>
 	/// 幅
 	/// </summary>
@@ -114,7 +115,7 @@ public struct ComparableSize : IComparable<ComparableSize>, IComparable {
 
 		var size = cs;
 		return this.Width == size.Width &&
-			   this.Height == size.Height;
+			this.Height == size.Height;
 	}
 
 	public override int GetHashCode() {

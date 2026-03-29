@@ -4,6 +4,7 @@ using MediaDeck.Core.Models.Files.SearchConditions;
 using MediaDeck.Database.Tables;
 
 namespace MediaDeck.Core.Models.Files.SearchConditions;
+
 public static class SearchConditionExtensions {
 	/// <summary>
 	/// 検索条件を引数に渡されたクエリに適用して返却する。

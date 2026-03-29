@@ -18,9 +18,7 @@ public class FileSizeConverter : IValueConverter {
 			unitIndex++;
 		}
 
-		return unitIndex == 0
-			? $"{displaySize:F0} {_units[unitIndex]}"
-			: $"{displaySize:F2} {_units[unitIndex]}";
+		return unitIndex == 0 ? $"{displaySize:F0} {_units[unitIndex]}" : $"{displaySize:F2} {_units[unitIndex]}";
 	}
 
 	public object ConvertBack(object value, Type targetType, object parameter, string language) {

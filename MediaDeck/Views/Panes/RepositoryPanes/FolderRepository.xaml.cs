@@ -1,6 +1,7 @@
 using MediaDeck.ViewModels.Panes.RepositoryPanes;
 
 namespace MediaDeck.Views.Panes.RepositoryPanes;
+
 public sealed partial class FolderRepository : FolderRepositoryUserControl {
 	public FolderRepository() {
 		this.InitializeComponent();
@@ -19,7 +20,7 @@ public sealed partial class FolderRepository : FolderRepositoryUserControl {
 			return;
 		}
 		vm.FolderRepositoryViewModel.SetRepositoryConditionCommand.Execute(Unit.Default);
-    }
+	}
 }
 
 public abstract class FolderRepositoryUserControl : UserControlBase<RepositorySelectorViewModel>;

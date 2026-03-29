@@ -5,12 +5,14 @@ using MetadataExtractor;
 using MetadataExtractor.Formats.Exif;
 using MetadataExtractor.Formats.Heif;
 
-namespace MediaDeck.FileTypes.Image.Utils.Formats; 
+namespace MediaDeck.FileTypes.Image.Utils.Formats;
+
 /// <summary>
 /// Heifメタデータ取得クラス
 /// </summary>
 public class Heif : ImageBase {
 	private readonly IReadOnlyList<MetadataExtractor.Directory> _reader;
+
 	/// <summary>
 	/// 幅
 	/// </summary>
@@ -79,7 +81,6 @@ public class Heif : ImageBase {
 	/// コンストラクタ
 	/// </summary>
 	/// <param name="stream">画像ファイルストリーム</param>
-
 	internal Heif(Stream stream) : base(stream) {
 		this._reader = HeifMetadataReader.ReadMetadata(stream);
 		var d = this._reader.OfType<HeicImagePropertiesDirectory>().First();

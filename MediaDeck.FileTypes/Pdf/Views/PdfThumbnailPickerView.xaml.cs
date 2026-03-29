@@ -10,5 +10,4 @@ public sealed partial class PdfThumbnailPickerView : PdfThumbnailPickerViewUserC
 	}
 }
 
-public class PdfThumbnailPickerViewUserControl : UserControlBase<PdfThumbnailPickerViewModel> {
-}
+public class PdfThumbnailPickerViewUserControl : UserControlBase<PdfThumbnailPickerViewModel> { }

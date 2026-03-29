@@ -9,11 +9,11 @@ namespace MediaDeck.ViewModels.Panes.FilterPanes;
 /// フィルターセレクターViewModel
 /// </summary>
 [Inject(InjectServiceLifetime.Singleton)]
-public class FilterSelectorViewModel :ViewModelBase {
+public class FilterSelectorViewModel : ViewModelBase {
 	/// <summary>
 	/// コンストラクタ
 	/// </summary>
-	public FilterSelectorViewModel(FilterSelector model, StateStore stateStore,MediaContentLibrary mediaContentLibrary) {
+	public FilterSelectorViewModel(FilterSelector model, StateStore stateStore, MediaContentLibrary mediaContentLibrary) {
 		this._stateStore = stateStore;
 		this.FilteringConditions = model.FilteringConditions.CreateView(x => new FilteringConditionViewModel(x)).ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
 		this.CurrentCondition = model.CurrentFilteringCondition.Select(x => this.FilteringConditions.FirstOrDefault(c => c.Model == x)).ToBindableReactiveProperty();
@@ -24,6 +24,7 @@ public class FilterSelectorViewModel :ViewModelBase {
 	}
 
 	private readonly StateStore _stateStore;
+
 	/// <summary>
 	/// カレント条件
 	/// </summary>

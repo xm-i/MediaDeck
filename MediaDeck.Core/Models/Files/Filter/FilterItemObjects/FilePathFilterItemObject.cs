@@ -2,6 +2,7 @@ using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.Files;
 
 namespace MediaDeck.Core.Models.Files.Filter.FilterItemObjects;
+
 /// <summary>
 /// ファイルパスフィルターアイテムオブジェクト
 /// </summary>
@@ -14,6 +15,7 @@ public class FilePathFilterItemObject : IFilterItemObject {
 			return $"{this.Text} in file path {(this.SearchType == SearchTypeInclude.Include ? "includes" : "does not include")}";
 		}
 	}
+
 	/// <summary>
 	/// パスに含まれる文字列
 	/// </summary>
@@ -45,7 +47,7 @@ public class FilePathFilterItemObject : IFilterItemObject {
 			throw new ArgumentException("parameter is null", nameof(text));
 		}
 		if (Enum.IsDefined(searchType)) {
-			throw new ArgumentException("parameter is undefined",nameof(searchType));
+			throw new ArgumentException("parameter is undefined", nameof(searchType));
 		}
 		this.Text = text;
 		this.SearchType = searchType;

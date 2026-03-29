@@ -2,6 +2,7 @@ using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.Files;
 
 namespace MediaDeck.Core.Models.Files.Filter.FilterItemObjects;
+
 /// <summary>
 /// タグフィルターアイテムオブジェクト
 /// </summary>

@@ -5,7 +5,8 @@ using MediaDeck.ViewModels.Filters.FilterItemCreators;
 using MediaDeck.Views.Filters.FilterItemCreators;
 
 namespace MediaDeck.Views.Filters;
-public sealed partial class FilterManagerView: FilterManagerViewUserControl {
+
+public sealed partial class FilterManagerView : FilterManagerViewUserControl {
 	public FilterManagerView() {
 		this.InitializeComponent();
 	}
@@ -41,5 +42,4 @@ public sealed partial class FilterManagerView: FilterManagerViewUserControl {
 	}
 }
 
-public class FilterManagerViewUserControl: UserControlBase<FilterManagerViewModel> {
-}
+public class FilterManagerViewUserControl : UserControlBase<FilterManagerViewModel> { }

@@ -4,6 +4,7 @@ using MediaDeck.ViewModels.Preferences;
 using MediaDeck.Views.Preferences.Config;
 
 using Windows.Graphics;
+
 using MediaDeck.ViewModels.Preferences.Config;
 
 namespace MediaDeck.Views.Preferences;
@@ -13,6 +14,7 @@ public sealed partial class ConfigWindow : Window {
 	public ConfigWindowViewModel ViewModel {
 		get;
 	}
+
 	public ConfigWindow(ConfigWindowViewModel ConfigWindowViewModel) {
 		this.InitializeComponent();
 		this.ViewModel = ConfigWindowViewModel;

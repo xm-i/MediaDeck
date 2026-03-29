@@ -1,7 +1,6 @@
-namespace MediaDeck.Database.Tables.Metadata; 
+namespace MediaDeck.Database.Tables.Metadata;
+
 public class VideoMetadataValue {
-
-
 	/// <summary>
 	/// メディアファイルID
 	/// </summary>

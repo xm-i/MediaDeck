@@ -6,7 +6,7 @@ using MediaDeck.Common.Extensions;
 namespace MediaDeck.ViewModels.Preferences.Config;
 
 [Inject(InjectServiceLifetime.Scoped)]
-public class ExecutionProgramConfigViewModel: ViewModelBase {
+public class ExecutionProgramConfigViewModel : ViewModelBase {
 	public BindableReactiveProperty<string> Path {
 		get;
 		set;
@@ -26,6 +26,5 @@ public class ExecutionProgramConfigViewModel: ViewModelBase {
 		this.Path = executionProgramConfigModel.Path.ToTwoWayBindableReactiveProperty(string.Empty).AddTo(this.CompositeDisposable);
 		this.Args = executionProgramConfigModel.Args.ToTwoWayBindableReactiveProperty(string.Empty).AddTo(this.CompositeDisposable);
 		this.MediaType = executionProgramConfigModel.MediaType.ToTwoWayBindableReactiveProperty(Composition.Enum.MediaType.Image).AddTo(this.CompositeDisposable);
-
 	}
 }

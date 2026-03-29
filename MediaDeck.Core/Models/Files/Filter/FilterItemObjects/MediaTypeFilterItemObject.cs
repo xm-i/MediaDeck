@@ -1,6 +1,7 @@
 using MediaDeck.Composition.Interfaces.Files;
 
 namespace MediaDeck.Core.Models.Files.Filter.FilterItemObjects;
+
 /// <summary>
 /// ファイルタイプフィルターアイテムオブジェクト
 /// </summary>
@@ -27,8 +28,7 @@ public class MediaTypeFilterItemObject : IFilterItemObject {
 	}
 
 	[Obsolete("for serialize")]
-	public MediaTypeFilterItemObject() {
-	}
+	public MediaTypeFilterItemObject() { }
 
 	/// <summary>
 	/// コンストラクタ

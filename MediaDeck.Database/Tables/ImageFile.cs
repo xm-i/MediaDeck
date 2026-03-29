@@ -1,9 +1,9 @@
-namespace MediaDeck.Database.Tables; 
+namespace MediaDeck.Database.Tables;
+
 /// <summary>
 /// 画像ファイルテーブル
 /// </summary>
 public class ImageFile {
-
 	/// <summary>
 	/// メディアファイルID
 	/// </summary>

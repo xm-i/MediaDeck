@@ -1,17 +1,27 @@
 using MediaDeck.Database.Tables;
+
 using System.IO;
+
 using FFMpegCore;
+
 using System.Text.RegularExpressions;
+
 using MediaDeck.Database.Tables.Metadata;
+
 using CommunityToolkit.Mvvm.DependencyInjection;
+
 using System.Drawing;
+
 using MediaDeck.FileTypes.Base.Models;
+
 using System.Threading.Tasks;
+
 using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
 
 namespace MediaDeck.FileTypes.Video.Models;
+
 [Inject(InjectServiceLifetime.Transient)]
 public partial class VideoFileOperator : BaseFileOperator {
 	private readonly ConfigModel _config;
@@ -22,9 +32,9 @@ public partial class VideoFileOperator : BaseFileOperator {
 	} = MediaType.Video;
 
 	private static readonly string[] locationTagNames = [
-			"TAG:location",
-			"TAG:com.apple.quicktime.location.ISO6709"
-		];
+		"TAG:location",
+		"TAG:com.apple.quicktime.location.ISO6709"
+	];
 
 	public VideoFileOperator(IFilePathService filePathService) {
 		this._config = Ioc.Default.GetRequiredService<ConfigModel>();
@@ -75,11 +85,7 @@ public partial class VideoFileOperator : BaseFileOperator {
 			Altitude = location?.Altitude,
 			Width = metadata.PrimaryVideoStream?.Width ?? 0,
 			Height = metadata.PrimaryVideoStream?.Height ?? 0,
-			VideoFile = new() {
-				Duration = metadata.PrimaryVideoStream?.Duration.TotalSeconds,
-				Rotation = metadata.PrimaryVideoStream?.Rotation,
-				VideoMetadataValues = metadata.PrimaryVideoStream?.Tags?.Select(x => new VideoMetadataValue() { Key = x.Key, Value = x.Value }).ToList() ?? []
-			}
+			VideoFile = new() { Duration = metadata.PrimaryVideoStream?.Duration.TotalSeconds, Rotation = metadata.PrimaryVideoStream?.Rotation, VideoMetadataValues = metadata.PrimaryVideoStream?.Tags?.Select(x => new VideoMetadataValue() { Key = x.Key, Value = x.Value }).ToList() ?? [] }
 		};
 
 		await db.MediaFiles.AddAsync(mf);
@@ -90,6 +96,7 @@ public partial class VideoFileOperator : BaseFileOperator {
 
 		return mf;
 	}
+
 	/// <summary>
 	/// サムネイル作成
 	/// </summary>
@@ -99,8 +106,6 @@ public partial class VideoFileOperator : BaseFileOperator {
 	/// <param name="time">時間指定</param>
 	/// <returns>作成されたサムネイルファイル名</returns>
 	public byte[] CreateThumbnail(IFileModel fileModel, int width, int height, TimeSpan time) {
-
-
 		var metadata = FFProbe.Analyse(fileModel.FilePath);
 		if (metadata.PrimaryVideoStream is not { } videoStream) {
 			throw new Exception("PrimaryVideoStream is null");
@@ -140,7 +145,6 @@ public partial class VideoFileOperator : BaseFileOperator {
 	/// <param name="mediaAnalysis">解析結果</param>
 	/// <returns>位置情報</returns>
 	private static (double Latitude, double Longitude, double? Altitude)? GetLocation(IMediaAnalysis mediaAnalysis) {
-
 		var locationTag = mediaAnalysis.PrimaryVideoStream?.Tags?.FirstOrDefault(x => locationTagNames.Contains(x.Key)).Value;
 
 		if (locationTag is null) {

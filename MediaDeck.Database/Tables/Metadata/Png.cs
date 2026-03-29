@@ -1,4 +1,5 @@
-namespace MediaDeck.Database.Tables.Metadata; 
+namespace MediaDeck.Database.Tables.Metadata;
+
 /// <summary>
 /// Pngメタデータテーブル
 /// </summary>
@@ -205,5 +206,4 @@ public class Png : MetadataBase {
 		get;
 		set;
 	}
-
 }

@@ -1,9 +1,11 @@
 using Microsoft.UI.Xaml.Controls;
 
 namespace MediaDeck.FileTypes.Base.Views;
-public abstract class UserControlBase<T>:UserControl where T:class {
+
+public abstract class UserControlBase<T> : UserControl where T : class {
 	public T? ViewModel {
-		get; set;
+		get;
+		set;
 	}
 
 	protected UserControlBase() {
@@ -14,6 +16,5 @@ public abstract class UserControlBase<T>:UserControl where T:class {
 		};
 	}
 
-	protected virtual void OnViewModelChanged(T? oldViewModel, T? newViewModel) {
-	}
+	protected virtual void OnViewModelChanged(T? oldViewModel, T? newViewModel) { }
 }

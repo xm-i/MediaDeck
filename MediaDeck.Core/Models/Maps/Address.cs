@@ -71,8 +71,7 @@ public class Address {
 	/// コンストラクタ
 	/// </summary>
 	/// <param name="positions">この場所に含まれるPositionテーブルのデータ</param>
-	public Address(IEnumerable<Position> positions) : this(null, null, null, positions) {
-	}
+	public Address(IEnumerable<Position> positions) : this(null, null, null, positions) { }
 
 	/// <summary>
 	/// コンストラクタ子要素作成用
@@ -91,15 +90,17 @@ public class Address {
 			.Where(x => x.Addresses.Count != 0)
 			.GroupBy(x => {
 				IEnumerable<PositionAddress> q = x.Addresses.OrderByDescending(a => a.SequenceNumber);
+
 				// type指定がある場合はその次の場所からはじめる
 				if (type != null) {
 					q = q.SkipWhile(pa => pa.Type != type)
-					.Skip(1);
+						.Skip(1);
 				}
 				var pos = q
 					.FirstOrDefault(pa => !sourceArray.Contains(pa.Type));
 				return (pos?.Type, pos?.Name);
-			}).Where(x => x.Key.Type != null)
+			})
+			.Where(x => x.Key.Type != null)
 			.Select(x => new Address(this, x.Key.Type, x.Key.Name, [.. x]));
 
 		if (positionsArray.Any(x => x.Addresses.Count == 0 && !x.IsAcquired)) {
@@ -125,6 +126,7 @@ public class Address {
 		this.Count = positions.Count();
 		this.IsYet = isYet;
 		this.IsFailure = isFailure;
+
 		// 未取得、取得不可の座標一覧を出力する。
 		if (name is "未取得" or "取得不可") {
 			this.Children =

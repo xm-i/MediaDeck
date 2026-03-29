@@ -4,7 +4,8 @@ using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces;
 using MediaDeck.Composition.Objects;
 
-namespace MediaDeck.Common.Base; 
+namespace MediaDeck.Common.Base;
+
 /// <summary>
 /// ViewModel基底クラス
 /// </summary>
@@ -14,6 +15,7 @@ public class ViewModelBase : ObservableObject, IViewModelBase {
 	/// 処理を行っている途中でDisposeされるとマズイ場合、このオブジェクトでロックしておく。
 	/// </summary>
 	protected readonly DisposableLock DisposeLock = new(LockRecursionPolicy.SupportsRecursion);
+
 	/// <summary>
 	/// Dispose通知用Subject
 	/// </summary>

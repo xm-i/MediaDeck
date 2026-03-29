@@ -2,8 +2,9 @@ using MediaDeck.Common.Utilities;
 using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Database.Tables;
 
-namespace MediaDeck.Core.Models.Files; 
-public class TagModel: ITagModel {
+namespace MediaDeck.Core.Models.Files;
+
+public class TagModel : ITagModel {
 	[Obsolete("for serialize")]
 	public TagModel() {
 		this.TagCategory = null!;
@@ -12,6 +13,7 @@ public class TagModel: ITagModel {
 		this.Romaji = null!;
 		this.TagAliases = null!;
 	}
+
 	public TagModel(Tag tag) {
 		this.TagId = tag.TagId;
 		this.TagCategoryId = tag.TagCategoryId;
@@ -75,12 +77,13 @@ public class TagModel: ITagModel {
 	} = new();
 }
 
-public class TagCategoryModel: ITagCategoryModel {
+public class TagCategoryModel : ITagCategoryModel {
 	[Obsolete("for serialize")]
 	public TagCategoryModel() {
 		this.TagCategoryName = null!;
 		this.Detail = null!;
 	}
+
 	public TagCategoryModel(TagCategory tagCategory) {
 		this.TagCategoryId = tagCategory.TagCategoryId;
 		this.TagCategoryName = tagCategory.TagCategoryName;
@@ -112,11 +115,12 @@ public class TagCategoryModel: ITagCategoryModel {
 	}
 }
 
-public class TagAliasModel: ITagAliasModel {
+public class TagAliasModel : ITagAliasModel {
 	[Obsolete("for serialize")]
 	public TagAliasModel() {
 		this.Alias = null!;
 	}
+
 	public TagAliasModel(TagAlias tagAlias) {
 		this.TagAliasId = tagAlias.TagAliasId;
 		this.TagId = tagAlias.TagId;
@@ -124,6 +128,7 @@ public class TagAliasModel: ITagAliasModel {
 		this.Ruby = tagAlias.Ruby;
 		this.Romaji = (tagAlias.Ruby ?? tagAlias.Alias.KatakanaToHiragana()).HiraganaToRomaji();
 	}
+
 	/// <summary>
 	/// タグ別名ID
 	/// </summary>

@@ -2,11 +2,13 @@ using System.IO;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
 using Portable.Xaml;
 
 using MediaDeck.Composition.Interfaces.Files;
 
-namespace MediaDeck.Core.Stores.Converters; 
+namespace MediaDeck.Core.Stores.Converters;
+
 public class SearchConditionJsonConverter : JsonConverter<ISearchCondition?> {
 	public override ISearchCondition? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) {
 		var xml = reader.GetString();

@@ -5,6 +5,7 @@ using MediaDeck.Core.Primitives;
 using MediaDeck.Core.Models.Files.Filter.FilterItemObjects;
 
 namespace MediaDeck.ViewModels.Filters.FilterItemCreators;
+
 /// <summary>
 /// 座標フィルター作成ViewModel
 /// </summary>
@@ -38,8 +39,8 @@ public class LocationFilterCreatorViewModel : ViewModelBase, IFilterCreatorViewM
 	public IEnumerable<DisplayObject<bool>> HasLocationList {
 		get;
 	} = [
-		new DisplayObject<bool>("座標情報を含む",true),
-		new DisplayObject<bool>("座標情報を含まない",false)
+		new DisplayObject<bool>("座標情報を含む", true),
+		new DisplayObject<bool>("座標情報を含まない", false)
 	];
 
 	public LocationFilterCreatorViewModel(ReactiveProperty<FilteringConditionEditorViewModel?> target) {

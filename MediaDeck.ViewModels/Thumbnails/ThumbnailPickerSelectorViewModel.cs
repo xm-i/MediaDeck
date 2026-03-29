@@ -4,13 +4,12 @@ using MediaDeck.Common.Base;
 using MediaDeck.Core.Utils;
 
 namespace MediaDeck.ViewModels.Thumbnails;
+
 [Inject(InjectServiceLifetime.Transient)]
-public class ThumbnailPickerSelectorViewModel: ViewModelBase {
-
+public class ThumbnailPickerSelectorViewModel : ViewModelBase {
 	public ThumbnailPickerSelectorViewModel() {
-
 		this.FileViewModel.Subscribe(async x => {
-			if(x == null) {
+			if (x == null) {
 				this.ThumbnailPickerViewModel.Value = null;
 				this.ThumbnailPickerView.Value = null;
 				return;
@@ -25,6 +24,7 @@ public class ThumbnailPickerSelectorViewModel: ViewModelBase {
 	public BindableReactiveProperty<IThumbnailPickerViewModel?> ThumbnailPickerViewModel {
 		get;
 	} = new();
+
 	public BindableReactiveProperty<IThumbnailPickerView?> ThumbnailPickerView {
 		get;
 	} = new();

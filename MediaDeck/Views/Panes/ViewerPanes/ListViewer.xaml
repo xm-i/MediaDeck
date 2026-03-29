@@ -1,103 +1,142 @@
-<?xml version="1.0" encoding="utf-8"?>
-<local:ViewerPaneBase
-    x:Class="MediaDeck.Views.Panes.ViewerPanes.ListViewer"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:MediaDeck.Views.Panes.ViewerPanes"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+<?xml version="1.0" encoding="utf-8" ?>
+<local:ViewerPaneBase x:Class="MediaDeck.Views.Panes.ViewerPanes.ListViewer"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:local="using:MediaDeck.Views.Panes.ViewerPanes"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:controls="using:CommunityToolkit.WinUI.Controls"
 	xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
 	xmlns:behaviors="using:CommunityToolkit.WinUI.Behaviors"
 	xmlns:vmIf="using:MediaDeck.Composition.Interfaces.FileTypes.ViewModels"
 	xmlns:viewerpanes="using:MediaDeck.ViewModels.Panes.ViewerPanes"
-	mc:Ignorable="d">
+	mc:Ignorable="d" >
 	<Grid>
 		<Grid.RowDefinitions>
-			<RowDefinition Height="Auto"/>
-			<RowDefinition Height="Auto"/>
-			<RowDefinition Height="*"/>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="*" />
 		</Grid.RowDefinitions>
-		<controls:TokenizingTextBox
-			Grid.Row="0"
+		<controls:TokenizingTextBox Grid.Row="0"
 			RelativePanel.AlignVerticalCenterWithPanel="True"
 			ItemsSource="{x:Bind ViewModel.MediaContentLibraryViewModel.SearchConditions ,Mode=OneWay}"
 			SuggestedItemsSource="{x:Bind ViewModel.MediaContentLibraryViewModel.FilteredSearchConditionCandidates,Mode=OneWay}"
 			TextChanged="TokenizingTextBox_TextChanged"
 			TokenItemAdding="TokenizingTextBox_TokenItemAdding"
-			TokenItemRemoving="TokenizingTextBox_TokenItemRemoving">
+			TokenItemRemoving="TokenizingTextBox_TokenItemRemoving" >
 			<controls:TokenizingTextBox.TokenItemTemplate>
-				<DataTemplate x:DataType="viewerpanes:SearchConditionViewModel">
-					<TextBlock Text="{x:Bind DisplayText}"/>
+				<DataTemplate x:DataType="viewerpanes:SearchConditionViewModel" >
+					<TextBlock Text="{x:Bind DisplayText}" />
 				</DataTemplate>
 			</controls:TokenizingTextBox.TokenItemTemplate>
 			<controls:TokenizingTextBox.SuggestedItemTemplate>
-				<DataTemplate x:DataType="viewerpanes:SearchConditionViewModel">
-					<TextBlock Text="{x:Bind DisplayText}"/>
+				<DataTemplate x:DataType="viewerpanes:SearchConditionViewModel" >
+					<TextBlock Text="{x:Bind DisplayText}" />
 				</DataTemplate>
 			</controls:TokenizingTextBox.SuggestedItemTemplate>
 		</controls:TokenizingTextBox>
 		<!-- ヘッダー行 -->
-		<Grid Grid.Row="1" Background="{ThemeResource SubtleFillColorSecondaryBrush}" Padding="4,8">
+		<Grid Grid.Row="1"
+			Background="{ThemeResource SubtleFillColorSecondaryBrush}"
+			Padding="4,8" >
 			<Grid.ColumnDefinitions>
-				<ColumnDefinition Width="60"/>
-				<ColumnDefinition Width="*" MinWidth="200"/>
-				<ColumnDefinition Width="100"/>
-				<ColumnDefinition Width="100"/>
-				<ColumnDefinition Width="150"/>
-				<ColumnDefinition Width="60"/>
+				<ColumnDefinition Width="60" />
+				<ColumnDefinition Width="*"
+					MinWidth="200" />
+				<ColumnDefinition Width="100" />
+				<ColumnDefinition Width="100" />
+				<ColumnDefinition Width="150" />
+				<ColumnDefinition Width="60" />
 			</Grid.ColumnDefinitions>
-			<TextBlock Grid.Column="0" Text="" FontWeight="SemiBold"/>
-			<TextBlock Grid.Column="1" Text="ファイル名" FontWeight="SemiBold"/>
-			<TextBlock Grid.Column="2" Text="解像度" FontWeight="SemiBold"/>
-			<TextBlock Grid.Column="3" Text="サイズ" FontWeight="SemiBold"/>
-			<TextBlock Grid.Column="4" Text="作成日時" FontWeight="SemiBold"/>
-			<TextBlock Grid.Column="5" Text="評価" FontWeight="SemiBold"/>
+			<TextBlock Grid.Column="0"
+				Text=""
+				FontWeight="SemiBold" />
+			<TextBlock Grid.Column="1"
+				Text="ファイル名"
+				FontWeight="SemiBold" />
+			<TextBlock Grid.Column="2"
+				Text="解像度"
+				FontWeight="SemiBold" />
+			<TextBlock Grid.Column="3"
+				Text="サイズ"
+				FontWeight="SemiBold" />
+			<TextBlock Grid.Column="4"
+				Text="作成日時"
+				FontWeight="SemiBold" />
+			<TextBlock Grid.Column="5"
+				Text="評価"
+				FontWeight="SemiBold" />
 		</Grid>
-		<ListBox
-			x:Name="List"
+		<ListBox x:Name="List"
 			Grid.Row="2"
 			ItemsSource="{x:Bind ViewModel.MediaContentLibraryViewModel.Files, Mode=OneWay}"
 			SelectedItem="{x:Bind ViewModel.MediaContentLibraryViewModel.SelectedFile.Value, Mode=TwoWay}"
 			SelectionMode="Extended"
 			SelectionChanged="List_SelectionChanged"
 			ScrollViewer.VerticalScrollMode="Auto"
-			ScrollViewer.VerticalScrollBarVisibility="Auto">
+			ScrollViewer.VerticalScrollBarVisibility="Auto" >
 			<ListBox.ItemContainerStyle>
-				<Style TargetType="ListBoxItem">
-					<Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-					<Setter Property="VerticalContentAlignment" Value="Top"/>
-					<Setter Property="Padding" Value="0"/>
-					<Setter Property="Margin" Value="0"/>
-					<Setter Property="MinHeight" Value="0"/>
+				<Style TargetType="ListBoxItem" >
+					<Setter Property="HorizontalContentAlignment"
+						Value="Stretch" />
+					<Setter Property="VerticalContentAlignment"
+						Value="Top" />
+					<Setter Property="Padding"
+						Value="0" />
+					<Setter Property="Margin"
+						Value="0" />
+					<Setter Property="MinHeight"
+						Value="0" />
 				</Style>
 			</ListBox.ItemContainerStyle>
 			<ListBox.ItemsPanel>
 				<ItemsPanelTemplate>
-					<ItemsStackPanel/>
+					<ItemsStackPanel />
 				</ItemsPanelTemplate>
 			</ListBox.ItemsPanel>
 			<ListBox.ItemTemplate>
-				<DataTemplate x:DataType="vmIf:IFileViewModel">
-					<Grid DoubleTapped="File_DoubleTapped" Height="Auto">
+				<DataTemplate x:DataType="vmIf:IFileViewModel" >
+					<Grid DoubleTapped="File_DoubleTapped"
+						Height="Auto" >
 						<Grid.RowDefinitions>
-							<RowDefinition Height="Auto"/>
+							<RowDefinition Height="Auto" />
 						</Grid.RowDefinitions>
 						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="Auto" MinWidth="60"/>
-							<ColumnDefinition Width="*" MinWidth="200"/>
-							<ColumnDefinition Width="100"/>
-							<ColumnDefinition Width="100"/>
-							<ColumnDefinition Width="150"/>
-							<ColumnDefinition Width="60"/>
+							<ColumnDefinition Width="Auto"
+								MinWidth="60" />
+							<ColumnDefinition Width="*"
+								MinWidth="200" />
+							<ColumnDefinition Width="100" />
+							<ColumnDefinition Width="100" />
+							<ColumnDefinition Width="150" />
+							<ColumnDefinition Width="60" />
 						</Grid.ColumnDefinitions>
-						<Image Grid.Column="0" Stretch="Uniform" Margin="4" Height="{Binding DataContext.ItemSize.Value, Mode=OneWay, ElementName=List}" Width="{Binding DataContext.ItemSize.Value, Mode=OneWay, ElementName=List}" Source="{x:Bind ThumbnailFilePath.Value, Mode=OneWay}"/>
-						<TextBlock Grid.Column="1" Text="{x:Bind FilePath}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
-						<TextBlock Grid.Column="2" Text="{x:Bind FileModel.Resolution}" VerticalAlignment="Center"/>
-						<TextBlock Grid.Column="3" Text="{x:Bind FileModel.FileSize, Converter={StaticResource FileSizeConverter}}" VerticalAlignment="Center"/>
-						<TextBlock Grid.Column="4" Text="{x:Bind FileModel.CreationTime}" VerticalAlignment="Center"/>
-						<TextBlock Grid.Column="5" Text="{x:Bind FileModel.Rate}" VerticalAlignment="Center"/>
-						<Grid Grid.ColumnSpan="6" Opacity="0.7" Background="DarkGray" Visibility="{x:Bind Exists, Converter={StaticResource InvertBoolToVisibilityConverter}}"/>
+						<Image Grid.Column="0"
+							Stretch="Uniform"
+							Margin="4"
+							Height="{Binding DataContext.ItemSize.Value, Mode=OneWay, ElementName=List}"
+							Width="{Binding DataContext.ItemSize.Value, Mode=OneWay, ElementName=List}"
+							Source="{x:Bind ThumbnailFilePath.Value, Mode=OneWay}" />
+						<TextBlock Grid.Column="1"
+							Text="{x:Bind FilePath}"
+							VerticalAlignment="Center"
+							TextTrimming="CharacterEllipsis" />
+						<TextBlock Grid.Column="2"
+							Text="{x:Bind FileModel.Resolution}"
+							VerticalAlignment="Center" />
+						<TextBlock Grid.Column="3"
+							Text="{x:Bind FileModel.FileSize, Converter={StaticResource FileSizeConverter}}"
+							VerticalAlignment="Center" />
+						<TextBlock Grid.Column="4"
+							Text="{x:Bind FileModel.CreationTime}"
+							VerticalAlignment="Center" />
+						<TextBlock Grid.Column="5"
+							Text="{x:Bind FileModel.Rate}"
+							VerticalAlignment="Center" />
+						<Grid Grid.ColumnSpan="6"
+							Opacity="0.7"
+							Background="DarkGray"
+							Visibility="{x:Bind Exists, Converter={StaticResource InvertBoolToVisibilityConverter}}" />
 					</Grid>
 				</DataTemplate>
 			</ListBox.ItemTemplate>

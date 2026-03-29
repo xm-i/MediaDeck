@@ -1,8 +1,10 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+
 using MediaDeck.ViewModels;
 
 using Windows.Graphics;
+
 using MediaDeck.Core.Models.Services;
 
 namespace MediaDeck.Views;

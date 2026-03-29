@@ -8,6 +8,7 @@ using MediaDeck.Views;
 using Windows.Graphics;
 
 namespace MediaDeck.Utils.Tools;
+
 public static class WinUIUtility {
 	public static Window GetParentWindow(this FrameworkElement element) {
 		var parent = element.XamlRoot.Content;

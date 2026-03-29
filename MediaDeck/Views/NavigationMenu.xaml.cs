@@ -10,6 +10,7 @@ using MediaDeck.Views.Tags;
 using MediaDeck.Views.Tools;
 
 namespace MediaDeck.Views;
+
 public sealed partial class NavigationMenu : NavigationMenuUserControl {
 	public NavigationMenu() {
 		this.InitializeComponent();
@@ -17,18 +18,19 @@ public sealed partial class NavigationMenu : NavigationMenuUserControl {
 	}
 
 	private void NavigationMenu_Loaded(object sender, RoutedEventArgs e) {
-		if(this.ViewModel == null) {
+		if (this.ViewModel == null) {
 			return;
 		}
 		this.ViewModel.HasUnprocessedChanges.Subscribe(hasChanges => {
-			this.DispatcherQueue?.TryEnqueue(() => {
-				if (hasChanges) {
-					this.NotificationPulseStoryboard.Begin();
-				} else {
-					this.NotificationPulseStoryboard.Stop();
-				}
-			});
-		}).AddTo(this.ViewModel.CompositeDisposable);
+				this.DispatcherQueue?.TryEnqueue(() => {
+					if (hasChanges) {
+						this.NotificationPulseStoryboard.Begin();
+					} else {
+						this.NotificationPulseStoryboard.Stop();
+					}
+				});
+			})
+			.AddTo(this.ViewModel.CompositeDisposable);
 	}
 
 	private void MenuFlyoutItem_Click(object sender, RoutedEventArgs e) {
@@ -63,4 +65,3 @@ public sealed partial class NavigationMenu : NavigationMenuUserControl {
 }
 
 public abstract class NavigationMenuUserControl : UserControlBase<NavigationMenuViewModel>;
-

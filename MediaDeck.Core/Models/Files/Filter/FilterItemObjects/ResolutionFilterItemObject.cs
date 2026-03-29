@@ -3,6 +3,7 @@ using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Objects;
 
 namespace MediaDeck.Core.Models.Files.Filter.FilterItemObjects;
+
 /// <summary>
 /// 解像度フィルターアイテムオブジェクト
 /// </summary>
@@ -13,11 +14,11 @@ public class ResolutionFilterItemObject : IFilterItemObject {
 	public string DisplayName {
 		get {
 			var com = new Dictionary<SearchTypeComparison, string> {
-				{SearchTypeComparison.GreaterThan, "greater than"},
-				{SearchTypeComparison.GreaterThanOrEqual, "greater than or equal to"},
-				{SearchTypeComparison.Equal, "equal to"},
-				{SearchTypeComparison.LessThanOrEqual, "less than or equal to"},
-				{SearchTypeComparison.LessThan, "less than"}
+				{ SearchTypeComparison.GreaterThan, "greater than" },
+				{ SearchTypeComparison.GreaterThanOrEqual, "greater than or equal to" },
+				{ SearchTypeComparison.Equal, "equal to" },
+				{ SearchTypeComparison.LessThanOrEqual, "less than or equal to" },
+				{ SearchTypeComparison.LessThan, "less than" }
 			}[this.SearchType];
 			if (this.Width != null) {
 				return $"Width is {this.Width} {com}";
@@ -65,8 +66,7 @@ public class ResolutionFilterItemObject : IFilterItemObject {
 	}
 
 	[Obsolete("for serialize")]
-	public ResolutionFilterItemObject() {
-	}
+	public ResolutionFilterItemObject() { }
 
 	/// <summary>
 	/// コンストラクタ

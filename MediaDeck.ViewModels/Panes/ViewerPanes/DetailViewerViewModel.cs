@@ -7,10 +7,10 @@ namespace MediaDeck.ViewModels.Panes.ViewerPanes;
 
 [Inject(InjectServiceLifetime.Transient)]
 public class DetailViewerViewModel : ViewerPaneViewModelBase, IDetailViewerViewModel {
-	public DetailViewerViewModel(MediaContentLibraryViewModel mediaContentLibraryViewModel, FilesManager filesManager) : base ("Detail", filesManager){
+	public DetailViewerViewModel(MediaContentLibraryViewModel mediaContentLibraryViewModel, FilesManager filesManager) : base("Detail", filesManager) {
 		this.MediaContentLibraryViewModel = mediaContentLibraryViewModel;
 		mediaContentLibraryViewModel.SelectedFile.Subscribe(x => {
-			if (x is not {} vm) {
+			if (x is not { } vm) {
 				this.DetailViewerPreviewControlView.Value = null;
 				return;
 			}

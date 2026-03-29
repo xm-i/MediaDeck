@@ -15,14 +15,15 @@ public class SortManagerViewModel : ViewModelBase {
 		this.RemoveSortConditionCommand.Where(x => x != null).Subscribe(this.Remove);
 
 		this.SaveCommand.Subscribe(_ => {
-			this.Save();
-		}).AddTo(this.CompositeDisposable);
+				this.Save();
+			})
+			.AddTo(this.CompositeDisposable);
 
 		this.LoadCommand.Subscribe(_ => {
-			this.Load();
-		}).AddTo(this.CompositeDisposable);
+				this.Load();
+			})
+			.AddTo(this.CompositeDisposable);
 		this.SortConditions = this._sortManager.SortConditions.CreateView(x => new SortConditionEditorViewModel(x)).ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
-
 	}
 
 	private readonly SortManager _sortManager;

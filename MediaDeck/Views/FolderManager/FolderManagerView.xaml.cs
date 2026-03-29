@@ -6,6 +6,7 @@ using MediaDeck.ViewModels.FolderManager;
 using Windows.Storage.Pickers;
 
 namespace MediaDeck.Views.FolderManager;
+
 public sealed partial class FolderManagerView : FolderManagerViewUserControl {
 	public Window? ParentWindow {
 		get;
@@ -15,6 +16,7 @@ public sealed partial class FolderManagerView : FolderManagerViewUserControl {
 	public FolderManagerView() {
 		this.InitializeComponent();
 	}
+
 	private async void AddFolderButton_Click(object sender, RoutedEventArgs e) {
 		if (this.ViewModel is null) {
 			return;
@@ -66,5 +68,3 @@ public sealed partial class FolderManagerView : FolderManagerViewUserControl {
 }
 
 public abstract class FolderManagerViewUserControl : UserControlBase<FolderManagerViewModel>;
-
-

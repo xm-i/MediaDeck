@@ -10,5 +10,4 @@ public sealed partial class ImageThumbnailPickerView : ImageThumbnailPickerViewU
 	}
 }
 
-public class ImageThumbnailPickerViewUserControl : UserControlBase<ImageThumbnailPickerViewModel> {
-}
+public class ImageThumbnailPickerViewUserControl : UserControlBase<ImageThumbnailPickerViewModel> { }

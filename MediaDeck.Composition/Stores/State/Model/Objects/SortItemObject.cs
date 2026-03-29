@@ -9,7 +9,6 @@ namespace MediaDeck.Composition.Stores.State.Model.Objects;
 [Inject(InjectServiceLifetime.Scoped)]
 [GenerateR3JsonConfigDto]
 public class SortItemObject {
-
 	/// <summary>
 	/// ソートキー
 	/// </summary>
@@ -25,6 +24,7 @@ public class SortItemObject {
 		get;
 		set;
 	}
+
 	public bool Equals(SortItemObject? other) {
 		if (other is null) {
 			return false;

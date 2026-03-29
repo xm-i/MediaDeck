@@ -1,8 +1,9 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace MediaDeck.Core.Stores.Converters; 
-public class GuidJsonConverter: JsonConverter<Guid> {
+namespace MediaDeck.Core.Stores.Converters;
+
+public class GuidJsonConverter : JsonConverter<Guid> {
 	public override Guid Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) {
 		var str = reader.GetString();
 		if (str == null) {

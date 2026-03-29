@@ -10,6 +10,7 @@ using MediaDeck.FileTypes.Base.Models;
 using MediaDeck.FileTypes.Image.Utils;
 
 namespace MediaDeck.FileTypes.Archive.Models;
+
 [Inject(InjectServiceLifetime.Transient)]
 public partial class ArchiveFileOperator : BaseFileOperator {
 	private readonly IFilePathService _filePathService;
@@ -61,9 +62,7 @@ public partial class ArchiveFileOperator : BaseFileOperator {
 			LastAccessTime = fileInfo.Exists ? fileInfo.LastAccessTime : DateTime.MinValue,
 			RegisteredTime = DateTime.Now,
 			IsExists = fileInfo.Exists,
-			Container = new() {
-				PageCount = archiveFile.Entries.Count(x => this._filePathService.IsImageFile(x.Name)),
-			}
+			Container = new() { PageCount = archiveFile.Entries.Count(x => this._filePathService.IsImageFile(x.Name)), }
 		};
 
 		if (first != null) {

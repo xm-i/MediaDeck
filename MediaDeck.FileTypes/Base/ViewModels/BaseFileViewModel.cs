@@ -21,15 +21,32 @@ public abstract class BaseFileViewModel : IFileViewModel {
 
 	private long _thumbnailRefreshTicks = 0;
 
-	public IFileModel FileModel { get; }
-	public string FilePath { get; }
-	public BindableReactiveProperty<string> ThumbnailFilePath { get; }
-	public bool Exists { get; }
+	public IFileModel FileModel {
+		get;
+	}
+
+	public string FilePath {
+		get;
+	}
+
+	public BindableReactiveProperty<string> ThumbnailFilePath {
+		get;
+	}
+
+	public bool Exists {
+		get;
+	}
+
 	/// <summary>
 	/// プロパティ
 	/// </summary>
-	public Attributes<string> Properties { get; }
-	public abstract MediaType MediaType { get; }
+	public Attributes<string> Properties {
+		get;
+	}
+
+	public abstract MediaType MediaType {
+		get;
+	}
 
 	public IGpsLocation? Location {
 		get;

@@ -1,5 +1,6 @@
-namespace MediaDeck.Composition.Interfaces.Primitives; 
-public interface IGpsLocation: IComparable<IGpsLocation>, IComparable {
+namespace MediaDeck.Composition.Interfaces.Primitives;
+
+public interface IGpsLocation : IComparable<IGpsLocation>, IComparable {
 	/// <summary>
 	/// 緯度
 	/// </summary>

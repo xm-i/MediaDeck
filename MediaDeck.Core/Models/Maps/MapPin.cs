@@ -2,6 +2,7 @@ using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Composition.Interfaces.Primitives;
 
 namespace MediaDeck.Core.Models.Maps;
+
 /// <summary>
 /// マップピン
 /// </summary>

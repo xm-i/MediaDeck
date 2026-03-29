@@ -1,5 +1,6 @@
 namespace MediaDeck.Database.Tables.Metadata;
-public class Container: MetadataBase {
+
+public class Container : MetadataBase {
 	/// <summary>
 	/// ページ数
 	/// </summary>

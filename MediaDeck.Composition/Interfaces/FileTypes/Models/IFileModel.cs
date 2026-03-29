@@ -15,6 +15,7 @@ public interface IFileModel {
 	public Observable<Unit> Changed {
 		get;
 	}
+
 	public MediaType MediaType {
 		get;
 	}

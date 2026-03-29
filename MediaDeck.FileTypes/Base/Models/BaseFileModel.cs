@@ -16,13 +16,17 @@ namespace MediaDeck.FileTypes.Base.Models;
 
 public abstract class BaseFileModel : ModelBase, IFileModel {
 	private static readonly ExecutionConfigModel executionConfig;
+
 	static BaseFileModel() {
 		executionConfig = Ioc.Default.GetRequiredService<ExecutionConfigModel>();
 	}
+
 	protected IFileOperator FileOperator {
 		get;
 	}
+
 	private readonly Subject<Unit> _changed = new();
+
 	public Observable<Unit> Changed {
 		get {
 			return this._changed.AsObservable();
@@ -153,13 +157,13 @@ public abstract class BaseFileModel : ModelBase, IFileModel {
 	public virtual Attributes<string> Properties {
 		get {
 			return new Dictionary<string, string> {
-					{ "作成日時",$"{this.CreationTime}" },
-					{ "編集日時",$"{this.ModifiedTime}" },
-					{ "最終アクセス日時",$"{this.LastAccessTime}" },
-					{ "登録日時",$"{this.RegisteredTime}" },
-					{ "ファイルサイズ",$"{StringUtility.LongToFileSize(this.FileSize)}" },
-					{ "解像度" , $"{this.Resolution?.ToString()}" }
-				}.ToAttributes();
+				{ "作成日時", $"{this.CreationTime}" },
+				{ "編集日時", $"{this.ModifiedTime}" },
+				{ "最終アクセス日時", $"{this.LastAccessTime}" },
+				{ "登録日時", $"{this.RegisteredTime}" },
+				{ "ファイルサイズ", $"{StringUtility.LongToFileSize(this.FileSize)}" },
+				{ "解像度", $"{this.Resolution?.ToString()}" }
+			}.ToAttributes();
 		}
 	}
 

@@ -1,4 +1,5 @@
 namespace MediaDeck.Common.Extensions;
+
 /// <summary>
 /// コレクション拡張メソッドクラス
 /// </summary>

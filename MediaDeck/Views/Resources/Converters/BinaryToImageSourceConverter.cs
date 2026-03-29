@@ -15,9 +15,10 @@ public class BinaryToImageSourceConverter : IValueConverter {
 			using var writer = new DataWriter(stream);
 			writer.WriteBytes(binary);
 			Task.Run(async () => {
-				await writer.StoreAsync();
-				await writer.FlushAsync();
-			}).Wait();
+					await writer.StoreAsync();
+					await writer.FlushAsync();
+				})
+				.Wait();
 			writer.DetachStream();
 			stream.Seek(0);
 
