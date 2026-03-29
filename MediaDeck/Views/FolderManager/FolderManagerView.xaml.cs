@@ -7,7 +7,7 @@ using Windows.Storage.Pickers;
 
 namespace MediaDeck.Views.FolderManager;
 
-public sealed partial class FolderManagerView : FolderManagerViewUserControl {
+public sealed partial class FolderManagerView {
 	public Window? ParentWindow {
 		get;
 		set;

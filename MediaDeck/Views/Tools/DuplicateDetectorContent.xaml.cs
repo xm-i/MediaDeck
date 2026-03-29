@@ -6,7 +6,7 @@ using MediaDeck.Composition.Interfaces.FileTypes.ViewModels;
 
 namespace MediaDeck.Views.Tools;
 
-public sealed partial class DuplicateDetectorContent : UserControl {
+public sealed partial class DuplicateDetectorContent {
 	public DuplicateDetectorContent() {
 		this.InitializeComponent();
 	}
@@ -25,7 +25,7 @@ public sealed partial class DuplicateDetectorContent : UserControl {
 		DependencyProperty.Register(nameof(ViewModel),
 			typeof(DuplicateDetectorViewModel),
 			typeof(DuplicateDetectorContent),
-			new PropertyMetadata(null));
+			new(null));
 
 	private async void OnOpenFileClick(object sender, RoutedEventArgs e) {
 		if (sender is FrameworkElement { DataContext: IFileViewModel fileViewModel }) {

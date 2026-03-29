@@ -41,7 +41,7 @@ public static class WinUIUtility {
 		var x = mainPos.X + ((mainSize.Width - childSize.Width) / 2);
 		var y = mainPos.Y + ((mainSize.Height - childSize.Height) / 2);
 
-		childAppWindow.Move(new PointInt32(x, y));
+		childAppWindow.Move(new(x, y));
 	}
 
 	private static AppWindow? GetAppWindow(Window window) {

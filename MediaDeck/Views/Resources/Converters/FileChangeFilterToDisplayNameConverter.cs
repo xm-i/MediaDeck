@@ -2,8 +2,6 @@ using Microsoft.UI.Xaml.Data;
 
 using MediaDeck.ViewModels;
 
-using System;
-
 namespace MediaDeck.Views.Resources.Converters;
 
 /// <summary>
@@ -18,7 +16,7 @@ public class FileChangeFilterToDisplayNameConverter : IValueConverter {
 	/// <param name="parameter">変換パラメータ（不使用）</param>
 	/// <param name="language">言語（不使用）</param>
 	/// <returns>日本語名文字列</returns>
-	public object Convert(object value, Type targetType, object parameter, string language) {
+	public object Convert(object? value, Type targetType, object parameter, string language) {
 		if (value is FileChangeFilter filter) {
 			return filter switch {
 				FileChangeFilter.All => "すべて",

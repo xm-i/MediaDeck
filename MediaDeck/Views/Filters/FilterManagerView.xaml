@@ -110,8 +110,7 @@
 							<ColumnDefinition Width="8" />
 							<ColumnDefinition Width="Auto" />
 						</Grid.ColumnDefinitions>
-						<ComboBox x:Name="FilterCreatorComboBox"
-							Grid.Column="0"
+						<ComboBox Grid.Column="0"
 							HorizontalAlignment="Stretch"
 							PlaceholderText="フィルター項目を選択"
 							SelectionChanged="FilterCreatorComboBox_SelectionChanged"

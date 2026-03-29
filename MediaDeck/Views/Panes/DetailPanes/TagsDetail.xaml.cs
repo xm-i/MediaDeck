@@ -13,7 +13,7 @@ using MediaDeck.Core.Primitives;
 
 namespace MediaDeck.Views.Panes.DetailPanes;
 
-public sealed partial class TagsDetail : DetailPaneBase {
+public sealed partial class TagsDetail {
 	private IDisposable? _newTagRequestedSubscription;
 
 	public TagsDetail() {

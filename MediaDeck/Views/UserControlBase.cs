@@ -9,7 +9,7 @@ public abstract class UserControlBase<T> : UserControl where T : class {
 	}
 
 	protected UserControlBase() {
-		this.DataContextChanged += (s, e) => {
+		this.DataContextChanged += (_, _) => {
 			var old = this.ViewModel;
 			this.ViewModel = this.DataContext as T;
 			this.OnViewModelChanged(old, this.ViewModel);

@@ -39,12 +39,16 @@ public class ToVisibilityConverter : IValueConverter {
 	public object Convert(object value, Type targetType, object parameter, string language) {
 		if (value == this.Visible && value != _defaultValue) {
 			return Visibility.Visible;
-		} else if (value == this.Collapse && value != _defaultValue) {
-			return Visibility.Collapsed;
-		} else if (this.Visible is string v && v == "*") {
-			return Visibility.Visible;
-		} else if (this.Collapse is string c && c == "*") {
-			return Visibility.Collapsed;
+		} else {
+			if (value == this.Collapse && value != _defaultValue) {
+				return Visibility.Collapsed;
+			}
+			if (this.Visible is "*") {
+				return Visibility.Visible;
+			}
+			if (this.Collapse is "*") {
+				return Visibility.Collapsed;
+			}
 		}
 		throw new InvalidOperationException();
 	}

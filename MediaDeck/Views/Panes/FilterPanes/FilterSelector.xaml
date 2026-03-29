@@ -36,8 +36,7 @@
 					Style="{ThemeResource BodyStrongTextBlockStyle}"
 					VerticalAlignment="Center" />
 			</StackPanel>
-			<Button x:Name="OpenFilterSettingsWindowButton"
-				Grid.Column="2"
+			<Button Grid.Column="2"
 				Click="OpenFilterSettingsWindowButton_Click"
 				ToolTipService.ToolTip="Filter Settings" >
 				<FontIcon Glyph="&#xE713;"

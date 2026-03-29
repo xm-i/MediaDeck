@@ -26,9 +26,9 @@ public class ViewerPaneBase : UserControlBase<ViewerSelectorViewModel> {
 			return;
 		}
 		if (sender is ListBox listBox) {
-			vm.MediaContentLibraryViewModel.SelectedFiles.Value = listBox.SelectedItems.Select(x => x as IFileViewModel).Where(x => x is not null).ToArray()!;
+			vm.MediaContentLibraryViewModel.SelectedFiles.Value = listBox.SelectedItems.Select(x => x as IFileViewModel).Where(x => x is { }).ToArray()!;
 		} else if (sender is GridView gridView) {
-			vm.MediaContentLibraryViewModel.SelectedFiles.Value = gridView.SelectedItems.Select(x => x as IFileViewModel).Where(x => x is not null).ToArray()!;
+			vm.MediaContentLibraryViewModel.SelectedFiles.Value = gridView.SelectedItems.Select(x => x as IFileViewModel).Where(x => x is { }).ToArray()!;
 		}
 	}
 
@@ -130,17 +130,18 @@ public class ViewerPaneBase : UserControlBase<ViewerSelectorViewModel> {
 
 	protected void HandleListPointerWheelChanged(object sender, PointerRoutedEventArgs e) {
 		var ctrlKeyState = InputKeyboardSource.GetKeyStateForCurrentThread(Windows.System.VirtualKey.Control);
-		if (ctrlKeyState.HasFlag(CoreVirtualKeyStates.Down)) {
-			var delta = e.GetCurrentPoint(sender as UIElement).Properties.MouseWheelDelta;
-			if (this.ViewModel != null) {
-				var step = 20;
-				if (delta > 0) {
-					this.ViewModel.ItemSize.Value = Math.Min(500, this.ViewModel.ItemSize.Value + step);
-				} else if (delta < 0) {
-					this.ViewModel.ItemSize.Value = Math.Max(20, this.ViewModel.ItemSize.Value - step);
-				}
-			}
-			e.Handled = true;
+		if (!ctrlKeyState.HasFlag(CoreVirtualKeyStates.Down)) {
+			return;
 		}
+		var delta = e.GetCurrentPoint(sender as UIElement).Properties.MouseWheelDelta;
+		if (this.ViewModel != null) {
+			const int step = 20;
+			this.ViewModel.ItemSize.Value = delta switch {
+				> 0 => Math.Min(500, this.ViewModel.ItemSize.Value + step),
+				< 0 => Math.Max(20, this.ViewModel.ItemSize.Value - step),
+				_ => this.ViewModel.ItemSize.Value
+			};
+		}
+		e.Handled = true;
 	}
 }

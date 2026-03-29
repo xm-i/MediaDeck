@@ -8,8 +8,7 @@
 	xmlns:folderManagerVm="using:MediaDeck.ViewModels.FolderManager"
 	mc:Ignorable="d" >
 
-	<Grid x:Name="Root"
-		Padding="12" >
+	<Grid Padding="12" >
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition Width="300" />
 			<ColumnDefinition Width="12" />

@@ -17,7 +17,7 @@ public class SortKeyToDisplayNameConverter : IValueConverter {
 		{ SortItemKey.Location, "Location" },
 		{ SortItemKey.Rate, "Rate" },
 		{ SortItemKey.Resolution, "Resolution" },
-		{ SortItemKey.UsageCount, "Usage Count" },
+		{ SortItemKey.UsageCount, "Usage Count" }
 	};
 
 	public object? Convert(object value, Type targetType, object parameter, string language) {

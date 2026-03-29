@@ -10,26 +10,23 @@ using MediaDeck.ViewModels.Preferences.Config;
 namespace MediaDeck.Views.Preferences;
 
 [Inject(InjectServiceLifetime.Transient)]
-public sealed partial class ConfigWindow : Window {
+public sealed partial class ConfigWindow {
 	public ConfigWindowViewModel ViewModel {
 		get;
 	}
 
-	public ConfigWindow(ConfigWindowViewModel ConfigWindowViewModel) {
+	public ConfigWindow(ConfigWindowViewModel configWindowViewModel) {
 		this.InitializeComponent();
-		this.ViewModel = ConfigWindowViewModel;
+		this.ViewModel = configWindowViewModel;
 		this.ViewModel.LoadCommand.Execute(Unit.Default);
-		this.AppWindow.Resize(new SizeInt32(1000, 700));
+		this.AppWindow.Resize(new(1000, 700));
 		this.ViewModel.SelectedPageViewModel.Subscribe(vm => {
-			if (vm is null) {
-				return;
-			}
 			Type view;
 			switch (vm) {
-				case ScanConfigPageViewModel _:
+				case ScanConfigPageViewModel:
 					view = typeof(ScanConfigPage);
 					break;
-				case ExecutionConfigPageViewModel _:
+				case ExecutionConfigPageViewModel:
 					view = typeof(ExecutionConfigPage);
 					break;
 				default:

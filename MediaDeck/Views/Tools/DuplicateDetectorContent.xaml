@@ -2,7 +2,6 @@
 <UserControl x:Class="MediaDeck.Views.Tools.DuplicateDetectorContent"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-	xmlns:local="using:MediaDeck.Views.Tools"
 	xmlns:fvm="using:MediaDeck.Composition.Interfaces.FileTypes.ViewModels"
 	xmlns:tools="using:MediaDeck.Core.Models.Tools"
 	xmlns:controls="using:CommunityToolkit.WinUI.Controls"

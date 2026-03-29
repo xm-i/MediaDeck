@@ -6,7 +6,6 @@ using MediaDeck.Composition.Objects;
 using MediaDeck.Core.Models.NotificationDispatcher;
 
 using Microsoft.UI.Dispatching;
-using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
 namespace MediaDeck.Views.Controls;
@@ -14,7 +13,7 @@ namespace MediaDeck.Views.Controls;
 /// <summary>
 /// アプリケーション全体の通知をInfoBarで表示するコントロール
 /// </summary>
-public sealed partial class GlobalInfoBar : UserControl {
+public sealed partial class GlobalInfoBar {
 	private readonly AppNotificationDispatcher _dispatcher;
 	private readonly ConcurrentQueue<InfoBarNotification> _notificationQueue = new();
 	private readonly DispatcherQueue _dispatcherQueue;
@@ -59,7 +58,7 @@ public sealed partial class GlobalInfoBar : UserControl {
 
 		this._isShowingNotification = true;
 		this._autoCloseCts?.Cancel();
-		this._autoCloseCts = new CancellationTokenSource();
+		this._autoCloseCts = new();
 
 		this.NotificationInfoBar.Title = notification.Title;
 		this.NotificationInfoBar.Message = notification.Message;

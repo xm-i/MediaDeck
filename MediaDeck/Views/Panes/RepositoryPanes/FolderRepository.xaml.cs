@@ -2,17 +2,14 @@ using MediaDeck.ViewModels.Panes.RepositoryPanes;
 
 namespace MediaDeck.Views.Panes.RepositoryPanes;
 
-public sealed partial class FolderRepository : FolderRepositoryUserControl {
+public sealed partial class FolderRepository {
 	public FolderRepository() {
 		this.InitializeComponent();
 	}
 
 	protected override void OnViewModelChanged(RepositorySelectorViewModel? oldViewModel, RepositorySelectorViewModel? newViewModel) {
 		base.OnViewModelChanged(oldViewModel, newViewModel);
-		if (newViewModel == null) {
-			return;
-		}
-		newViewModel.LoadCommand.Execute(Unit.Default);
+		newViewModel?.LoadCommand.Execute(Unit.Default);
 	}
 
 	private void TreeViewItem_DoubleTapped(object sender, Microsoft.UI.Xaml.Input.DoubleTappedRoutedEventArgs e) {

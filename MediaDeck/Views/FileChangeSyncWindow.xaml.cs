@@ -10,11 +10,11 @@ using MediaDeck.Core.Models.Services;
 namespace MediaDeck.Views;
 
 [Inject(InjectServiceLifetime.Transient)]
-public sealed partial class FileChangeSyncWindow : Window {
+public sealed partial class FileChangeSyncWindow {
 	public FileChangeSyncWindow(FileChangeSyncViewModel viewModel) {
 		this.ViewModel = viewModel;
 		this.InitializeComponent();
-		this.AppWindow.Resize(new SizeInt32(700, 500));
+		this.AppWindow.Resize(new(700, 500));
 	}
 
 	public FileChangeSyncViewModel ViewModel {

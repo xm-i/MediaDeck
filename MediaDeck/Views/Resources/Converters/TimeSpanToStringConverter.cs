@@ -20,10 +20,11 @@ public class TimeSpanToStringConverter : IValueConverter {
 	}
 
 	public object? ConvertBack(object value, Type targetType, object parameter, string language) {
-		if (value is string str) {
-			if (TimeSpan.TryParse(str, out var timeSpan)) {
-				return timeSpan;
-			}
+		if (value is not string str) {
+			return null;
+		}
+		if (TimeSpan.TryParse(str, out var timeSpan)) {
+			return timeSpan;
 		}
 		return null;
 	}

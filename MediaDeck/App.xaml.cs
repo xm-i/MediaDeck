@@ -5,7 +5,6 @@ using CommunityToolkit.Mvvm.DependencyInjection;
 using FFMpegCore;
 
 using MediaDeck.Composition.Constants;
-using MediaDeck.Composition.Interfaces;
 using MediaDeck.Core.Stores.Config;
 using MediaDeck.Core.Stores.State;
 using MediaDeck.Database;
@@ -21,7 +20,7 @@ using Serilog.Events;
 
 namespace MediaDeck;
 
-public partial class App : Application {
+public partial class App {
 	private Window? _window;
 	private readonly ConfigStore _configStore;
 	private readonly StateStore _stateStore;
@@ -30,7 +29,7 @@ public partial class App : Application {
 	/// <summary>
 	///     ILoggerFactory for DI外クラスでのログ使用。
 	/// </summary>
-	public static ILoggerFactory LoggerFactory {
+	private static ILoggerFactory LoggerFactory {
 		get {
 			return field ??= Ioc.Default.GetRequiredService<ILoggerFactory>();
 		}
@@ -71,7 +70,7 @@ public partial class App : Application {
 			Current.Exit();
 		};
 		var logger = LoggerFactory.CreateLogger<App>();
-		AppDomain.CurrentDomain.UnhandledException += (s, e) => {
+		AppDomain.CurrentDomain.UnhandledException += (_, e) => {
 			logger.LogError(e.ExceptionObject as Exception, "UnhandledException");
 		};
 		this._window.Activate();

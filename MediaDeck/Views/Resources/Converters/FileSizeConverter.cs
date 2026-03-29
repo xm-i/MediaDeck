@@ -6,7 +6,7 @@ public class FileSizeConverter : IValueConverter {
 	private static readonly string[] _units = ["B", "KB", "MB", "GB", "TB"];
 
 	public object Convert(object value, Type targetType, object parameter, string language) {
-		if (value is not long size || size <= 0) {
+		if (value is not (long size and > 0)) {
 			return "-";
 		}
 

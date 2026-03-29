@@ -9,7 +9,7 @@ public abstract class PageBase<T> : Page where T : class {
 	}
 
 	protected PageBase() {
-		this.DataContextChanged += (s, e) => {
+		this.DataContextChanged += (_, _) => {
 			this.ViewModel = this.DataContext as T;
 		};
 	}

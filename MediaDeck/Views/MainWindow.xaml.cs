@@ -5,15 +5,15 @@ using MediaDeck.ViewModels;
 namespace MediaDeck.Views;
 
 [Inject(InjectServiceLifetime.Singleton)]
-public sealed partial class MainWindow : Window {
-	private readonly MainWindowViewModel ViewModel;
+public sealed partial class MainWindow {
+	private readonly MainWindowViewModel _viewModel;
 
 	public MainWindow(MainWindowViewModel viewModel) {
-		this.ViewModel = viewModel;
+		this._viewModel = viewModel;
 		this.InitializeComponent();
 	}
 
 	private void Window_Loaded(object sender, RoutedEventArgs e) {
-		this.ViewModel.WindowActivatedCommand.Execute(Unit.Default);
+		this._viewModel.WindowActivatedCommand.Execute(Unit.Default);
 	}
 }

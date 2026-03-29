@@ -2,7 +2,7 @@ using MediaDeck.ViewModels.Panes.DetailPanes;
 
 namespace MediaDeck.Views.Panes.DetailPanes;
 
-public sealed partial class DetailSelector : DetailSelectorUserControl {
+public sealed partial class DetailSelector {
 	public DetailSelector() {
 		this.InitializeComponent();
 	}

@@ -10,8 +10,7 @@
 	xmlns:enum="using:MediaDeck.Composition.Enum"
 	mc:Ignorable="d" >
 
-	<Grid x:Name="Root"
-		DataContext="{x:Bind ViewModel}"
+	<Grid DataContext="{x:Bind ViewModel}"
 		Padding="12" >
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition Width="220" />

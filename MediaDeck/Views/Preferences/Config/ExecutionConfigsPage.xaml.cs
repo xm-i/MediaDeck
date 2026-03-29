@@ -1,13 +1,11 @@
-using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 
-using MediaDeck.ViewModels.Preferences;
 using MediaDeck.ViewModels.Preferences.Config;
 using MediaDeck.Composition.Enum;
 
 namespace MediaDeck.Views.Preferences.Config;
 
-public sealed partial class ExecutionConfigPage : Page {
+public sealed partial class ExecutionConfigPage {
 	public ExecutionConfigPage() {
 		this.InitializeComponent();
 	}

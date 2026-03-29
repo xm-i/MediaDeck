@@ -1,12 +1,11 @@
 using CommunityToolkit.Mvvm.DependencyInjection;
 
-using MediaDeck.Utils.Tools;
 using MediaDeck.ViewModels.Panes.ViewerPanes;
 using MediaDeck.Views.Sort;
 
 namespace MediaDeck.Views.Panes.ViewerPanes;
 
-public sealed partial class ViewerSelector : ViewerSelectorUserControl {
+public sealed partial class ViewerSelector {
 	public ViewerSelector() {
 		this.InitializeComponent();
 	}

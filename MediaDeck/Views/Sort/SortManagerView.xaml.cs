@@ -5,7 +5,7 @@ using Microsoft.UI.Xaml;
 
 namespace MediaDeck.Views.Sort;
 
-public sealed partial class SortManagerView : SortManagerViewUserControl {
+public sealed partial class SortManagerView {
 	public SortManagerView() {
 		this.InitializeComponent();
 	}
@@ -18,4 +18,4 @@ public sealed partial class SortManagerView : SortManagerViewUserControl {
 	}
 }
 
-public class SortManagerViewUserControl : UserControlBase<SortManagerViewModel> { }
+public class SortManagerViewUserControl : UserControlBase<SortManagerViewModel>;

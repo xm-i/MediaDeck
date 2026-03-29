@@ -11,7 +11,7 @@ using MediaDeck.Views.Tools;
 
 namespace MediaDeck.Views;
 
-public sealed partial class NavigationMenu : NavigationMenuUserControl {
+public sealed partial class NavigationMenu {
 	public NavigationMenu() {
 		this.InitializeComponent();
 		this.Loaded += this.NavigationMenu_Loaded;
@@ -37,24 +37,14 @@ public sealed partial class NavigationMenu : NavigationMenuUserControl {
 		if (sender is not MenuFlyoutItem selectedItem) {
 			return;
 		}
-		Window? window = null;
-		switch (selectedItem.Tag.ToString()) {
-			case "TagManager":
-				window = Ioc.Default.GetRequiredService<TagManagerWindow>();
-				break;
-			case "FolderManager":
-				window = Ioc.Default.GetRequiredService<FolderManagerWindow>();
-				break;
-			case "DuplicateDetector":
-				window = Ioc.Default.GetRequiredService<DuplicateDetectorWindow>();
-				break;
-			case "Config":
-				window = Ioc.Default.GetRequiredService<ConfigWindow>();
-				break;
-			case "BackgroundTasks":
-				window = Ioc.Default.GetRequiredService<BackgroundTasksWindow>();
-				break;
-		}
+		Window? window = selectedItem.Tag.ToString() switch {
+			"TagManager" => Ioc.Default.GetRequiredService<TagManagerWindow>(),
+			"FolderManager" => Ioc.Default.GetRequiredService<FolderManagerWindow>(),
+			"DuplicateDetector" => Ioc.Default.GetRequiredService<DuplicateDetectorWindow>(),
+			"Config" => Ioc.Default.GetRequiredService<ConfigWindow>(),
+			"BackgroundTasks" => Ioc.Default.GetRequiredService<BackgroundTasksWindow>(),
+			_ => null
+		};
 		window?.ActivateCenteredOnMainWindow();
 	}
 

@@ -9,7 +9,7 @@ public class NullToBooleanConverter : IValueConverter {
 	/// <summary>
 	/// Nullの場合にfalse、それ以外はtrueを返す
 	/// </summary>
-	public object Convert(object value, Type targetType, object parameter, string language) {
+	public object Convert(object? value, Type targetType, object parameter, string language) {
 		return value != null;
 	}
 

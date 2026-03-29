@@ -8,7 +8,7 @@ using MediaDeck.Composition.Enum;
 
 namespace MediaDeck.Views.Preferences.Config;
 
-public sealed partial class ScanConfigPage : Page {
+public sealed partial class ScanConfigPage {
 	public ScanConfigPage() {
 		this.InitializeComponent();
 	}

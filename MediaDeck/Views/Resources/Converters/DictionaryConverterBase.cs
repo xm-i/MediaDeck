@@ -7,7 +7,7 @@ namespace MediaDeck.Views.Resources.Converters;
 public abstract class DictionaryConverterBase<TKey, TValue> : IValueConverter where TKey : notnull {
 	protected Dictionary<TKey, TValue> Dictionary {
 		get;
-		set;
+		init;
 	} = [];
 
 	public object? Convert(object value, Type targetType, object parameter, string language) {

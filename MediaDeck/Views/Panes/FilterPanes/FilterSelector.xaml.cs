@@ -2,13 +2,12 @@ using CommunityToolkit.Mvvm.DependencyInjection;
 
 using Microsoft.UI.Xaml;
 
-using MediaDeck.Utils.Tools;
 using MediaDeck.ViewModels.Panes.FilterPanes;
 using MediaDeck.Views.Filters;
 
 namespace MediaDeck.Views.Panes.FilterPanes;
 
-public sealed partial class FilterSelector : FilterSelectorUserControl {
+public sealed partial class FilterSelector {
 	public FilterSelector() {
 		this.InitializeComponent();
 	}
