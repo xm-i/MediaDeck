@@ -75,9 +75,7 @@ public sealed partial class MapViewer {
 			}
 
 			var topLeft = new Location(location.Latitude, location.Longitude);
-			if (this.Map.LocationToView(topLeft) is not { } viewPoint) {
-				continue;
-			}
+			var viewPoint = this.Map.LocationToView(topLeft);
 
 			// 座標とピンサイズから矩形を生成
 			var rect =
