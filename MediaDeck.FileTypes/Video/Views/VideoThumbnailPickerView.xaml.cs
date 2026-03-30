@@ -4,8 +4,8 @@ using MediaDeck.FileTypes.Base.Views;
 
 namespace MediaDeck.FileTypes.Video.Views;
 
-public sealed partial class VideoThumbnailPickerView : VideoThumbnailPickerViewUserControl, IThumbnailPickerView {
-	public VideoThumbnailPickerView() {
+internal sealed partial class VideoThumbnailPickerView : VideoThumbnailPickerViewUserControl, IThumbnailPickerView {
+	internal VideoThumbnailPickerView() {
 		this.InitializeComponent();
 		this.MediaPlayerElement.Loaded += this.MediaPlayerElement_Loaded;
 	}
@@ -22,4 +22,4 @@ public sealed partial class VideoThumbnailPickerView : VideoThumbnailPickerViewU
 	}
 }
 
-public class VideoThumbnailPickerViewUserControl : UserControlBase<VideoThumbnailPickerViewModel> { }
+internal class VideoThumbnailPickerViewUserControl : UserControlBase<VideoThumbnailPickerViewModel> { }

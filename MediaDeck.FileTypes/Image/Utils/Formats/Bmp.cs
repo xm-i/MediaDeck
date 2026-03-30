@@ -9,22 +9,8 @@ namespace MediaDeck.FileTypes.Image.Utils.Formats;
 /// <summary>
 /// Bmpメタデータ取得クラス
 /// </summary>
-public class Bmp : ImageBase {
+internal class Bmp : ImageBase {
 	private readonly IReadOnlyList<MetadataExtractor.Directory> _reader;
-
-	/// <summary>
-	/// 幅
-	/// </summary>
-	public override int Width {
-		get;
-	}
-
-	/// <summary>
-	/// 高さ
-	/// </summary>
-	public override int Height {
-		get;
-	}
 
 	/// <summary>
 	/// コンストラクタ
@@ -37,7 +23,7 @@ public class Bmp : ImageBase {
 		this.Height = d.GetUInt16(BmpHeaderDirectory.TagImageHeight);
 	}
 
-	public Database.Tables.Metadata.Bmp CreateMetadataRecord() {
+	internal Database.Tables.Metadata.Bmp CreateMetadataRecord() {
 		var metadata = new Database.Tables.Metadata.Bmp();
 
 		var b = this._reader.FirstOrDefault(x => x is BmpHeaderDirectory);

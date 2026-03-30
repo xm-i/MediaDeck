@@ -9,23 +9,8 @@ namespace MediaDeck.FileTypes.Image.Utils.Formats;
 /// <summary>
 /// Gifメタデータ取得クラス
 /// </summary>
-public class Gif : ImageBase {
+internal class Gif : ImageBase {
 	private readonly IReadOnlyList<MetadataExtractor.Directory> _reader;
-
-	/// <summary>
-	/// 幅
-	/// </summary>
-	public override int Width {
-		get;
-	}
-
-	/// <summary>
-	/// 高さ
-	/// </summary>
-	public override int Height {
-		get;
-	}
-
 	/// <summary>
 	/// コンストラクタ
 	/// </summary>
@@ -37,7 +22,7 @@ public class Gif : ImageBase {
 		this.Height = d.GetUInt16(GifHeaderDirectory.TagImageHeight);
 	}
 
-	public Database.Tables.Metadata.Gif CreateMetadataRecord() {
+	internal Database.Tables.Metadata.Gif CreateMetadataRecord() {
 		var metadata = new Database.Tables.Metadata.Gif();
 
 		var h = this._reader.FirstOrDefault(x => x is GifHeaderDirectory);

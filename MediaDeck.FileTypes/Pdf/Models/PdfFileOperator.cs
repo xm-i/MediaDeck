@@ -16,16 +16,12 @@ using MediaDeck.Composition.Enum;
 namespace MediaDeck.FileTypes.Pdf.Models;
 
 [Inject(InjectServiceLifetime.Transient)]
-public partial class PdfFileOperator : BaseFileOperator {
+internal partial class PdfFileOperator : BaseFileOperator {
 	private readonly IFilePathService _filePathService;
 
-	public PdfFileOperator(IFilePathService filePathService) {
+	public PdfFileOperator(IFilePathService filePathService) : base(MediaType.Pdf) {
 		this._filePathService = filePathService;
 	}
-
-	public override MediaType TargetMediaType {
-		get;
-	} = MediaType.Pdf;
 
 	public override async Task<MediaFile?> RegisterFileAsync(string filePath) {
 		await using var db = await this._dbFactory.CreateDbContextAsync();
@@ -84,7 +80,7 @@ public partial class PdfFileOperator : BaseFileOperator {
 	/// <param name="height">サムネイル高さ</param>
 	/// <param name="pageNumber">サムネイルにするページ番号</param>
 	/// <returns>作成されたサムネイルファイル名</returns>
-	public byte[] CreateThumbnail(string filePath, int width, int height, int pageNumber = 1) {
+	internal byte[] CreateThumbnail(string filePath, int width, int height, int pageNumber = 1) {
 		var pdfDoc = PdfDocument.Load(filePath);
 		var page = pdfDoc.Pages[pageNumber - 1];
 		using var pdfBitmap = new PdfBitmap(width, height, true);

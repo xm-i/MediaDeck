@@ -2,8 +2,8 @@ using Microsoft.UI.Xaml.Controls;
 
 namespace MediaDeck.FileTypes.Base.Views;
 
-public abstract class UserControlBase<T> : UserControl where T : class {
-	public T? ViewModel {
+internal abstract class UserControlBase<T> : UserControl where T : class {
+	internal T? ViewModel {
 		get;
 		set;
 	}

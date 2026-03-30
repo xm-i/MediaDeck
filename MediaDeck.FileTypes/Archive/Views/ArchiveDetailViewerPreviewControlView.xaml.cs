@@ -4,10 +4,10 @@ using MediaDeck.FileTypes.Base.Views;
 
 namespace MediaDeck.FileTypes.Archive.Views;
 
-public sealed partial class ArchiveDetailViewerPreviewControlView : ArchiveDetailViewerPreviewControlViewUserControl, IDetailViewerPreviewControlView {
-	public ArchiveDetailViewerPreviewControlView() {
+internal sealed partial class ArchiveDetailViewerPreviewControlView : ArchiveDetailViewerPreviewControlViewUserControl, IDetailViewerPreviewControlView {
+	internal ArchiveDetailViewerPreviewControlView() {
 		this.InitializeComponent();
 	}
 }
 
-public class ArchiveDetailViewerPreviewControlViewUserControl : UserControlBase<IDetailViewerViewModel> { }
+internal class ArchiveDetailViewerPreviewControlViewUserControl : UserControlBase<IDetailViewerViewModel> { }

@@ -4,8 +4,4 @@ using MediaDeck.FileTypes.Base.ViewModels;
 
 namespace MediaDeck.FileTypes.Pdf.ViewModels;
 
-public class PdfFileViewModel(IFileModel fileModel) : BaseFileViewModel(fileModel) {
-	public override MediaType MediaType {
-		get;
-	} = MediaType.Pdf;
-}
+internal class PdfFileViewModel(IFileModel fileModel) : BaseFileViewModel(fileModel, MediaType.Pdf);

@@ -14,7 +14,7 @@ using MediaDeck.Composition.Stores.Config.Model;
 
 namespace MediaDeck.FileTypes.Base.Models;
 
-public abstract class BaseFileModel : ModelBase, IFileModel {
+internal abstract class BaseFileModel : ModelBase, IFileModel {
 	private static readonly ExecutionConfigModel executionConfig;
 
 	static BaseFileModel() {
@@ -33,14 +33,15 @@ public abstract class BaseFileModel : ModelBase, IFileModel {
 		}
 	}
 
-	public BaseFileModel(long id, string filePath, IFileOperator fileOperator) : base() {
+	internal BaseFileModel(long id, string filePath, IFileOperator fileOperator, MediaType mediaType) : base() {
 		this.FileOperator = fileOperator;
 		this.Id = id;
 		this.FilePath = filePath;
+		this.MediaType = mediaType;
 		this._changed.AddTo(this.CompositeDisposable);
 	}
 
-	public abstract MediaType MediaType {
+	public MediaType MediaType {
 		get;
 	}
 

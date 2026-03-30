@@ -4,10 +4,10 @@ using MediaDeck.FileTypes.Image.ViewModels;
 
 namespace MediaDeck.FileTypes.Image.Views;
 
-public sealed partial class ImageThumbnailPickerView : ImageThumbnailPickerViewUserControl, IThumbnailPickerView {
-	public ImageThumbnailPickerView() {
+internal sealed partial class ImageThumbnailPickerView : ImageThumbnailPickerViewUserControl, IThumbnailPickerView {
+	internal ImageThumbnailPickerView() {
 		this.InitializeComponent();
 	}
 }
 
-public class ImageThumbnailPickerViewUserControl : UserControlBase<ImageThumbnailPickerViewModel> { }
+internal class ImageThumbnailPickerViewUserControl : UserControlBase<ImageThumbnailPickerViewModel> { }

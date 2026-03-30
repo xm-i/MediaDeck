@@ -4,10 +4,10 @@ using MediaDeck.FileTypes.Base.Views;
 
 namespace MediaDeck.FileTypes.Archive.Views;
 
-public sealed partial class ArchiveThumbnailPickerView : ArchiveThumbnailPickerViewUserControl, IThumbnailPickerView {
-	public ArchiveThumbnailPickerView() {
+internal sealed partial class ArchiveThumbnailPickerView : ArchiveThumbnailPickerViewUserControl, IThumbnailPickerView {
+	internal ArchiveThumbnailPickerView() {
 		this.InitializeComponent();
 	}
 }
 
-public class ArchiveThumbnailPickerViewUserControl : UserControlBase<ArchiveThumbnailPickerViewModel> { }
+internal class ArchiveThumbnailPickerViewUserControl : UserControlBase<ArchiveThumbnailPickerViewModel> { }

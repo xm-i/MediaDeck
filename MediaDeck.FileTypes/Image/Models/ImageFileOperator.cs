@@ -16,16 +16,12 @@ using MediaDeck.FileTypes.Image.Utils.Formats;
 namespace MediaDeck.FileTypes.Image.Models;
 
 [Inject(InjectServiceLifetime.Transient)]
-public class ImageFileOperator : BaseFileOperator {
+internal class ImageFileOperator : BaseFileOperator {
 	private readonly IFilePathService _filePathService;
 
-	public ImageFileOperator(IFilePathService filePathService) {
+	public ImageFileOperator(IFilePathService filePathService): base(MediaType.Image) {
 		this._filePathService = filePathService;
 	}
-
-	public override MediaType TargetMediaType {
-		get;
-	} = MediaType.Image;
 
 	public override async Task<MediaFile?> RegisterFileAsync(string filePath) {
 		await using var db = await this._dbFactory.CreateDbContextAsync();
@@ -107,7 +103,7 @@ public class ImageFileOperator : BaseFileOperator {
 		return mf;
 	}
 
-	public byte[] CreateThumbnail(IFileModel fileModel, uint width, uint height) {
+	internal byte[] CreateThumbnail(IFileModel fileModel, uint width, uint height) {
 		using var fileFs = File.OpenRead(fileModel.FilePath);
 		using var ms = new MemoryStream();
 		using var mi = new MagickImage(fileFs);
@@ -118,7 +114,7 @@ public class ImageFileOperator : BaseFileOperator {
 		return ms.ToArray();
 	}
 
-	public byte[] CreateThumbnail(Stream fileStream, uint width, uint height) {
+	internal byte[] CreateThumbnail(Stream fileStream, uint width, uint height) {
 		using var ms = new MemoryStream();
 		using var mi = new MagickImage(fileStream);
 		mi.AutoOrient();

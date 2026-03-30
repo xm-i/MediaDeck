@@ -23,20 +23,16 @@ using MediaDeck.Composition.Interfaces.FileTypes.Models;
 namespace MediaDeck.FileTypes.Video.Models;
 
 [Inject(InjectServiceLifetime.Transient)]
-public partial class VideoFileOperator : BaseFileOperator {
+internal partial class VideoFileOperator : BaseFileOperator {
 	private readonly ConfigModel _config;
 	private readonly IFilePathService _filePathService;
-
-	public override MediaType TargetMediaType {
-		get;
-	} = MediaType.Video;
 
 	private static readonly string[] locationTagNames = [
 		"TAG:location",
 		"TAG:com.apple.quicktime.location.ISO6709"
 	];
 
-	public VideoFileOperator(IFilePathService filePathService) {
+	public VideoFileOperator(IFilePathService filePathService): base(MediaType.Video) {
 		this._config = Ioc.Default.GetRequiredService<ConfigModel>();
 		this._filePathService = filePathService;
 	}
@@ -105,7 +101,7 @@ public partial class VideoFileOperator : BaseFileOperator {
 	/// <param name="height">サムネイル高さ</param>
 	/// <param name="time">時間指定</param>
 	/// <returns>作成されたサムネイルファイル名</returns>
-	public byte[] CreateThumbnail(IFileModel fileModel, int width, int height, TimeSpan time) {
+	internal byte[] CreateThumbnail(IFileModel fileModel, int width, int height, TimeSpan time) {
 		var metadata = FFProbe.Analyse(fileModel.FilePath);
 		if (metadata.PrimaryVideoStream is not { } videoStream) {
 			throw new Exception("PrimaryVideoStream is null");
@@ -123,7 +119,7 @@ public partial class VideoFileOperator : BaseFileOperator {
 	/// <param name="height">サムネイル高さ</param>
 	/// <param name="time">時間指定</param>
 	/// <returns>作成されたサムネイルファイル名</returns>
-	public byte[] CreateThumbnail(string filePath, int originalWidth, int originalHeight, int width, int height, TimeSpan time) {
+	internal byte[] CreateThumbnail(string filePath, int originalWidth, int originalHeight, int width, int height, TimeSpan time) {
 		if (originalWidth / width > originalHeight / height) {
 			height = -1;
 		} else {

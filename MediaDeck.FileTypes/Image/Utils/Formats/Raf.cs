@@ -10,20 +10,7 @@ namespace MediaDeck.FileTypes.Image.Utils.Formats;
 /// <summary>
 /// Rafメタデータ取得クラス
 /// </summary>
-public class Raf : ImageBase {
-	/// <summary>
-	/// 幅
-	/// </summary>
-	public override int Width {
-		get;
-	}
-
-	/// <summary>
-	/// 高さ
-	/// </summary>
-	public override int Height {
-		get;
-	}
+internal class Raf : ImageBase {
 
 	/// <summary>
 	/// コンストラクタ

@@ -5,67 +5,67 @@ namespace MediaDeck.FileTypes.Image.Utils.Formats;
 /// <summary>
 /// 画像ファイルメタデータ取得インターフェイス
 /// </summary>
-public interface IImage : IDisposable {
+internal interface IImage : IDisposable {
 	/// <summary>
 	/// 幅
 	/// </summary>
-	public int Width {
+	internal int Width {
 		get;
 	}
 
 	/// <summary>
 	/// 高さ
 	/// </summary>
-	public int Height {
+	internal int Height {
 		get;
 	}
 
 	/// <summary>
 	/// 緯度
 	/// </summary>
-	public Rational[]? Latitude {
+	internal Rational[]? Latitude {
 		get;
 	}
 
 	/// <summary>
 	/// 経度
 	/// </summary>
-	public Rational[]? Longitude {
+	internal Rational[]? Longitude {
 		get;
 	}
 
 	/// <summary>
 	/// 高度
 	/// </summary>
-	public Rational? Altitude {
+	internal Rational? Altitude {
 		get;
 	}
 
 	/// <summary>
 	/// 緯度方向(N/S)
 	/// </summary>
-	public string? LatitudeRef {
+	internal string? LatitudeRef {
 		get;
 	}
 
 	/// <summary>
 	/// 経度方向(E/W)
 	/// </summary>
-	public string? LongitudeRef {
+	internal string? LongitudeRef {
 		get;
 	}
 
 	/// <summary>
 	/// 高度方向(0/1)
 	/// </summary>
-	public byte? AltitudeRef {
+	internal byte? AltitudeRef {
 		get;
 	}
 
 	/// <summary>
 	/// 画像の方向
 	/// </summary>
-	public int? Orientation {
+	internal int? Orientation {
 		get;
 	}
 }

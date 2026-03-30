@@ -7,10 +7,9 @@ using MediaDeck.FileTypes.Base.Models;
 namespace MediaDeck.FileTypes.Unknown.Models;
 
 [Inject(InjectServiceLifetime.Transient)]
-public partial class UnknownFileOperator : BaseFileOperator {
-	public override MediaType TargetMediaType {
-		get;
-	} = MediaType.Unknown;
+internal partial class UnknownFileOperator : BaseFileOperator {
+	public UnknownFileOperator() : base(MediaType.Unknown) {
+	}
 
 	public override Task<MediaFile?> RegisterFileAsync(string filePath) {
 		throw new NotSupportedException("Unknown file type cannot be registered.");

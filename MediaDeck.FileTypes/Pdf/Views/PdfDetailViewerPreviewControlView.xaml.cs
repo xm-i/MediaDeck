@@ -4,10 +4,10 @@ using MediaDeck.FileTypes.Base.Views;
 
 namespace MediaDeck.FileTypes.Pdf.Views;
 
-public sealed partial class PdfDetailViewerPreviewControlView : PdfDetailViewerPreviewControlViewUserControl, IDetailViewerPreviewControlView {
-	public PdfDetailViewerPreviewControlView() {
+internal sealed partial class PdfDetailViewerPreviewControlView : PdfDetailViewerPreviewControlViewUserControl, IDetailViewerPreviewControlView {
+	internal PdfDetailViewerPreviewControlView() {
 		this.InitializeComponent();
 	}
 }
 
-public class PdfDetailViewerPreviewControlViewUserControl : UserControlBase<IDetailViewerViewModel> { }
+internal class PdfDetailViewerPreviewControlViewUserControl : UserControlBase<IDetailViewerViewModel> { }

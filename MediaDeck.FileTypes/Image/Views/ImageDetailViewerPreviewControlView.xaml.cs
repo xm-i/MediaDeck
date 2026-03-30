@@ -4,10 +4,10 @@ using MediaDeck.FileTypes.Base.Views;
 
 namespace MediaDeck.FileTypes.Image.Views;
 
-public sealed partial class ImageDetailViewerPreviewControlView : ImageDetailViewerPreviewControlViewUserControl, IDetailViewerPreviewControlView {
-	public ImageDetailViewerPreviewControlView() {
+internal sealed partial class ImageDetailViewerPreviewControlView : ImageDetailViewerPreviewControlViewUserControl, IDetailViewerPreviewControlView {
+	internal ImageDetailViewerPreviewControlView() {
 		this.InitializeComponent();
 	}
 }
 
-public class ImageDetailViewerPreviewControlViewUserControl : UserControlBase<IDetailViewerViewModel> { }
+internal class ImageDetailViewerPreviewControlViewUserControl : UserControlBase<IDetailViewerViewModel> { }

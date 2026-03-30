@@ -9,22 +9,8 @@ namespace MediaDeck.FileTypes.Image.Utils.Formats;
 /// <summary>
 /// Pngメタデータ取得クラス
 /// </summary>
-public class Png : ImageBase {
+internal class Png : ImageBase {
 	private readonly IReadOnlyList<MetadataExtractor.Directory> _reader;
-
-	/// <summary>
-	/// 幅
-	/// </summary>
-	public override int Width {
-		get;
-	}
-
-	/// <summary>
-	/// 高さ
-	/// </summary>
-	public override int Height {
-		get;
-	}
 
 	/// <summary>
 	/// コンストラクタ
@@ -37,7 +23,7 @@ public class Png : ImageBase {
 		this.Height = d.GetUInt16(PngDirectory.TagImageHeight);
 	}
 
-	public Database.Tables.Metadata.Png CreateMetadataRecord() {
+	internal Database.Tables.Metadata.Png CreateMetadataRecord() {
 		var metadata = new Database.Tables.Metadata.Png();
 
 		var p = this._reader.FirstOrDefault(x => x is PngDirectory);

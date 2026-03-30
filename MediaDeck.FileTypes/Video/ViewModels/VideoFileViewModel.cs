@@ -4,8 +4,4 @@ using MediaDeck.FileTypes.Base.ViewModels;
 
 namespace MediaDeck.FileTypes.Video.ViewModels;
 
-public class VideoFileViewModel(IFileModel fileModel) : BaseFileViewModel(fileModel) {
-	public override MediaType MediaType {
-		get;
-	} = MediaType.Video;
-}
+internal class VideoFileViewModel(IFileModel fileModel) : BaseFileViewModel(fileModel, MediaType.Video);

@@ -11,17 +11,13 @@ using MediaDeck.FileTypes.Video.Views;
 namespace MediaDeck.FileTypes.Video;
 
 [Inject(InjectServiceLifetime.Transient, typeof(IFileType))]
-public class VideoFileType : BaseFileType<VideoFileOperator, VideoFileModel, VideoFileViewModel, VideoDetailViewerPreviewControlView, VideoThumbnailPickerViewModel, VideoThumbnailPickerView> {
+internal class VideoFileType : BaseFileType<VideoFileOperator, VideoFileModel, VideoFileViewModel, VideoDetailViewerPreviewControlView, VideoThumbnailPickerViewModel, VideoThumbnailPickerView> {
 	private VideoDetailViewerPreviewControlView? _videoDetailViewerPreviewControlView;
 	private readonly VideoFileOperator _videoFileOperator;
 
-	public VideoFileType(VideoFileOperator videoFileOperator) {
+	public VideoFileType(VideoFileOperator videoFileOperator) : base(MediaType.Video) {
 		this._videoFileOperator = videoFileOperator;
 	}
-
-	public override MediaType MediaType {
-		get;
-	} = MediaType.Video;
 
 	public override VideoFileOperator CreateFileOperator() {
 		return this._videoFileOperator;

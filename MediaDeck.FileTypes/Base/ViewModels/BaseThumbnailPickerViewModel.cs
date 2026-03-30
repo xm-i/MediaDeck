@@ -5,8 +5,8 @@ using MediaDeck.FileTypes.Base.Models;
 
 namespace MediaDeck.FileTypes.Base.ViewModels;
 
-public abstract class BaseThumbnailPickerViewModel : IThumbnailPickerViewModel {
-	public BaseThumbnailPickerViewModel(BaseThumbnailPickerModel thumbnailPickerModel) {
+internal abstract class BaseThumbnailPickerViewModel : IThumbnailPickerViewModel {
+	internal BaseThumbnailPickerViewModel(BaseThumbnailPickerModel thumbnailPickerModel) {
 		this.RecreateThumbnailCommand.Subscribe(_ => this.RecreateThumbnail());
 		this.SaveCommand.Subscribe(async _ => await this.SaveAsync());
 		this.thumbnailPickerModel = thumbnailPickerModel;

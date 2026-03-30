@@ -4,10 +4,10 @@ using MediaDeck.FileTypes.Base.Views;
 
 namespace MediaDeck.FileTypes.Pdf.Views;
 
-public sealed partial class PdfThumbnailPickerView : PdfThumbnailPickerViewUserControl, IThumbnailPickerView {
-	public PdfThumbnailPickerView() {
+internal sealed partial class PdfThumbnailPickerView : PdfThumbnailPickerViewUserControl, IThumbnailPickerView {
+	internal PdfThumbnailPickerView() {
 		this.InitializeComponent();
 	}
 }
 
-public class PdfThumbnailPickerViewUserControl : UserControlBase<PdfThumbnailPickerViewModel> { }
+internal class PdfThumbnailPickerViewUserControl : UserControlBase<PdfThumbnailPickerViewModel> { }

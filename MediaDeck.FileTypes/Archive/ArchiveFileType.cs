@@ -11,17 +11,13 @@ using MediaDeck.Composition.Interfaces.FileTypes;
 namespace MediaDeck.FileTypes.Archive;
 
 [Inject(InjectServiceLifetime.Transient, typeof(IFileType))]
-public class ArchiveFileType : BaseFileType<ArchiveFileOperator, ArchiveFileModel, ArchiveFileViewModel, ArchiveDetailViewerPreviewControlView, ArchiveThumbnailPickerViewModel, ArchiveThumbnailPickerView> {
+internal class ArchiveFileType : BaseFileType<ArchiveFileOperator, ArchiveFileModel, ArchiveFileViewModel, ArchiveDetailViewerPreviewControlView, ArchiveThumbnailPickerViewModel, ArchiveThumbnailPickerView> {
 	private ArchiveDetailViewerPreviewControlView? _archiveDetailViewerPreviewControlView;
 	private readonly ArchiveFileOperator _archiveFileOperator;
 
-	public ArchiveFileType(ArchiveFileOperator archiveFileOperator) {
+	public ArchiveFileType(ArchiveFileOperator archiveFileOperator) : base(MediaType.Archive) {
 		this._archiveFileOperator = archiveFileOperator;
 	}
-
-	public override MediaType MediaType {
-		get;
-	} = MediaType.Archive;
 
 	public override ArchiveFileOperator CreateFileOperator() {
 		return this._archiveFileOperator;

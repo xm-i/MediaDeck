@@ -10,81 +10,62 @@ namespace MediaDeck.FileTypes.Image.Utils.Formats;
 /// <remarks>
 /// コンストラクタで受け取ったStreamをDisposeする。
 /// </remarks>
-public abstract class ImageBase : IImage {
+internal abstract class ImageBase : IImage {
 	private bool _disposedValue;
 	private readonly Stream _stream;
 
-	/// <summary>
-	/// 幅
-	/// </summary>
-	public abstract int Width {
+	/// <inheritdoc/>
+	public int Width {
 		get;
+		protected internal init;
 	}
 
-	/// <summary>
-	/// 高さ
-	/// </summary>
-	public abstract int Height {
+	/// <inheritdoc/>
+	public int Height {
 		get;
+		protected internal init;
 	}
 
-	/// <summary>
-	/// 緯度
-	/// </summary>
-	public virtual Rational[]? Latitude {
-		get {
-			return null;
-		}
-	}
-
-	/// <summary>
-	/// 経度
-	/// </summary>
-	public virtual Rational[]? Longitude {
-		get {
-			return null;
-		}
-	}
-
-	/// <summary>
-	/// 高度
-	/// </summary>
-	public virtual Rational? Altitude {
+	/// <inheritdoc/>
+	public Rational[]? Latitude {
 		get;
+		protected internal init;
 	}
 
-	/// <summary>
-	/// 緯度方向(N/S)
-	/// </summary>
-	public virtual string? LatitudeRef {
-		get {
-			return null;
-		}
-	}
-
-	/// <summary>
-	/// 経度方向(E/W)
-	/// </summary>
-	public virtual string? LongitudeRef {
-		get {
-			return null;
-		}
-	}
-
-	/// <summary>
-	/// 高度方向(0/1)
-	/// </summary>
-	public virtual byte? AltitudeRef {
+	/// <inheritdoc/>
+	public Rational[]? Longitude {
 		get;
+		protected internal init;
 	}
 
-	/// <summary>
-	/// 画像の方向
-	/// </summary>
-	public virtual int? Orientation {
-		get {
-			return null;
-		}
+	/// <inheritdoc/>
+	public Rational? Altitude {
+		get;
+		protected internal init;
+	}
+
+	/// <inheritdoc/>
+	public string? LatitudeRef {
+		get;
+		protected internal init;
+	}
+
+	/// <inheritdoc/>
+	public string? LongitudeRef {
+		get;
+		protected internal init;
+	}
+
+	/// <inheritdoc/>
+	public byte? AltitudeRef {
+		get;
+		protected internal init;
+	}
+
+	/// <inheritdoc/>
+	public int? Orientation {
+		get;
+		protected internal init;
 	}
 
 	/// <summary>
@@ -226,9 +207,7 @@ public abstract class ImageBase : IImage {
 		}
 	}
 
-	/// <summary>
-	/// Dispose
-	/// </summary>
+	/// <inheritdoc/>
 	public void Dispose() {
 		this.Dispose(true);
 		GC.SuppressFinalize(this);

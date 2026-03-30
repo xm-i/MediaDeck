@@ -8,20 +8,7 @@ namespace MediaDeck.FileTypes.Image.Utils.Formats;
 /// <summary>
 /// Psdメタデータ取得クラス
 /// </summary>
-public class Psd : ImageBase {
-	/// <summary>
-	/// 幅
-	/// </summary>
-	public override int Width {
-		get;
-	}
-
-	/// <summary>
-	/// 高さ
-	/// </summary>
-	public override int Height {
-		get;
-	}
+internal class Psd : ImageBase {
 
 	/// <summary>
 	/// コンストラクタ

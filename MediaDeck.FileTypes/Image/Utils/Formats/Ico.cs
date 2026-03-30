@@ -8,21 +8,7 @@ namespace MediaDeck.FileTypes.Image.Utils.Formats;
 /// <summary>
 /// Icoメタデータ取得クラス
 /// </summary>
-public class Ico : ImageBase {
-	/// <summary>
-	/// 幅
-	/// </summary>
-	public override int Width {
-		get;
-	}
-
-	/// <summary>
-	/// 高さ
-	/// </summary>
-	public override int Height {
-		get;
-	}
-
+internal class Ico : ImageBase {
 	/// <summary>
 	/// コンストラクタ
 	/// </summary>

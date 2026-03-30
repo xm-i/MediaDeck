@@ -9,13 +9,14 @@ using MediaDeck.Composition.Objects;
 
 namespace MediaDeck.FileTypes.Base.ViewModels;
 
-public abstract class BaseFileViewModel : IFileViewModel {
-	protected BaseFileViewModel(IFileModel fileModel) {
+internal abstract class BaseFileViewModel : IFileViewModel {
+	protected BaseFileViewModel(IFileModel fileModel, MediaType mediaType) {
 		this.FileModel = fileModel;
 		this.FilePath = fileModel.FilePath;
 		this.ThumbnailFilePath = new($"file:///{fileModel.ThumbnailFilePath ?? FilePathConstants.NoThumbnailFilePath}");
 		this.Exists = fileModel.Exists;
 		this.Properties = fileModel.Properties;
+		this.MediaType = mediaType;
 		this.Location = fileModel.Location;
 	}
 
@@ -44,7 +45,7 @@ public abstract class BaseFileViewModel : IFileViewModel {
 		get;
 	}
 
-	public abstract MediaType MediaType {
+	public MediaType MediaType {
 		get;
 	}
 

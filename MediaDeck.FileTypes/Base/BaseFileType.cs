@@ -14,14 +14,19 @@ using MediaDeck.Database.Tables;
 
 namespace MediaDeck.FileTypes.Base;
 
-public abstract class BaseFileType<TFileOperator, TFileModel, TFileViewModel, TDetailViewerPreviewControlView, TThumbnailPickerViewModel, TThumbnailPickerView> : IFileType<TFileOperator, TFileModel, TFileViewModel, TDetailViewerPreviewControlView, TThumbnailPickerViewModel, TThumbnailPickerView>
+internal abstract class BaseFileType<TFileOperator, TFileModel, TFileViewModel, TDetailViewerPreviewControlView, TThumbnailPickerViewModel, TThumbnailPickerView> : IFileType<TFileOperator, TFileModel, TFileViewModel, TDetailViewerPreviewControlView, TThumbnailPickerViewModel, TThumbnailPickerView>
 	where TFileOperator : IFileOperator
 	where TFileModel : IFileModel
 	where TFileViewModel : IFileViewModel
 	where TDetailViewerPreviewControlView : IDetailViewerPreviewControlView
 	where TThumbnailPickerViewModel : IThumbnailPickerViewModel
 	where TThumbnailPickerView : IThumbnailPickerView {
-	public abstract MediaType MediaType {
+
+	internal BaseFileType(MediaType mediaType) {
+		this.MediaType = mediaType;
+	}
+
+	public MediaType MediaType {
 		get;
 	}
 

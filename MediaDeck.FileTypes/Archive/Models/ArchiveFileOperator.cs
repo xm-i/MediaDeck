@@ -12,16 +12,12 @@ using MediaDeck.FileTypes.Image.Utils;
 namespace MediaDeck.FileTypes.Archive.Models;
 
 [Inject(InjectServiceLifetime.Transient)]
-public partial class ArchiveFileOperator : BaseFileOperator {
+internal partial class ArchiveFileOperator : BaseFileOperator {
 	private readonly IFilePathService _filePathService;
 
-	public ArchiveFileOperator(IFilePathService filePathService) {
+	public ArchiveFileOperator(IFilePathService filePathService): base(MediaType.Archive) {
 		this._filePathService = filePathService;
 	}
-
-	public override MediaType TargetMediaType {
-		get;
-	} = MediaType.Archive;
 
 	public override async Task<MediaFile?> RegisterFileAsync(string filePath) {
 		await using var db = await this._dbFactory.CreateDbContextAsync();
@@ -97,7 +93,7 @@ public partial class ArchiveFileOperator : BaseFileOperator {
 	/// <param name="height">サムネイル高さ</param>
 	/// <param name="fileName">サムネイルにするファイル名</param>
 	/// <returns>作成されたサムネイルファイル</returns>
-	public byte[] CreateThumbnail(ZipArchive archiveFile, uint width, uint height, string fileName) {
+	internal byte[] CreateThumbnail(ZipArchive archiveFile, uint width, uint height, string fileName) {
 		using var ms = new MemoryStream();
 		using var stream = archiveFile.Entries.FirstOrDefault(x => x.FullName == fileName)!.Open();
 		using var mi = new MagickImage(stream);

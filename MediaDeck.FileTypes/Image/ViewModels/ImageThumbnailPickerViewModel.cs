@@ -5,7 +5,7 @@ using MediaDeck.FileTypes.Image.Models;
 namespace MediaDeck.FileTypes.Image.ViewModels;
 
 [Inject(InjectServiceLifetime.Transient)]
-public class ImageThumbnailPickerViewModel(BaseThumbnailPickerModel thumbnailPickerModel, ImageFileOperator imageFileOperator) : BaseThumbnailPickerViewModel(thumbnailPickerModel) {
+internal class ImageThumbnailPickerViewModel(BaseThumbnailPickerModel thumbnailPickerModel, ImageFileOperator imageFileOperator) : BaseThumbnailPickerViewModel(thumbnailPickerModel) {
 	private readonly ImageFileOperator _imageFileOperator = imageFileOperator;
 
 	public override void RecreateThumbnail() {

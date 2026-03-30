@@ -5,10 +5,10 @@ using MediaDeck.FileTypes.Pdf.Models;
 namespace MediaDeck.FileTypes.Pdf.ViewModels;
 
 [Inject(InjectServiceLifetime.Transient)]
-public class PdfThumbnailPickerViewModel(BaseThumbnailPickerModel thumbnailPickerModel, PdfFileOperator pdfFileOperator) : BaseThumbnailPickerViewModel(thumbnailPickerModel) {
+internal class PdfThumbnailPickerViewModel(BaseThumbnailPickerModel thumbnailPickerModel, PdfFileOperator pdfFileOperator) : BaseThumbnailPickerViewModel(thumbnailPickerModel) {
 	private readonly PdfFileOperator _pdfFileOperator = pdfFileOperator;
 
-	public BindableReactiveProperty<int> PageNumber {
+	internal BindableReactiveProperty<int> PageNumber {
 		get;
 	} = new(1);
 

@@ -11,17 +11,13 @@ using MediaDeck.FileTypes.Image.Views;
 namespace MediaDeck.FileTypes.Image;
 
 [Inject(InjectServiceLifetime.Transient, typeof(IFileType))]
-public class ImageFileType : BaseFileType<ImageFileOperator, ImageFileModel, ImageFileViewModel, ImageDetailViewerPreviewControlView, ImageThumbnailPickerViewModel, ImageThumbnailPickerView> {
+internal class ImageFileType : BaseFileType<ImageFileOperator, ImageFileModel, ImageFileViewModel, ImageDetailViewerPreviewControlView, ImageThumbnailPickerViewModel, ImageThumbnailPickerView> {
 	private ImageDetailViewerPreviewControlView? _imageDetailViewerPreviewControlView;
 	private readonly ImageFileOperator _imageFileOperator;
 
-	public ImageFileType(ImageFileOperator imageFileOperator) {
+	public ImageFileType(ImageFileOperator imageFileOperator) : base(MediaType.Image) {
 		this._imageFileOperator = imageFileOperator;
 	}
-
-	public override MediaType MediaType {
-		get;
-	} = MediaType.Image;
 
 	public override ImageFileOperator CreateFileOperator() {
 		return this._imageFileOperator;

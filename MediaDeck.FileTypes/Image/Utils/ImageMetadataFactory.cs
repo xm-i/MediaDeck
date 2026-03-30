@@ -9,12 +9,12 @@ namespace MediaDeck.FileTypes.Image.Utils;
 /// <summary>
 /// 画像メタデータクラス
 /// </summary>
-public static class ImageMetadataFactory {
+internal static class ImageMetadataFactory {
 	/// <summary>
 	/// コンストラクタ
 	/// </summary>
 	/// <param name="stream">画像ファイルストリーム</param>
-	public static IImage Create(Stream stream) {
+	internal static IImage Create(Stream stream) {
 		return FileTypeDetector.DetectFileType(stream) switch {
 			FileType.Jpeg => new Jpeg(stream),
 			FileType.Tiff or FileType.Arw or FileType.Cr2 or FileType.Nef or FileType.Orf or FileType.Rw2 => throw new ArgumentException("Unsupported file format."),

@@ -8,20 +8,8 @@ namespace MediaDeck.FileTypes.Image.Utils.Formats;
 /// <summary>
 /// Pcxメタデータ取得クラス
 /// </summary>
-public class Pcx : ImageBase {
-	/// <summary>
-	/// 幅
-	/// </summary>
-	public override int Width {
-		get;
-	}
+internal class Pcx : ImageBase {
 
-	/// <summary>
-	/// 高さ
-	/// </summary>
-	public override int Height {
-		get;
-	}
 
 	/// <summary>
 	/// コンストラクタ

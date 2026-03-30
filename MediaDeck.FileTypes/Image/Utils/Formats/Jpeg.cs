@@ -10,71 +10,8 @@ namespace MediaDeck.FileTypes.Image.Utils.Formats;
 /// <summary>
 /// Jpegメタデータ取得クラス
 /// </summary>
-public class Jpeg : ImageBase {
+internal class Jpeg : ImageBase {
 	private readonly IReadOnlyList<MetadataExtractor.Directory> _reader;
-
-	/// <summary>
-	/// 幅
-	/// </summary>
-	public override int Width {
-		get;
-	}
-
-	/// <summary>
-	/// 高さ
-	/// </summary>
-	public override int Height {
-		get;
-	}
-
-	/// <summary>
-	/// 緯度
-	/// </summary>
-	public override Rational[]? Latitude {
-		get;
-	}
-
-	/// <summary>
-	/// 経度
-	/// </summary>
-	public override Rational[]? Longitude {
-		get;
-	}
-
-	/// <summary>
-	/// 高度
-	/// </summary>
-	public override Rational? Altitude {
-		get;
-	}
-
-	/// <summary>
-	/// 緯度方向(N/S)
-	/// </summary>
-	public override string? LatitudeRef {
-		get;
-	}
-
-	/// <summary>
-	/// 経度方向(E/W)
-	/// </summary>
-	public override string? LongitudeRef {
-		get;
-	}
-
-	/// <summary>
-	/// 高度方向(0/1)
-	/// </summary>
-	public override byte? AltitudeRef {
-		get;
-	}
-
-	/// <summary>
-	/// 画像の方向
-	/// </summary>
-	public override int? Orientation {
-		get;
-	}
 
 	/// <summary>
 	/// コンストラクタ
@@ -106,7 +43,7 @@ public class Jpeg : ImageBase {
 		}
 	}
 
-	public Database.Tables.Metadata.Jpeg CreateMetadataRecord() {
+	internal Database.Tables.Metadata.Jpeg CreateMetadataRecord() {
 		var metadata = new Database.Tables.Metadata.Jpeg();
 
 		var gps = this._reader.FirstOrDefault(x => x is GpsDirectory);

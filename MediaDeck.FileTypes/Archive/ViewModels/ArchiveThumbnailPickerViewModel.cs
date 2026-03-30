@@ -10,7 +10,7 @@ using MediaDeck.FileTypes.Base.Models;
 namespace MediaDeck.FileTypes.Archive.ViewModels;
 
 [Inject(InjectServiceLifetime.Transient)]
-public class ArchiveThumbnailPickerViewModel : BaseThumbnailPickerViewModel {
+internal class ArchiveThumbnailPickerViewModel : BaseThumbnailPickerViewModel {
 	private readonly ArchiveFileOperator _archiveFileOperator;
 	private readonly IFilePathService _filePathService;
 
@@ -27,15 +27,15 @@ public class ArchiveThumbnailPickerViewModel : BaseThumbnailPickerViewModel {
 		});
 	}
 
-	public BindableReactiveProperty<string?> FileName {
+	internal BindableReactiveProperty<string?> FileName {
 		get;
 	} = new();
 
-	public ObservableList<string> Entries {
+	internal ObservableList<string> Entries {
 		get;
 	} = [];
 
-	public BindableReactiveProperty<string?> SelectedEntry {
+	internal BindableReactiveProperty<string?> SelectedEntry {
 		get;
 	} = new();
 
