@@ -1,5 +1,3 @@
-#nullable enable
-
 using MediaDeck.Common.Base;
 using MediaDeck.Composition.Objects;
 using MediaDeck.Core.Models.Files;
