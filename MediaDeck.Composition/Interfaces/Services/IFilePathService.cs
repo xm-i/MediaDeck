@@ -6,9 +6,8 @@ public interface IFilePathService {
 	/// <summary>
 	/// サムネイル相対ファイルパス取得
 	/// </summary>
-	/// <param name="filePath">生成元ファイルパス</param>
 	/// <returns>サムネイル相対ファイルパス</returns>
-	public string GetThumbnailRelativeFilePath(string filePath);
+	public string GetThumbnailRelativeFilePath();
 
 	/// <summary>
 	/// サムネイル絶対ファイルパス取得

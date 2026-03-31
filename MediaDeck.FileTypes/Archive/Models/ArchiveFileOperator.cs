@@ -26,7 +26,7 @@ internal partial class ArchiveFileOperator : BaseFileOperator {
 		if (isExists) {
 			return null;
 		}
-		var thumbRelativePath = this._filePathService.GetThumbnailRelativeFilePath(filePath);
+		var thumbRelativePath = this._filePathService.GetThumbnailRelativeFilePath();
 		var thumbPath = this._filePathService.GetThumbnailAbsoluteFilePath(thumbRelativePath);
 
 		using var archiveFile = ZipFile.Open(filePath, ZipArchiveMode.Read);

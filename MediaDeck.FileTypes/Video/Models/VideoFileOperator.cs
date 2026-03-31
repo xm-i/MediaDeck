@@ -40,7 +40,7 @@ internal partial class VideoFileOperator : BaseFileOperator {
 		}
 		var metadata = FFProbe.Analyse(filePath);
 
-		var thumbRelativePath = this._filePathService.GetThumbnailRelativeFilePath(filePath);
+		var thumbRelativePath = this._filePathService.GetThumbnailRelativeFilePath();
 		var thumbPath = this._filePathService.GetThumbnailAbsoluteFilePath(thumbRelativePath);
 		try {
 			if (metadata.PrimaryVideoStream is not { } videoStream) {

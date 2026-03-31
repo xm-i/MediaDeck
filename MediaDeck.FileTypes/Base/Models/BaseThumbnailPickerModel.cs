@@ -14,7 +14,7 @@ internal class BaseThumbnailPickerModel(IDbContextFactory<MediaDeckDbContext> db
 	private readonly IFilePathService _filePathService = filePathService;
 
 	internal async Task UpdateThumbnailAsync(IFileModel fileModel, byte[] thumbnail) {
-		var thumbRelativePath = this._filePathService.GetThumbnailRelativeFilePath(fileModel.FilePath);
+		var thumbRelativePath = this._filePathService.GetThumbnailRelativeFilePath();
 		var thumbPath = this._filePathService.GetThumbnailAbsoluteFilePath(thumbRelativePath);
 		await File.WriteAllBytesAsync(thumbPath, thumbnail);
 

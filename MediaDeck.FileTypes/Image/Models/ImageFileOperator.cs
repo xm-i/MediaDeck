@@ -33,7 +33,7 @@ internal class ImageFileOperator : BaseFileOperator {
 			fileFs.CopyTo(fileMs);
 			fileMs.Position = 0;
 		}
-		var thumbRelativePath = this._filePathService.GetThumbnailRelativeFilePath(filePath);
+		var thumbRelativePath = this._filePathService.GetThumbnailRelativeFilePath();
 		var thumbPath = this._filePathService.GetThumbnailAbsoluteFilePath(thumbRelativePath);
 		try {
 			var image = this.CreateThumbnail(fileMs, 300, 300);

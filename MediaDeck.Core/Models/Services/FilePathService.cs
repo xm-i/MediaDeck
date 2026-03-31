@@ -1,6 +1,3 @@
-using System.Security.Cryptography;
-using System.Text;
-
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Stores.Config.Model;
 
@@ -15,8 +12,9 @@ public class FilePathService : IFilePathService {
 	}
 
 	/// <inheritdoc/>
-	public string GetThumbnailRelativeFilePath(string filePath) {
-		return $"{string.Join("", SHA512.HashData(Encoding.UTF8.GetBytes(filePath)).Select(b => $"{b:X2}")).Insert(2, @"\")}.jpg";
+	public string GetThumbnailRelativeFilePath() {
+		var uuid = Guid.NewGuid().ToString("N");
+		return @$"{uuid[..2]}\{uuid[2..]}.jpg";
 	}
 
 	/// <inheritdoc/>

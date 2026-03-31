@@ -27,7 +27,7 @@ internal partial class PdfFileOperator : BaseFileOperator {
 			return null;
 		}
 
-		var thumbRelativePath = this._filePathService.GetThumbnailRelativeFilePath(filePath);
+		var thumbRelativePath = this._filePathService.GetThumbnailRelativeFilePath();
 		var thumbPath = this._filePathService.GetThumbnailAbsoluteFilePath(thumbRelativePath);
 		try {
 			var image = this.CreateThumbnail(filePath, 300, 300, 1);
