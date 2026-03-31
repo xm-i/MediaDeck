@@ -9,7 +9,6 @@ namespace MediaDeck.FileTypes.Image.Utils.Formats;
 /// Netpbmメタデータ取得クラス
 /// </summary>
 internal class Netpbm : ImageBase {
-
 	/// <summary>
 	/// コンストラクタ
 	/// </summary>

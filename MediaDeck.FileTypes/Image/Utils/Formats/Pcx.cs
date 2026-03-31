@@ -9,8 +9,6 @@ namespace MediaDeck.FileTypes.Image.Utils.Formats;
 /// Pcxメタデータ取得クラス
 /// </summary>
 internal class Pcx : ImageBase {
-
-
 	/// <summary>
 	/// コンストラクタ
 	/// </summary>

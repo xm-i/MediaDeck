@@ -6,7 +6,6 @@ namespace MediaDeck.FileTypes.Image.Utils.Formats;
 /// Tiffメタデータ取得クラス
 /// </summary>
 internal class Tiff : ImageBase {
-
 	/// <summary>
 	/// コンストラクタ
 	/// </summary>

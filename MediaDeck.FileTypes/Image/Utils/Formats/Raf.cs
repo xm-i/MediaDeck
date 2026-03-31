@@ -11,7 +11,6 @@ namespace MediaDeck.FileTypes.Image.Utils.Formats;
 /// Rafメタデータ取得クラス
 /// </summary>
 internal class Raf : ImageBase {
-
 	/// <summary>
 	/// コンストラクタ
 	/// </summary>

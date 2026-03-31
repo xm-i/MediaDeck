@@ -11,6 +11,7 @@ namespace MediaDeck.FileTypes.Image.Utils.Formats;
 /// </summary>
 internal class Gif : ImageBase {
 	private readonly IReadOnlyList<MetadataExtractor.Directory> _reader;
+
 	/// <summary>
 	/// コンストラクタ
 	/// </summary>

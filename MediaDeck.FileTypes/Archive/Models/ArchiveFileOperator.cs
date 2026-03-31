@@ -15,7 +15,7 @@ namespace MediaDeck.FileTypes.Archive.Models;
 internal partial class ArchiveFileOperator : BaseFileOperator {
 	private readonly IFilePathService _filePathService;
 
-	public ArchiveFileOperator(IFilePathService filePathService): base(MediaType.Archive) {
+	public ArchiveFileOperator(IFilePathService filePathService) : base(MediaType.Archive) {
 		this._filePathService = filePathService;
 	}
 

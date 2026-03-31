@@ -19,7 +19,7 @@ namespace MediaDeck.FileTypes.Image.Models;
 internal class ImageFileOperator : BaseFileOperator {
 	private readonly IFilePathService _filePathService;
 
-	public ImageFileOperator(IFilePathService filePathService): base(MediaType.Image) {
+	public ImageFileOperator(IFilePathService filePathService) : base(MediaType.Image) {
 		this._filePathService = filePathService;
 	}
 

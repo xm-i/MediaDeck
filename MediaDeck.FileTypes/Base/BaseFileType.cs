@@ -21,7 +21,6 @@ internal abstract class BaseFileType<TFileOperator, TFileModel, TFileViewModel, 
 	where TDetailViewerPreviewControlView : IDetailViewerPreviewControlView
 	where TThumbnailPickerViewModel : IThumbnailPickerViewModel
 	where TThumbnailPickerView : IThumbnailPickerView {
-
 	internal BaseFileType(MediaType mediaType) {
 		this.MediaType = mediaType;
 	}

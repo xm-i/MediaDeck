@@ -35,12 +35,16 @@ public class ExecutionProgramConfigViewModel : ViewModelBase {
 	/// <summary>
 	/// メディアタイプの選択肢一覧
 	/// </summary>
-	public MediaType[] MediaTypeConditions { get; } = Enum.GetValues<MediaType>();
+	public MediaType[] MediaTypeConditions {
+		get;
+	} = Enum.GetValues<MediaType>();
 
 	/// <summary>
 	/// このプログラムを削除するコマンド
 	/// </summary>
-	public ReactiveCommand RemoveCommand { get; } = new();
+	public ReactiveCommand RemoveCommand {
+		get;
+	} = new();
 
 	public ExecutionProgramConfigViewModel(ExecutionProgramObjectModel executionProgramConfigModel, ExecutionConfigModel executionConfig) {
 		this.Path = executionProgramConfigModel.Path.ToTwoWayBindableReactiveProperty(string.Empty).AddTo(this.CompositeDisposable);
@@ -48,7 +52,8 @@ public class ExecutionProgramConfigViewModel : ViewModelBase {
 		this.MediaType = executionProgramConfigModel.MediaType.ToTwoWayBindableReactiveProperty(Composition.Enum.MediaType.Image).AddTo(this.CompositeDisposable);
 
 		this.RemoveCommand.Subscribe(_ => {
-			executionConfig.RemoveExecutionProgram(executionProgramConfigModel);
-		}).AddTo(this.CompositeDisposable);
+				executionConfig.RemoveExecutionProgram(executionProgramConfigModel);
+			})
+			.AddTo(this.CompositeDisposable);
 	}
 }

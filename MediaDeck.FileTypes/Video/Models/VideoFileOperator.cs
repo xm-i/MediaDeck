@@ -32,7 +32,7 @@ internal partial class VideoFileOperator : BaseFileOperator {
 		"TAG:com.apple.quicktime.location.ISO6709"
 	];
 
-	public VideoFileOperator(IFilePathService filePathService): base(MediaType.Video) {
+	public VideoFileOperator(IFilePathService filePathService) : base(MediaType.Video) {
 		this._config = Ioc.Default.GetRequiredService<ConfigModel>();
 		this._filePathService = filePathService;
 	}

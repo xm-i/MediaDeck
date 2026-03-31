@@ -3,6 +3,7 @@ using System;
 using Microsoft.Extensions.Logging;
 
 namespace MediaDeck.Database;
+
 /// <summary>
 /// ログ出力クラス
 /// </summary>

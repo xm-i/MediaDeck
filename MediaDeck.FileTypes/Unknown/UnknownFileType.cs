@@ -14,8 +14,8 @@ namespace MediaDeck.FileTypes.Unknown;
 internal class UnknownFileType : BaseFileType<UnknownFileOperator, UnknownFileModel, UnknownFileViewModel, UnknownDetailViewerPreviewControlView, UnknownThumbnailPickerViewModel, UnknownThumbnailPickerView> {
 	private UnknownDetailViewerPreviewControlView? _unknownDetailViewerPreviewControlView;
 
-	public UnknownFileType() : base(MediaType.Unknown) {
-	}
+	public UnknownFileType() : base(MediaType.Unknown) { }
+
 	public override UnknownFileOperator CreateFileOperator() {
 		return new UnknownFileOperator();
 	}

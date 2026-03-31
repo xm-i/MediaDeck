@@ -9,7 +9,6 @@ namespace MediaDeck.FileTypes.Image.Utils.Formats;
 /// Psdメタデータ取得クラス
 /// </summary>
 internal class Psd : ImageBase {
-
 	/// <summary>
 	/// コンストラクタ
 	/// </summary>

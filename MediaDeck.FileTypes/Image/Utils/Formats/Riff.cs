@@ -9,7 +9,6 @@ namespace MediaDeck.FileTypes.Image.Utils.Formats;
 /// Riffメタデータ取得クラス
 /// </summary>
 internal class Riff : ImageBase {
-
 	/// <summary>
 	/// コンストラクタ
 	/// </summary>
