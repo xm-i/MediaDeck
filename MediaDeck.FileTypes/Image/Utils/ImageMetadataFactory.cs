@@ -1,8 +1,8 @@
 using System.IO;
 
-using MetadataExtractor.Util;
-
 using MediaDeck.FileTypes.Image.Utils.Formats;
+
+using MetadataExtractor.Util;
 
 namespace MediaDeck.FileTypes.Image.Utils;
 

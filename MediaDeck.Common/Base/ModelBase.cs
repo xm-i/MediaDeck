@@ -1,12 +1,11 @@
-using MediaDeck.Composition.Enum;
-using MediaDeck.Composition.Objects;
+using System.Collections.Concurrent;
+using System.Runtime.CompilerServices;
 
 using CommunityToolkit.Mvvm.ComponentModel;
 
-using System.Runtime.CompilerServices;
-using System.Collections.Concurrent;
-
+using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces;
+using MediaDeck.Composition.Objects;
 
 namespace MediaDeck.Common.Base;
 

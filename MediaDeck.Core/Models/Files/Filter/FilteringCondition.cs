@@ -1,9 +1,8 @@
-using MediaDeck.Database.Tables;
-using MediaDeck.Composition.Interfaces.FileTypes.Models;
-using MediaDeck.Composition.Interfaces.Files;
-using MediaDeck.Composition.Stores.State.Model.Objects;
 using MediaDeck.Common.Base;
-using MediaDeck.Core.Models.Files.Filter;
+using MediaDeck.Composition.Interfaces.Files;
+using MediaDeck.Composition.Interfaces.FileTypes.Models;
+using MediaDeck.Composition.Stores.State.Model.Objects;
+using MediaDeck.Database.Tables;
 
 namespace MediaDeck.Core.Models.Files.Filter;
 

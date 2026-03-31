@@ -1,9 +1,9 @@
 using CommunityToolkit.Mvvm.DependencyInjection;
 
-using Microsoft.UI.Xaml;
-
 using MediaDeck.ViewModels.Panes.FilterPanes;
 using MediaDeck.Views.Filters;
+
+using Microsoft.UI.Xaml;
 
 namespace MediaDeck.Views.Panes.FilterPanes;
 

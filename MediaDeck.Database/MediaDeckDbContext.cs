@@ -1,7 +1,7 @@
-using Microsoft.EntityFrameworkCore;
-
 using MediaDeck.Database.Tables;
 using MediaDeck.Database.Tables.Metadata;
+
+using Microsoft.EntityFrameworkCore;
 
 namespace MediaDeck.Database;
 

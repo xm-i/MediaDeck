@@ -1,8 +1,8 @@
 using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
-using MediaDeck.Database.Tables;
 using MediaDeck.Core.Models.FileDetailManagers.Objects;
 using MediaDeck.Core.Primitives;
+using MediaDeck.Database.Tables;
 
 namespace MediaDeck.Core.Models.FileDetailManagers;
 

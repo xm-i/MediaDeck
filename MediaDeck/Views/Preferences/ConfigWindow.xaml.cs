@@ -1,11 +1,6 @@
-using Microsoft.UI.Xaml;
-
 using MediaDeck.ViewModels.Preferences;
-using MediaDeck.Views.Preferences.Config;
-
-using Windows.Graphics;
-
 using MediaDeck.ViewModels.Preferences.Config;
+using MediaDeck.Views.Preferences.Config;
 
 namespace MediaDeck.Views.Preferences;
 

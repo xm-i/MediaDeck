@@ -1,9 +1,9 @@
 using System.Threading.Tasks;
 
+using Windows.Storage.Streams;
+
 using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Media.Imaging;
-
-using Windows.Storage.Streams;
 
 namespace MediaDeck.Views.Resources.Converters;
 

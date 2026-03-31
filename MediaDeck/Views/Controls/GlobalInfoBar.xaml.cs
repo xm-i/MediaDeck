@@ -2,6 +2,8 @@ using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 
+using CommunityToolkit.Mvvm.DependencyInjection;
+
 using MediaDeck.Composition.Objects;
 using MediaDeck.Core.Models.NotificationDispatcher;
 
@@ -26,7 +28,7 @@ public sealed partial class GlobalInfoBar {
 	public GlobalInfoBar() {
 		this.InitializeComponent();
 		this._dispatcherQueue = DispatcherQueue.GetForCurrentThread();
-		this._dispatcher = CommunityToolkit.Mvvm.DependencyInjection.Ioc.Default.GetRequiredService<AppNotificationDispatcher>();
+		this._dispatcher = Ioc.Default.GetRequiredService<AppNotificationDispatcher>();
 		this._dispatcher.Notify
 			.ObserveOnCurrentSynchronizationContext()
 			.Subscribe(appNotification => {

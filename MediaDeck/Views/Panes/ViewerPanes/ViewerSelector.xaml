@@ -27,8 +27,7 @@
 				SelectionMode="Single"
 				ItemsSource="{x:Bind ViewModel.ViewerPaneViewModels}"
 				SelectedItem="{x:Bind ViewModel.SelectedViewerPane.Value,Mode=TwoWay}"
-				DisplayMemberPath="Name" >
-			</controls:Segmented>
+				DisplayMemberPath="Name" />
 			<StackPanel Grid.Column="3"
 				Orientation="Horizontal"
 				Spacing="6" >

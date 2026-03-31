@@ -1,13 +1,12 @@
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
+using MediaDeck.Common.Base;
+using MediaDeck.Common.Extensions;
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Objects;
-using MediaDeck.Common.Base;
-using MediaDeck.Common.Extensions;
-using MediaDeck.Core.Primitives;
 using MediaDeck.Core.Models.Files.Filter.FilterItemObjects;
+using MediaDeck.Core.Primitives;
 
 namespace MediaDeck.ViewModels.Filters.FilterItemCreators;
 

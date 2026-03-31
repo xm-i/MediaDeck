@@ -10,8 +10,7 @@
 	<converters:ToVisibilityConverter x:Key="NullToCollapseConverter"
 		Collapse="{x:Null}"
 		Visible="*" />
-	<converters:InvertBoolToVisibilityConverter x:Key="InvertBoolToVisibilityConverter" >
-	</converters:InvertBoolToVisibilityConverter>
+	<converters:InvertBoolToVisibilityConverter x:Key="InvertBoolToVisibilityConverter" />
 	<converters:SortKeyToDisplayNameConverter x:Key="SortKeyToDisplayNameConverter" />
 	<converters:ListSortDirectionToIconGlyphConverter x:Key="ListSortDirectionToIconGlyphConverter" />
 	<converters:ListSortDirectionToBooleanConverter x:Key="ListSortDirectionToBooleanConverter" />

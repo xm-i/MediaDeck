@@ -1,11 +1,10 @@
-using System.Collections.Generic;
 using System.Diagnostics;
 
-using MediaDeck.Composition.Interfaces.FileTypes.ViewModels;
 using MediaDeck.Common.Base;
-using MediaDeck.Core.Utils;
+using MediaDeck.Composition.Interfaces.FileTypes.ViewModels;
 using MediaDeck.Core.Models.Tools;
 using MediaDeck.Core.Primitives;
+using MediaDeck.Core.Utils;
 
 namespace MediaDeck.ViewModels.Tools;
 

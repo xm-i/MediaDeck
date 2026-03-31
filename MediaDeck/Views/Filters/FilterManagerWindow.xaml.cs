@@ -1,8 +1,4 @@
-using Microsoft.UI.Xaml;
-
 using MediaDeck.ViewModels.Filters;
-
-using Windows.Graphics;
 
 namespace MediaDeck.Views.Filters;
 

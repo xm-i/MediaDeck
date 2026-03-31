@@ -1,10 +1,10 @@
 using System.ComponentModel;
 
+using MediaDeck.Common.Base;
+using MediaDeck.Common.Extensions;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Composition.Stores.State.Model.Objects;
-using MediaDeck.Common.Base;
-using MediaDeck.Common.Extensions;
 
 namespace MediaDeck.Core.Models.Files.Sort;
 

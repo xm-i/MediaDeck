@@ -1,6 +1,6 @@
 using MediaDeck.Common.Base;
-using MediaDeck.Core.Models.Files.Filter;
 using MediaDeck.Core.Models.Files;
+using MediaDeck.Core.Models.Files.Filter;
 using MediaDeck.Core.Stores.State;
 
 namespace MediaDeck.ViewModels.Panes.FilterPanes;

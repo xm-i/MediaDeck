@@ -1,5 +1,3 @@
-using System.Threading.Tasks;
-
 namespace MediaDeck.Composition.Interfaces.FileTypes.ViewModels;
 
 public interface IThumbnailPickerViewModel {

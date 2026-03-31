@@ -1,5 +1,3 @@
-using System.Text.Json.Serialization;
-
 using R3.JsonConfig.Attributes;
 
 namespace MediaDeck.Composition.Stores.State.Model.Objects;

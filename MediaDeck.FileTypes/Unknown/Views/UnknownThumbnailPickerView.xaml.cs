@@ -1,6 +1,6 @@
-using MediaDeck.FileTypes.Unknown.ViewModels;
 using MediaDeck.Composition.Interfaces.FileTypes.Views;
 using MediaDeck.FileTypes.Base.Views;
+using MediaDeck.FileTypes.Unknown.ViewModels;
 
 namespace MediaDeck.FileTypes.Unknown.Views;
 

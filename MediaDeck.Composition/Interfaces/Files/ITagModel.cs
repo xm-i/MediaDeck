@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace MediaDeck.Composition.Interfaces.Files;
 
 public interface ITagModel {

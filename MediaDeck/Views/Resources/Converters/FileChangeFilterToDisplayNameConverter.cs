@@ -1,6 +1,6 @@
-using Microsoft.UI.Xaml.Data;
-
 using MediaDeck.ViewModels;
+
+using Microsoft.UI.Xaml.Data;
 
 namespace MediaDeck.Views.Resources.Converters;
 

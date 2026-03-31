@@ -1,8 +1,8 @@
-using Microsoft.UI.Xaml.Controls;
-
 using MediaDeck.ViewModels.Filters;
 using MediaDeck.ViewModels.Filters.FilterItemCreators;
 using MediaDeck.Views.Filters.FilterItemCreators;
+
+using Microsoft.UI.Xaml.Controls;
 
 namespace MediaDeck.Views.Filters;
 

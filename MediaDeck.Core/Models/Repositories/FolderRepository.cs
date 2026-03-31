@@ -1,5 +1,3 @@
-using System.IO;
-
 using MediaDeck.Common.Extensions;
 using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Core.Models.Files.SearchConditions;

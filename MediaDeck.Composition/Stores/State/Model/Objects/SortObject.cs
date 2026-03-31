@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 using Microsoft.Extensions.DependencyInjection;
 
 using R3.JsonConfig.Attributes;

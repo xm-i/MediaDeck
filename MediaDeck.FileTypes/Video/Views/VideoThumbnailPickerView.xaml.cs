@@ -1,6 +1,10 @@
+using Windows.Media.Playback;
+
 using MediaDeck.Composition.Interfaces.FileTypes.Views;
-using MediaDeck.FileTypes.Video.ViewModels;
 using MediaDeck.FileTypes.Base.Views;
+using MediaDeck.FileTypes.Video.ViewModels;
+
+using Microsoft.UI.Xaml;
 
 namespace MediaDeck.FileTypes.Video.Views;
 
@@ -10,11 +14,11 @@ internal sealed partial class VideoThumbnailPickerView : VideoThumbnailPickerVie
 		this.MediaPlayerElement.Loaded += this.MediaPlayerElement_Loaded;
 	}
 
-	private void MediaPlayerElement_Loaded(object sender, Microsoft.UI.Xaml.RoutedEventArgs e) {
+	private void MediaPlayerElement_Loaded(object sender, RoutedEventArgs e) {
 		this.MediaPlayerElement.MediaPlayer.PlaybackSession.PositionChanged += this.PlaybackSession_PositionChanged;
 	}
 
-	private void PlaybackSession_PositionChanged(Windows.Media.Playback.MediaPlaybackSession sender, object args) {
+	private void PlaybackSession_PositionChanged(MediaPlaybackSession sender, object args) {
 		if (this.ViewModel is not { } vm) {
 			return;
 		}

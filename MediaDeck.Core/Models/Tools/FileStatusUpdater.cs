@@ -1,5 +1,3 @@
-using System.IO;
-
 using MediaDeck.Database;
 using MediaDeck.Database.Tables;
 

@@ -1,5 +1,5 @@
-using MediaDeck.Database;
 using MediaDeck.Common.Utilities;
+using MediaDeck.Database;
 
 using Microsoft.Extensions.Logging;
 

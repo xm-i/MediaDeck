@@ -1,5 +1,5 @@
-using System.Text;
 using System.Security.Cryptography;
+using System.Text;
 
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Stores.Config.Model;

@@ -1,12 +1,12 @@
 using CommunityToolkit.Mvvm.DependencyInjection;
 
+using MediaDeck.Composition.Enum;
+using MediaDeck.Composition.Interfaces.FileTypes;
 using MediaDeck.Database.Tables;
-using MediaDeck.FileTypes.Base;
 using MediaDeck.FileTypes.Archive.Models;
 using MediaDeck.FileTypes.Archive.ViewModels;
 using MediaDeck.FileTypes.Archive.Views;
-using MediaDeck.Composition.Enum;
-using MediaDeck.Composition.Interfaces.FileTypes;
+using MediaDeck.FileTypes.Base;
 
 namespace MediaDeck.FileTypes.Archive;
 

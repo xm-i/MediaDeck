@@ -1,6 +1,6 @@
-using Microsoft.UI.Xaml;
-
 using MediaDeck.ViewModels;
+
+using Microsoft.UI.Xaml;
 
 namespace MediaDeck.Views;
 

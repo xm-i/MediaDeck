@@ -1,6 +1,6 @@
+using MediaDeck.Common.Base;
 using MediaDeck.Composition.Interfaces.FileTypes.ViewModels;
 using MediaDeck.Composition.Interfaces.FileTypes.Views;
-using MediaDeck.Common.Base;
 using MediaDeck.Core.Utils;
 
 namespace MediaDeck.ViewModels.Thumbnails;

@@ -1,24 +1,18 @@
-using MediaDeck.Database.Tables;
-
+using System.Drawing;
 using System.IO;
-
-using FFMpegCore;
-
 using System.Text.RegularExpressions;
-
-using MediaDeck.Database.Tables.Metadata;
+using System.Threading.Tasks;
 
 using CommunityToolkit.Mvvm.DependencyInjection;
 
-using System.Drawing;
+using FFMpegCore;
 
-using MediaDeck.FileTypes.Base.Models;
-
-using System.Threading.Tasks;
-
-using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
+using MediaDeck.Composition.Stores.Config.Model;
+using MediaDeck.Database.Tables;
+using MediaDeck.Database.Tables.Metadata;
+using MediaDeck.FileTypes.Base.Models;
 
 namespace MediaDeck.FileTypes.Video.Models;
 

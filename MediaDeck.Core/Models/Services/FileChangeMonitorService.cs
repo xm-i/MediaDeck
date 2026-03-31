@@ -1,15 +1,13 @@
 #nullable enable
-using MediaDeck.Composition.Objects;
-using MediaDeck.Database;
-
-using Microsoft.Extensions.Logging;
 
 using MediaDeck.Common.Base;
+using MediaDeck.Composition.Objects;
 using MediaDeck.Core.Models.Files;
 using MediaDeck.Core.Models.NotificationDispatcher;
 using MediaDeck.Core.Stores.State;
+using MediaDeck.Database;
 
-using System.IO;
+using Microsoft.Extensions.Logging;
 
 namespace MediaDeck.Core.Models.Services;
 
@@ -95,7 +93,7 @@ public class FileChangeMonitorService : ModelBase {
 	/// </summary>
 	/// <param name="items">反映対象のアイテム一覧</param>
 	/// <param name="deleteFromDb">強制的に削除するかどうか</param>
-	public async Task ApplyChangesAsync(System.Collections.Generic.IEnumerable<FileChangeItem> items, bool deleteFromDb) {
+	public async Task ApplyChangesAsync(IEnumerable<FileChangeItem> items, bool deleteFromDb) {
 		try {
 			await using var db = await this._dbFactory.CreateDbContextAsync();
 			foreach (var item in items) {
@@ -128,7 +126,7 @@ public class FileChangeMonitorService : ModelBase {
 	/// 未処理変更として提示された内容を破棄（無視）します。
 	/// </summary>
 	/// <param name="items">破棄対象のアイテム一覧</param>
-	public void DiscardChanges(System.Collections.Generic.IEnumerable<FileChangeItem> items) {
+	public void DiscardChanges(IEnumerable<FileChangeItem> items) {
 		this.Tracker.RemoveItems(items);
 	}
 

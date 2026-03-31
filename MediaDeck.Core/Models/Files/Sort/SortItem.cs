@@ -1,8 +1,8 @@
 using System.ComponentModel;
 
+using MediaDeck.Common.Base;
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
-using MediaDeck.Common.Base;
 
 namespace MediaDeck.Core.Models.Files.Sort;
 

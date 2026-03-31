@@ -1,13 +1,13 @@
 using CommunityToolkit.Mvvm.DependencyInjection;
 
-using Microsoft.Extensions.DependencyInjection;
-
 using MediaDeck.Composition.Enum;
-using MediaDeck.Database.Tables;
+using MediaDeck.Composition.Interfaces.FileTypes;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Composition.Interfaces.FileTypes.ViewModels;
 using MediaDeck.Composition.Interfaces.FileTypes.Views;
-using MediaDeck.Composition.Interfaces.FileTypes;
+using MediaDeck.Database.Tables;
+
+using Microsoft.Extensions.DependencyInjection;
 
 namespace MediaDeck.Core.Utils;
 

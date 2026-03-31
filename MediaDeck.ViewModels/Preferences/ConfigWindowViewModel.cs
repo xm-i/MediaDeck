@@ -1,6 +1,6 @@
 using MediaDeck.Common.Base;
-using MediaDeck.ViewModels.Preferences.Config;
 using MediaDeck.Core.Stores.Config;
+using MediaDeck.ViewModels.Preferences.Config;
 
 namespace MediaDeck.ViewModels.Preferences;
 

@@ -1,8 +1,8 @@
 using System.Linq.Expressions;
 
+using MediaDeck.Common.Base;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Database.Tables;
-using MediaDeck.Common.Base;
 
 namespace MediaDeck.Core.Models.Files.Filter;
 

@@ -1,4 +1,3 @@
-using System.IO;
 using System.Linq.Expressions;
 
 using MediaDeck.Composition.Interfaces.Files;

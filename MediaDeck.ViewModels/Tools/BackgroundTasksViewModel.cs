@@ -1,6 +1,3 @@
-using System.Threading.Tasks;
-
-using MediaDeck.Composition.Interfaces.Services;
 using MediaDeck.Common.Base;
 using MediaDeck.Core.Models.Tools;
 

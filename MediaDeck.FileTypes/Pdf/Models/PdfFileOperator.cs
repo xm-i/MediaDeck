@@ -1,17 +1,13 @@
-using MediaDeck.Database.Tables;
-
-using System.IO;
-
-using Patagames.Pdf.Net;
-using Patagames.Pdf.Enums;
-
 using System.Drawing.Imaging;
-
-using MediaDeck.FileTypes.Base.Models;
-
+using System.IO;
 using System.Threading.Tasks;
 
 using MediaDeck.Composition.Enum;
+using MediaDeck.Database.Tables;
+using MediaDeck.FileTypes.Base.Models;
+
+using Patagames.Pdf.Enums;
+using Patagames.Pdf.Net;
 
 namespace MediaDeck.FileTypes.Pdf.Models;
 

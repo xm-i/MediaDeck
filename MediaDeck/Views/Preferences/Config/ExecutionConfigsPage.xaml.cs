@@ -1,6 +1,6 @@
-using Microsoft.UI.Xaml.Navigation;
-
 using MediaDeck.ViewModels.Preferences.Config;
+
+using Microsoft.UI.Xaml.Navigation;
 
 namespace MediaDeck.Views.Preferences.Config;
 

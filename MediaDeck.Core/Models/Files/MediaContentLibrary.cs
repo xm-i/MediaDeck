@@ -1,9 +1,9 @@
 using System.Diagnostics;
 
+using MediaDeck.Common.Base;
 using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Composition.Stores.State.Model;
-using MediaDeck.Common.Base;
 using MediaDeck.Core.Models.FileDetailManagers;
 using MediaDeck.Core.Models.Files.Loaders;
 using MediaDeck.Core.Models.Files.SearchConditions;

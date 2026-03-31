@@ -30,8 +30,7 @@
 			<MediaPlayerElement x:Name="MediaPlayerElement"
 				Grid.Row="0"
 				Source="{x:Bind ViewModel.VideoFilePath.Value, Mode=OneWay, Converter={StaticResource PathToMediaPlaybackSourceConverter}}"
-				AreTransportControlsEnabled="True" >
-			</MediaPlayerElement>
+				AreTransportControlsEnabled="True" />
 			<Image Grid.Row="1"
 				Source="{x:Bind ViewModel.CandidateThumbnail.Value,Mode=OneWay,Converter={StaticResource BinaryToImageSourceConverter}}" />
 		</Grid>

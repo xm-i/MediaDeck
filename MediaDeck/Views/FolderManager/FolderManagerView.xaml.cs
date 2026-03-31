@@ -1,9 +1,11 @@
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
+using Windows.Storage.Pickers;
 
 using MediaDeck.ViewModels.FolderManager;
 
-using Windows.Storage.Pickers;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+
+using WinRT.Interop;
 
 namespace MediaDeck.Views.FolderManager;
 
@@ -23,8 +25,8 @@ public sealed partial class FolderManagerView {
 		}
 		var openPicker = new FolderPicker();
 
-		var hWnd = WinRT.Interop.WindowNative.GetWindowHandle(this.ParentWindow);
-		WinRT.Interop.InitializeWithWindow.Initialize(openPicker, hWnd);
+		var hWnd = WindowNative.GetWindowHandle(this.ParentWindow);
+		InitializeWithWindow.Initialize(openPicker, hWnd);
 		openPicker.SuggestedStartLocation = PickerLocationId.Desktop;
 		openPicker.FileTypeFilter.Add("*");
 

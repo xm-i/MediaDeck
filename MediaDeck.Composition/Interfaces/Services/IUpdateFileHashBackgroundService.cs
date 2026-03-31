@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
 namespace MediaDeck.Composition.Interfaces.Services;
 
 public interface IUpdateFileHashBackgroundService {

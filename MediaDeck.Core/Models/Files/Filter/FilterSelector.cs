@@ -1,7 +1,7 @@
+using MediaDeck.Common.Base;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Database.Tables;
-using MediaDeck.Common.Base;
 
 namespace MediaDeck.Core.Models.Files.Filter;
 

@@ -1,7 +1,7 @@
-using MediaDeck.Composition.Interfaces.Files;
-using MediaDeck.Database.Tables;
 using MediaDeck.Common.Base;
+using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Core.Models.FileDetailManagers;
+using MediaDeck.Database.Tables;
 
 namespace MediaDeck.ViewModels.Tags;
 

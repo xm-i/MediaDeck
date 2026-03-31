@@ -1,6 +1,6 @@
+using MediaDeck.Common.Base;
 using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Composition.Stores.State.Model.Objects;
-using MediaDeck.Common.Base;
 using MediaDeck.Core.Models.Files;
 
 namespace MediaDeck.Core.Models.FolderManager;

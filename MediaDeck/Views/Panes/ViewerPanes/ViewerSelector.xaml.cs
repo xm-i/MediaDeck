@@ -3,6 +3,8 @@ using CommunityToolkit.Mvvm.DependencyInjection;
 using MediaDeck.ViewModels.Panes.ViewerPanes;
 using MediaDeck.Views.Sort;
 
+using Microsoft.UI.Xaml;
+
 namespace MediaDeck.Views.Panes.ViewerPanes;
 
 public sealed partial class ViewerSelector {
@@ -10,7 +12,7 @@ public sealed partial class ViewerSelector {
 		this.InitializeComponent();
 	}
 
-	private void Button_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e) {
+	private void Button_Click(object sender, RoutedEventArgs e) {
 		var window = Ioc.Default.GetRequiredService<SortManagerWindow>();
 		window.ActivateCenteredOnMainWindow();
 	}

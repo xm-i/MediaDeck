@@ -1,15 +1,16 @@
+using System.Threading.Tasks;
+
+using Windows.System;
+
+using MediaDeck.Composition.Interfaces.Files;
+using MediaDeck.Core.Primitives;
+using MediaDeck.ViewModels.Panes.DetailPanes;
+using MediaDeck.ViewModels.Tags;
+using MediaDeck.Views.Tags;
+
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
-
-using MediaDeck.Composition.Interfaces.Files;
-using MediaDeck.Views.Tags;
-using MediaDeck.ViewModels.Tags;
-using MediaDeck.ViewModels.Panes.DetailPanes;
-
-using System.Threading.Tasks;
-
-using MediaDeck.Core.Primitives;
 
 namespace MediaDeck.Views.Panes.DetailPanes;
 
@@ -49,7 +50,7 @@ public sealed partial class TagsDetail {
 	}
 
 	private void AutoSuggestBox_PreviewKeyDown(object sender, KeyRoutedEventArgs e) {
-		if (e.Key == Windows.System.VirtualKey.Enter) {
+		if (e.Key == VirtualKey.Enter) {
 			this.ViewModel?.AddTagCommand.Execute(Unit.Default);
 		}
 	}

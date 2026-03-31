@@ -1,22 +1,21 @@
-using CommunityToolkit.Mvvm.DependencyInjection;
-using CommunityToolkit.WinUI.Controls;
-
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Input;
-
-using MediaDeck.ViewModels.Panes.ViewerPanes;
-using MediaDeck.Views.Thumbnails;
-
 using System.Diagnostics;
 using System.IO;
 
-using Microsoft.UI.Input;
-
+using Windows.System;
 using Windows.UI.Core;
+
+using CommunityToolkit.Mvvm.DependencyInjection;
+using CommunityToolkit.WinUI.Controls;
 
 using MediaDeck.Composition.Interfaces.FileTypes.ViewModels;
 using MediaDeck.Core.Models.Files.SearchConditions;
+using MediaDeck.ViewModels.Panes.ViewerPanes;
+using MediaDeck.Views.Thumbnails;
+
+using Microsoft.UI.Input;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
 
 namespace MediaDeck.Views.Panes.ViewerPanes;
 
@@ -129,7 +128,7 @@ public class ViewerPaneBase : UserControlBase<ViewerSelectorViewModel> {
 	}
 
 	protected void HandleListPointerWheelChanged(object sender, PointerRoutedEventArgs e) {
-		var ctrlKeyState = InputKeyboardSource.GetKeyStateForCurrentThread(Windows.System.VirtualKey.Control);
+		var ctrlKeyState = InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.Control);
 		if (!ctrlKeyState.HasFlag(CoreVirtualKeyStates.Down)) {
 			return;
 		}

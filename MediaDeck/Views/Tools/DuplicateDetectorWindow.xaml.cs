@@ -1,8 +1,4 @@
-using Microsoft.UI.Xaml;
-
 using MediaDeck.ViewModels.Tools;
-
-using Windows.Graphics;
 
 namespace MediaDeck.Views.Tools;
 

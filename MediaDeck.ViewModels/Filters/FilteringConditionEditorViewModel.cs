@@ -1,5 +1,5 @@
-using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Common.Base;
+using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Core.Models.Files.Filter;
 
 namespace MediaDeck.ViewModels.Filters;

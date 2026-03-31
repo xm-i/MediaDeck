@@ -1,6 +1,6 @@
+using MediaDeck.Common.Base;
 using MediaDeck.Database;
 using MediaDeck.Database.Tables;
-using MediaDeck.Common.Base;
 
 namespace MediaDeck.Core.Models.Tools;
 

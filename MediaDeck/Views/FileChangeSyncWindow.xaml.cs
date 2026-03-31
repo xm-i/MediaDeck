@@ -1,11 +1,8 @@
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-
+using MediaDeck.Core.Models.Services;
 using MediaDeck.ViewModels;
 
-using Windows.Graphics;
-
-using MediaDeck.Core.Models.Services;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 
 namespace MediaDeck.Views;
 

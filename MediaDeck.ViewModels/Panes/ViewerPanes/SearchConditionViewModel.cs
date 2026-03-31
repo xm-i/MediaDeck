@@ -1,5 +1,5 @@
-using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Common.Base;
+using MediaDeck.Composition.Interfaces.Files;
 
 namespace MediaDeck.ViewModels.Panes.ViewerPanes;
 

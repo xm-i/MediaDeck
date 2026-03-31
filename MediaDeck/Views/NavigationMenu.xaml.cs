@@ -1,13 +1,13 @@
 using CommunityToolkit.Mvvm.DependencyInjection;
 
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-
 using MediaDeck.ViewModels;
 using MediaDeck.Views.FolderManager;
 using MediaDeck.Views.Preferences;
 using MediaDeck.Views.Tags;
 using MediaDeck.Views.Tools;
+
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 
 namespace MediaDeck.Views;
 

@@ -1,8 +1,4 @@
-using Microsoft.UI.Xaml;
-
 using MediaDeck.ViewModels.Tags;
-
-using Windows.Graphics;
 
 namespace MediaDeck.Views.Tags;
 

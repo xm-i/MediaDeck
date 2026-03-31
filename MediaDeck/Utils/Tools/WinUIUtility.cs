@@ -1,9 +1,12 @@
 using CommunityToolkit.Mvvm.DependencyInjection;
 
+using MediaDeck.Views;
+
+using Microsoft.UI;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 
-using MediaDeck.Views;
+using WinRT.Interop;
 
 namespace MediaDeck.Utils.Tools;
 
@@ -43,8 +46,8 @@ public static class WinUIUtility {
 	}
 
 	private static AppWindow? GetAppWindow(Window window) {
-		var hWnd = WinRT.Interop.WindowNative.GetWindowHandle(window);
-		var windowId = Microsoft.UI.Win32Interop.GetWindowIdFromWindow(hWnd);
+		var hWnd = WindowNative.GetWindowHandle(window);
+		var windowId = Win32Interop.GetWindowIdFromWindow(hWnd);
 		return AppWindow.GetFromWindowId(windowId);
 	}
 }

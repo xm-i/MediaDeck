@@ -1,5 +1,3 @@
-using System.IO;
-
 using MediaDeck.Common.Extensions;
 using MediaDeck.Common.Utilities;
 using MediaDeck.Database;
@@ -247,7 +245,7 @@ public class FileChangeTracker : IDisposable {
 	/// 指定されたアイテムをリストから一括削除します。
 	/// </summary>
 	/// <param name="items">削除対象のアイテム一覧</param>
-	public void RemoveItems(System.Collections.Generic.IEnumerable<FileChangeItem> items) {
+	public void RemoveItems(IEnumerable<FileChangeItem> items) {
 		var targetElements = this.UnprocessedChanges
 			.Where(x => items.Any(i => i.MediaFileId == x.MediaFileId && (x.MediaFileId != null || i.NewPath == x.NewPath)))
 			.ToList();

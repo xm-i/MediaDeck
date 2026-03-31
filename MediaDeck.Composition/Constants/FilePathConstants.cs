@@ -1,5 +1,3 @@
-using System.IO;
-
 namespace MediaDeck.Composition.Constants;
 
 public static class FilePathConstants {

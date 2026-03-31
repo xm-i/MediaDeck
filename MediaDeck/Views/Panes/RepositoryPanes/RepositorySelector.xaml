@@ -40,8 +40,7 @@
 				SelectionMode="Single"
 				ItemsSource="{x:Bind ViewModel.RepositoryPaneViewModels}"
 				SelectedItem="{x:Bind ViewModel.SelectedRepositoryPane.Value, Mode=TwoWay}"
-				DisplayMemberPath="Name" >
-			</controls:Segmented>
+				DisplayMemberPath="Name" />
 		</Grid>
 
 		<!-- Content -->

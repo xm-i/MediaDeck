@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Interfaces.Primitives;

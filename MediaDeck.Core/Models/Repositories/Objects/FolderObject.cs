@@ -1,5 +1,3 @@
-using System.IO;
-
 using MediaDeck.Core.Primitives;
 
 namespace MediaDeck.Core.Models.Repositories.Objects;

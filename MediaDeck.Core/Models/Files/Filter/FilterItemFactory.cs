@@ -1,5 +1,3 @@
-using System.IO;
-
 using CommunityToolkit.Mvvm.DependencyInjection;
 
 using MediaDeck.Composition.Enum;

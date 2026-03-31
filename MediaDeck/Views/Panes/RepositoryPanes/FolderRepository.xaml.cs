@@ -1,5 +1,7 @@
 using MediaDeck.ViewModels.Panes.RepositoryPanes;
 
+using Microsoft.UI.Xaml.Input;
+
 namespace MediaDeck.Views.Panes.RepositoryPanes;
 
 public sealed partial class FolderRepository {
@@ -12,7 +14,7 @@ public sealed partial class FolderRepository {
 		newViewModel?.LoadCommand.Execute(Unit.Default);
 	}
 
-	private void TreeViewItem_DoubleTapped(object sender, Microsoft.UI.Xaml.Input.DoubleTappedRoutedEventArgs e) {
+	private void TreeViewItem_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e) {
 		if (this.ViewModel is not { } vm) {
 			return;
 		}

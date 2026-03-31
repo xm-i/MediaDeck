@@ -1,8 +1,6 @@
-using System.Collections.Generic;
-
 using MediaDeck.Common.Base;
-using MediaDeck.Core.Primitives;
 using MediaDeck.Core.Models.Files.Filter.FilterItemObjects;
+using MediaDeck.Core.Primitives;
 
 namespace MediaDeck.ViewModels.Filters.FilterItemCreators;
 

@@ -1,6 +1,6 @@
-using Microsoft.UI.Xaml.Data;
-
 using Windows.Media.Core;
+
+using Microsoft.UI.Xaml.Data;
 
 namespace MediaDeck.Views.Resources.Converters;
 

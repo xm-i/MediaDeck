@@ -1,8 +1,8 @@
-using Microsoft.UI.Xaml.Data;
-
 using System.Collections.Generic;
 
 using MediaDeck.Composition.Enum;
+
+using Microsoft.UI.Xaml.Data;
 
 namespace MediaDeck.Views.Resources.Converters;
 

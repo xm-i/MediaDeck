@@ -1,15 +1,12 @@
-using MediaDeck.Database.Tables;
-
 using System.IO;
+using System.Threading.Tasks;
 
 using ImageMagick;
 
-using MediaDeck.FileTypes.Base.Models;
-
-using System.Threading.Tasks;
-
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
+using MediaDeck.Database.Tables;
+using MediaDeck.FileTypes.Base.Models;
 using MediaDeck.FileTypes.Image.Utils;
 using MediaDeck.FileTypes.Image.Utils.Formats;
 
