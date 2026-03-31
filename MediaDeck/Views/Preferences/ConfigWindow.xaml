@@ -6,34 +6,71 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:config="using:MediaDeck.ViewModels.Preferences.Config"
 	mc:Ignorable="d"
-	Title="Configuration" >
-	<Grid RowDefinitions="*,Auto"
-		ColumnDefinitions="200,*" >
-		<StackPanel Grid.Column="0"
-			Padding="12"
-			Spacing="8" >
-			<TextBlock Text="Categories"
-				FontWeight="SemiBold" />
-			<ListView ItemsSource="{x:Bind ViewModel.ConfigPageViewModels}"
-				SelectedItem="{x:Bind ViewModel.SelectedPageViewModel.Value, Mode=TwoWay}" >
-				<ListView.ItemTemplate>
-					<DataTemplate x:DataType="config:IConfigPageViewModel" >
-						<TextBlock Text="{Binding PageName}" />
-					</DataTemplate>
-				</ListView.ItemTemplate>
-			</ListView>
-		</StackPanel>
-		<Frame x:Name="ContentFrame"
-			Grid.Column="1" />
-		<Grid Grid.Row="1"
-			Grid.ColumnSpan="2" >
-			<Grid.ColumnDefinitions>
-				<ColumnDefinition Width="*" />
-				<ColumnDefinition Width="Auto" />
-			</Grid.ColumnDefinitions>
-			<Button Grid.Column="1"
-				Content="Save"
-				Command="{x:Bind ViewModel.SaveCommand}" />
-		</Grid>
+	Title="設定" >
+
+	<Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" >
+		<NavigationView x:Name="SettingsNavView"
+			IsBackButtonVisible="Collapsed"
+			IsSettingsVisible="False"
+			AlwaysShowHeader="False"
+			PaneDisplayMode="Left"
+			OpenPaneLength="280"
+			MenuItemsSource="{x:Bind ViewModel.ConfigPageViewModels}"
+			SelectedItem="{x:Bind ViewModel.SelectedPageViewModel.Value, Mode=TwoWay}" >
+
+			<!-- ナビゲーションメニュー項目のテンプレート -->
+			<NavigationView.MenuItemTemplate>
+				<DataTemplate x:DataType="config:IConfigPageViewModel" >
+					<NavigationViewItem>
+						<NavigationViewItem.Icon>
+							<FontIcon Glyph="{Binding PageIconGlyph}" />
+						</NavigationViewItem.Icon>
+						<NavigationViewItem.Content>
+							<StackPanel Spacing="2" >
+								<TextBlock Text="{Binding PageName}"
+									FontSize="14"
+									FontWeight="SemiBold" />
+								<TextBlock Text="{Binding PageDescription}"
+									FontSize="11"
+									Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+									TextTrimming="CharacterEllipsis" />
+							</StackPanel>
+						</NavigationViewItem.Content>
+					</NavigationViewItem>
+				</DataTemplate>
+			</NavigationView.MenuItemTemplate>
+
+			<!-- コンテンツ領域 -->
+			<Grid>
+				<Grid.RowDefinitions>
+					<RowDefinition Height="*" />
+					<RowDefinition Height="Auto" />
+				</Grid.RowDefinitions>
+
+				<!-- ページコンテンツ表示用の Frame -->
+				<Frame x:Name="ContentFrame"
+					Grid.Row="0" />
+
+				<!-- フッター: 保存ボタン -->
+				<Border Grid.Row="1"
+					Padding="24,12"
+					BorderThickness="0,1,0,0"
+					BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}" >
+					<Grid>
+						<Button HorizontalAlignment="Right"
+							Style="{StaticResource AccentButtonStyle}"
+							Command="{x:Bind ViewModel.SaveCommand}"
+							MinWidth="120" >
+							<StackPanel Orientation="Horizontal"
+								Spacing="8" >
+								<FontIcon Glyph="&#xE74E;"
+									FontSize="14" />
+								<TextBlock Text="保存" />
+							</StackPanel>
+						</Button>
+					</Grid>
+				</Border>
+			</Grid>
+		</NavigationView>
 	</Grid>
 </Window>

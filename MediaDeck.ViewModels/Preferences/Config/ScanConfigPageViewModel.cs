@@ -7,9 +7,27 @@ namespace MediaDeck.ViewModels.Preferences.Config;
 
 [Inject(InjectServiceLifetime.Transient)]
 public class ScanConfigPageViewModel : ViewModelBase, IConfigPageViewModel {
+	/// <summary>
+	/// ページ名
+	/// </summary>
 	public string PageName {
 		get;
-	} = "Scan";
+	} = "スキャン";
+
+	/// <summary>
+	/// ページのアイコン（Segoe Fluent Icons のグリフ文字）
+	/// </summary>
+	public string PageIconGlyph {
+		get;
+	} = "\uE721";
+
+	/// <summary>
+	/// ページの説明
+	/// </summary>
+	public string PageDescription {
+		get;
+	} = "対象拡張子やスキャン方法を設定します";
+
 
 	private readonly ScanConfigModel _scanConfig;
 
@@ -17,7 +35,7 @@ public class ScanConfigPageViewModel : ViewModelBase, IConfigPageViewModel {
 		this._scanConfig = scanConfig;
 		this.AddExtensionCommand.Subscribe(_ => {
 			this._scanConfig.AddTargetExtension();
-		});
+		}).AddTo(this.CompositeDisposable);
 		this.TargetExtensions =
 			this._scanConfig
 				.TargetExtensions
@@ -32,6 +50,9 @@ public class ScanConfigPageViewModel : ViewModelBase, IConfigPageViewModel {
 		get;
 	}
 
+	/// <summary>
+	/// 拡張子追加コマンド
+	/// </summary>
 	public ReactiveCommand AddExtensionCommand {
 		get;
 	} = new();

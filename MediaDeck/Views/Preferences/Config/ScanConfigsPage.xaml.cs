@@ -1,10 +1,6 @@
-using Microsoft.UI.Xaml.Controls;
-
 using MediaDeck.ViewModels.Preferences.Config;
 
 using Microsoft.UI.Xaml.Navigation;
-
-using MediaDeck.Composition.Enum;
 
 namespace MediaDeck.Views.Preferences.Config;
 
@@ -14,22 +10,22 @@ public sealed partial class ScanConfigPage {
 	}
 
 	/// <summary>
-	/// ナビゲート時に ViewModel を受け取ります。
+	/// ナビゲート時に ViewModel を受け取り、DataContext にも設定します。
 	/// </summary>
 	protected override void OnNavigatedTo(NavigationEventArgs e) {
 		if (e.Parameter is not ScanConfigPageViewModel vm) {
 			throw new InvalidOperationException("ViewModel is not passed.");
 		}
 		this.ViewModel = vm;
+		this.DataContext = vm;
 		base.OnNavigatedTo(e);
 	}
 
+	/// <summary>
+	/// ビューモデル
+	/// </summary>
 	public ScanConfigPageViewModel? ViewModel {
 		get;
 		set;
 	}
-
-	public MediaType[] MediaTypeConditions {
-		get;
-	} = Enum.GetValues<MediaType>();
 }

@@ -1,4 +1,5 @@
 using MediaDeck.Composition.Stores.Config.Model;
+using MediaDeck.Composition.Enum;
 using MediaDeck.Common.Base;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -7,9 +8,27 @@ namespace MediaDeck.ViewModels.Preferences.Config;
 
 [Inject(InjectServiceLifetime.Transient)]
 public class ExecutionConfigPageViewModel : ViewModelBase, IConfigPageViewModel {
+	/// <summary>
+	/// ページ名
+	/// </summary>
 	public string PageName {
 		get;
-	} = "Execution";
+	} = "外部プログラム";
+
+	/// <summary>
+	/// ページのアイコン（Segoe Fluent Icons のグリフ文字）
+	/// </summary>
+	public string PageIconGlyph {
+		get;
+	} = "\uE756";
+
+	/// <summary>
+	/// ページの説明
+	/// </summary>
+	public string PageDescription {
+		get;
+	} = "メディアを開く外部プログラムを設定します";
+
 
 	private readonly ExecutionConfigModel _executionConfig;
 
@@ -17,7 +36,7 @@ public class ExecutionConfigPageViewModel : ViewModelBase, IConfigPageViewModel 
 		this._executionConfig = executionConfig;
 		this.AddExecutionProgramCommand.Subscribe(_ => {
 			this._executionConfig.AddExecutionProgram();
-		});
+		}).AddTo(this.CompositeDisposable);
 		this.ExecutionPrograms =
 			this._executionConfig
 				.ExecutionPrograms
@@ -26,12 +45,15 @@ public class ExecutionConfigPageViewModel : ViewModelBase, IConfigPageViewModel 
 	}
 
 	/// <summary>
-	/// 対象拡張子
+	/// 外部プログラムの一覧
 	/// </summary>
 	public INotifyCollectionChangedSynchronizedViewList<ExecutionProgramConfigViewModel> ExecutionPrograms {
 		get;
 	}
 
+	/// <summary>
+	/// プログラム追加コマンド
+	/// </summary>
 	public ReactiveCommand AddExecutionProgramCommand {
 		get;
 	} = new();
