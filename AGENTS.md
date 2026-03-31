@@ -26,6 +26,7 @@
 - **コメント規約**: コメントは必ず「日本語」で記述すること。また、新規作成・編集したクラス、メソッド、プロパティには必ずXMLドキュメンテーションコメント（`/// <summary>...`）を付与すること。
 - **MVVMパターンの遵守**: View (XAML) と ViewModel の分離を徹底する。コードビハインド（.xaml.cs）への記述は最小限にし、純粋なUI制御（アニメーションなど）のみに留める。
 - **R3の使用 (非常に重要)**: 非同期処理、データバインディング、コマンドの実装には `R3` （Rxの代替）を活用する。`[ObservableProperty]` や `[RelayCommand]` といった CommunityToolkit のジェネレーターは使用せず、`ReactiveProperty` や `ReactiveCommand` 等でリアクティブに設計する。また、購読の解除漏れを防ぐため、`AddTo(this.CompositeDisposable)` を徹底すること。これにより、親オブジェクトの `Dispose` 時に全ての購読も破棄されるように設計する。
+- **非同期購読には `SubscribeAwait` を使うこと**: `Subscribe(async _ => ...)` のような `async void` 相当の書き方は禁止。非同期処理が伴う購読は必ず `SubscribeAwait` を使用し、`AwaitOperation` を明示的に指定すること。
 - **設定管理**: アプリケーション設定は `R3.JsonConfig` を利用して管理・永続化を行う。
 - **ロギング**: プロジェクト全体のログ出力には `Serilog` を使用する。
 - **DIとサービス管理**: `AutoDiAttributes` などを活用してDIの自動登録を行い、コンポーネント間は疎結合に保つ。

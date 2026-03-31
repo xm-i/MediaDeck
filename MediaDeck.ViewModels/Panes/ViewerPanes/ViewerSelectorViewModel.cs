@@ -29,6 +29,11 @@ public class ViewerSelectorViewModel : ViewModelBase {
 		this.SortSelectorViewModel = sortSelectorViewModel;
 
 		this.ItemSize = stateStore.State.ViewerState.ItemSize.ToTwoWayBindableReactiveProperty(stateStore.State.ViewerState.ItemSize.Value).AddTo(this.CompositeDisposable);
+
+		this.RefreshCommand.SubscribeAwait(async (_, ct) =>
+					await this.MediaContentLibraryViewModel.ReloadAsync().ConfigureAwait(false),
+				AwaitOperation.Drop)
+			.AddTo(this.CompositeDisposable);
 	}
 
 	public MediaContentLibraryViewModel MediaContentLibraryViewModel {
@@ -66,4 +71,8 @@ public class ViewerSelectorViewModel : ViewModelBase {
 	public BindableReactiveProperty<int> ItemSize {
 		get;
 	} = new(150);
+
+	public ReactiveCommand RefreshCommand {
+		get;
+	} = new();
 }
