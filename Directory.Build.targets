@@ -15,7 +15,7 @@
     <PackageReference Update="Microsoft.Extensions.DependencyInjection" Version="10.0.5" />
     <PackageReference Update="Microsoft.Extensions.Logging" Version="10.0.5" />
     <PackageReference Update="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.7705" />
-    <PackageReference Update="Microsoft.WindowsAppSDK" Version="2.0.0-experimental6" />
+    <PackageReference Update="Microsoft.WindowsAppSDK" Version="2.0.0-preview2" />
     <PackageReference Update="ObservableCollections" Version="3.3.4" />
     <PackageReference Update="ObservableCollections.R3" Version="3.3.4" />
     <PackageReference Update="Pdfium.Net.SDK" Version="4.107.2704" />
