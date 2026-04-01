@@ -40,6 +40,10 @@ public partial class FileChangeSyncViewModel : ViewModelBase {
 		get;
 	}
 
+	public BindableReactiveProperty<FileChangeItem[]> FileChangeItems {
+		get;
+	} = new();
+
 	/// <summary>
 	/// フィルターの種類
 	/// </summary>
@@ -108,6 +112,8 @@ public partial class FileChangeSyncViewModel : ViewModelBase {
 		this._view = this._service.Tracker.UnprocessedChanges.CreateView(x => x);
 		this._view.AddTo(this.CompositeDisposable);
 		this.Changes = this._view.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
+		this.FilteredCount.Value = this.Changes.Count();
+		this.FileChangeItems.Value = this._view.ToArray();
 
 		// フィルター変更の監視。選択されたフィルターに応じて表示リストを絞り込みます。
 		this.FilterType.Where(x => x.HasValue)
@@ -120,22 +126,25 @@ public partial class FileChangeSyncViewModel : ViewModelBase {
 					FileChangeFilter.Added => x.ChangeType == FileChangeType.Added,
 					_ => true
 				});
-				this.FilteredCount.Value = this._view.Count;
 			})
 			.AddTo(this.CompositeDisposable);
 
 		// ビュー内容変更の監視（削除などが実行された際に件数を更新）
-		Observable.FromEvent<Action<NotifyCollectionChangedAction>, NotifyCollectionChangedAction>(h => h,
-				h => this._view.CollectionStateChanged += h,
-				h => this._view.CollectionStateChanged -= h)
-			.Subscribe(_ => this.FilteredCount.Value = this._view.Count)
+		Observable.FromEvent<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>(
+				h => (sender, e) => h(e),
+				h => this.Changes.CollectionChanged += h,
+				h => this.Changes.CollectionChanged -= h)
+			.Subscribe(_ => {
+				this.FilteredCount.Value = this.Changes.Count();
+				this.FileChangeItems.Value = this._view.ToArray();
+			})
 			.AddTo(this.CompositeDisposable);
 
 		// すべて反映コマンド
 		this.ApplyAllCommand = new ReactiveCommand();
 		this.ApplyAllCommand.SubscribeAwait(async (_, ct) => {
 				// 現在表示（フィルタリング）されているアイテムのみを対象に反映を実行
-				var items = this._view.Select(x => x).ToArray();
+				var items = this._view.ToArray();
 				await this._service.ApplyChangesAsync(items, false);
 			})
 			.AddTo(this.CompositeDisposable);
@@ -144,7 +153,7 @@ public partial class FileChangeSyncViewModel : ViewModelBase {
 		this.DiscardAllCommand = new ReactiveCommand();
 		this.DiscardAllCommand.Subscribe(_ => {
 				// 現在表示されているアイテムのみを対象に無視を実行
-				var items = this._view.Select(x => x).ToArray();
+				var items = this._view.ToArray();
 				this._service.DiscardChanges(items);
 			})
 			.AddTo(this.CompositeDisposable);

@@ -12,6 +12,7 @@ public class NavigationMenuViewModel : ViewModelBase {
 	public NavigationMenuViewModel(FileChangeMonitorService fileChangeMonitorService) {
 		this.HasUnprocessedChanges = fileChangeMonitorService.Tracker.UnprocessedChanges
 			.ObserveCountChanged()
+			.ObserveOnCurrentSynchronizationContext()
 			.Select(count => count > 0)
 			.ToBindableReactiveProperty(fileChangeMonitorService.Tracker.UnprocessedChanges.Count > 0)
 			.AddTo(this.CompositeDisposable);
