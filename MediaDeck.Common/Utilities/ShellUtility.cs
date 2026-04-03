@@ -61,8 +61,24 @@ public static class ShellUtility {
 
 		if (!ShellExecuteExW(ref info)) {
 			// フォールバック: 通常のProcess.Startを使用
-			var psi = new ProcessStartInfo { FileName = filePath, Arguments = arguments ?? "", UseShellExecute = true };
+			var psi = new ProcessStartInfo { FileName = filePath, UseShellExecute = false };
+			if (arguments != null) {
+				psi.Arguments = arguments;
+			}
 			Process.Start(psi);
 		}
+	}
+
+	/// <summary>
+	/// Explorerでファイルを選択した状態で表示
+	/// </summary>
+	public static void ShowInExplorer(string filePath) {
+		if (string.IsNullOrEmpty(filePath)) {
+			return;
+		}
+
+		var psi = new ProcessStartInfo { FileName = "explorer.exe", UseShellExecute = false };
+		psi.ArgumentList.Add("/select," + filePath);
+		Process.Start(psi);
 	}
 }
