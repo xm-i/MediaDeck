@@ -6,6 +6,8 @@ using MediaDeck.Composition.Enum;
 using MediaDeck.Database.Tables;
 using MediaDeck.FileTypes.Base.Models;
 
+using Microsoft.Extensions.Logging;
+
 using Patagames.Pdf.Enums;
 using Patagames.Pdf.Net;
 
@@ -14,9 +16,11 @@ namespace MediaDeck.FileTypes.Pdf.Models;
 [Inject(InjectServiceLifetime.Transient)]
 internal partial class PdfFileOperator : BaseFileOperator {
 	private readonly IFilePathService _filePathService;
+	private readonly ILogger<PdfFileOperator> _logger;
 
-	public PdfFileOperator(IFilePathService filePathService) : base(MediaType.Pdf) {
+	public PdfFileOperator(IFilePathService filePathService, ILogger<PdfFileOperator> logger) : base(MediaType.Pdf) {
 		this._filePathService = filePathService;
+		this._logger = logger;
 	}
 
 	public override async Task<MediaFile?> RegisterFileAsync(string filePath) {
@@ -33,7 +37,8 @@ internal partial class PdfFileOperator : BaseFileOperator {
 			var image = this.CreateThumbnail(filePath, 300, 300, 1);
 			new FileInfo(thumbPath).Directory?.Create();
 			File.WriteAllBytes(thumbPath, image);
-		} catch (Exception) {
+		} catch (Exception ex) {
+			this._logger.LogError(ex, "Failed to create pdf thumbnail for file {FilePath}", filePath);
 			thumbPath = null;
 			thumbRelativePath = null;
 		}
