@@ -82,8 +82,12 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 		if (rel.Any()) {
 			db.MediaFileTags.RemoveRange(rel);
 			await db.SaveChangesAsync();
+
+			var removedIds = rel.Select(x => x.MediaFileId).ToHashSet();
 			foreach (var file in fileModels) {
-				file.Tags.RemoveAll(x => x.TagId == tagId);
+				if (removedIds.Contains(file.Id)) {
+					file.Tags.RemoveAll(x => x.TagId == tagId);
+				}
 			}
 			await transaction.CommitAsync();
 		}
