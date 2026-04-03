@@ -126,6 +126,6 @@ public class DuplicateDetectorViewModel : ViewModelBase {
 	/// Explorerでファイルを表示
 	/// </summary>
 	public static void ShowInExplorer(string filePath) {
-		Process.Start("explorer.exe", $"/select,\"{filePath}\"");
+		ShellUtility.ShowInExplorer(filePath);
 	}
 }
