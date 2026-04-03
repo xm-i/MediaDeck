@@ -12,6 +12,8 @@ using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Database.Tables;
 using MediaDeck.Database.Tables.Metadata;
+using Microsoft.Extensions.Logging;
+
 using MediaDeck.FileTypes.Base.Models;
 
 namespace MediaDeck.FileTypes.Video.Models;
@@ -20,15 +22,17 @@ namespace MediaDeck.FileTypes.Video.Models;
 internal partial class VideoFileOperator : BaseFileOperator {
 	private readonly ConfigModel _config;
 	private readonly IFilePathService _filePathService;
+	private readonly ILogger<VideoFileOperator> _logger;
 
 	private static readonly string[] locationTagNames = [
 		"TAG:location",
 		"TAG:com.apple.quicktime.location.ISO6709"
 	];
 
-	public VideoFileOperator(IFilePathService filePathService) : base(MediaType.Video) {
+	public VideoFileOperator(IFilePathService filePathService, ILogger<VideoFileOperator> logger) : base(MediaType.Video) {
 		this._config = Ioc.Default.GetRequiredService<ConfigModel>();
 		this._filePathService = filePathService;
+		this._logger = logger;
 	}
 
 	public override async Task<MediaFile?> RegisterFileAsync(string filePath) {
@@ -49,7 +53,8 @@ internal partial class VideoFileOperator : BaseFileOperator {
 			var image = this.CreateThumbnail(filePath, videoStream.Width, videoStream.Height, 300, 300, metadata.Duration / 5);
 			new FileInfo(thumbPath).Directory?.Create();
 			File.WriteAllBytes(thumbPath, image);
-		} catch (Exception) {
+		} catch (Exception ex) {
+			this._logger.LogError(ex, "Failed to create video thumbnail for file {FilePath}", filePath);
 			thumbPath = null;
 			thumbRelativePath = null;
 		}

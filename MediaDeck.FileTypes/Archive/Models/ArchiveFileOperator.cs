@@ -9,14 +9,18 @@ using MediaDeck.Database.Tables;
 using MediaDeck.FileTypes.Base.Models;
 using MediaDeck.FileTypes.Image.Utils;
 
+using Microsoft.Extensions.Logging;
+
 namespace MediaDeck.FileTypes.Archive.Models;
 
 [Inject(InjectServiceLifetime.Transient)]
 internal partial class ArchiveFileOperator : BaseFileOperator {
 	private readonly IFilePathService _filePathService;
+	private readonly ILogger<ArchiveFileOperator> _logger;
 
-	public ArchiveFileOperator(IFilePathService filePathService) : base(MediaType.Archive) {
+	public ArchiveFileOperator(IFilePathService filePathService, ILogger<ArchiveFileOperator> logger) : base(MediaType.Archive) {
 		this._filePathService = filePathService;
+		this._logger = logger;
 	}
 
 	public override async Task<MediaFile?> RegisterFileAsync(string filePath) {
@@ -38,7 +42,8 @@ internal partial class ArchiveFileOperator : BaseFileOperator {
 				new FileInfo(thumbPath).Directory?.Create();
 				File.WriteAllBytes(thumbPath, image);
 			}
-		} catch (Exception) {
+		} catch (Exception ex) {
+			this._logger.LogError(ex, "Failed to create archive thumbnail for file {FilePath}", filePath);
 			thumbPath = null;
 			thumbRelativePath = null;
 		}
@@ -70,7 +75,8 @@ internal partial class ArchiveFileOperator : BaseFileOperator {
 				using var meta = ImageMetadataFactory.Create(ms);
 				mf.Width = meta.Width;
 				mf.Height = meta.Height;
-			} catch (Exception) {
+			} catch (Exception ex) {
+				this._logger.LogError(ex, "Failed to get image metadata for archive entry {EntryName} in file {FilePath}", first.FullName, filePath);
 				mf.Width = 0;
 				mf.Height = 0;
 			}

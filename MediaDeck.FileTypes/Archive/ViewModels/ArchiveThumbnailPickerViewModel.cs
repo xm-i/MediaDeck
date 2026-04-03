@@ -1,6 +1,8 @@
 using System.IO.Compression;
 using System.Threading.Tasks;
 
+using Microsoft.Extensions.Logging;
+
 using MediaDeck.Composition.Interfaces.FileTypes.ViewModels;
 using MediaDeck.FileTypes.Archive.Models;
 using MediaDeck.FileTypes.Base.Models;
@@ -12,10 +14,12 @@ namespace MediaDeck.FileTypes.Archive.ViewModels;
 internal class ArchiveThumbnailPickerViewModel : BaseThumbnailPickerViewModel {
 	private readonly ArchiveFileOperator _archiveFileOperator;
 	private readonly IFilePathService _filePathService;
+	private readonly ILogger<ArchiveThumbnailPickerViewModel> _logger;
 
-	public ArchiveThumbnailPickerViewModel(BaseThumbnailPickerModel thumbnailPickerModel, ArchiveFileOperator pdfFileOperator, IFilePathService filePathService) : base(thumbnailPickerModel) {
+	public ArchiveThumbnailPickerViewModel(BaseThumbnailPickerModel thumbnailPickerModel, ArchiveFileOperator pdfFileOperator, IFilePathService filePathService, ILogger<ArchiveThumbnailPickerViewModel> logger) : base(thumbnailPickerModel) {
 		this._archiveFileOperator = pdfFileOperator;
 		this._filePathService = filePathService;
+		this._logger = logger;
 		this.SelectedEntry.Subscribe(x => {
 			if (x is null) {
 				this.FileName.Value = null;
@@ -54,7 +58,8 @@ internal class ArchiveThumbnailPickerViewModel : BaseThumbnailPickerViewModel {
 
 		try {
 			this.CandidateThumbnail.Value = this._archiveFileOperator.CreateThumbnail(archive, 300, 300, this.FileName.Value);
-		} catch (Exception) {
+		} catch (Exception ex) {
+			this._logger.LogError(ex, "Failed to recreate archive thumbnail for file {FilePath} at entry {EntryName}", this.targetFileViewModel.FilePath, this.FileName.Value);
 			this.CandidateThumbnail.Value = null;
 		}
 	}
