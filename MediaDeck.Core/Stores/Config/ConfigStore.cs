@@ -20,6 +20,13 @@ public class ConfigStore {
 		private set;
 	}
 
+	// Protected property to allow overriding the file path during testing.
+	protected virtual string ConfigFilePath {
+		get {
+			return FilePathConstants.ConfigFilePath;
+		}
+	}
+
 	public ConfigStore(IServiceProvider service) {
 		this.ScopedService = service;
 		this.Load();
@@ -32,8 +39,8 @@ public class ConfigStore {
 	public void Load() {
 		var scope = this.ScopedService.CreateScope();
 		try {
-			if (File.Exists(FilePathConstants.ConfigFilePath)) {
-				var json = File.ReadAllText(FilePathConstants.ConfigFilePath);
+			if (File.Exists(this.ConfigFilePath)) {
+				var json = File.ReadAllText(this.ConfigFilePath);
 				var loaded = JsonSerializer.Deserialize(json, ConfigJsonSerializerContext.Default.ConfigModelForJson);
 				if (loaded != null) {
 					this.Config = ConfigModelForJson.CreateModel(loaded, scope.ServiceProvider);
@@ -51,11 +58,11 @@ public class ConfigStore {
 	/// </summary>
 	public void Save() {
 		try {
-			Directory.CreateDirectory(Path.GetDirectoryName(FilePathConstants.ConfigFilePath)!);
+			Directory.CreateDirectory(Path.GetDirectoryName(this.ConfigFilePath)!);
 
 			var jsonDto = ConfigModelForJson.CreateJson(this.Config);
 			var json = JsonSerializer.Serialize(jsonDto, ConfigJsonSerializerContext.Default.ConfigModelForJson);
-			File.WriteAllText(FilePathConstants.ConfigFilePath, json);
+			File.WriteAllText(this.ConfigFilePath, json);
 		} catch (Exception) {
 			// TODO: 失敗通知
 		}
