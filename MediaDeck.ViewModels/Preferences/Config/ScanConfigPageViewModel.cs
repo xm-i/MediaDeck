@@ -34,8 +34,8 @@ public class ScanConfigPageViewModel : ViewModelBase, IConfigPageViewModel {
 	public ScanConfigPageViewModel(ScanConfigModel scanConfig) {
 		this._scanConfig = scanConfig;
 		this.AddExtensionCommand.Subscribe(_ => {
-				this._scanConfig.AddTargetExtension();
-			})
+			this._scanConfig.AddTargetExtension();
+		})
 			.AddTo(this.CompositeDisposable);
 		this.TargetExtensions =
 			this._scanConfig

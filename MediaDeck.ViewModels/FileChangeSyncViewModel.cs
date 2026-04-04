@@ -143,33 +143,33 @@ public partial class FileChangeSyncViewModel : ViewModelBase {
 		// すべて反映コマンド
 		this.ApplyAllCommand = new ReactiveCommand();
 		this.ApplyAllCommand.SubscribeAwait(async (_, ct) => {
-				// 現在表示（フィルタリング）されているアイテムのみを対象に反映を実行
-				var items = this._view.ToArray();
-				await this._service.ApplyChangesAsync(items, false);
-			})
+			// 現在表示（フィルタリング）されているアイテムのみを対象に反映を実行
+			var items = this._view.ToArray();
+			await this._service.ApplyChangesAsync(items, false);
+		})
 			.AddTo(this.CompositeDisposable);
 
 		// すべて無視コマンド
 		this.DiscardAllCommand = new ReactiveCommand();
 		this.DiscardAllCommand.Subscribe(_ => {
-				// 現在表示されているアイテムのみを対象に無視を実行
-				var items = this._view.ToArray();
-				this._service.DiscardChanges(items);
-			})
+			// 現在表示されているアイテムのみを対象に無視を実行
+			var items = this._view.ToArray();
+			this._service.DiscardChanges(items);
+		})
 			.AddTo(this.CompositeDisposable);
 
 		// 単一反映コマンド
 		this.ApplySingleCommand = new ReactiveCommand<FileChangeItem>();
 		this.ApplySingleCommand.SubscribeAwait(async (item, ct) => {
-				await this._service.ApplyChangesAsync(new[] { item }, false);
-			})
+			await this._service.ApplyChangesAsync(new[] { item }, false);
+		})
 			.AddTo(this.CompositeDisposable);
 
 		// 単一無視コマンド
 		this.DiscardSingleCommand = new ReactiveCommand<FileChangeItem>();
 		this.DiscardSingleCommand.Subscribe(item => {
-				this._service.DiscardChanges(new[] { item });
-			})
+			this._service.DiscardChanges(new[] { item });
+		})
 			.AddTo(this.CompositeDisposable);
 	}
 }

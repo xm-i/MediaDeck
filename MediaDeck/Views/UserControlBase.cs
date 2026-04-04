@@ -16,5 +16,6 @@ public abstract class UserControlBase<T> : UserControl where T : class {
 		};
 	}
 
-	protected virtual void OnViewModelChanged(T? oldViewModel, T? newViewModel) { }
+	protected virtual void OnViewModelChanged(T? oldViewModel, T? newViewModel) {
+	}
 }

@@ -10,4 +10,5 @@ internal sealed partial class UnknownThumbnailPickerView : UnknownThumbnailPicke
 	}
 }
 
-internal class UnknownThumbnailPickerViewUserControl : UserControlBase<UnknownThumbnailPickerViewModel> { }
+internal class UnknownThumbnailPickerViewUserControl : UserControlBase<UnknownThumbnailPickerViewModel> {
+}

@@ -115,8 +115,8 @@ public partial class App {
 		// DataBase
 		var sb = new SqliteConnectionStringBuilder { DataSource = Path.Combine(FilePathConstants.BaseDirectory, "pix.db") };
 		serviceCollection.AddDbContextFactory<MediaDeckDbContext>(x => {
-				x.UseSqlite(sb.ConnectionString);
-			},
+			x.UseSqlite(sb.ConnectionString);
+		},
 			ServiceLifetime.Transient);
 
 		Ioc.Default.ConfigureServices(serviceCollection.BuildServiceProvider());
