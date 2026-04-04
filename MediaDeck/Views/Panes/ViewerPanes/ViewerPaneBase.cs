@@ -102,7 +102,7 @@ public class ViewerPaneBase : UserControlBase<ViewerSelectorViewModel> {
 				break;
 			case "OpenFolder":
 				if (!string.IsNullOrEmpty(fvm.FilePath) && File.Exists(fvm.FilePath)) {
-					Process.Start(new ProcessStartInfo { FileName = "explorer.exe", Arguments = $"/select, \"{fvm.FilePath}\"", UseShellExecute = true });
+					ShellUtility.ShowInExplorer(fvm.FilePath);
 				}
 				break;
 		}
