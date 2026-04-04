@@ -12,11 +12,6 @@ public class Attributes<T> : IEnumerable<TitleValuePair<T>> {
 	/// <summary>
 	/// コンストラクタ
 	/// </summary>
-	public Attributes() { }
-
-	/// <summary>
-	/// コンストラクタ
-	/// </summary>
 	/// <param name="source">生成元<see cref="Dictionary{TKey, TValue}"/></param>
 	public Attributes(Dictionary<string, T> source) {
 		foreach (var item in source) {

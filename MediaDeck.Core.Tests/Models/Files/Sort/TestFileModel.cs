@@ -29,7 +29,7 @@ public class TestFileModel : IFileModel
     public DateTime LastAccessTime { get; set; }
     public DateTime RegisteredTime { get; set; }
     public long FileSize { get; set; }
-    public Attributes<string> Properties { get; } = new();
+    public Attributes<string> Properties { get; } = new Attributes<string>(System.Array.Empty<TitleValuePair<string>>());
 
     public Task UpdateRateAsync(int rate) => Task.CompletedTask;
     public Task IncrementUsageCountAsync() => Task.CompletedTask;

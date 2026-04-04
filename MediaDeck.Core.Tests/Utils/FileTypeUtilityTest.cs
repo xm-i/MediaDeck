@@ -477,7 +477,7 @@ public class FileTypeUtilityTest {
 		/// </summary>
 		public Attributes<string> Properties {
 			get;
-		} = new();
+		} = new(System.Array.Empty<TitleValuePair<string>>());
 
 		/// <summary>
 		/// 評価を更新する。
