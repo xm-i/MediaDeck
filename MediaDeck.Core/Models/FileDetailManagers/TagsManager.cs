@@ -84,10 +84,11 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 			await db.SaveChangesAsync();
 
 			var removedIds = rel.Select(x => x.MediaFileId).ToHashSet();
-			foreach (var file in fileModels) {
-				if (removedIds.Contains(file.Id)) {
-					file.Tags.RemoveAll(x => x.TagId == tagId);
-				}
+
+			// Extract only the files we need to modify from the removedIds dictionary to avoid O(N) iteration over all models when N is large.
+			var targetFiles = fileModels.Where(x => removedIds.Contains(x.Id)).ToArray();
+			foreach (var file in targetFiles) {
+				file.Tags.RemoveAll(x => x.TagId == tagId);
 			}
 			await transaction.CommitAsync();
 		}
