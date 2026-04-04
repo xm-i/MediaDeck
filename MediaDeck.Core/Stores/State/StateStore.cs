@@ -1,7 +1,7 @@
-using System.Diagnostics.CodeAnalysis;
-using System.Text.Json;
-using System.IO;
 using System;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.Text.Json;
 using MediaDeck.Composition.Constants;
 using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Stores.SerializerContext;
@@ -20,8 +20,12 @@ public class StateStore {
 		private set;
 	}
 
-    // Protected property to allow overriding the file path during testing.
-    protected virtual string StateFilePath => FilePathConstants.StateFilePath;
+	// Protected property to allow overriding the file path during testing.
+	protected virtual string StateFilePath {
+		get {
+			return FilePathConstants.StateFilePath;
+		}
+	}
 
 	public StateStore(IServiceProvider service) {
 		this.ScopedService = service;
