@@ -38,10 +38,10 @@ public class FolderManagerViewModel : ViewModelBase {
 		this.RemoveFolderCommand.Subscribe(x => this._folderManager.RemoveFolder(x.GetModel())).AddTo(this.CompositeDisposable);
 		this.ScanCommand.Subscribe(async x => await this._folderManager.Scan()).AddTo(this.CompositeDisposable);
 		this.ScanSelectedFolderCommand.Subscribe(async x => {
-				if (x is not null) {
-					await this._folderManager.ScanFolder(x.GetModel());
-				}
-			})
+			if (x is not null) {
+				await this._folderManager.ScanFolder(x.GetModel());
+			}
+		})
 			.AddTo(this.CompositeDisposable);
 	}
 }

@@ -1,21 +1,17 @@
 using System.IO;
-
-using Windows.System;
-using Windows.UI.Core;
-
 using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.WinUI.Controls;
-
+using MediaDeck.Common.Utilities;
 using MediaDeck.Composition.Interfaces.FileTypes.ViewModels;
 using MediaDeck.Core.Models.Files.SearchConditions;
 using MediaDeck.ViewModels.Panes.ViewerPanes;
 using MediaDeck.Views.Thumbnails;
-
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
-using MediaDeck.Common.Utilities;
+using Windows.System;
+using Windows.UI.Core;
 
 namespace MediaDeck.Views.Panes.ViewerPanes;
 

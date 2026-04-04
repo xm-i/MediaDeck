@@ -10,4 +10,5 @@ internal sealed partial class ArchiveDetailViewerPreviewControlView : ArchiveDet
 	}
 }
 
-internal class ArchiveDetailViewerPreviewControlViewUserControl : UserControlBase<IDetailViewerViewModel> { }
+internal class ArchiveDetailViewerPreviewControlViewUserControl : UserControlBase<IDetailViewerViewModel> {
+}

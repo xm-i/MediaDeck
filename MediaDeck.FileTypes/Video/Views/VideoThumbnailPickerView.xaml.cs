@@ -1,10 +1,8 @@
-using Windows.Media.Playback;
-
 using MediaDeck.Composition.Interfaces.FileTypes.Views;
 using MediaDeck.FileTypes.Base.Views;
 using MediaDeck.FileTypes.Video.ViewModels;
-
 using Microsoft.UI.Xaml;
+using Windows.Media.Playback;
 
 namespace MediaDeck.FileTypes.Video.Views;
 
@@ -26,4 +24,5 @@ internal sealed partial class VideoThumbnailPickerView : VideoThumbnailPickerVie
 	}
 }
 
-internal class VideoThumbnailPickerViewUserControl : UserControlBase<VideoThumbnailPickerViewModel> { }
+internal class VideoThumbnailPickerViewUserControl : UserControlBase<VideoThumbnailPickerViewModel> {
+}

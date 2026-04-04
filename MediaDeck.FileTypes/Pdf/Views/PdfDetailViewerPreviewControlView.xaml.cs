@@ -10,4 +10,5 @@ internal sealed partial class PdfDetailViewerPreviewControlView : PdfDetailViewe
 	}
 }
 
-internal class PdfDetailViewerPreviewControlViewUserControl : UserControlBase<IDetailViewerViewModel> { }
+internal class PdfDetailViewerPreviewControlViewUserControl : UserControlBase<IDetailViewerViewModel> {
+}

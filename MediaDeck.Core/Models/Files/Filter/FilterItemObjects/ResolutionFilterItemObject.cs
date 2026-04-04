@@ -66,7 +66,8 @@ public class ResolutionFilterItemObject : IFilterItemObject {
 	}
 
 	[Obsolete("for serialize")]
-	public ResolutionFilterItemObject() { }
+	public ResolutionFilterItemObject() {
+	}
 
 	/// <summary>
 	/// コンストラクタ

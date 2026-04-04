@@ -1,6 +1,6 @@
 using MediaDeck.Composition.Enum;
-using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Composition.Interfaces.Files;
+using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Composition.Interfaces.Primitives;
 using MediaDeck.Composition.Objects;
 using R3;
@@ -31,8 +31,7 @@ public class TestFileModel : IFileModel
     public long FileSize { get; set; }
     public Attributes<string> Properties { get; } = new Attributes<string>(System.Array.Empty<TitleValuePair<string>>());
 
-    public Task UpdateRateAsync(int rate) => Task.CompletedTask;
-    public Task IncrementUsageCountAsync() => Task.CompletedTask;
-    public Task UpdateDescriptionAsync(string description) => Task.CompletedTask;
-    public Task ExecuteFileAsync() => Task.CompletedTask;
+	public Task ExecuteFileAsync() {
+		return Task.CompletedTask;
+	}
 }
