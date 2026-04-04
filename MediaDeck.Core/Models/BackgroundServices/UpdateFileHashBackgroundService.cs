@@ -218,14 +218,11 @@ public class UpdateFileHashBackgroundService : IUpdateFileHashBackgroundService 
 
 			// PreHashが重複していないレコードのFullHashをクリア
 			if (nonDuplicateIdsWithFullHash.Count > 0) {
-				foreach (var id in nonDuplicateIdsWithFullHash) {
-					var mediaFile = await db.MediaFiles.FindAsync(id);
-					if (mediaFile != null) {
-						mediaFile.FullHash = null;
-						mediaFile.FullHashUpdatedTime = null;
-					}
-				}
-				await db.SaveChangesAsync();
+				await db.MediaFiles
+					.Where(m => nonDuplicateIdsWithFullHash.Contains(m.MediaFileId))
+					.ExecuteUpdateAsync(setter => setter
+						.SetProperty(m => m.FullHash, (string?)null)
+						.SetProperty(m => m.FullHashUpdatedTime, (DateTime?)null));
 				await transaction.CommitAsync();
 			}
 		}
