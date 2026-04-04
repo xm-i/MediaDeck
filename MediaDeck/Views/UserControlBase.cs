@@ -21,8 +21,7 @@ public abstract class UserControlBase<T> : UserControl where T : class {
 	/// </summary>
 	/// <param name="oldViewModel">変更前の ViewModel。</param>
 	/// <param name="newViewModel">変更後の ViewModel。</param>
-	protected virtual void OnViewModelChanged(T? oldViewModel, T? newViewModel)
-	{
+	protected virtual void OnViewModelChanged(T? oldViewModel, T? newViewModel) {
 		// 派生クラスでのオーバーライド用のフックメソッド
 	}
 }

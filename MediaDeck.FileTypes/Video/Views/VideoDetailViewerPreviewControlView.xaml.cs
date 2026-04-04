@@ -10,4 +10,5 @@ internal sealed partial class VideoDetailViewerPreviewControlView : VideoDetailV
 	}
 }
 
-internal class VideoDetailViewerPreviewControlViewUserControl : UserControlBase<IDetailViewerViewModel> { }
+internal class VideoDetailViewerPreviewControlViewUserControl : UserControlBase<IDetailViewerViewModel> {
+}

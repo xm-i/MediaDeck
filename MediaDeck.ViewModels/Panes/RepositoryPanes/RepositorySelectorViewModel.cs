@@ -8,9 +8,9 @@ public class RepositorySelectorViewModel : ViewModelBase {
 	public RepositorySelectorViewModel(
 		RepositorySelector repositorySelector) {
 		this.RepositoryPaneViewModels = repositorySelector.Repositories.Select(x => x switch {
-				FolderRepository folderRepository => new FolderRepositoryViewModel(folderRepository),
-				_ => throw new NotImplementedException()
-			})
+			FolderRepository folderRepository => new FolderRepositoryViewModel(folderRepository),
+			_ => throw new NotImplementedException()
+		})
 			.ToArray();
 		this.FolderRepositoryViewModel = (this.RepositoryPaneViewModels.First(vm => vm is FolderRepositoryViewModel) as FolderRepositoryViewModel)!;
 		this.SelectedRepositoryPane = repositorySelector.SelectedRepository.Select(x => this.RepositoryPaneViewModels.First(vm => vm.Model == x)).ToBindableReactiveProperty(null!);

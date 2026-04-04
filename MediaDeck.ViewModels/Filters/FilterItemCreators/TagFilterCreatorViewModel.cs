@@ -53,9 +53,9 @@ public class TagFilterCreatorViewModel : ViewModelBase, IFilterCreatorViewModel 
 		this.SearchType.Value = this.SearchTypeList.First();
 		this.AddFilterCommand = this.TagName.Select(x => !string.IsNullOrEmpty(x)).ToReactiveCommand();
 		this.AddFilterCommand.Subscribe(_ => {
-				var filter = new TagFilterItemObject(this.TagName.Value, this.SearchType.Value.Value);
-				target.Value?.AddFilter(filter);
-			})
+			var filter = new TagFilterItemObject(this.TagName.Value, this.SearchType.Value.Value);
+			target.Value?.AddFilter(filter);
+		})
 			.AddTo(this.CompositeDisposable);
 	}
 }

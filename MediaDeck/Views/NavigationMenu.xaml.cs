@@ -22,14 +22,14 @@ public sealed partial class NavigationMenu {
 			return;
 		}
 		this.ViewModel.HasUnprocessedChanges.Subscribe(hasChanges => {
-				this.DispatcherQueue?.TryEnqueue(() => {
-					if (hasChanges) {
-						this.NotificationPulseStoryboard.Begin();
-					} else {
-						this.NotificationPulseStoryboard.Stop();
-					}
-				});
-			})
+			this.DispatcherQueue?.TryEnqueue(() => {
+				if (hasChanges) {
+					this.NotificationPulseStoryboard.Begin();
+				} else {
+					this.NotificationPulseStoryboard.Stop();
+				}
+			});
+		})
 			.AddTo(this.ViewModel.CompositeDisposable);
 	}
 

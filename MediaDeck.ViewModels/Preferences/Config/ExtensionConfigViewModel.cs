@@ -41,8 +41,8 @@ public class ExtensionConfigViewModel : ViewModelBase {
 		this.MediaType = extensionConfigModel.MediaType.ToTwoWayBindableReactiveProperty(Composition.Enum.MediaType.Image).AddTo(this.CompositeDisposable);
 
 		this.RemoveCommand.Subscribe(_ => {
-				scanConfig.RemoveTargetExtension(extensionConfigModel);
-			})
+			scanConfig.RemoveTargetExtension(extensionConfigModel);
+		})
 			.AddTo(this.CompositeDisposable);
 	}
 }

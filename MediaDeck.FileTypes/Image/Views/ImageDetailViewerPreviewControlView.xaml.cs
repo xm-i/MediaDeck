@@ -10,4 +10,5 @@ internal sealed partial class ImageDetailViewerPreviewControlView : ImageDetailV
 	}
 }
 
-internal class ImageDetailViewerPreviewControlViewUserControl : UserControlBase<IDetailViewerViewModel> { }
+internal class ImageDetailViewerPreviewControlViewUserControl : UserControlBase<IDetailViewerViewModel> {
+}

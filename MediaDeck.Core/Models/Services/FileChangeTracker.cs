@@ -34,8 +34,8 @@ public class FileChangeTracker : IDisposable {
 		this.UnprocessedChanges
 			.ObserveAdd()
 			.SubscribeAwait(async (_, ct) => {
-					await this.ProcessPendingChangesAsync();
-				},
+				await this.ProcessPendingChangesAsync();
+			},
 				AwaitOperation.ThrottleFirstLast)
 			.AddTo(this._compositeDisposable);
 	}
