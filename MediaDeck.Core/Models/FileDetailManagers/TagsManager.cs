@@ -85,7 +85,6 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 
 			var removedIds = rel.Select(x => x.MediaFileId).ToHashSet();
 
-			// Extract only the files we need to modify from the removedIds dictionary to avoid O(N) iteration over all models when N is large.
 			var targetFiles = fileModels.Where(x => removedIds.Contains(x.Id)).ToArray();
 			foreach (var file in targetFiles) {
 				file.Tags.RemoveAll(x => x.TagId == tagId);
