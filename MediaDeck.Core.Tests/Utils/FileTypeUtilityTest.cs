@@ -1,5 +1,9 @@
 using System.IO;
+
 using CommunityToolkit.Mvvm.DependencyInjection;
+
+using Shouldly;
+
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Interfaces.FileTypes;
@@ -12,9 +16,10 @@ using MediaDeck.Composition.Objects;
 using MediaDeck.Core.Utils;
 using MediaDeck.Database.Tables;
 using MediaDeck.Database.Tables.Metadata;
+
 using Microsoft.Extensions.DependencyInjection;
+
 using R3;
-using Shouldly;
 
 namespace MediaDeck.Core.Tests.Utils;
 
@@ -599,8 +604,7 @@ public class FileTypeUtilityTest {
 		/// <summary>
 		/// サムネイルを更新する。
 		/// </summary>
-		public void RefreshThumbnail() {
-		}
+		public void RefreshThumbnail() { }
 	}
 
 	/// <summary>
@@ -681,8 +685,7 @@ public class FileTypeUtilityTest {
 		/// <summary>
 		/// サムネイルを再生成する。
 		/// </summary>
-		public void RecreateThumbnail() {
-		}
+		public void RecreateThumbnail() { }
 
 		/// <summary>
 		/// サムネイルを保存する。

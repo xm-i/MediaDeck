@@ -1,8 +1,8 @@
 using System;
 using System.IO;
+using Shouldly;
 using MediaDeck.Core.Models.Repositories.Objects;
 using MediaDeck.Database.Tables;
-using Shouldly;
 using Xunit;
 
 namespace MediaDeck.Core.Tests.Models.Repositories.Objects;
