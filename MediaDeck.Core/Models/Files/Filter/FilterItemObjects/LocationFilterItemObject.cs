@@ -66,7 +66,8 @@ public class LocationFilterItemObject : IFilterItemObject {
 	}
 
 	[Obsolete("for serialize")]
-	public LocationFilterItemObject() { }
+	public LocationFilterItemObject() {
+	}
 
 	/// <summary>
 	/// コンストラクタ

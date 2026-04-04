@@ -70,8 +70,8 @@ public class FilterManagerViewModel : ViewModelBase {
 		this.RemoveFilteringConditionCommand.Where(x => x != null).Subscribe(this.Remove);
 
 		this.SaveCommand.Subscribe(_ => {
-				this.Save();
-			})
+			this.Save();
+		})
 			.AddTo(this.CompositeDisposable);
 
 		this.FilteringConditions = filterManager.FilteringConditions.CreateView(x => new FilteringConditionEditorViewModel(x)).ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);

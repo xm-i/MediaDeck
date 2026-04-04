@@ -1,11 +1,9 @@
 using System.Threading.Tasks;
-
-using Microsoft.Extensions.Logging;
-
 using MediaDeck.Composition.Interfaces.FileTypes.ViewModels;
 using MediaDeck.FileTypes.Base.Models;
 using MediaDeck.FileTypes.Base.ViewModels;
 using MediaDeck.FileTypes.Video.Models;
+using Microsoft.Extensions.Logging;
 
 namespace MediaDeck.FileTypes.Video.ViewModels;
 

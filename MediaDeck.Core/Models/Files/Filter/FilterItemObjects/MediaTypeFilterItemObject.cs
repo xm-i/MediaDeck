@@ -28,7 +28,8 @@ public class MediaTypeFilterItemObject : IFilterItemObject {
 	}
 
 	[Obsolete("for serialize")]
-	public MediaTypeFilterItemObject() { }
+	public MediaTypeFilterItemObject() {
+	}
 
 	/// <summary>
 	/// コンストラクタ

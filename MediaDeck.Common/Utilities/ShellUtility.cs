@@ -68,7 +68,8 @@ public static class ShellUtility {
 	/// <param name="filePath">開く対象のファイルパス</param>
 	/// <param name="arguments">プログラムに渡す引数。nullの場合はファイル単体として開きます</param>
 	public static void ShellExecute(string filePath, string? arguments = null) {
-		if (string.IsNullOrEmpty(filePath)) return;
+		if (string.IsNullOrEmpty(filePath))
+			return;
 
 		// セキュリティ対策:
 		// PATH上の任意の実行ファイル（cmd.exe等）やURLプロトコルの意図しない起動を防ぐため絶対パス化する

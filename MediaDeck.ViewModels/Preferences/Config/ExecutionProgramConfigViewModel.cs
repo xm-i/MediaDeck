@@ -52,8 +52,8 @@ public class ExecutionProgramConfigViewModel : ViewModelBase {
 		this.MediaType = executionProgramConfigModel.MediaType.ToTwoWayBindableReactiveProperty(Composition.Enum.MediaType.Image).AddTo(this.CompositeDisposable);
 
 		this.RemoveCommand.Subscribe(_ => {
-				executionConfig.RemoveExecutionProgram(executionProgramConfigModel);
-			})
+			executionConfig.RemoveExecutionProgram(executionProgramConfigModel);
+		})
 			.AddTo(this.CompositeDisposable);
 	}
 }
