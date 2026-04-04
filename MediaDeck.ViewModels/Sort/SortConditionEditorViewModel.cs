@@ -17,13 +17,13 @@ public class SortConditionEditorViewModel : ViewModelBase {
 		this.SortItemObjects = this.Model.SortItemObjects.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
 
 		this.AddSortItemCommand.Subscribe(x => {
-				if (x is not { } sortItemKey) {
-					return;
-				}
-				var si = this.Model.AddSortItemObject();
-				si.SortItemKey = sortItemKey;
-				si.Direction = this.Direction.Value;
-			})
+			if (x is not { } sortItemKey) {
+				return;
+			}
+			var si = this.Model.AddSortItemObject();
+			si.SortItemKey = sortItemKey;
+			si.Direction = this.Direction.Value;
+		})
 			.AddTo(this.CompositeDisposable);
 		this.RemoveSortItemCommand.Subscribe(this.Model.RemoveSortItemObject).AddTo(this.CompositeDisposable);
 		this.CandidateSortItemKeys.Value = Enum.GetValues<SortItemKey>();

@@ -24,7 +24,8 @@ public class ExistsFilterItemObject : IFilterItemObject {
 	}
 
 	[Obsolete("for serialize")]
-	public ExistsFilterItemObject() { }
+	public ExistsFilterItemObject() {
+	}
 
 	/// <summary>
 	/// コンストラクタ

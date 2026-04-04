@@ -10,4 +10,5 @@ internal sealed partial class ImageThumbnailPickerView : ImageThumbnailPickerVie
 	}
 }
 
-internal class ImageThumbnailPickerViewUserControl : UserControlBase<ImageThumbnailPickerViewModel> { }
+internal class ImageThumbnailPickerViewUserControl : UserControlBase<ImageThumbnailPickerViewModel> {
+}

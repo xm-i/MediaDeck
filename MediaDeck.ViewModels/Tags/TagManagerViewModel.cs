@@ -18,7 +18,11 @@ public class TagManagerViewModel : ViewModelBase {
 			this._tagCategories.AddRange(tagsManager.TagCategories.Select(x => new TagCategoryViewModel(x, tagsManager)));
 		});
 		this.AddTagCategoryCommand.Subscribe(_ => {
-			this._tagCategories.Add(new(new() { TagCategoryName = "", Tags = [], Detail = "" }, tagsManager));
+			this._tagCategories.Add(new(new() {
+				TagCategoryName = "",
+				Tags = [],
+				Detail = ""
+			}, tagsManager));
 		});
 	}
 
