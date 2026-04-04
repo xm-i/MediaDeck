@@ -102,20 +102,6 @@ public class FileChangeTracker : IDisposable {
 		}
 
 		await using var db = await this._dbFactory.CreateDbContextAsync();
-
-		var pathsToFetch = pendingItems
-			.Where(item => item.ChangeType == FileChangeType.Deleted || item.ChangeType == FileChangeType.Renamed)
-			.Select(item => item.OldPath)
-			.Where(path => !string.IsNullOrEmpty(path))
-			.Distinct()
-			.ToList();
-
-		var mediaFilesDict = new Dictionary<string, Database.Tables.MediaFile>();
-		if (pathsToFetch.Count > 0) {
-			var files = await db.MediaFiles.Where(mf => pathsToFetch.Contains(mf.FilePath)).ToListAsync();
-			mediaFilesDict = files.ToDictionary(mf => mf.FilePath);
-		}
-
 		foreach (var item in pendingItems) {
 			if (item.ChangeType == FileChangeType.Deleted || item.ChangeType == FileChangeType.Renamed) {
 				// 1. 先行する変更アイテムが既に UnprocessedChanges にないか確認 (A->B, B->C のケース対応)
@@ -125,8 +111,9 @@ public class FileChangeTracker : IDisposable {
 					item.FileSize = predecessor.FileSize;
 					item.OldHash = predecessor.OldHash;
 				} else {
-					// 2. 一括取得したDBデータから取得
-					if (!string.IsNullOrEmpty(item.OldPath) && mediaFilesDict.TryGetValue(item.OldPath, out var file)) {
+					// 2. DBから取得
+					var file = await db.MediaFiles.FirstOrDefaultAsync(mf => mf.FilePath == item.OldPath);
+					if (file != null) {
 						item.MediaFileId = file.MediaFileId;
 						item.FileSize = file.FileSize;
 						item.OldHash = file.PreHash ?? string.Empty;
