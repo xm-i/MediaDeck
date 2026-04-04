@@ -132,6 +132,7 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 		var tagCategories =
 			await
 				db.TagCategories
+					.AsSplitQuery()
 					.Include(x => x.Tags)
 					.ThenInclude(x => x.TagAliases)
 					.Include(x => x.Tags)
