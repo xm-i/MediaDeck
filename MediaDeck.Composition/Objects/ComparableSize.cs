@@ -4,41 +4,33 @@ namespace MediaDeck.Composition.Objects;
 /// 比較可能なサイズ構造体
 /// </summary>
 public struct ComparableSize : IComparable<ComparableSize>, IComparable {
-	private double _width;
-	private double _height;
-
 	/// <summary>
 	/// 幅
 	/// </summary>
 	public double Width {
-		get {
-			return this._width;
-		}
-		set {
-			this._width = value;
-			this.UpdateArea();
-		}
+		get;
+		set;
 	}
 
 	/// <summary>
 	/// 高さ
 	/// </summary>
 	public double Height {
-		get {
-			return this._height;
-		}
-		set {
-			this._height = value;
-			this.UpdateArea();
-		}
+		get;
+		set;
 	}
 
 	/// <summary>
 	/// 面積
 	/// </summary>
 	public double Area {
-		get;
-		private set;
+		get {
+			if (double.IsNaN(this.Width) || double.IsNaN(this.Height)) {
+				return double.NaN;
+			} else {
+				return this.Width * this.Height;
+			}
+		}
 	}
 
 	/// <summary>
@@ -46,20 +38,9 @@ public struct ComparableSize : IComparable<ComparableSize>, IComparable {
 	/// </summary>
 	/// <param name="width">幅</param>
 	/// <param name="height">高さ</param>
-	public ComparableSize(double width, double height) : this() {
+	public ComparableSize(double width, double height) {
 		this.Width = width;
 		this.Height = height;
-	}
-
-	/// <summary>
-	/// 面積更新
-	/// </summary>
-	private void UpdateArea() {
-		if (double.IsNaN(this.Width) || double.IsNaN(this.Height)) {
-			this.Area = double.NaN;
-		} else {
-			this.Area = this.Width * this.Height;
-		}
 	}
 
 	public int CompareTo(ComparableSize other) {
