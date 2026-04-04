@@ -36,6 +36,12 @@
     <File Path="LICENSE" />
     <File Path="README.md" />
   </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="MediaDeck.Core.Tests/MediaDeck.Core.Tests.csproj">
+      <BuildType Solution="Debug-Unpackaged|*" Project="Debug" />
+      <BuildType Solution="Release-Unpackaged|*" Project="Debug" />
+    </Project>
+  </Folder>
   <Project Path="MediaDeck.Common/MediaDeck.Common.csproj" Id="a4fa147f-96da-4dbf-b176-c855c0796a93">
     <BuildType Solution="Debug-Unpackaged|*" Project="Debug" />
     <BuildType Solution="Release-Unpackaged|*" Project="Release" />
@@ -47,10 +53,6 @@
   <Project Path="MediaDeck.Composition/MediaDeck.Composition.csproj">
     <BuildType Solution="Debug-Unpackaged|*" Project="Debug" />
     <BuildType Solution="Release-Unpackaged|*" Project="Release" />
-  </Project>
-  <Project Path="MediaDeck.Core.Tests/MediaDeck.Core.Tests.csproj">
-    <BuildType Solution="Debug-Unpackaged|*" Project="Debug" />
-    <BuildType Solution="Release-Unpackaged|*" Project="Debug" />
   </Project>
   <Project Path="MediaDeck.Core/MediaDeck.Core.csproj" Id="68cf92ce-95d6-4497-883f-6f94af7a717d">
     <BuildType Solution="Debug-Unpackaged|*" Project="Debug" />
