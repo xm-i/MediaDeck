@@ -4,18 +4,13 @@ namespace MediaDeck.Composition.Objects;
 /// 比較可能なサイズ構造体
 /// </summary>
 public struct ComparableSize : IComparable<ComparableSize>, IComparable {
-	private double _width;
-	private double _height;
-
 	/// <summary>
 	/// 幅
 	/// </summary>
 	public double Width {
-		get {
-			return this._width;
-		}
+		get;
 		set {
-			this._width = value;
+			field = value;
 			this.UpdateArea();
 		}
 	}
@@ -24,11 +19,9 @@ public struct ComparableSize : IComparable<ComparableSize>, IComparable {
 	/// 高さ
 	/// </summary>
 	public double Height {
-		get {
-			return this._height;
-		}
+		get;
 		set {
-			this._height = value;
+			field = value;
 			this.UpdateArea();
 		}
 	}
