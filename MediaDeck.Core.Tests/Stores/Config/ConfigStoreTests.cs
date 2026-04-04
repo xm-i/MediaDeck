@@ -45,6 +45,7 @@ public class ConfigStoreTests : IDisposable {
 		}
 	}
 
+
 	[Fact]
 	public void Load_ThrowsException_CreatesDefaultConfig() {
 		// Arrange
@@ -100,5 +101,29 @@ public class ConfigStoreTests : IDisposable {
 		// Calling Save with an empty file path will cause an exception in Path.GetDirectoryName or File.WriteAllText
 		// The test ensures the exception is caught and does not crash the application
 		Should.NotThrow(() => store.Save());
+	}
+
+	[Fact]
+	public void Save_WithInvalidDirectoryCondition_DoesNotThrow() {
+		// Arrange: Set up an invalid directory condition that works cross-platform.
+		// By setting the target file path to inside a file that already exists, Directory.CreateDirectory will throw an IOException.
+		var tempFile = Path.GetTempFileName();
+		TestableConfigStore.TestPath = Path.Combine(tempFile, "invalid_dir", "test.config");
+
+		try {
+			var services = new ServiceCollection();
+			var mockConfig = (ConfigModel)RuntimeHelpers.GetUninitializedObject(typeof(ConfigModel));
+			services.AddSingleton(mockConfig);
+			var serviceProvider = services.BuildServiceProvider();
+
+			var store = new TestableConfigStore(serviceProvider);
+
+			// Act & Assert
+			Should.NotThrow(() => store.Save());
+		} finally {
+			if (File.Exists(tempFile)) {
+				File.Delete(tempFile);
+			}
+		}
 	}
 }
