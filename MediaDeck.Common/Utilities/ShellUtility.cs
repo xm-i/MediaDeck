@@ -88,15 +88,12 @@ public static class ShellUtility {
 		if (!ShellExecuteExW(ref info)) {
 			// フォールバック: セキュアなProcess.Startを使用
 			var psi = new ProcessStartInfo {
+				FileName = fullPath,
 				UseShellExecute = false
 			};
 
 			if (arguments != null) {
-				psi.FileName = fullPath;
 				psi.Arguments = arguments;
-			} else {
-				psi.FileName = "explorer.exe";
-				psi.ArgumentList.Add(fullPath);
 			}
 
 			Process.Start(psi);
