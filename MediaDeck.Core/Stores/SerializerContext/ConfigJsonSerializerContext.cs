@@ -6,4 +6,5 @@ namespace MediaDeck.Stores.SerializerContext;
 
 [JsonSourceGenerationOptions(WriteIndented = true)]
 [JsonSerializable(typeof(ConfigModelForJson))]
-public partial class ConfigJsonSerializerContext : JsonSerializerContext { }
+public partial class ConfigJsonSerializerContext : JsonSerializerContext {
+}

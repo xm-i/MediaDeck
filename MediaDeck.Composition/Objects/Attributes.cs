@@ -12,7 +12,8 @@ public class Attributes<T> : IEnumerable<TitleValuePair<T>> {
 	/// <summary>
 	/// コンストラクタ
 	/// </summary>
-	public Attributes() { }
+	public Attributes() {
+	}
 
 	/// <summary>
 	/// コンストラクタ

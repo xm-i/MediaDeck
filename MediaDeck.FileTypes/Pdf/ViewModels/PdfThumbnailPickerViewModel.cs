@@ -1,8 +1,7 @@
-using Microsoft.Extensions.Logging;
-
 using MediaDeck.FileTypes.Base.Models;
 using MediaDeck.FileTypes.Base.ViewModels;
 using MediaDeck.FileTypes.Pdf.Models;
+using Microsoft.Extensions.Logging;
 
 namespace MediaDeck.FileTypes.Pdf.ViewModels;
 

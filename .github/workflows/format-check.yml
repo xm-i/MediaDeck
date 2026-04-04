@@ -16,4 +16,6 @@ jobs:
           dotnet-version: '10.0.x'
 
       - name: Verify C# Formatting
-        run: dotnet restore /p:EnableWindowsTargeting=true && dotnet format --no-restore --verify-no-changes
+        run: dotnet format --verify-no-changes
+        env:
+          EnableWindowsTargeting: true

@@ -10,4 +10,5 @@ internal sealed partial class PdfThumbnailPickerView : PdfThumbnailPickerViewUse
 	}
 }
 
-internal class PdfThumbnailPickerViewUserControl : UserControlBase<PdfThumbnailPickerViewModel> { }
+internal class PdfThumbnailPickerViewUserControl : UserControlBase<PdfThumbnailPickerViewModel> {
+}

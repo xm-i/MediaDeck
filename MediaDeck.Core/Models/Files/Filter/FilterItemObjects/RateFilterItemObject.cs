@@ -40,7 +40,8 @@ public class RateFilterItemObject : IFilterItemObject {
 	}
 
 	[Obsolete("for serialize")]
-	public RateFilterItemObject() { }
+	public RateFilterItemObject() {
+	}
 
 	/// <summary>
 	/// コンストラクタ
