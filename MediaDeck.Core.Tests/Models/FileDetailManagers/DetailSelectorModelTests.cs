@@ -1,6 +1,3 @@
-using R3;
-using ObservableCollections;
-using MediaDeck.Core.Models.FileDetailManagers.Objects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,11 +5,14 @@ using System.Threading.Tasks;
 using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Core.Models.FileDetailManagers;
+using MediaDeck.Core.Models.FileDetailManagers.Objects;
 using MediaDeck.Core.Primitives;
 using MediaDeck.Database;
 using MediaDeck.Database.Tables;
 using Microsoft.EntityFrameworkCore;
 using Moq;
+using ObservableCollections;
+using R3;
 using Shouldly;
 using Xunit;
 
@@ -21,10 +21,8 @@ namespace MediaDeck.Core.Tests.Models.FileDetailManagers;
 /// <summary>
 /// DetailSelectorModelの単体テスト
 /// </summary>
-public class DetailSelectorModelTests
-{
-	private TagsManager CreateTagsManager(out Mock<IDbContextFactory<MediaDeckDbContext>> dbFactoryMock, out Mock<ITagModelFactory> tagModelFactoryMock)
-	{
+public class DetailSelectorModelTests {
+	private TagsManager CreateTagsManager(out Mock<IDbContextFactory<MediaDeckDbContext>> dbFactoryMock, out Mock<ITagModelFactory> tagModelFactoryMock) {
 		dbFactoryMock = new Mock<IDbContextFactory<MediaDeckDbContext>>();
 		tagModelFactoryMock = new Mock<ITagModelFactory>();
 
@@ -34,8 +32,7 @@ public class DetailSelectorModelTests
 			.Options;
 
 		dbFactoryMock.Setup(x => x.CreateDbContextAsync(It.IsAny<System.Threading.CancellationToken>()))
-			.ReturnsAsync(() =>
-			{
+			.ReturnsAsync(() => {
 				var db = new MediaDeckDbContext(options);
 				db.Database.OpenConnection();
 				db.Database.EnsureCreated();
@@ -49,8 +46,7 @@ public class DetailSelectorModelTests
 	/// ファイルが0件の場合のRefreshの動作を検証する。
 	/// </summary>
 	[Fact]
-	public void Refresh_EmptyFiles_ShouldResetProperties()
-	{
+	public void Refresh_EmptyFiles_ShouldResetProperties() {
 		// Arrange
 		var tagsManager = this.CreateTagsManager(out _, out _);
 		using var model = new DetailSelectorModel(tagsManager);
@@ -71,8 +67,7 @@ public class DetailSelectorModelTests
 	/// ファイルが1件の場合のRefreshの動作を検証する。
 	/// </summary>
 	[Fact]
-	public void Refresh_SingleFile_ShouldSetProperties()
-	{
+	public void Refresh_SingleFile_ShouldSetProperties() {
 		// Arrange
 		var tagsManager = this.CreateTagsManager(out _, out _);
 		using var model = new DetailSelectorModel(tagsManager);
@@ -103,8 +98,7 @@ public class DetailSelectorModelTests
 	/// ファイルが複数件の場合のRefreshの動作を検証する。
 	/// </summary>
 	[Fact]
-	public void Refresh_MultipleFiles_ShouldAggregateProperties()
-	{
+	public void Refresh_MultipleFiles_ShouldAggregateProperties() {
 		// Arrange
 		var tagsManager = this.CreateTagsManager(out _, out _);
 		using var model = new DetailSelectorModel(tagsManager);
@@ -155,8 +149,7 @@ public class DetailSelectorModelTests
 	/// RefreshTagsがタグを適切にグループ化・カウントすることを検証する。
 	/// </summary>
 	[Fact]
-	public void RefreshTags_MultipleFiles_ShouldGroupAndCountTags()
-	{
+	public void RefreshTags_MultipleFiles_ShouldGroupAndCountTags() {
 		// Arrange
 		var tagsManager = this.CreateTagsManager(out _, out _);
 		using var model = new DetailSelectorModel(tagsManager);
@@ -187,8 +180,7 @@ public class DetailSelectorModelTests
 	/// FindTagByNameAsyncがTagsManagerに委譲していることを検証する。
 	/// </summary>
 	[Fact]
-	public async Task FindTagByNameAsync_ShouldDelegateToTagsManager()
-	{
+	public async Task FindTagByNameAsync_ShouldDelegateToTagsManager() {
 		// Arrange
 		var tagsManager = this.CreateTagsManager(out _, out _);
 		using var model = new DetailSelectorModel(tagsManager);
@@ -208,8 +200,7 @@ public class DetailSelectorModelTests
 	/// LoadTagCandidatesAsyncがTagsManagerに委譲していることを検証する。
 	/// </summary>
 	[Fact]
-	public async Task LoadTagCandidatesAsync_ShouldDelegateToTagsManager()
-	{
+	public async Task LoadTagCandidatesAsync_ShouldDelegateToTagsManager() {
 		// Arrange
 		var tagsManager = this.CreateTagsManager(out var dbFactoryMock, out var tagModelFactoryMock);
 		using var model = new DetailSelectorModel(tagsManager);
@@ -225,8 +216,7 @@ public class DetailSelectorModelTests
 	/// UpdateDescriptionAsyncがIFileModelに委譲していることを検証する。
 	/// </summary>
 	[Fact]
-	public async Task UpdateDescriptionAsync_ShouldDelegateToFileModel()
-	{
+	public async Task UpdateDescriptionAsync_ShouldDelegateToFileModel() {
 		// Arrange
 		var tagsManager = this.CreateTagsManager(out _, out _);
 		using var model = new DetailSelectorModel(tagsManager);
@@ -244,8 +234,7 @@ public class DetailSelectorModelTests
 	/// UpdateRateAsyncが複数のIFileModelに委譲していることを検証する。
 	/// </summary>
 	[Fact]
-	public async Task UpdateRateAsync_ShouldDelegateToAllFileModels()
-	{
+	public async Task UpdateRateAsync_ShouldDelegateToAllFileModels() {
 		// Arrange
 		var tagsManager = this.CreateTagsManager(out _, out _);
 		using var model = new DetailSelectorModel(tagsManager);
@@ -266,8 +255,7 @@ public class DetailSelectorModelTests
 	/// AddTagAsyncがTagsManagerに委譲し、状態をリフレッシュすることを検証する。
 	/// </summary>
 	[Fact]
-	public async Task AddTagAsync_ShouldAddAndRefreshTags()
-	{
+	public async Task AddTagAsync_ShouldAddAndRefreshTags() {
 		// Arrange
 		var tagsManager = this.CreateTagsManager(out _, out _);
 		using var model = new DetailSelectorModel(tagsManager);
@@ -295,8 +283,7 @@ public class DetailSelectorModelTests
 	/// RemoveTagAsyncがTagsManagerに委譲し、状態をリフレッシュすることを検証する。
 	/// </summary>
 	[Fact]
-	public async Task RemoveTagAsync_ShouldRemoveAndRefreshTags()
-	{
+	public async Task RemoveTagAsync_ShouldRemoveAndRefreshTags() {
 		// Arrange
 		var tagsManager = this.CreateTagsManager(out _, out _);
 		using var model = new DetailSelectorModel(tagsManager);
@@ -322,16 +309,19 @@ public class DetailSelectorModelTests
 	[InlineData("nomatch", false, null, "tag")] // No match
 	[InlineData("", false, null, "tag")] // Empty string
 	[InlineData(null, false, null, "tag")] // Null string
-	public void MatchesTagFilter_ShouldFilterCorrectly(string searchText, bool expectedResult, string? expectedRepresentativeText, string tagName)
-	{
+	public void MatchesTagFilter_ShouldFilterCorrectly(string? searchText, bool expectedResult, string? expectedRepresentativeText, string tagName) {
 		// Arrange
 		var tagMock = new Mock<ITagModel>();
 		tagMock.SetupGet(x => x.TagName).Returns(tagName);
 
 		var aliasList = new List<ITagAliasModel>();
-		if (tagName == "tag")
-		{
-			var aliasMock = new Mock<ITagAliasModel>(); aliasMock.SetupGet(x => x.Alias).Returns("TestAlias"); aliasMock.SetupGet(x => x.Ruby).Returns("testruby"); aliasMock.SetupGet(x => x.Romaji).Returns("testromaji"); aliasMock.SetupGet(x => x.Romaji).Returns("testromaji"); aliasList.Add(aliasMock.Object);
+		if (tagName == "tag") {
+			var aliasMock = new Mock<ITagAliasModel>();
+			aliasMock.SetupGet(x => x.Alias).Returns("TestAlias");
+			aliasMock.SetupGet(x => x.Ruby).Returns("testruby");
+			aliasMock.SetupGet(x => x.Romaji).Returns("testromaji");
+			aliasMock.SetupGet(x => x.Romaji).Returns("testromaji");
+			aliasList.Add(aliasMock.Object);
 		}
 		tagMock.SetupGet(x => x.TagAliases).Returns(aliasList);
 
