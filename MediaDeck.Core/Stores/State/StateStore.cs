@@ -1,10 +1,10 @@
+using System;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Text.Json;
-
 using MediaDeck.Composition.Constants;
 using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Stores.SerializerContext;
-
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MediaDeck.Core.Stores.State;
@@ -20,6 +20,13 @@ public class StateStore {
 		private set;
 	}
 
+	// Protected property to allow overriding the file path during testing.
+	protected virtual string StateFilePath {
+		get {
+			return FilePathConstants.StateFilePath;
+		}
+	}
+
 	public StateStore(IServiceProvider service) {
 		this.ScopedService = service;
 		this.Load();
@@ -32,8 +39,8 @@ public class StateStore {
 	public void Load() {
 		var scope = this.ScopedService.CreateScope();
 		try {
-			if (File.Exists(FilePathConstants.StateFilePath)) {
-				var json = File.ReadAllText(FilePathConstants.StateFilePath);
+			if (File.Exists(this.StateFilePath)) {
+				var json = File.ReadAllText(this.StateFilePath);
 				var loaded = JsonSerializer.Deserialize(json, StateJsonSerializerContext.Default.StateModelForJson);
 				if (loaded != null) {
 					this.State = StateModelForJson.CreateModel(loaded, scope.ServiceProvider);
@@ -51,11 +58,11 @@ public class StateStore {
 	/// </summary>
 	public void Save() {
 		try {
-			Directory.CreateDirectory(Path.GetDirectoryName(FilePathConstants.StateFilePath)!);
+			Directory.CreateDirectory(Path.GetDirectoryName(this.StateFilePath)!);
 
 			var jsonDto = StateModelForJson.CreateJson(this.State);
 			var json = JsonSerializer.Serialize(jsonDto, StateJsonSerializerContext.Default.StateModelForJson);
-			File.WriteAllText(FilePathConstants.StateFilePath, json);
+			File.WriteAllText(this.StateFilePath, json);
 		} catch (Exception) {
 			// TODO: 失敗通知
 		}
