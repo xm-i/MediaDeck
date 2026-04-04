@@ -1,0 +1,7 @@
+🧪 Add test for ConfigStore.Save exception handling
+
+🎯 **What:** Added a unit test to verify that `ConfigStore.Save()` catches exceptions, as it is designed to do, rather than propagating them.
+
+📊 **Coverage:** Tests the failure path by temporarily replacing the expected file path with a directory, inducing an `UnauthorizedAccessException` during the save operation, validating that no exception is thrown to the caller.
+
+✨ **Result:** Improved test coverage for the `ConfigStore.Save()` operation and prevents future regressions related to unhandled file I/O exceptions.
