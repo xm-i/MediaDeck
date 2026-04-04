@@ -2,6 +2,7 @@ using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Composition.Stores.State.Model.Objects;
 using MediaDeck.Core.Models.Files.Sort;
 using MediaDeck.Core.Stores.State;
+using MediaDeck.Composition.Enum;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using ObservableCollections;
@@ -37,6 +38,41 @@ public class SortManagerTests
         mockScope.Setup(x => x.ServiceProvider).Returns(realServiceProvider);
 
         _stateStore = new StateStore(_mockServiceProvider.Object);
+    }
+
+    /// <summary>
+    /// ソートロジックが未ソートのリストを正しい順序でソートすることを確認します。
+    /// </summary>
+    [Fact]
+    public void SortLogic_OrdersUnsortedListCorrectly()
+    {
+        // Arrange
+        var sortManager = new SortManager(_stateStore);
+        sortManager.AddCondition();
+        var sortObject = sortManager.SortConditions.Last();
+
+        var item = sortObject.AddSortItemObject();
+        item.SortItemKey = SortItemKey.FilePath;
+        item.Direction = System.ComponentModel.ListSortDirection.Ascending;
+
+        _stateStore.State.SearchState.CurrentSortCondition.Value = sortObject.Id;
+        _stateStore.State.SearchState.SortDirection.Value = System.ComponentModel.ListSortDirection.Ascending;
+
+        var selector = new SortSelector(_stateStore.State);
+        var unsortedList = new[]
+        {
+            new TestFileModel { FilePath = "FileC.txt" },
+            new TestFileModel { FilePath = "FileA.txt" },
+            new TestFileModel { FilePath = "FileB.txt" }
+        };
+
+        // Act
+        var result = selector.SetSortConditions(unsortedList).Cast<TestFileModel>().ToList();
+
+        // Assert
+        Assert.Equal("FileA.txt", result[0].FilePath);
+        Assert.Equal("FileB.txt", result[1].FilePath);
+        Assert.Equal("FileC.txt", result[2].FilePath);
     }
 
     /// <summary>
