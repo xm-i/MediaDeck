@@ -1,0 +1,36 @@
+name: Test
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: ['**']
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Test
+        shell: bash
+        run: |
+          mapfile -t projects < <(find . -name '*Tests.csproj' -not -path '*/obj/*')
+
+          if [ ${#projects[@]} -eq 0 ]; then
+            echo "No test projects found."
+            exit 1
+          fi
+
+          for project in "${projects[@]}"; do
+            echo "Running tests: $project"
+            dotnet test "$project" --configuration Release --verbosity normal
+          done

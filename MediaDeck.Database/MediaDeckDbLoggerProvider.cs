@@ -18,7 +18,8 @@ internal class MediaDeckDbLoggerProvider : ILoggerProvider {
 	/// <summary>
 	/// Dispose
 	/// </summary>
-	public void Dispose() { }
+	public void Dispose() {
+	}
 
 	/// <summary>
 	/// コンソール出力ロガー

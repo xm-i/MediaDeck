@@ -10,4 +10,5 @@ internal sealed partial class ArchiveThumbnailPickerView : ArchiveThumbnailPicke
 	}
 }
 
-internal class ArchiveThumbnailPickerViewUserControl : UserControlBase<ArchiveThumbnailPickerViewModel> { }
+internal class ArchiveThumbnailPickerViewUserControl : UserControlBase<ArchiveThumbnailPickerViewModel> {
+}

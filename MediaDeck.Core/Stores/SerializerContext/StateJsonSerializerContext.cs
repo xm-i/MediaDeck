@@ -12,4 +12,5 @@ namespace MediaDeck.Stores.SerializerContext;
 		typeof(SearchConditionJsonConverter)
 	])]
 [JsonSerializable(typeof(StateModelForJson))]
-public partial class StateJsonSerializerContext : JsonSerializerContext { }
+public partial class StateJsonSerializerContext : JsonSerializerContext {
+}

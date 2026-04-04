@@ -1,9 +1,5 @@
 using System.IO;
-
 using CommunityToolkit.Mvvm.DependencyInjection;
-
-using FluentAssertions;
-
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Interfaces.FileTypes;
@@ -16,10 +12,9 @@ using MediaDeck.Composition.Objects;
 using MediaDeck.Core.Utils;
 using MediaDeck.Database.Tables;
 using MediaDeck.Database.Tables.Metadata;
-
 using Microsoft.Extensions.DependencyInjection;
-
 using R3;
+using Shouldly;
 
 namespace MediaDeck.Core.Tests.Utils;
 
@@ -63,10 +58,8 @@ public class FileTypeUtilityTest {
 
 		var result = FileTypeUtility.CreateFileModelFromRecord(mediaFile);
 
-		result.Should()
-			.BeOfType<TestFileModel>()
-			.Which.CreatedBy.Should()
-			.Be("image");
+		var testFileModel = result.ShouldBeOfType<TestFileModel>();
+		testFileModel.CreatedBy.ShouldBe("image");
 	}
 
 	/// <summary>
@@ -78,10 +71,8 @@ public class FileTypeUtilityTest {
 
 		var result = FileTypeUtility.CreateFileModelFromRecord(mediaFile);
 
-		result.Should()
-			.BeOfType<TestFileModel>()
-			.Which.CreatedBy.Should()
-			.Be("unknown");
+		var testFileModel = result.ShouldBeOfType<TestFileModel>();
+		testFileModel.CreatedBy.ShouldBe("unknown");
 	}
 
 	/// <summary>
@@ -93,10 +84,8 @@ public class FileTypeUtilityTest {
 
 		var result = FileTypeUtility.CreateFileViewModel(fileModel);
 
-		result.Should()
-			.BeOfType<TestFileViewModel>()
-			.Which.CreatedBy.Should()
-			.Be("video");
+		var testFileViewModel = result.ShouldBeOfType<TestFileViewModel>();
+		testFileViewModel.CreatedBy.ShouldBe("video");
 	}
 
 	/// <summary>
@@ -108,10 +97,8 @@ public class FileTypeUtilityTest {
 
 		var result = FileTypeUtility.CreateDetailViewerPreviewControlView(fileViewModel);
 
-		result.Should()
-			.BeOfType<TestDetailViewerPreviewControlView>()
-			.Which.CreatedBy.Should()
-			.Be("unknown");
+		var testView = result.ShouldBeOfType<TestDetailViewerPreviewControlView>();
+		testView.CreatedBy.ShouldBe("unknown");
 	}
 
 	/// <summary>
@@ -124,14 +111,10 @@ public class FileTypeUtilityTest {
 		var thumbnailPickerViewModel = FileTypeUtility.CreateThumbnailPickerViewModel(fileViewModel);
 		var thumbnailPickerView = FileTypeUtility.CreateThumbnailPickerView(fileViewModel);
 
-		thumbnailPickerViewModel.Should()
-			.BeOfType<TestThumbnailPickerViewModel>()
-			.Which.CreatedBy.Should()
-			.Be("video");
-		thumbnailPickerView.Should()
-			.BeOfType<TestThumbnailPickerView>()
-			.Which.CreatedBy.Should()
-			.Be("video");
+		var testPickerVm = thumbnailPickerViewModel.ShouldBeOfType<TestThumbnailPickerViewModel>();
+		testPickerVm.CreatedBy.ShouldBe("video");
+		var testPickerView = thumbnailPickerView.ShouldBeOfType<TestThumbnailPickerView>();
+		testPickerView.CreatedBy.ShouldBe("video");
 	}
 
 	/// <summary>
@@ -141,9 +124,9 @@ public class FileTypeUtilityTest {
 	public void CreateFileOperators_ReturnsOperatorsForAllRegisteredFileTypes() {
 		var result = FileTypeUtility.CreateFileOperators();
 
-		result.Should().HaveCount(3);
-		result.Should().OnlyContain(x => x is TestFileOperator);
-		result.Cast<TestFileOperator>().Select(x => x.CreatedBy).Should().Equal("unknown", "image", "video");
+		result.Count().ShouldBe(3);
+		result.ShouldAllBe(x => x is TestFileOperator);
+		result.Cast<TestFileOperator>().Select(x => x.CreatedBy).ToArray().ShouldBe(["unknown", "image", "video"]);
 	}
 
 	/// <summary>
@@ -155,12 +138,11 @@ public class FileTypeUtilityTest {
 
 		var result = FileTypeUtility.IncludeTables(mediaFiles).ToList();
 
-		result.Select(x => x.FilePath)
-			.Should()
-			.Equal(@"C:\media\base.dat",
+		result.Select(x => x.FilePath).ToArray()
+			.ShouldBe([@"C:\media\base.dat",
 				@"C:\included\unknown.dat",
 				@"C:\included\image.dat",
-				@"C:\included\video.dat");
+				@"C:\included\video.dat"]);
 	}
 
 	/// <summary>
@@ -617,7 +599,8 @@ public class FileTypeUtilityTest {
 		/// <summary>
 		/// サムネイルを更新する。
 		/// </summary>
-		public void RefreshThumbnail() { }
+		public void RefreshThumbnail() {
+		}
 	}
 
 	/// <summary>
@@ -698,7 +681,8 @@ public class FileTypeUtilityTest {
 		/// <summary>
 		/// サムネイルを再生成する。
 		/// </summary>
-		public void RecreateThumbnail() { }
+		public void RecreateThumbnail() {
+		}
 
 		/// <summary>
 		/// サムネイルを保存する。

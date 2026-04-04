@@ -34,8 +34,8 @@ public class ExecutionConfigPageViewModel : ViewModelBase, IConfigPageViewModel 
 	public ExecutionConfigPageViewModel(ExecutionConfigModel executionConfig) {
 		this._executionConfig = executionConfig;
 		this.AddExecutionProgramCommand.Subscribe(_ => {
-				this._executionConfig.AddExecutionProgram();
-			})
+			this._executionConfig.AddExecutionProgram();
+		})
 			.AddTo(this.CompositeDisposable);
 		this.ExecutionPrograms =
 			this._executionConfig

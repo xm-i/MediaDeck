@@ -70,7 +70,12 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 	}
 
 	public async Task RemoveTagAsync(IFileModel[] fileModels, int tagId) {
-		var ids = fileModels.Select(x => x.Id);
+		var target = fileModels.Where(x => x.Tags.Any(t => t.TagId == tagId)).ToArray();
+		if (!target.Any()) {
+			return;
+		}
+
+		var ids = target.Select(x => x.Id);
 		await using var db = await this._dbFactory.CreateDbContextAsync();
 		using var transaction = await db.Database.BeginTransactionAsync();
 		var rel =
@@ -84,7 +89,7 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 			await db.SaveChangesAsync();
 
 			var removedIds = rel.Select(x => x.MediaFileId).ToHashSet();
-			foreach (var file in fileModels) {
+			foreach (var file in target) {
 				if (removedIds.Contains(file.Id)) {
 					file.Tags.RemoveAll(x => x.TagId == tagId);
 				}
@@ -132,6 +137,7 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 		var tagCategories =
 			await
 				db.TagCategories
+					.AsSplitQuery()
 					.Include(x => x.Tags)
 					.ThenInclude(x => x.TagAliases)
 					.Include(x => x.Tags)
