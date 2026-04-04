@@ -39,7 +39,7 @@ public class UpdateFileHashBackgroundServiceTests {
 				mediaFiles.Add(new MediaFile {
 					FilePath = $"path{i}.jpg",
 					DirectoryPath = "dir",
-					Description = "",
+					Description = string.Empty,
 					IsExists = true,
 					PreHash = $"pre{i}",
 					FullHash = $"full{i}",
