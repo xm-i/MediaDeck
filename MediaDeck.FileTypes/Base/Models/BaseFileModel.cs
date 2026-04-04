@@ -109,7 +109,7 @@ internal abstract class BaseFileModel : ModelBase, IFileModel {
 	public string Description {
 		get;
 		set;
-	} = "";
+	} = string.Empty;
 
 	/// <summary>
 	/// 作成日時

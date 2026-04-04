@@ -59,7 +59,7 @@ public class DetailSelectorViewModel : ViewModelBase {
 			}
 
 			await model.AddTagAsync(this.TargetFileModels, tag);
-			this.Text.Value = "";
+			this.Text.Value = string.Empty;
 		});
 		this.SearchTaggedFilesCommand.Subscribe(x => {
 			searchConditionNotificationDispatcher.AddRequest.OnNext(new TagSearchCondition(x.Value));
@@ -143,7 +143,7 @@ public class DetailSelectorViewModel : ViewModelBase {
 
 	public async Task OnNewTagCreated(ITagModel tag) {
 		await this._model.AddTagAsync(this.TargetFileModels, tag);
-		this.Text.Value = "";
+		this.Text.Value = string.Empty;
 	}
 
 	public TagsManager GetTagsManager() {

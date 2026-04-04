@@ -315,7 +315,7 @@ public static class StringUtility {
 
 
 	public static string KatakanaToHiragana(this string text) {
-		var result = "";
+		var result = string.Empty;
 		foreach (var ch in text) {
 			result += ch is >= beginKatakana and <= endKatakana ? (char)(ch - offset) : ch;
 		}
