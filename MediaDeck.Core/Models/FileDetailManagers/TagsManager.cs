@@ -132,15 +132,13 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 		var tagCategories =
 			await
 				db.TagCategories
+					.AsSplitQuery()
 					.Include(x => x.Tags)
 					.ThenInclude(x => x.TagAliases)
+					.Include(x => x.Tags)
+					.ThenInclude(x => x.MediaFileTags)
 					.ToArrayAsync();
-
-		var tagCounts = await db.Tags
-			.Select(x => new { x.TagId, Count = x.MediaFileTags.Count })
-			.ToDictionaryAsync(x => x.TagId, x => x.Count);
-
-		foreach (var tag in tagCategories.SelectMany(x => x.Tags).OrderByDescending(x => tagCounts.GetValueOrDefault(x.TagId, 0))) {
+		foreach (var tag in tagCategories.SelectMany(x => x.Tags).OrderByDescending(x => x.MediaFileTags.Count)) {
 			var newTag = this._tagModelFactory.Create(tag);
 			this.Tags.Add(newTag);
 		}
