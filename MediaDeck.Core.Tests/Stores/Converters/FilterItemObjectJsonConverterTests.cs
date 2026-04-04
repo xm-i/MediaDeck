@@ -1,7 +1,7 @@
 using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using FluentAssertions;
+using Shouldly;
 using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Core.Stores.Converters;
 using Portable.Xaml;
@@ -31,7 +31,7 @@ public class FilterItemObjectJsonConverterTests
         Action act = () => JsonSerializer.Deserialize<IFilterItemObject>(json, _options);
 
         // Assert
-        act.Should().Throw<Exception>()
-            .WithMessage("Failed to deserialize IFilterItemObject from XAML.");
+        var exception = act.ShouldThrow<Exception>();
+        exception.Message.ShouldBe("Failed to deserialize IFilterItemObject from XAML.");
     }
 }
