@@ -1,75 +1,85 @@
 using System;
 using System.IO;
-using System.Reflection;
 using System.Runtime.CompilerServices;
-using Shouldly;
 using MediaDeck.Composition.Constants;
+using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Core.Stores.Config;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
+using Shouldly;
 using Xunit;
 
 namespace MediaDeck.Core.Tests.Stores.Config;
 
-public class ConfigStoreTests
+public class ConfigStoreTests : IDisposable
 {
+    private readonly string _configFilePath;
+    private readonly string _backupConfigFilePath;
+    private readonly bool _hadExistingConfig;
+
+    public ConfigStoreTests()
+    {
+        _configFilePath = FilePathConstants.ConfigFilePath;
+        _backupConfigFilePath = _configFilePath + ".bak";
+
+        _hadExistingConfig = File.Exists(_configFilePath);
+        if (_hadExistingConfig)
+        {
+            File.Move(_configFilePath, _backupConfigFilePath);
+        }
+    }
+
+    public void Dispose()
+    {
+        if (File.Exists(_configFilePath))
+        {
+            File.Delete(_configFilePath);
+        }
+
+        if (_hadExistingConfig)
+        {
+            File.Move(_backupConfigFilePath, _configFilePath);
+        }
+    }
+
     [Fact]
-    public void Save_ShouldHandleException_WhenFilePathIsInvalid()
+    public void Load_ThrowsException_CreatesDefaultConfig()
     {
         // Arrange
-        // Create an uninitialized object to bypass the constructor which calls Load() and requires dependency injection setup
-        var configStore = (ConfigStore)RuntimeHelpers.GetUninitializedObject(typeof(ConfigStore));
+        Directory.CreateDirectory(Path.GetDirectoryName(_configFilePath)!);
+        // Write invalid JSON to force JsonSerializer.Deserialize to throw JsonException
+        File.WriteAllText(_configFilePath, "{ invalid json }");
 
-        // Let's modify the exception simulation approach.
-        // If we can't easily overwrite the static initonly backing field without unsafe code in newer .NET,
-        // we can set up an invalid state another way if possible.
-        // Wait, setting initonly fields via reflection used to work but is blocked in .NET 10.
-        // Another approach: since `ConfigFilePath` evaluates to `Environment.SpecialFolder.ApplicationData + "\\MediaDeck\\MediaDeck.config"`,
-        // and we cannot easily change `Environment.SpecialFolder.ApplicationData`, what if we pre-create a directory at that path?
-        // Wait, the path is %APPDATA%\MediaDeck\MediaDeck.config. We can create a folder named `MediaDeck.config`.
-        // `File.WriteAllText` will throw `UnauthorizedAccessException` when it tries to write to a path that is actually a directory.
+        var services = new ServiceCollection();
+        var mockConfig = (ConfigModel)RuntimeHelpers.GetUninitializedObject(typeof(ConfigModel));
+        services.AddSingleton(mockConfig);
+        var serviceProvider = services.BuildServiceProvider();
 
-        var configFilePath = FilePathConstants.ConfigFilePath;
-        var isCreatedByTest = false;
-        var directoryExisted = Directory.Exists(configFilePath);
-        var fileExisted = File.Exists(configFilePath);
+        // Act
+        var store = new ConfigStore(serviceProvider); // Load is called in constructor
 
-        string? tempFileBackup = null;
+        // Assert
+        store.Config.ShouldNotBeNull();
+        store.Config.ShouldBeSameAs(mockConfig); // Should fallback to DI
+    }
 
-        try
-        {
-            if (fileExisted)
-            {
-                // Temporarily backup the file if it exists
-                tempFileBackup = Path.GetTempFileName();
-                File.Copy(configFilePath, tempFileBackup, true);
-                File.Delete(configFilePath);
-            }
+    [Fact]
+    public void Save_ThrowsException_DoesNotCrash()
+    {
+        // Arrange
+        Directory.CreateDirectory(Path.GetDirectoryName(_configFilePath)!);
+        // Lock the file to force an IOException when Save tries to write to it
+        using var fs = new FileStream(_configFilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
 
-            if (!directoryExisted && !fileExisted)
-            {
-                Directory.CreateDirectory(configFilePath);
-                isCreatedByTest = true;
-            }
+        var services = new ServiceCollection();
+        var mockConfig = (ConfigModel)RuntimeHelpers.GetUninitializedObject(typeof(ConfigModel));
+        services.AddSingleton(mockConfig);
+        var serviceProvider = services.BuildServiceProvider();
 
-            // Act
-            Action act = () => configStore.Save();
+        var store = new ConfigStore(serviceProvider);
 
-            // Assert
-            act.ShouldNotThrow();
-        }
-        finally
-        {
-            // Clean up
-            if (isCreatedByTest && Directory.Exists(configFilePath))
-            {
-                Directory.Delete(configFilePath);
-            }
-
-            if (tempFileBackup != null && File.Exists(tempFileBackup))
-            {
-                File.Copy(tempFileBackup, configFilePath, true);
-                File.Delete(tempFileBackup);
-            }
-        }
+        // Act & Assert
+        // Should not throw
+        Should.NotThrow(() => store.Save());
     }
 }
