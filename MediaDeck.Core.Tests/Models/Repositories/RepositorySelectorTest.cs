@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using MediaDeck.Core.Models.Repositories;
 using System.Runtime.CompilerServices;
 using Xunit;
@@ -25,11 +25,10 @@ public class RepositorySelectorTest
         var selector = new RepositorySelector(dummyFolderRepository!);
 
         // Assert
-        selector.Repositories.Should().NotBeNull();
-        selector.Repositories.Should().ContainSingle();
-        selector.Repositories.First().Should().BeSameAs(dummyFolderRepository);
+        selector.Repositories.ShouldNotBeNull();
+        selector.Repositories.ShouldHaveSingleItem().ShouldBeSameAs(dummyFolderRepository);
 
-        selector.SelectedRepository.Should().NotBeNull();
-        selector.SelectedRepository.Value.Should().BeSameAs(dummyFolderRepository);
+        selector.SelectedRepository.ShouldNotBeNull();
+        selector.SelectedRepository.Value.ShouldBeSameAs(dummyFolderRepository);
     }
 }

@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using FluentAssertions;
+using Shouldly;
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Composition.Stores.Config.Model.Objects;
@@ -38,13 +38,13 @@ public class FilePathServiceTests
         var result = _sut.GetThumbnailRelativeFilePath();
 
         // Assert
-        result.Should().NotBeNullOrWhiteSpace();
-        result.Should().EndWith(".jpg");
+        result.ShouldNotBeNullOrWhiteSpace();
+        result.ShouldEndWith(".jpg");
 
         // Format should be: [2 chars]\[30 chars].jpg
         // Guid without hyphens ("N") is 32 chars. Total length = 2 + 1 + 30 + 4 = 37
-        result.Length.Should().Be(37);
-        result.Substring(2, 1).Should().Be(@"\");
+        result.Length.ShouldBe(37);
+        result.Substring(2, 1).ShouldBe(@"\");
     }
 
     [Fact]
@@ -59,7 +59,7 @@ public class FilePathServiceTests
         var result = _sut.GetThumbnailAbsoluteFilePath(relativePath);
 
         // Assert
-        result.Should().Be(expectedAbsolutePath);
+        result.ShouldBe(expectedAbsolutePath);
     }
 
     [Theory]
@@ -76,7 +76,7 @@ public class FilePathServiceTests
         var result = _sut.IsTargetFile(path);
 
         // Assert
-        result.Should().Be(expected);
+        result.ShouldBe(expected);
     }
 
     [Theory]
@@ -92,7 +92,7 @@ public class FilePathServiceTests
         var result = _sut.IsVideoFile(path);
 
         // Assert
-        result.Should().Be(expected);
+        result.ShouldBe(expected);
     }
 
     [Theory]
@@ -108,7 +108,7 @@ public class FilePathServiceTests
         var result = _sut.IsImageFile(path);
 
         // Assert
-        result.Should().Be(expected);
+        result.ShouldBe(expected);
     }
 
     [Theory]
@@ -124,6 +124,6 @@ public class FilePathServiceTests
         var result = _sut.GetMediaType(path);
 
         // Assert
-        result.Should().Be(expected);
+        result.ShouldBe(expected);
     }
 }

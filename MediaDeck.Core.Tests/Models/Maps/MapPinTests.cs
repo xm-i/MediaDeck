@@ -1,6 +1,6 @@
 using System;
 using System.Drawing;
-using FluentAssertions;
+using Shouldly;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Composition.Interfaces.Primitives;
 using MediaDeck.Core.Models.Maps;
@@ -26,12 +26,12 @@ public class MapPinTests {
         var mapPin = new MapPin(mockFile.Object, rect);
 
         // Assert
-        mapPin.Core.Value.Should().Be(mockFile.Object);
-        mapPin.CoreRectangle.Should().Be(rect);
-        mapPin.Location.Should().Be(mockLocation.Object);
-        mapPin.Items.Should().ContainSingle().Which.Should().Be(mockFile.Object);
-        mapPin.Count.Should().Be(1);
-        mapPin.PinState.Value.Should().Be(PinState.Unselected);
+        mapPin.Core.Value.ShouldBe(mockFile.Object);
+        mapPin.CoreRectangle.ShouldBe(rect);
+        mapPin.Location.ShouldBe(mockLocation.Object);
+        mapPin.Items.ShouldHaveSingleItem().ShouldBe(mockFile.Object);
+        mapPin.Count.ShouldBe(1);
+        mapPin.PinState.Value.ShouldBe(PinState.Unselected);
     }
 
     [Fact]
@@ -46,7 +46,7 @@ public class MapPinTests {
         mapPin.Items.Add(mockFile2.Object);
 
         // Assert
-        mapPin.Count.Should().Be(2);
+        mapPin.Count.ShouldBe(2);
     }
 
     [Fact]
@@ -61,6 +61,6 @@ public class MapPinTests {
         var result = mapPin.ToString();
 
         // Assert
-        result.Should().Be("<[MediaDeck.Core.Models.Maps.MapPin] test/path/to/file.jpg>");
+        result.ShouldBe("<[MediaDeck.Core.Models.Maps.MapPin] test/path/to/file.jpg>");
     }
 }
