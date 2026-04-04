@@ -1,13 +1,11 @@
 using System.Text;
 using System.Text.Json;
 
+using FluentAssertions;
+
 using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Core.Models.Files.SearchConditions;
 using MediaDeck.Core.Stores.Converters;
-
-using Portable.Xaml;
-
-using Shouldly;
 
 namespace MediaDeck.Core.Tests.Stores.Converters;
 
@@ -39,9 +37,9 @@ public class SearchConditionJsonConverterTests {
 		var result = JsonSerializer.Deserialize<ISearchCondition>(json, this._options);
 
 		// Assert
-		result.ShouldNotBeNull();
-		result.ShouldBeOfType<WordSearchCondition>();
-		((WordSearchCondition)result).Word.ShouldBe(word);
+		result.Should().NotBeNull();
+		result.Should().BeOfType<WordSearchCondition>();
+		((WordSearchCondition)result!).Word.Should().Be(word);
 	}
 
 	/// <summary>
@@ -56,7 +54,7 @@ public class SearchConditionJsonConverterTests {
 		var result = JsonSerializer.Deserialize<ISearchCondition>(json, this._options);
 
 		// Assert
-		result.ShouldBeNull();
+		result.Should().BeNull();
 	}
 
 	/// <summary>
@@ -69,11 +67,14 @@ public class SearchConditionJsonConverterTests {
 		var xaml = @"<String xmlns=""http://schemas.microsoft.com/winfx/2006/xaml"">test</String>";
 		var json = $@"""{xaml.Replace(@"""", @"\""")}""";
 
-		// Act & Assert
-		var ex = Should.Throw<JsonException>(() => JsonSerializer.Deserialize<ISearchCondition>(json, this._options));
-		ex.InnerException.ShouldNotBeNull();
-		// Portable.Xaml は未知の型や不適合な型に対して XamlObjectWriterException などを投げる可能性がある
-		// ここでは InnerException が存在し、Converter 内で rethrow されたことを確認する
+		// Act
+		var action = () => JsonSerializer.Deserialize<ISearchCondition>(json, this._options);
+
+		// Assert
+		// JsonSerializer は Converter から投げられた Exception を JsonException でラップする
+		action.Should().Throw<JsonException>()
+			.WithInnerException<Exception>()
+			.And.InnerException!.Message.Should().Be("Failed to deserialize ISearchCondition from XAML.");
 	}
 
 	/// <summary>
@@ -89,13 +90,13 @@ public class SearchConditionJsonConverterTests {
 		var json = JsonSerializer.Serialize<ISearchCondition>(condition, this._options);
 
 		// Assert
-		json.ShouldContain("WordSearchCondition");
-		json.ShouldContain(word);
+		json.Should().Contain("WordSearchCondition");
+		json.Should().Contain(word);
 
 		// Round trip
 		var deserialized = JsonSerializer.Deserialize<ISearchCondition>(json, this._options);
-		deserialized.ShouldNotBeNull();
-		deserialized.ShouldBeOfType<WordSearchCondition>();
-		((WordSearchCondition)deserialized).Word.ShouldBe(word);
+		deserialized.Should().NotBeNull();
+		deserialized.Should().BeOfType<WordSearchCondition>();
+		((WordSearchCondition)deserialized!).Word.Should().Be(word);
 	}
 }

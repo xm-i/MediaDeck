@@ -2,7 +2,7 @@ using System.IO;
 
 using CommunityToolkit.Mvvm.DependencyInjection;
 
-using Shouldly;
+using FluentAssertions;
 
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.Files;
@@ -63,8 +63,10 @@ public class FileTypeUtilityTest {
 
 		var result = FileTypeUtility.CreateFileModelFromRecord(mediaFile);
 
-		var testFileModel = result.ShouldBeOfType<TestFileModel>();
-		testFileModel.CreatedBy.ShouldBe("image");
+		result.Should()
+			.BeOfType<TestFileModel>()
+			.Which.CreatedBy.Should()
+			.Be("image");
 	}
 
 	/// <summary>
@@ -76,8 +78,10 @@ public class FileTypeUtilityTest {
 
 		var result = FileTypeUtility.CreateFileModelFromRecord(mediaFile);
 
-		var testFileModel = result.ShouldBeOfType<TestFileModel>();
-		testFileModel.CreatedBy.ShouldBe("unknown");
+		result.Should()
+			.BeOfType<TestFileModel>()
+			.Which.CreatedBy.Should()
+			.Be("unknown");
 	}
 
 	/// <summary>
@@ -89,8 +93,10 @@ public class FileTypeUtilityTest {
 
 		var result = FileTypeUtility.CreateFileViewModel(fileModel);
 
-		var testFileViewModel = result.ShouldBeOfType<TestFileViewModel>();
-		testFileViewModel.CreatedBy.ShouldBe("video");
+		result.Should()
+			.BeOfType<TestFileViewModel>()
+			.Which.CreatedBy.Should()
+			.Be("video");
 	}
 
 	/// <summary>
@@ -102,8 +108,10 @@ public class FileTypeUtilityTest {
 
 		var result = FileTypeUtility.CreateDetailViewerPreviewControlView(fileViewModel);
 
-		var testView = result.ShouldBeOfType<TestDetailViewerPreviewControlView>();
-		testView.CreatedBy.ShouldBe("unknown");
+		result.Should()
+			.BeOfType<TestDetailViewerPreviewControlView>()
+			.Which.CreatedBy.Should()
+			.Be("unknown");
 	}
 
 	/// <summary>
@@ -116,10 +124,14 @@ public class FileTypeUtilityTest {
 		var thumbnailPickerViewModel = FileTypeUtility.CreateThumbnailPickerViewModel(fileViewModel);
 		var thumbnailPickerView = FileTypeUtility.CreateThumbnailPickerView(fileViewModel);
 
-		var testPickerVm = thumbnailPickerViewModel.ShouldBeOfType<TestThumbnailPickerViewModel>();
-		testPickerVm.CreatedBy.ShouldBe("video");
-		var testPickerView = thumbnailPickerView.ShouldBeOfType<TestThumbnailPickerView>();
-		testPickerView.CreatedBy.ShouldBe("video");
+		thumbnailPickerViewModel.Should()
+			.BeOfType<TestThumbnailPickerViewModel>()
+			.Which.CreatedBy.Should()
+			.Be("video");
+		thumbnailPickerView.Should()
+			.BeOfType<TestThumbnailPickerView>()
+			.Which.CreatedBy.Should()
+			.Be("video");
 	}
 
 	/// <summary>
@@ -129,9 +141,9 @@ public class FileTypeUtilityTest {
 	public void CreateFileOperators_ReturnsOperatorsForAllRegisteredFileTypes() {
 		var result = FileTypeUtility.CreateFileOperators();
 
-		result.Count().ShouldBe(3);
-		result.ShouldAllBe(x => x is TestFileOperator);
-		result.Cast<TestFileOperator>().Select(x => x.CreatedBy).ToArray().ShouldBe(["unknown", "image", "video"]);
+		result.Should().HaveCount(3);
+		result.Should().OnlyContain(x => x is TestFileOperator);
+		result.Cast<TestFileOperator>().Select(x => x.CreatedBy).Should().Equal("unknown", "image", "video");
 	}
 
 	/// <summary>
@@ -143,11 +155,12 @@ public class FileTypeUtilityTest {
 
 		var result = FileTypeUtility.IncludeTables(mediaFiles).ToList();
 
-		result.Select(x => x.FilePath).ToArray()
-			.ShouldBe([@"C:\media\base.dat",
+		result.Select(x => x.FilePath)
+			.Should()
+			.Equal(@"C:\media\base.dat",
 				@"C:\included\unknown.dat",
 				@"C:\included\image.dat",
-				@"C:\included\video.dat"]);
+				@"C:\included\video.dat");
 	}
 
 	/// <summary>

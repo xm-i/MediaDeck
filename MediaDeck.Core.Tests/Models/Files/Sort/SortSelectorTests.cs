@@ -27,8 +27,8 @@ public class SortSelectorTests
         services.AddSingleton<ViewerStateModel>();
         services.AddSingleton<StateModel>();
 
-        _serviceProvider = services.BuildServiceProvider();
-        _stateModel = _serviceProvider.GetRequiredService<StateModel>();
+        this._serviceProvider = services.BuildServiceProvider();
+        this._stateModel = this._serviceProvider.GetRequiredService<StateModel>();
     }
 
     /// <summary>
@@ -38,7 +38,7 @@ public class SortSelectorTests
     public void SetSortConditions_ReturnsOriginalArray_WhenCurrentSortConditionIsNull()
     {
         // Arrange
-        var selector = new SortSelector(_stateModel);
+        var selector = new SortSelector(this._stateModel);
         var files = new[] { new TestFileModel { Id = 1 }, new TestFileModel { Id = 2 } };
 
         // Act
@@ -55,10 +55,10 @@ public class SortSelectorTests
     public void SetSortConditions_ThrowsInvalidOperationException_WhenSortItemObjectsIsEmpty()
     {
         // Arrange
-        var sortObject = _stateModel.SearchState.AddSortCondition();
-        _stateModel.SearchState.CurrentSortCondition.Value = sortObject.Id;
+        var sortObject = this._stateModel.SearchState.AddSortCondition();
+        this._stateModel.SearchState.CurrentSortCondition.Value = sortObject.Id;
 
-        var selector = new SortSelector(_stateModel);
+        var selector = new SortSelector(this._stateModel);
         var files = new[] { new TestFileModel { Id = 1 } };
 
         // Act & Assert
@@ -72,15 +72,15 @@ public class SortSelectorTests
     public void SetSortConditions_SortsBySingleProperty_Ascending()
     {
         // Arrange
-        var sortObject = _stateModel.SearchState.AddSortCondition();
+        var sortObject = this._stateModel.SearchState.AddSortCondition();
         var item = sortObject.AddSortItemObject();
         item.SortItemKey = SortItemKey.FilePath;
         item.Direction = ListSortDirection.Ascending;
 
-        _stateModel.SearchState.CurrentSortCondition.Value = sortObject.Id;
-        _stateModel.SearchState.SortDirection.Value = ListSortDirection.Ascending;
+        this._stateModel.SearchState.CurrentSortCondition.Value = sortObject.Id;
+        this._stateModel.SearchState.SortDirection.Value = ListSortDirection.Ascending;
 
-        var selector = new SortSelector(_stateModel);
+        var selector = new SortSelector(this._stateModel);
         var files = new[]
         {
             new TestFileModel { FilePath = "B" },
@@ -104,15 +104,15 @@ public class SortSelectorTests
     public void SetSortConditions_SortsBySingleProperty_Descending()
     {
         // Arrange
-        var sortObject = _stateModel.SearchState.AddSortCondition();
+        var sortObject = this._stateModel.SearchState.AddSortCondition();
         var item = sortObject.AddSortItemObject();
         item.SortItemKey = SortItemKey.FilePath;
         item.Direction = ListSortDirection.Ascending; // Item's base direction is Asc
 
-        _stateModel.SearchState.CurrentSortCondition.Value = sortObject.Id;
-        _stateModel.SearchState.SortDirection.Value = ListSortDirection.Descending; // Overall reverse is Desc
+        this._stateModel.SearchState.CurrentSortCondition.Value = sortObject.Id;
+        this._stateModel.SearchState.SortDirection.Value = ListSortDirection.Descending; // Overall reverse is Desc
 
-        var selector = new SortSelector(_stateModel);
+        var selector = new SortSelector(this._stateModel);
         var files = new[]
         {
             new TestFileModel { FilePath = "B" },
@@ -136,7 +136,7 @@ public class SortSelectorTests
     public void SetSortConditions_SortsByMultipleProperties()
     {
         // Arrange
-        var sortObject = _stateModel.SearchState.AddSortCondition();
+        var sortObject = this._stateModel.SearchState.AddSortCondition();
 
         var item1 = sortObject.AddSortItemObject();
         item1.SortItemKey = SortItemKey.Rate;
@@ -146,10 +146,10 @@ public class SortSelectorTests
         item2.SortItemKey = SortItemKey.FilePath;
         item2.Direction = ListSortDirection.Ascending;
 
-        _stateModel.SearchState.CurrentSortCondition.Value = sortObject.Id;
-        _stateModel.SearchState.SortDirection.Value = ListSortDirection.Ascending;
+        this._stateModel.SearchState.CurrentSortCondition.Value = sortObject.Id;
+        this._stateModel.SearchState.SortDirection.Value = ListSortDirection.Ascending;
 
-        var selector = new SortSelector(_stateModel);
+        var selector = new SortSelector(this._stateModel);
         var files = new[]
         {
             new TestFileModel { Rate = 5, FilePath = "B" },

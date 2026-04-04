@@ -2,7 +2,6 @@ using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Composition.Stores.State.Model.Objects;
 using MediaDeck.Core.Models.Files.Sort;
 using MediaDeck.Core.Stores.State;
-using MediaDeck.Composition.Enum;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using ObservableCollections;
@@ -29,50 +28,15 @@ public class SortManagerTests
 
         var realServiceProvider = services.BuildServiceProvider();
 
-        _mockServiceProvider = new Mock<IServiceProvider>();
+        this._mockServiceProvider = new Mock<IServiceProvider>();
         var mockScope = new Mock<IServiceScope>();
         var mockScopeFactory = new Mock<IServiceScopeFactory>();
 
-        _mockServiceProvider.Setup(x => x.GetService(typeof(IServiceScopeFactory))).Returns(mockScopeFactory.Object);
+        this._mockServiceProvider.Setup(x => x.GetService(typeof(IServiceScopeFactory))).Returns(mockScopeFactory.Object);
         mockScopeFactory.Setup(x => x.CreateScope()).Returns(mockScope.Object);
         mockScope.Setup(x => x.ServiceProvider).Returns(realServiceProvider);
 
-        _stateStore = new StateStore(_mockServiceProvider.Object);
-    }
-
-    /// <summary>
-    /// ソートロジックが未ソートのリストを正しい順序でソートすることを確認します。
-    /// </summary>
-    [Fact]
-    public void SortLogic_OrdersUnsortedListCorrectly()
-    {
-        // Arrange
-        var sortManager = new SortManager(_stateStore);
-        sortManager.AddCondition();
-        var sortObject = sortManager.SortConditions.Last();
-
-        var item = sortObject.AddSortItemObject();
-        item.SortItemKey = SortItemKey.FilePath;
-        item.Direction = System.ComponentModel.ListSortDirection.Ascending;
-
-        _stateStore.State.SearchState.CurrentSortCondition.Value = sortObject.Id;
-        _stateStore.State.SearchState.SortDirection.Value = System.ComponentModel.ListSortDirection.Ascending;
-
-        var selector = new SortSelector(_stateStore.State);
-        var unsortedList = new[]
-        {
-            new TestFileModel { FilePath = "FileC.txt" },
-            new TestFileModel { FilePath = "FileA.txt" },
-            new TestFileModel { FilePath = "FileB.txt" }
-        };
-
-        // Act
-        var result = selector.SetSortConditions(unsortedList).Cast<TestFileModel>().ToList();
-
-        // Assert
-        Assert.Equal("FileA.txt", result[0].FilePath);
-        Assert.Equal("FileB.txt", result[1].FilePath);
-        Assert.Equal("FileC.txt", result[2].FilePath);
+        this._stateStore = new StateStore(this._mockServiceProvider.Object);
     }
 
     /// <summary>
@@ -82,10 +46,10 @@ public class SortManagerTests
     public void Constructor_SetsSortConditionsFromStateStore()
     {
         // Act
-        var sortManager = new SortManager(_stateStore);
+        var sortManager = new SortManager(this._stateStore);
 
         // Assert
-        Assert.Same(_stateStore.State.SearchState.SortConditions, sortManager.SortConditions);
+        Assert.Same(this._stateStore.State.SearchState.SortConditions, sortManager.SortConditions);
     }
 
     /// <summary>
@@ -95,7 +59,7 @@ public class SortManagerTests
     public void AddCondition_AddsNewSortCondition()
     {
         // Arrange
-        var sortManager = new SortManager(_stateStore);
+        var sortManager = new SortManager(this._stateStore);
         var initialCount = sortManager.SortConditions.Count;
 
         // Act
@@ -112,7 +76,7 @@ public class SortManagerTests
     public void RemoveCondition_RemovesTargetSortCondition()
     {
         // Arrange
-        var sortManager = new SortManager(_stateStore);
+        var sortManager = new SortManager(this._stateStore);
         sortManager.AddCondition();
         var conditionToRemove = sortManager.SortConditions.Last();
         var initialCount = sortManager.SortConditions.Count;
@@ -132,7 +96,7 @@ public class SortManagerTests
     public void Save_ExecutesWithoutException()
     {
         // Arrange
-        var sortManager = new SortManager(_stateStore);
+        var sortManager = new SortManager(this._stateStore);
 
         // Act
         var exception = Record.Exception(() => sortManager.Save());

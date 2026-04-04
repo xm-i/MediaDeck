@@ -1,12 +1,8 @@
 using System.Diagnostics;
-using System.IO;
 using System.Runtime.InteropServices;
 
 namespace MediaDeck.Common.Utilities;
 
-/// <summary>
-/// シェル連携機能を提供するユーティリティクラス
-/// </summary>
 public static class ShellUtility {
 	[DllImport("user32.dll")]
 	private static extern nint GetForegroundWindow();
@@ -49,9 +45,33 @@ public static class ShellUtility {
 	private const int SW_SHOWNORMAL = 1;
 
 	/// <summary>
-	/// Explorerでファイルを選択した状態で表示します
+	/// 現在のフォアグラウンドウィンドウと同じモニターでファイルを開く
 	/// </summary>
-	/// <param name="filePath">選択するファイルのフルパス</param>
+	public static void ShellExecute(string filePath, string? arguments = null) {
+		var hwnd = GetForegroundWindow();
+
+		var info = new SHELLEXECUTEINFOW {
+			cbSize = Marshal.SizeOf<SHELLEXECUTEINFOW>(),
+			hwnd = hwnd,
+			lpVerb = "open",
+			lpFile = filePath,
+			lpParameters = arguments,
+			nShow = SW_SHOWNORMAL
+		};
+
+		if (!ShellExecuteExW(ref info)) {
+			// フォールバック: 通常のProcess.Startを使用
+			var psi = new ProcessStartInfo { FileName = filePath, UseShellExecute = false };
+			if (arguments != null) {
+				psi.Arguments = arguments;
+			}
+			Process.Start(psi);
+		}
+	}
+
+	/// <summary>
+	/// Explorerでファイルを選択した状態で表示
+	/// </summary>
 	public static void ShowInExplorer(string filePath) {
 		if (string.IsNullOrEmpty(filePath)) {
 			return;
@@ -60,43 +80,5 @@ public static class ShellUtility {
 		var psi = new ProcessStartInfo { FileName = "explorer.exe", UseShellExecute = false };
 		psi.ArgumentList.Add("/select," + filePath);
 		Process.Start(psi);
-	}
-
-	/// <summary>
-	/// 現在のフォアグラウンドウィンドウと同じモニターでファイルを開きます
-	/// </summary>
-	/// <param name="filePath">開く対象のファイルパス</param>
-	/// <param name="arguments">プログラムに渡す引数。nullの場合はファイル単体として開きます</param>
-	public static void ShellExecute(string filePath, string? arguments = null) {
-		if (string.IsNullOrEmpty(filePath)) return;
-
-		// セキュリティ対策:
-		// PATH上の任意の実行ファイル（cmd.exe等）やURLプロトコルの意図しない起動を防ぐため絶対パス化する
-		var fullPath = Path.GetFullPath(filePath);
-
-		var hwnd = GetForegroundWindow();
-
-		var info = new SHELLEXECUTEINFOW {
-			cbSize = Marshal.SizeOf<SHELLEXECUTEINFOW>(),
-			hwnd = hwnd,
-			lpVerb = "open",
-			lpFile = fullPath,
-			lpParameters = arguments,
-			nShow = SW_SHOWNORMAL
-		};
-
-		if (!ShellExecuteExW(ref info)) {
-			// フォールバック: セキュアなProcess.Startを使用
-			var psi = new ProcessStartInfo {
-				FileName = fullPath,
-				UseShellExecute = false
-			};
-
-			if (arguments != null) {
-				psi.Arguments = arguments;
-			}
-
-			Process.Start(psi);
-		}
 	}
 }

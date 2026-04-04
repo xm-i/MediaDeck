@@ -51,6 +51,7 @@ internal class Jpeg : ImageBase {
 		var subIfd = this._reader.FirstOrDefault(x => x is ExifSubIfdDirectory);
 
 		metadata.ImageDescription = this.GetString(ifd0, ExifDirectoryBase.TagImageDescription);
+		metadata.ImageDescription = this.GetString(ifd0, ExifDirectoryBase.TagImageDescription);
 		metadata.Make = this.GetString(ifd0, ExifDirectoryBase.TagMake);
 		metadata.Model = this.GetString(ifd0, ExifDirectoryBase.TagModel);
 		metadata.Orientation = this.GetShort(ifd0, ExifDirectoryBase.TagOrientation);
