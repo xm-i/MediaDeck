@@ -196,7 +196,6 @@ public class UpdateFileHashBackgroundService : IUpdateFileHashBackgroundService 
 	/// 重複が解消されたファイルから不要なFullHashを削除する。
 	/// </summary>
 	private async Task ClearFullHashForNonDuplicatePreHashAsync() {
-		List<long> nonDuplicateIdsWithFullHash;
 		await using (var db = await this._dbFactory.CreateDbContextAsync())
 		using (var transaction = await db.Database.BeginTransactionAsync()) {
 			// PreHashが重複しているグループを特定
@@ -207,27 +206,17 @@ public class UpdateFileHashBackgroundService : IUpdateFileHashBackgroundService 
 				.Select(g => g.Key)
 				.ToListAsync();
 
-			// PreHashが重複していないのにFullHashが設定されているレコードを見つける
-			nonDuplicateIdsWithFullHash = await db.MediaFiles
+			// PreHashが重複していないレコードのFullHashをクリア
+			await db.MediaFiles
 				.Where(m => m.IsExists &&
 					m.PreHash != null &&
 					!duplicatePreHashes.Contains(m.PreHash) &&
 					m.FullHash != null)
-				.Select(m => m.MediaFileId)
-				.ToListAsync();
+				.ExecuteUpdateAsync(s => s
+					.SetProperty(m => m.FullHash, (string?)null)
+					.SetProperty(m => m.FullHashUpdatedTime, (DateTime?)null));
 
-			// PreHashが重複していないレコードのFullHashをクリア
-			if (nonDuplicateIdsWithFullHash.Count > 0) {
-				foreach (var id in nonDuplicateIdsWithFullHash) {
-					var mediaFile = await db.MediaFiles.FindAsync(id);
-					if (mediaFile != null) {
-						mediaFile.FullHash = null;
-						mediaFile.FullHashUpdatedTime = null;
-					}
-				}
-				await db.SaveChangesAsync();
-				await transaction.CommitAsync();
-			}
+			await transaction.CommitAsync();
 		}
 	}
 
