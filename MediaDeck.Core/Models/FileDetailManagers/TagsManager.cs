@@ -83,10 +83,8 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 			db.MediaFileTags.RemoveRange(rel);
 			await db.SaveChangesAsync();
 
-			// Use HashSet to avoid O(N * M) performance issue when filtering deleted items
 			var removedIds = rel.Select(x => x.MediaFileId).ToHashSet();
 			foreach (var file in fileModels) {
-				// Only iterate over files that actually had their tag removed in DB
 				if (removedIds.Contains(file.Id)) {
 					file.Tags.RemoveAll(x => x.TagId == tagId);
 				}
