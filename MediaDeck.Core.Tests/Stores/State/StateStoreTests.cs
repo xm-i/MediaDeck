@@ -100,4 +100,14 @@ public class StateStoreTests : IDisposable {
 		store.State.ShouldNotBeNull();
 		this._serviceProviderMock.Verify(x => x.GetService(typeof(StateModel)), Times.Once);
 	}
+
+	[Fact]
+	public void Save_WithInvalidFilePath_DoesNotThrow() {
+		TestableStateStore.TestPath = string.Empty;
+
+		var store = new TestableStateStore(this._serviceProviderMock.Object);
+
+		var act = () => store.Save();
+		Should.NotThrow(act);
+	}
 }
