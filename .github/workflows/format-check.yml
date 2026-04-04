@@ -6,7 +6,8 @@ jobs:
   check-format:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
           submodules: recursive
 
@@ -15,7 +16,10 @@ jobs:
         with:
           dotnet-version: '10.0.x'
 
+      - name: Restore dependencies
+        run: dotnet restore -p:EnableWindowsTargeting=true
+
       - name: Verify C# Formatting
-        run: dotnet format --verify-no-changes
+        run: dotnet format --verify-no-changes --no-restore
         env:
           EnableWindowsTargeting: true
