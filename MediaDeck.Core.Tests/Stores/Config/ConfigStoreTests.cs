@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using FluentAssertions;
+using Shouldly;
 using MediaDeck.Composition.Constants;
 using MediaDeck.Core.Stores.Config;
 using Moq;
@@ -55,7 +55,7 @@ public class ConfigStoreTests
             Action act = () => configStore.Save();
 
             // Assert
-            act.Should().NotThrow();
+            act.ShouldNotThrow();
         }
         finally
         {
