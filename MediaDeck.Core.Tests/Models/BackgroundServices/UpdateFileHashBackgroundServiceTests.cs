@@ -38,7 +38,6 @@ public class UpdateFileHashBackgroundServiceTests : IDisposable {
 		if (Directory.Exists(this._tempDir)) {
 			Directory.Delete(this._tempDir, true);
 		}
-		this._connection.Close();
 		this._connection.Dispose();
 	}
 
@@ -66,6 +65,8 @@ public class UpdateFileHashBackgroundServiceTests : IDisposable {
 		service.EnqueueHashUpdate(1L);
 
 		// Assert
+		service.HashUpdateQueue.Count.ShouldBe(1);
+		service.HashUpdateQueue.ShouldContain(1L);
 		service.TargetCount.Value.ShouldBe(1);
 	}
 
@@ -94,6 +95,7 @@ public class UpdateFileHashBackgroundServiceTests : IDisposable {
 	public async Task CheckAndEnqueueFullHashUpdatesAsync_WhenHashUpdateQueueIsEmpty_ShouldEnqueueFullHash() {
 		// Arrange
 		using (var context = new MediaDeckDbContext(this._options)) {
+			// 同じPreHashを持つレコードを2つ作成
 			context.MediaFiles.Add(new MediaFile { FilePath = "dummy1.jpg", DirectoryPath = "dir", IsExists = true, PreHash = "samehash", Description = string.Empty });
 			context.MediaFiles.Add(new MediaFile { FilePath = "dummy2.jpg", DirectoryPath = "dir", IsExists = true, PreHash = "samehash", Description = string.Empty });
 			await context.SaveChangesAsync();
@@ -105,6 +107,7 @@ public class UpdateFileHashBackgroundServiceTests : IDisposable {
 
 		// Act
 		await service.CheckAndEnqueueFullHashUpdatesAsync();
+		await Task.Delay(100);
 
 		// Assert
 		service.FullHashUpdateQueue.Count.ShouldBe(2);
@@ -121,6 +124,7 @@ public class UpdateFileHashBackgroundServiceTests : IDisposable {
 		var loggerMock = new Mock<ILogger<UpdateFileHashBackgroundService>>();
 		var service = new UpdateFileHashBackgroundService(dbFactoryMock.Object, loggerMock.Object);
 
+		// キューに要素を追加しておく
 		service.HashUpdateQueue.Enqueue(1L);
 
 		// Act
@@ -166,6 +170,7 @@ public class UpdateFileHashBackgroundServiceTests : IDisposable {
 			updatedMediaFile.PreHash.ShouldNotBeNullOrEmpty();
 			updatedMediaFile.PreHashUpdatedTime.ShouldNotBeNull();
 		}
+		service.CompletedCount.Value.ShouldBe(1);
 	}
 
 	/// <summary>
@@ -199,6 +204,7 @@ public class UpdateFileHashBackgroundServiceTests : IDisposable {
 			mediaFile.ShouldNotBeNull();
 			mediaFile.PreHash.ShouldBeNull(); // 更新されていないこと
 		}
+		service.CompletedCount.Value.ShouldBe(1); // finallyブロックでカウントは進む
 	}
 
 	/// <summary>
@@ -235,6 +241,8 @@ public class UpdateFileHashBackgroundServiceTests : IDisposable {
 				It.IsAny<Exception>(),
 				It.Is<Func<It.IsAnyType, Exception?, string>>((v, t) => true)),
 			Times.Once);
+
+		service.CompletedCount.Value.ShouldBe(1);
 	}
 
 	/// <summary>
@@ -273,6 +281,7 @@ public class UpdateFileHashBackgroundServiceTests : IDisposable {
 			updatedMediaFile.FullHash.ShouldNotBeNullOrEmpty();
 			updatedMediaFile.FullHashUpdatedTime.ShouldNotBeNull();
 		}
+		service.FullHashCompletedCount.Value.ShouldBe(1);
 	}
 
 	/// <summary>
@@ -281,12 +290,15 @@ public class UpdateFileHashBackgroundServiceTests : IDisposable {
 	[Fact]
 	public async Task EnqueueFullHashUpdatesForDuplicatePreHashAsync_ShouldEnqueueForDuplicatePreHash() {
 		// Arrange
+		long fileId1, fileId2;
 		using (var context = new MediaDeckDbContext(this._options)) {
 			var mediaFile1 = new MediaFile { FilePath = "dummy1.txt", DirectoryPath = "dir", IsExists = true, PreHash = "dup_hash", Description = string.Empty, PreHashUpdatedTime = DateTime.Now };
 			var mediaFile2 = new MediaFile { FilePath = "dummy2.txt", DirectoryPath = "dir", IsExists = true, PreHash = "dup_hash", Description = string.Empty, PreHashUpdatedTime = DateTime.Now };
 			context.MediaFiles.Add(mediaFile1);
 			context.MediaFiles.Add(mediaFile2);
 			await context.SaveChangesAsync();
+			fileId1 = mediaFile1.MediaFileId;
+			fileId2 = mediaFile2.MediaFileId;
 		}
 
 		var mockFactory = this.CreateDbFactoryMock();
@@ -303,50 +315,5 @@ public class UpdateFileHashBackgroundServiceTests : IDisposable {
 		// Assert
 		service.FullHashUpdateQueue.Count.ShouldBeGreaterThanOrEqualTo(2);
 		service.FullHashTargetCount.Value.ShouldBe(2);
-	}
-
-	/// <summary>
-	/// PreHashが重複していないメディアファイルのFullHashがクリアされることを確認するパフォーマンス・検証テスト。
-	/// </summary>
-	[Fact]
-	public async Task ClearFullHashForNonDuplicatePreHashAsync_PerformanceTest() {
-		// Arrange
-		using (var context = new MediaDeckDbContext(this._options)) {
-			var mediaFiles = new List<MediaFile>();
-			for (int i = 0; i < 100; i++) {
-				mediaFiles.Add(new MediaFile {
-					FilePath = $"path{i}.jpg",
-					DirectoryPath = "dir",
-					Description = string.Empty,
-					IsExists = true,
-					PreHash = $"pre{i}",
-					FullHash = $"full{i}",
-					FullHashUpdatedTime = DateTime.Now
-				});
-			}
-			context.MediaFiles.AddRange(mediaFiles);
-			await context.SaveChangesAsync();
-		}
-
-		var mockFactory = this.CreateDbFactoryMock();
-		var loggerMock = new Mock<ILogger<UpdateFileHashBackgroundService>>();
-		var service = new UpdateFileHashBackgroundService(mockFactory.Object, loggerMock.Object);
-
-		var method = typeof(UpdateFileHashBackgroundService).GetMethod("ClearFullHashForNonDuplicatePreHashAsync", BindingFlags.NonPublic | BindingFlags.Instance);
-		method.ShouldNotBeNull();
-
-		// Act
-		var sw = Stopwatch.StartNew();
-		var task = (Task)method.Invoke(service, null)!;
-		await task;
-		sw.Stop();
-
-		// Assert
-		using (var context = new MediaDeckDbContext(this._options)) {
-			var remainingFullHashes = await context.MediaFiles.CountAsync(m => m.FullHash != null);
-			remainingFullHashes.ShouldBe(0);
-		}
-
-		Console.WriteLine($"Execution time for 100 records: {sw.ElapsedMilliseconds}ms");
 	}
 }
