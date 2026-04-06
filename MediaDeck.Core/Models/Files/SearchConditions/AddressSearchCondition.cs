@@ -6,8 +6,12 @@ using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Core.Models.Maps;
 using MediaDeck.Database.Tables;
 
+using R3.JsonConfig.Attributes;
+
 namespace MediaDeck.Core.Models.Files.SearchConditions;
 
+[GenerateR3JsonConfigDto]
+[JsonConfigDerivedType("address")]
 public class AddressSearchCondition : ISearchCondition {
 	[Obsolete("for serialize")]
 	public AddressSearchCondition() {

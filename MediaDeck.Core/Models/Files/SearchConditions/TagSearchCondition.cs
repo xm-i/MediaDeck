@@ -5,8 +5,12 @@ using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Database.Tables;
 
+using R3.JsonConfig.Attributes;
+
 namespace MediaDeck.Core.Models.Files.SearchConditions;
 
+[GenerateR3JsonConfigDto]
+[JsonConfigDerivedType("tag")]
 public class TagSearchCondition : ISearchCondition {
 	[Obsolete("for serialize")]
 	public TagSearchCondition() {

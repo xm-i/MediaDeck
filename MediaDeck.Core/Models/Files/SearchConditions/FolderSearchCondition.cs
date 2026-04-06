@@ -5,8 +5,12 @@ using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Core.Models.Repositories.Objects;
 using MediaDeck.Database.Tables;
 
+using R3.JsonConfig.Attributes;
+
 namespace MediaDeck.Core.Models.Files.SearchConditions;
 
+[GenerateR3JsonConfigDto]
+[JsonConfigDerivedType("folder")]
 public class FolderSearchCondition : ISearchCondition {
 	[Obsolete("for serialize")]
 	public FolderSearchCondition() {

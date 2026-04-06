@@ -1,11 +1,14 @@
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.Files;
+using R3.JsonConfig.Attributes;
 
 namespace MediaDeck.Core.Models.Files.Filter.FilterItemObjects;
 
 /// <summary>
 /// タグフィルターアイテムオブジェクト
 /// </summary>
+[GenerateR3JsonConfigDto]
+[JsonConfigDerivedType("tagFilter")]
 public class TagFilterItemObject : IFilterItemObject {
 	/// <summary>
 	/// 表示名

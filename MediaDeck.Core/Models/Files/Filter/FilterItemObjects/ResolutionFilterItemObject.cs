@@ -1,12 +1,15 @@
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Objects;
+using R3.JsonConfig.Attributes;
 
 namespace MediaDeck.Core.Models.Files.Filter.FilterItemObjects;
 
 /// <summary>
 /// 解像度フィルターアイテムオブジェクト
 /// </summary>
+[GenerateR3JsonConfigDto]
+[JsonConfigDerivedType("resolution")]
 public class ResolutionFilterItemObject : IFilterItemObject {
 	/// <summary>
 	/// 表示名

@@ -1,8 +1,12 @@
 using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Interfaces.Primitives;
 using MediaDeck.Composition.Objects;
+using R3.JsonConfig.Attributes;
 
 namespace MediaDeck.Core.Models.Files.Filter.FilterItemObjects;
+
+[GenerateR3JsonConfigDto]
+[JsonConfigDerivedType("location")]
 
 /// <summary>
 /// 座標に関するフィルターアイテムオブジェクト
