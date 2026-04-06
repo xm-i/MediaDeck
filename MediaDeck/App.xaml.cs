@@ -22,8 +22,8 @@ namespace MediaDeck;
 
 public partial class App {
 	private Window? _window;
-	private readonly ConfigStore _configStore;
-	private readonly StateStore _stateStore;
+	private readonly IConfigStore _configStore;
+	private readonly IStateStore _stateStore;
 
 
 	/// <summary>
@@ -47,8 +47,8 @@ public partial class App {
 			InitialDataRegisterer.Register(db);
 		}
 
-		this._configStore = Ioc.Default.GetRequiredService<ConfigStore>();
-		this._stateStore = Ioc.Default.GetRequiredService<StateStore>();
+		this._configStore = Ioc.Default.GetRequiredService<IConfigStore>();
+		this._stateStore = Ioc.Default.GetRequiredService<IStateStore>();
 		Directory.CreateDirectory(this._configStore.Config.PathConfig.TemporaryFolderPath.Value);
 
 		GlobalFFOptions.Configure(options => {

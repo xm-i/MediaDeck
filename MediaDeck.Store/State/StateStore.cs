@@ -1,16 +1,19 @@
-using System;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using System.Text.Json;
+
+using AutoDiAttributes;
+
 using MediaDeck.Composition.Constants;
 using MediaDeck.Composition.Stores.State.Model;
+using MediaDeck.Core.Stores.State;
 using MediaDeck.Stores.SerializerContext;
+
 using Microsoft.Extensions.DependencyInjection;
 
-namespace MediaDeck.Core.Stores.State;
+namespace MediaDeck.Store.State;
 
-[Inject(InjectServiceLifetime.Singleton)]
-public class StateStore {
+[Inject(InjectServiceLifetime.Singleton, typeof(IStateStore))]
+public class StateStore : IStateStore {
 	public IServiceProvider ScopedService {
 		get;
 	}

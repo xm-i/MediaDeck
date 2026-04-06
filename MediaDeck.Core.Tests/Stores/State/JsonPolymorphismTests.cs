@@ -26,7 +26,7 @@ public class JsonPolymorphismTests {
 		var condition = new FolderSearchCondition {
 			FolderPath = "C:\\Test"
 		};
-		
+
 		// Act & Assert
 		this.VerifyRoundTrip<ISearchCondition, FolderSearchCondition>(condition, "folder");
 	}
@@ -36,7 +36,7 @@ public class JsonPolymorphismTests {
 		// Arrange
 		var condition = new TagSearchCondition();
 		// TagSearchCondition のプロパティ設定が必要ならここで行う
-		
+
 		// Act & Assert
 		this.VerifyRoundTrip<ISearchCondition, TagSearchCondition>(condition, "tag");
 	}
@@ -45,7 +45,7 @@ public class JsonPolymorphismTests {
 	public void TagFilterItemObject_RoundTrip_Works() {
 		// Arrange
 		var filter = new TagFilterItemObject();
-		
+
 		// Act & Assert
 		this.VerifyRoundTrip<IFilterItemObject, TagFilterItemObject>(filter, "tagFilter");
 	}
@@ -54,12 +54,12 @@ public class JsonPolymorphismTests {
 	public void RateFilterItemObject_RoundTrip_Works() {
 		// Arrange
 		var filter = new RateFilterItemObject();
-		
+
 		// Act & Assert
 		this.VerifyRoundTrip<IFilterItemObject, RateFilterItemObject>(filter, "rate");
 	}
 
-	private void VerifyRoundTrip<TInterface, TConcrete>(TInterface original, string expectedTypeId) 
+	private void VerifyRoundTrip<TInterface, TConcrete>(TInterface original, string expectedTypeId)
 		where TConcrete : TInterface {
 		var options = new JsonSerializerOptions(JsonSerializerDefaults.Web) {
 			WriteIndented = true
@@ -68,7 +68,7 @@ public class JsonPolymorphismTests {
 		// 1. DTO への変換 (本来は StateModel 全体で行うが、ここでは個別テスト)
 		// ISearchConditionForJson.CreateJson などの静的メソッドが生成されているはず
 		// しかし、直接シリアライズ・デシリアライズをテストするのが確実
-		
+
 		string json;
 		if (original is ISearchCondition sc) {
 			var dto = ISearchConditionForJson.CreateJson(sc);

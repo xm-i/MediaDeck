@@ -66,6 +66,10 @@
     <BuildType Solution="Debug-Unpackaged|*" Project="Debug" />
     <BuildType Solution="Release-Unpackaged|*" Project="Release" />
   </Project>
+  <Project Path="MediaDeck.Store/MediaDeck.Store.csproj" Id="f701f5c7-8a55-4b6a-b953-d363a1eaa393">
+    <BuildType Solution="Debug-Unpackaged|*" Project="Debug" />
+    <BuildType Solution="Release-Unpackaged|*" Project="Release" />
+  </Project>
   <Project Path="MediaDeck.ViewModels/MediaDeck.ViewModels.csproj" Id="02ffdfe7-f911-4b47-be39-ba3a22ace8ba">
     <BuildType Solution="Debug-Unpackaged|*" Project="Debug" />
     <BuildType Solution="Release-Unpackaged|*" Project="Release" />

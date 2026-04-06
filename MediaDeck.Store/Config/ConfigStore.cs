@@ -1,16 +1,19 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 
+using AutoDiAttributes;
+
 using MediaDeck.Composition.Constants;
 using MediaDeck.Composition.Stores.Config.Model;
+using MediaDeck.Core.Stores.Config;
 using MediaDeck.Stores.SerializerContext;
 
 using Microsoft.Extensions.DependencyInjection;
 
-namespace MediaDeck.Core.Stores.Config;
+namespace MediaDeck.Store.Config;
 
-[Inject(InjectServiceLifetime.Singleton)]
-public class ConfigStore {
+[Inject(InjectServiceLifetime.Singleton, typeof(IConfigStore))]
+public class ConfigStore : IConfigStore {
 	public IServiceProvider ScopedService {
 		get;
 	}
