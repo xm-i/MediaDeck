@@ -73,10 +73,10 @@ public class JsonPolymorphismTests {
 		string json;
 		if (original is ISearchCondition sc) {
 			var dto = ISearchConditionForJson.CreateJson(sc);
-			json = JsonSerializer.Serialize(dto, StateJsonSerializerContext.Default.ISearchConditionForJson);
+			json = JsonSerializer.Serialize(dto, StateJsonSerializerContext.DefaultOptions);
 		} else if (original is IFilterItemObject fio) {
 			var dto = IFilterItemObjectForJson.CreateJson(fio);
-			json = JsonSerializer.Serialize(dto, StateJsonSerializerContext.Default.IFilterItemObjectForJson);
+			json = JsonSerializer.Serialize(dto, StateJsonSerializerContext.DefaultOptions);
 		} else {
 			throw new ArgumentException("Unsupported type");
 		}
@@ -87,11 +87,11 @@ public class JsonPolymorphismTests {
 		// 2. 復元
 		object? restoredDto;
 		if (typeof(TInterface) == typeof(ISearchCondition)) {
-			restoredDto = JsonSerializer.Deserialize(json, StateJsonSerializerContext.Default.ISearchConditionForJson);
+			restoredDto = JsonSerializer.Deserialize<ISearchConditionForJson>(json, StateJsonSerializerContext.DefaultOptions);
 			var restored = ISearchConditionForJson.CreateModel((ISearchConditionForJson)restoredDto!, this._serviceProvider);
 			restored.ShouldBeOfType<TConcrete>();
 		} else {
-			restoredDto = JsonSerializer.Deserialize(json, StateJsonSerializerContext.Default.IFilterItemObjectForJson);
+			restoredDto = JsonSerializer.Deserialize<IFilterItemObjectForJson>(json, StateJsonSerializerContext.DefaultOptions);
 			var restored = IFilterItemObjectForJson.CreateModel((IFilterItemObjectForJson)restoredDto!, this._serviceProvider);
 			restored.ShouldBeOfType<TConcrete>();
 		}

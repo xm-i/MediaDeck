@@ -9,6 +9,7 @@ namespace MediaDeck.Core.Models.Files.Filter.FilterItemObjects;
 /// </summary>
 [GenerateR3JsonConfigDto]
 [JsonConfigDerivedType("rate")]
+[Inject(InjectServiceLifetime.Transient)]
 public class RateFilterItemObject : IFilterItemObject {
 	/// <summary>
 	/// 表示名

@@ -11,6 +11,7 @@ namespace MediaDeck.Core.Models.Files.SearchConditions;
 
 [GenerateR3JsonConfigDto]
 [JsonConfigDerivedType("tag")]
+[Inject(InjectServiceLifetime.Transient)]
 public class TagSearchCondition : ISearchCondition {
 	[Obsolete("for serialize")]
 	public TagSearchCondition() {

@@ -11,6 +11,7 @@ namespace MediaDeck.Core.Models.Files.SearchConditions;
 
 [GenerateR3JsonConfigDto]
 [JsonConfigDerivedType("word")]
+[Inject(InjectServiceLifetime.Transient)]
 public class WordSearchCondition : ISearchCondition {
 	[Obsolete("for serialize")]
 	public WordSearchCondition() {

@@ -9,6 +9,7 @@ namespace MediaDeck.Core.Models.Files.Filter.FilterItemObjects;
 /// </summary>
 [GenerateR3JsonConfigDto]
 [JsonConfigDerivedType("filePath")]
+[Inject(InjectServiceLifetime.Transient)]
 public class FilePathFilterItemObject : IFilterItemObject {
 	/// <summary>
 	/// 表示名

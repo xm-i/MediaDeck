@@ -10,6 +10,7 @@ namespace MediaDeck.Core.Models.Files.Filter.FilterItemObjects;
 /// </summary>
 [GenerateR3JsonConfigDto]
 [JsonConfigDerivedType("resolution")]
+[Inject(InjectServiceLifetime.Transient)]
 public class ResolutionFilterItemObject : IFilterItemObject {
 	/// <summary>
 	/// 表示名

@@ -11,6 +11,7 @@ namespace MediaDeck.Core.Models.Files.SearchConditions;
 
 [GenerateR3JsonConfigDto]
 [JsonConfigDerivedType("folder")]
+[Inject(InjectServiceLifetime.Transient)]
 public class FolderSearchCondition : ISearchCondition {
 	[Obsolete("for serialize")]
 	public FolderSearchCondition() {

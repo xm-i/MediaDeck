@@ -12,6 +12,7 @@ namespace MediaDeck.Core.Models.Files.SearchConditions;
 
 [GenerateR3JsonConfigDto]
 [JsonConfigDerivedType("address")]
+[Inject(InjectServiceLifetime.Transient)]
 public class AddressSearchCondition : ISearchCondition {
 	[Obsolete("for serialize")]
 	public AddressSearchCondition() {

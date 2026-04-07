@@ -8,6 +8,7 @@ namespace MediaDeck.Core.Models.Files.Filter.FilterItemObjects;
 /// </summary>
 [GenerateR3JsonConfigDto]
 [JsonConfigDerivedType("exists")]
+[Inject(InjectServiceLifetime.Transient)]
 public class ExistsFilterItemObject : IFilterItemObject {
 	/// <summary>
 	/// 表示名

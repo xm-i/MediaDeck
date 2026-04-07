@@ -8,6 +8,8 @@ namespace MediaDeck.Core.Models.Files.Filter.FilterItemObjects;
 /// </summary>
 [GenerateR3JsonConfigDto]
 [JsonConfigDerivedType("mediaType")]
+[Inject(InjectServiceLifetime.Transient)]
+
 public class MediaTypeFilterItemObject : IFilterItemObject {
 	/// <summary>
 	/// 表示名
