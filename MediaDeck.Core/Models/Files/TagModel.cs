@@ -71,7 +71,7 @@ public class TagModel : ITagModel {
 		set;
 	}
 
-	public BindableReactiveProperty<string?> RepresentativeText {
+	public ReactiveProperty<string?> RepresentativeText {
 		get;
 		set;
 	} = new();

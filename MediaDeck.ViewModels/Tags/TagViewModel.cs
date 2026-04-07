@@ -1,5 +1,6 @@
 using MediaDeck.Common.Base;
 using MediaDeck.Common.Extensions;
+using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Core.Models.FileDetailManagers;
 using MediaDeck.Database.Tables;
 
@@ -7,9 +8,11 @@ namespace MediaDeck.ViewModels.Tags;
 
 [Inject(InjectServiceLifetime.Transient)]
 public class TagViewModel : ViewModelBase {
-	public TagViewModel(TagCategoryViewModel parent, Tag tag, TagsManager tagsManager) {
+	public TagViewModel(TagCategoryViewModel parent, ITagModel tag, TagsManager tagsManager) {
+		this.Model = tag;
 		this.TagName.Value = tag.TagName;
 		this.Detail.Value = tag.Detail;
+		this.RepresentativeText = tag.RepresentativeText.ToBindableReactiveProperty().AddTo(this.CompositeDisposable);
 		this._tagAliases.AddRange(tag.TagAliases.Select(x => new TagAliasViewModel(x, this)));
 		this.TagAliases = this._tagAliases.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
 		this.TagCategory.Value = parent;
@@ -47,6 +50,10 @@ public class TagViewModel : ViewModelBase {
 	private bool _editedFlag = false;
 	private readonly ObservableList<TagAliasViewModel> _tagAliases = [];
 
+	public ITagModel Model {
+		get;
+	}
+
 	public BindableReactiveProperty<string> TagName {
 		get;
 	} = new();
@@ -75,7 +82,11 @@ public class TagViewModel : ViewModelBase {
 		get;
 	} = new();
 
-	public ReactiveProperty<string?> RepresentativeTextForSearch {
+	public BindableReactiveProperty<string?> RepresentativeText {
+		get;
+	}
+
+	public BindableReactiveProperty<string?> RepresentativeTextForSearch {
 		get;
 	} = new();
 

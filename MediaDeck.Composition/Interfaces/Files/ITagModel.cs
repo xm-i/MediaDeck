@@ -48,7 +48,7 @@ public interface ITagModel {
 		set;
 	}
 
-	public BindableReactiveProperty<string?> RepresentativeText {
+	public ReactiveProperty<string?> RepresentativeText {
 		get;
 		set;
 	}

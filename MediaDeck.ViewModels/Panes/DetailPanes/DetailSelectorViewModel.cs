@@ -8,12 +8,14 @@ using MediaDeck.Core.Models.Files.SearchConditions;
 using MediaDeck.Core.Models.NotificationDispatcher;
 using MediaDeck.Core.Primitives;
 using MediaDeck.Database.Tables;
+using MediaDeck.ViewModels.Tags;
 
 namespace MediaDeck.ViewModels.Panes.DetailPanes;
 
 [Inject(InjectServiceLifetime.Transient)]
 public class DetailSelectorViewModel : ViewModelBase {
 	private readonly DetailSelectorModel _model;
+	private readonly System.Collections.Concurrent.ConcurrentDictionary<int, TagCategoryViewModel> _categoryViewModels = new();
 
 	public DetailSelectorViewModel(DetailSelectorModel model, SearchConditionNotificationDispatcher searchConditionNotificationDispatcher) {
 		this._model = model;
@@ -24,9 +26,16 @@ public class DetailSelectorViewModel : ViewModelBase {
 		this.UsageCount = model.UsageCount.ToBindableReactiveProperty();
 		this._model.AddTo(this.CompositeDisposable);
 
-		this.TagCandidates = model.TagModels.CreateView(x => x);
+		this.TagCandidates = model.TagModels.CreateView(x => {
+			var categoryViewModel = this._categoryViewModels.GetOrAdd(x.TagCategoryId, _ => new TagCategoryViewModel(x.TagCategory, model.TagsManager));
+			return new TagViewModel(categoryViewModel, x, model.TagsManager);
+		});
 		this.FilteredTagCandidates = this.TagCandidates.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
-		this.Tags = model.Tags.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
+		this.Tags = model.Tags.CreateView(x => {
+			var categoryViewModel = this._categoryViewModels.GetOrAdd(x.Value.TagCategoryId, _ => new TagCategoryViewModel(x.Value.TagCategory, model.TagsManager));
+			return new ValueCountPair<TagViewModel>(new TagViewModel(categoryViewModel, x.Value, model.TagsManager), x.Count);
+		})
+			.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
 
 		Observable.Merge(this.TargetFiles.Where(x => x != null).Select(_ => Unit.Default),
 				model.ContentChanged.AsObservable())
@@ -45,7 +54,7 @@ public class DetailSelectorViewModel : ViewModelBase {
 			await model.UpdateDescriptionAsync(this.TargetFileModels.First(), this.Description.Value);
 		});
 		this.RemoveTagCommand.Subscribe(async x => {
-			await model.RemoveTagAsync(this.TargetFileModels, x.Value.TagId);
+			await model.RemoveTagAsync(this.TargetFileModels, x.Value.Model.TagId);
 		});
 		this.AddTagCommand.Subscribe(async _ => {
 			if (string.IsNullOrEmpty(this.Text.Value)) {
@@ -62,7 +71,7 @@ public class DetailSelectorViewModel : ViewModelBase {
 			this.Text.Value = "";
 		});
 		this.SearchTaggedFilesCommand.Subscribe(x => {
-			searchConditionNotificationDispatcher.AddRequest.OnNext(new TagSearchCondition(x.Value));
+			searchConditionNotificationDispatcher.AddRequest.OnNext(new TagSearchCondition(x.Value.Model));
 		});
 	}
 
@@ -85,11 +94,11 @@ public class DetailSelectorViewModel : ViewModelBase {
 		get;
 	} = new();
 
-	public ISynchronizedView<ITagModel, ITagModel> TagCandidates {
+	public ISynchronizedView<ITagModel, TagViewModel> TagCandidates {
 		get;
 	}
 
-	public INotifyCollectionChangedSynchronizedViewList<ITagModel> FilteredTagCandidates {
+	public INotifyCollectionChangedSynchronizedViewList<TagViewModel> FilteredTagCandidates {
 		get;
 	}
 
@@ -101,11 +110,11 @@ public class DetailSelectorViewModel : ViewModelBase {
 		get;
 	} = new();
 
-	public INotifyCollectionChangedSynchronizedViewList<ValueCountPair<ITagModel>> Tags {
+	public INotifyCollectionChangedSynchronizedViewList<ValueCountPair<TagViewModel>> Tags {
 		get;
 	}
 
-	public ReactiveCommand<ValueCountPair<ITagModel>> SearchTaggedFilesCommand {
+	public ReactiveCommand<ValueCountPair<TagViewModel>> SearchTaggedFilesCommand {
 		get;
 	} = new();
 
@@ -129,7 +138,7 @@ public class DetailSelectorViewModel : ViewModelBase {
 		get;
 	} = new();
 
-	public ReactiveCommand<ValueCountPair<ITagModel>> RemoveTagCommand {
+	public ReactiveCommand<ValueCountPair<TagViewModel>> RemoveTagCommand {
 		get;
 	} = new();
 

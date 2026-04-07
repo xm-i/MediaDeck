@@ -7,6 +7,8 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:controls="using:CommunityToolkit.WinUI.Controls"
 	xmlns:files="using:MediaDeck.Core.Models.Files"
+	xmlns:tags="using:MediaDeck.ViewModels.Tags"
+	xmlns:primitives="using:MediaDeck.Core.Primitives"
 	mc:Ignorable="d" >
 
 	<StackPanel x:Name="ControlRoot"
@@ -32,14 +34,14 @@
 				ItemsSource="{x:Bind ViewModel.FilteredTagCandidates, Mode=OneWay}"
 				PlaceholderText="Add tags..."
 				Text="{x:Bind ViewModel.Text.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-				TextMemberPath="TagName"
+				TextMemberPath="TagNameText"
 				TextChanged="AutoSuggestBox_TextChanged"
 				PreviewKeyDown="AutoSuggestBox_PreviewKeyDown" >
 				<AutoSuggestBox.ItemTemplate>
-					<DataTemplate x:DataType="files:TagModel" >
+					<DataTemplate x:DataType="tags:TagViewModel" >
 						<StackPanel Spacing="2"
 							Padding="4" >
-							<TextBlock Text="{x:Bind TagName}" />
+							<TextBlock Text="{x:Bind TagName.Value}" />
 							<TextBlock Text="{x:Bind RepresentativeText.Value, Mode=OneWay}"
 								Style="{ThemeResource CaptionTextBlockStyle}"
 								Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
@@ -80,7 +82,7 @@
 						<StackPanel Orientation="Horizontal"
 							Spacing="4" >
 							<TextBlock IsTextSelectionEnabled="True"
-								Text="{Binding Value.TagName}" />
+								Text="{Binding Value.TagName.Value}" />
 							<TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" >
 								<Run Text="(" />
 								<Run Text="{Binding Count}" />

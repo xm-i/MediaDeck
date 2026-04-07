@@ -1,12 +1,14 @@
 using System.Threading.Tasks;
-using MediaDeck.Composition.Interfaces.Files;
+
 using MediaDeck.Core.Primitives;
 using MediaDeck.ViewModels.Panes.DetailPanes;
 using MediaDeck.ViewModels.Tags;
 using MediaDeck.Views.Tags;
+
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
+
 using Windows.System;
 
 namespace MediaDeck.Views.Panes.DetailPanes;
@@ -59,7 +61,7 @@ public sealed partial class TagsDetail {
 	}
 
 	private void TagGrid_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e) {
-		if (this.TagListBox.SelectedItem is not ValueCountPair<ITagModel> tag) {
+		if (this.TagListBox.SelectedItem is not ValueCountPair<TagViewModel> tag) {
 			return;
 		}
 		this.ViewModel?.SearchTaggedFilesCommand.Execute(tag);
