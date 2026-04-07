@@ -4,6 +4,7 @@ using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Core.Models.Files.Filter.FilterItemObjects;
 using MediaDeck.Core.Models.Files.SearchConditions;
 using MediaDeck.Stores.SerializerContext;
+
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 using Xunit;

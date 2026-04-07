@@ -9,9 +9,9 @@ namespace MediaDeck.Core.Models.Files.Sort;
 /// </summary>
 [Inject(InjectServiceLifetime.Singleton)]
 public class SortManager : ModelBase {
-	private readonly StateStore _stateStore;
+	private readonly IStateStore _stateStore;
 
-	public SortManager(StateStore stateStore) {
+	public SortManager(IStateStore stateStore) {
 		this._stateStore = stateStore;
 		this.SortConditions = this._stateStore.State.SearchState.SortConditions;
 	}

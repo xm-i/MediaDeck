@@ -38,7 +38,7 @@ public class FileChangeMonitorService : ModelBase {
 	/// <param name="dispatcherGate">UIスレッドディスパッチャー</param>
 	/// <param name="appNotificationDispatcher">通知送信クラス</param>
 	/// <param name="fileRegistrar">ファイル登録クラス</param>
-	public FileChangeMonitorService(StateStore stateStore, IDbContextFactory<MediaDeckDbContext> dbFactory, FileChangeTracker tracker, ILogger<FileChangeMonitorService> logger, AppNotificationDispatcher appNotificationDispatcher, FileRegistrar fileRegistrar) {
+	public FileChangeMonitorService(IStateStore stateStore, IDbContextFactory<MediaDeckDbContext> dbFactory, FileChangeTracker tracker, ILogger<FileChangeMonitorService> logger, AppNotificationDispatcher appNotificationDispatcher, FileRegistrar fileRegistrar) {
 		this._dbFactory = dbFactory;
 		this._logger = logger;
 		this._appNotificationDispatcher = appNotificationDispatcher;

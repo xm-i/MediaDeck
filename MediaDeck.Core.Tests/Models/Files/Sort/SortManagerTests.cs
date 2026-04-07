@@ -3,6 +3,8 @@ using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Composition.Stores.State.Model.Objects;
 using MediaDeck.Core.Models.Files.Sort;
 using MediaDeck.Core.Stores.State;
+using MediaDeck.Store.State;
+
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using ObservableCollections;
@@ -13,7 +15,7 @@ namespace MediaDeck.Core.Tests.Models.Files.Sort;
 /// <see cref="SortManager"/> のユニットテスト
 /// </summary>
 public class SortManagerTests {
-	private readonly StateStore _stateStore;
+	private readonly IStateStore _stateStore;
 	private readonly Mock<IServiceProvider> _mockServiceProvider;
 
 	public SortManagerTests() {

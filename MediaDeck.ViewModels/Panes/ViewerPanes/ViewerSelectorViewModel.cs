@@ -7,7 +7,7 @@ namespace MediaDeck.ViewModels.Panes.ViewerPanes;
 [Inject(InjectServiceLifetime.Transient)]
 public class ViewerSelectorViewModel : ViewModelBase {
 	public ViewerSelectorViewModel(
-		StateStore stateStore,
+		IStateStore stateStore,
 		MediaContentLibraryViewModel mediaContentLibraryViewModel,
 		WrapViewerViewModel wrapViewerViewModel,
 		ListViewerViewModel listViewerViewModel,

@@ -15,7 +15,7 @@ public class SortSelectorViewModel : ViewModelBase {
 	/// <summary>
 	/// コンストラクタ
 	/// </summary>
-	public SortSelectorViewModel(SortSelector model, StateStore stateStore, MediaContentLibrary mediaContentLibrary) {
+	public SortSelectorViewModel(SortSelector model, IStateStore stateStore, MediaContentLibrary mediaContentLibrary) {
 		this._stateStore = stateStore;
 		this.SortConditions = model.SortConditions.CreateView(x => new SortConditionViewModel(x)).ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
 		this.CurrentCondition.Value = this.SortConditions.FirstOrDefault(c => c.Model == model.CurrentSortCondition.Value);
@@ -30,7 +30,7 @@ public class SortSelectorViewModel : ViewModelBase {
 		});
 	}
 
-	private readonly StateStore _stateStore;
+	private readonly IStateStore _stateStore;
 
 	/// <summary>
 	/// カレント条件

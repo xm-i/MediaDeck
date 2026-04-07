@@ -11,9 +11,9 @@ namespace MediaDeck.Core.Models.Files.Filter;
 /// </remarks>
 [Inject(InjectServiceLifetime.Singleton)]
 public class FilterManager : ModelBase {
-	private readonly StateStore _stateStore;
+	private readonly IStateStore _stateStore;
 
-	public FilterManager(StateStore stateStore) {
+	public FilterManager(IStateStore stateStore) {
 		this._stateStore = stateStore;
 		this.FilteringConditions = [.. stateStore.State.SearchState.FilteringConditions.Select(x => new FilteringConditionEditor(x))];
 	}

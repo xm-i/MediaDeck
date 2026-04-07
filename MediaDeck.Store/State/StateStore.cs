@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
 
 using AutoDiAttributes;
 
@@ -35,6 +36,14 @@ public class StateStore : IStateStore {
 		this.Load();
 	}
 
+	public JsonSerializerOptions JsonSerializerOptions {
+		get {
+			return field ??= new JsonSerializerOptions() {
+				TypeInfoResolver = StateJsonSerializerContext.Default.WithAddedModifier(global::R3.JsonConfig.ForJsonConverterRegistry.ApplyPolymorphism)
+			};
+		}
+	}
+
 	/// <summary>
 	///     保存済み設定を読み込みます。
 	/// </summary>
@@ -44,7 +53,7 @@ public class StateStore : IStateStore {
 		try {
 			if (File.Exists(this.StateFilePath)) {
 				var json = File.ReadAllText(this.StateFilePath);
-				var loaded = JsonSerializer.Deserialize(json, StateJsonSerializerContext.Default.StateModelForJson);
+				var loaded = JsonSerializer.Deserialize<StateModelForJson>(json, this.JsonSerializerOptions);
 				if (loaded != null) {
 					this.State = StateModelForJson.CreateModel(loaded, scope.ServiceProvider);
 					return;
@@ -64,7 +73,7 @@ public class StateStore : IStateStore {
 			Directory.CreateDirectory(Path.GetDirectoryName(this.StateFilePath)!);
 
 			var jsonDto = StateModelForJson.CreateJson(this.State);
-			var json = JsonSerializer.Serialize(jsonDto, StateJsonSerializerContext.Default.StateModelForJson);
+			var json = JsonSerializer.Serialize(jsonDto, this.JsonSerializerOptions);
 			File.WriteAllText(this.StateFilePath, json);
 		} catch (Exception) {
 			// TODO: 失敗通知

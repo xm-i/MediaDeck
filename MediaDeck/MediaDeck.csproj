@@ -58,6 +58,7 @@
     <ProjectReference Include="..\MediaDeck.Composition.UI\MediaDeck.Composition.UI.csproj" />
     <ProjectReference Include="..\MediaDeck.Database\MediaDeck.Database.csproj" />
     <ProjectReference Include="..\MediaDeck.FileTypes\MediaDeck.FileTypes.csproj" />
+    <ProjectReference Include="..\MediaDeck.Store\MediaDeck.Store.csproj" />
     <ProjectReference Include="..\MediaDeck.ViewModels\MediaDeck.ViewModels.csproj" />
   </ItemGroup>
 

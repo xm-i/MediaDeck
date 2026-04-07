@@ -15,7 +15,6 @@
     <ProjectReference Include="..\MediaDeck.Composition\MediaDeck.Composition.csproj" />
     <PackageReference Include="ObservableCollections" />
     <PackageReference Include="ObservableCollections.R3" />
-    <PackageReference Include="Portable.Xaml" />
     <PackageReference Include="R3" />
   </ItemGroup>
   

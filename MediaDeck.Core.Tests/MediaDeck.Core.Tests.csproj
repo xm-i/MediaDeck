@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MediaDeck.Core\MediaDeck.Core.csproj" />
+    <ProjectReference Include="..\MediaDeck.Store\MediaDeck.Store.csproj" />
   </ItemGroup>
 
   <ItemGroup>

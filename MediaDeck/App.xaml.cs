@@ -111,6 +111,7 @@ public partial class App {
 		FileTypes.DIRegistration.AddGeneratedServices(serviceCollection);
 		ViewModels.DIRegistration.AddGeneratedServices(serviceCollection);
 		Core.DIRegistration.AddGeneratedServices(serviceCollection);
+		Store.DIRegistration.AddGeneratedServices(serviceCollection);
 
 		// DataBase
 		var sb = new SqliteConnectionStringBuilder { DataSource = Path.Combine(FilePathConstants.BaseDirectory, "pix.db") };
