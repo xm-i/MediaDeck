@@ -22,6 +22,7 @@
   
   <PropertyGroup Condition="'$(Packaged)' != 'true'">
     <WindowsPackageType>None</WindowsPackageType>
+    <WindowsAppSDKSelfContained>false</WindowsAppSDKSelfContained>
   </PropertyGroup>
   
   <ItemGroup>
