@@ -72,7 +72,7 @@ public class UpdateFileHashBackgroundService : ServiceBase, IUpdateFileHashBackg
 			.ThrottleFirst(TimeSpan.FromSeconds(0.1))
 			.ObserveOnThreadPool()
 			.SubscribeAwait(async (x, ct) =>
-					await this.UpdateHashAsync().ConfigureAwait(false),
+					await this.UpdateHashAsync(ct).ConfigureAwait(false),
 				AwaitOperation.Sequential,
 				false)
 			.AddTo(this.CompositeDisposable);
@@ -82,7 +82,7 @@ public class UpdateFileHashBackgroundService : ServiceBase, IUpdateFileHashBackg
 			.ThrottleFirst(TimeSpan.FromSeconds(0.1))
 			.ObserveOnThreadPool()
 			.SubscribeAwait(async (x, ct) =>
-					await this.UpdateFullHashAsync().ConfigureAwait(false),
+					await this.UpdateFullHashAsync(ct).ConfigureAwait(false),
 				AwaitOperation.Sequential,
 				false)
 			.AddTo(this.CompositeDisposable);
@@ -110,10 +110,10 @@ public class UpdateFileHashBackgroundService : ServiceBase, IUpdateFileHashBackg
 	/// <summary>
 	/// PreHash更新キューが空の場合に、重複PreHashのチェックとFullHash管理を実行する
 	/// </summary>
-	public async Task CheckAndEnqueueFullHashUpdatesAsync() {
+	public async Task CheckAndEnqueueFullHashUpdatesAsync(CancellationToken ct = default) {
 		// PreHash更新がない場合でも、重複PreHashのFullHashチェックを行う
 		if (this.HashUpdateQueue.Count == 0) {
-			await this.EnqueueDuplicatePreHashForFullHashAsync();
+			await this.EnqueueDuplicatePreHashForFullHashAsync(ct).ConfigureAwait(false);
 		}
 	}
 
@@ -121,12 +121,15 @@ public class UpdateFileHashBackgroundService : ServiceBase, IUpdateFileHashBackg
 	/// キューに追加されたメディアファイルのPreHashを順次更新する。
 	/// 全ての更新完了後、重複PreHashのチェックとFullHash管理を実行する。
 	/// </summary>
-	private async Task UpdateHashAsync() {
+	private async Task UpdateHashAsync(CancellationToken ct) {
 		while (this.HashUpdateQueue.TryDequeue(out var mediaFileId)) {
+			if (ct.IsCancellationRequested) {
+				return;
+			}
 			try {
 				string? filePath;
-				await using (var db = await this._dbFactory.CreateDbContextAsync()) {
-					var mediaFile = await db.MediaFiles.FindAsync(mediaFileId);
+				await using (var db = await this._dbFactory.CreateDbContextAsync(ct).ConfigureAwait(false)) {
+					var mediaFile = await db.MediaFiles.FindAsync([mediaFileId], cancellationToken: ct).ConfigureAwait(false);
 					if (mediaFile == null || !mediaFile.IsExists) {
 						continue;
 					}
@@ -135,14 +138,14 @@ public class UpdateFileHashBackgroundService : ServiceBase, IUpdateFileHashBackg
 
 				var hash = FileHashUtility.ComputeFileHash(filePath);
 
-				await using (var db = await this._dbFactory.CreateDbContextAsync())
-				using (var transaction = await db.Database.BeginTransactionAsync()) {
-					var mediaFile = await db.MediaFiles.FindAsync(mediaFileId);
+				await using (var db = await this._dbFactory.CreateDbContextAsync(ct).ConfigureAwait(false))
+				await using (var transaction = await db.Database.BeginTransactionAsync(ct).ConfigureAwait(false)) {
+					var mediaFile = await db.MediaFiles.FindAsync([mediaFileId], cancellationToken: ct).ConfigureAwait(false);
 					if (mediaFile != null) {
 						mediaFile.PreHash = hash;
 						mediaFile.PreHashUpdatedTime = DateTime.Now;
-						await db.SaveChangesAsync();
-						await transaction.CommitAsync();
+						await db.SaveChangesAsync(ct).ConfigureAwait(false);
+						await transaction.CommitAsync(ct).ConfigureAwait(false);
 					}
 				}
 			} catch (Exception e) {
@@ -153,24 +156,24 @@ public class UpdateFileHashBackgroundService : ServiceBase, IUpdateFileHashBackg
 		}
 
 		// PreHashキューが空になったら、重複PreHashを持つレコードのFullHashを生成し、重複がなくなったレコードのFullHashをクリア。
-		await this.ClearFullHashForNonDuplicatePreHashAsync();
-		await this.EnqueueDuplicatePreHashForFullHashAsync();
+		await this.ClearFullHashForNonDuplicatePreHashAsync(ct).ConfigureAwait(false);
+		await this.EnqueueDuplicatePreHashForFullHashAsync(ct).ConfigureAwait(false);
 	}
 
 	/// <summary>
 	/// PreHashの重複がある場合はFullHashを更新する。
 	/// </summary>
-	private async Task EnqueueDuplicatePreHashForFullHashAsync() {
-		await this.EnqueueFullHashUpdatesForDuplicatePreHashAsync();
+	private async Task EnqueueDuplicatePreHashForFullHashAsync(CancellationToken ct) {
+		await this.EnqueueFullHashUpdatesForDuplicatePreHashAsync(ct).ConfigureAwait(false);
 	}
 
 	/// <summary>
 	/// PreHashが重複しているメディアファイルのFullHash更新をキューに追加する。
 	/// FullHashが未設定、またはPreHashより古い場合に更新対象とする。
 	/// </summary>
-	private async Task EnqueueFullHashUpdatesForDuplicatePreHashAsync() {
+	private async Task EnqueueFullHashUpdatesForDuplicatePreHashAsync(CancellationToken ct) {
 		List<long> duplicateIds;
-		await using (var db = await this._dbFactory.CreateDbContextAsync()) {
+		await using (var db = await this._dbFactory.CreateDbContextAsync(ct).ConfigureAwait(false)) {
 			// PreHashが同一のレコードが2つ以上あるグループを見つけ、
 			// その中でFullHashが未設定またはPreHashより古いものを抽出
 			var duplicatePreHashes = await db.MediaFiles
@@ -178,14 +181,14 @@ public class UpdateFileHashBackgroundService : ServiceBase, IUpdateFileHashBackg
 				.GroupBy(m => m.PreHash)
 				.Where(g => g.Count() >= 2)
 				.Select(g => g.Key)
-				.ToListAsync();
+				.ToListAsync(ct).ConfigureAwait(false);
 
 			duplicateIds = await db.MediaFiles
 				.Where(m => m.IsExists &&
 					duplicatePreHashes.Contains(m.PreHash) &&
 					(m.FullHash == null || m.PreHashUpdatedTime > m.FullHashUpdatedTime))
 				.Select(m => m.MediaFileId)
-				.ToListAsync();
+				.ToListAsync(ct).ConfigureAwait(false);
 		}
 
 		if (duplicateIds.Count > 0) {
@@ -198,16 +201,16 @@ public class UpdateFileHashBackgroundService : ServiceBase, IUpdateFileHashBackg
 	/// PreHashが重複していないメディアファイルのFullHashとFullHashUpdatedTimeをクリアする。
 	/// 重複が解消されたファイルから不要なFullHashを削除する。
 	/// </summary>
-	private async Task ClearFullHashForNonDuplicatePreHashAsync() {
-		await using (var db = await this._dbFactory.CreateDbContextAsync())
-		using (var transaction = await db.Database.BeginTransactionAsync()) {
+	private async Task ClearFullHashForNonDuplicatePreHashAsync(CancellationToken ct) {
+		await using (var db = await this._dbFactory.CreateDbContextAsync(ct).ConfigureAwait(false))
+		await using (var transaction = await db.Database.BeginTransactionAsync(ct).ConfigureAwait(false)) {
 			// PreHashが重複しているグループを特定
 			var duplicatePreHashes = await db.MediaFiles
 				.Where(m => m.IsExists && m.PreHash != null)
 				.GroupBy(m => m.PreHash)
 				.Where(g => g.Count() >= 2)
 				.Select(g => g.Key)
-				.ToListAsync();
+				.ToListAsync(ct).ConfigureAwait(false);
 
 			// PreHashが重複していないレコードのFullHashをクリア
 			await db.MediaFiles
@@ -217,9 +220,9 @@ public class UpdateFileHashBackgroundService : ServiceBase, IUpdateFileHashBackg
 					m.FullHash != null)
 				.ExecuteUpdateAsync(s => s
 					.SetProperty(m => m.FullHash, (string?)null)
-					.SetProperty(m => m.FullHashUpdatedTime, (DateTime?)null));
+					.SetProperty(m => m.FullHashUpdatedTime, (DateTime?)null), ct).ConfigureAwait(false);
 
-			await transaction.CommitAsync();
+			await transaction.CommitAsync(ct).ConfigureAwait(false);
 		}
 	}
 
@@ -227,12 +230,15 @@ public class UpdateFileHashBackgroundService : ServiceBase, IUpdateFileHashBackg
 	/// キューに追加されたメディアファイルのFullHashを順次更新する。
 	/// ファイル全体をスキャンして完全なハッシュ値を計算し、データベースに保存する。
 	/// </summary>
-	private async Task UpdateFullHashAsync() {
+	private async Task UpdateFullHashAsync(CancellationToken ct) {
 		while (this.FullHashUpdateQueue.TryDequeue(out var mediaFileId)) {
+			if (ct.IsCancellationRequested) {
+				return;
+			}
 			try {
 				string? filePath;
-				await using (var db = await this._dbFactory.CreateDbContextAsync()) {
-					var mediaFile = await db.MediaFiles.FindAsync(mediaFileId);
+				await using (var db = await this._dbFactory.CreateDbContextAsync(ct).ConfigureAwait(false)) {
+					var mediaFile = await db.MediaFiles.FindAsync([mediaFileId], cancellationToken: ct).ConfigureAwait(false);
 					if (mediaFile == null || !mediaFile.IsExists) {
 						continue;
 					}
@@ -241,14 +247,14 @@ public class UpdateFileHashBackgroundService : ServiceBase, IUpdateFileHashBackg
 
 				var fullHash = FileHashUtility.ComputeFullFileHash(filePath);
 
-				await using (var db = await this._dbFactory.CreateDbContextAsync())
-				using (var transaction = await db.Database.BeginTransactionAsync()) {
-					var mediaFile = await db.MediaFiles.FindAsync(mediaFileId);
+				await using (var db = await this._dbFactory.CreateDbContextAsync(ct).ConfigureAwait(false))
+				await using (var transaction = await db.Database.BeginTransactionAsync(ct).ConfigureAwait(false)) {
+					var mediaFile = await db.MediaFiles.FindAsync([mediaFileId], cancellationToken: ct).ConfigureAwait(false);
 					if (mediaFile != null) {
 						mediaFile.FullHash = fullHash;
 						mediaFile.FullHashUpdatedTime = DateTime.Now;
-						await db.SaveChangesAsync();
-						await transaction.CommitAsync();
+						await db.SaveChangesAsync(ct).ConfigureAwait(false);
+						await transaction.CommitAsync(ct).ConfigureAwait(false);
 					}
 				}
 			} catch (Exception e) {

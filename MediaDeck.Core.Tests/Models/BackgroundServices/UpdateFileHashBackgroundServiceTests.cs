@@ -9,6 +9,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 using Moq;
+using ObservableCollections;
+using R3;
 using Shouldly;
 
 namespace MediaDeck.Core.Tests.Models.BackgroundServices;
@@ -51,11 +53,21 @@ public class UpdateFileHashBackgroundServiceTests : IDisposable {
 		return mock;
 	}
 
+	private async Task WaitUntilAsync<T>(ReactiveProperty<T> property, T expectedValue, int timeoutMs = 5000) {
+		var stopwatch = Stopwatch.StartNew();
+		while (!EqualityComparer<T>.Default.Equals(property.Value, expectedValue)) {
+			if (stopwatch.ElapsedMilliseconds > timeoutMs) {
+				throw new TimeoutException($"Timed out waiting for property to reach {expectedValue}. Current value: {property.Value}");
+			}
+			await Task.Delay(10);
+		}
+	}
+
 	/// <summary>
-	/// EnqueueHashUpdateが呼び出された際、キューにアイテムが追加され、TargetCountが増加することを確認する。
+	/// EnqueueHashUpdateが呼び出された際、TargetCountが増加し、最終的に処理が完了することを確認する。
 	/// </summary>
 	[Fact]
-	public void EnqueueHashUpdate_ShouldAddQueueAndIncrementTargetCount() {
+	public async Task EnqueueHashUpdate_ShouldIncrementTargetCountAndComplete() {
 		// Arrange
 		var dbFactoryMock = this.CreateDbFactoryMock();
 		var loggerMock = new Mock<ILogger<UpdateFileHashBackgroundService>>();
@@ -63,18 +75,21 @@ public class UpdateFileHashBackgroundServiceTests : IDisposable {
 
 		// Act
 		service.EnqueueHashUpdate(1L);
+		// バックグラウンドスレッドが即座にdequeueする可能性があるため、TargetCountの増分を即座に確認
+		service.TargetCount.Value.ShouldBe(1);
+		
+		// 完了を待機
+		await this.WaitUntilAsync(service.CompletedCount, 1L);
 
 		// Assert
-		service.HashUpdateQueue.Count.ShouldBe(1);
-		service.HashUpdateQueue.ShouldContain(1L);
-		service.TargetCount.Value.ShouldBe(1);
+		service.CompletedCount.Value.ShouldBe(1);
 	}
 
 	/// <summary>
-	/// EnqueueHashUpdateRangeが呼び出された際、キューに複数のアイテムが追加され、TargetCountが正しく増加することを確認する。
+	/// EnqueueHashUpdateRangeが呼び出された際、TargetCountが正しく増加し、最終的にすべて完了することを確認する。
 	/// </summary>
 	[Fact]
-	public void EnqueueHashUpdateRange_ShouldAddQueueAndIncrementTargetCount() {
+	public async Task EnqueueHashUpdateRange_ShouldIncrementTargetCountAndComplete() {
 		// Arrange
 		var dbFactoryMock = this.CreateDbFactoryMock();
 		var loggerMock = new Mock<ILogger<UpdateFileHashBackgroundService>>();
@@ -83,9 +98,13 @@ public class UpdateFileHashBackgroundServiceTests : IDisposable {
 
 		// Act
 		service.EnqueueHashUpdateRange(ids);
+		service.TargetCount.Value.ShouldBe(3);
+
+		// 完了を待機
+		await this.WaitUntilAsync(service.CompletedCount, 3L);
 
 		// Assert
-		service.TargetCount.Value.ShouldBe(3);
+		service.CompletedCount.Value.ShouldBe(3);
 	}
 
 	/// <summary>
@@ -107,10 +126,9 @@ public class UpdateFileHashBackgroundServiceTests : IDisposable {
 
 		// Act
 		await service.CheckAndEnqueueFullHashUpdatesAsync();
-		await Task.Delay(100);
+		await this.WaitUntilAsync(service.FullHashTargetCount, 2L);
 
 		// Assert
-		service.FullHashUpdateQueue.Count.ShouldBe(2);
 		service.FullHashTargetCount.Value.ShouldBe(2);
 	}
 
@@ -122,16 +140,21 @@ public class UpdateFileHashBackgroundServiceTests : IDisposable {
 		// Arrange
 		var dbFactoryMock = this.CreateDbFactoryMock();
 		var loggerMock = new Mock<ILogger<UpdateFileHashBackgroundService>>();
+		// データベースが空の状態でも、キューに何かあればスキップされるはず
 		using var service = new UpdateFileHashBackgroundService(dbFactoryMock.Object, loggerMock.Object);
 
-		// キューに要素を追加しておく
-		service.HashUpdateQueue.Enqueue(1L);
+		// キューに要素を追加し、バックグラウンド処理が走らないように工夫（存在しないIDなどでもキューには残るはずだが即終わる可能性がある）
+		// ここでは大量に積むことで空にならない瞬間を狙うか、あるいは内部状態を直接いじる
+		service.HashUpdateQueue.Enqueue(999L);
+		service.TargetCount.Value++;
 
 		// Act
 		await service.CheckAndEnqueueFullHashUpdatesAsync();
 
 		// Assert
-		service.FullHashUpdateQueue.Count.ShouldBe(0);
+		// キューが処理されて空になる前に CheckAndEnqueueFullHashUpdatesAsync が走れば成功だが、
+		// レースコンディションを避けるため、FullHashTargetCount が増えていないことを確認
+		service.FullHashTargetCount.Value.ShouldBe(0);
 	}
 
 	/// <summary>
@@ -155,13 +178,9 @@ public class UpdateFileHashBackgroundServiceTests : IDisposable {
 		var loggerMock = new Mock<ILogger<UpdateFileHashBackgroundService>>();
 		using var service = new UpdateFileHashBackgroundService(mockFactory.Object, loggerMock.Object);
 
-		var method = typeof(UpdateFileHashBackgroundService).GetMethod("UpdateHashAsync", BindingFlags.NonPublic | BindingFlags.Instance);
-		method.ShouldNotBeNull();
-
 		// Act
-		service.HashUpdateQueue.Enqueue(mediaFileId);
-		var task = (Task)method.Invoke(service, null)!;
-		await task;
+		service.EnqueueHashUpdate(mediaFileId);
+		await this.WaitUntilAsync(service.CompletedCount, 1L);
 
 		// Assert
 		using (var context = new MediaDeckDbContext(this._options)) {
@@ -191,12 +210,9 @@ public class UpdateFileHashBackgroundServiceTests : IDisposable {
 		var loggerMock = new Mock<ILogger<UpdateFileHashBackgroundService>>();
 		using var service = new UpdateFileHashBackgroundService(mockFactory.Object, loggerMock.Object);
 
-		var method = typeof(UpdateFileHashBackgroundService).GetMethod("UpdateHashAsync", BindingFlags.NonPublic | BindingFlags.Instance);
-
 		// Act
-		service.HashUpdateQueue.Enqueue(mediaFileId);
-		var task = (Task)method!.Invoke(service, null)!;
-		await task;
+		service.EnqueueHashUpdate(mediaFileId);
+		await this.WaitUntilAsync(service.CompletedCount, 1L);
 
 		// Assert
 		using (var context = new MediaDeckDbContext(this._options)) {
@@ -225,12 +241,9 @@ public class UpdateFileHashBackgroundServiceTests : IDisposable {
 		var loggerMock = new Mock<ILogger<UpdateFileHashBackgroundService>>();
 		using var service = new UpdateFileHashBackgroundService(mockFactory.Object, loggerMock.Object);
 
-		var method = typeof(UpdateFileHashBackgroundService).GetMethod("UpdateHashAsync", BindingFlags.NonPublic | BindingFlags.Instance);
-
 		// Act
-		service.HashUpdateQueue.Enqueue(mediaFileId);
-		var task = (Task)method!.Invoke(service, null)!;
-		await task;
+		service.EnqueueHashUpdate(mediaFileId);
+		await this.WaitUntilAsync(service.CompletedCount, 1L);
 
 		// Assert
 		loggerMock.Verify(
@@ -266,13 +279,10 @@ public class UpdateFileHashBackgroundServiceTests : IDisposable {
 		var loggerMock = new Mock<ILogger<UpdateFileHashBackgroundService>>();
 		using var service = new UpdateFileHashBackgroundService(mockFactory.Object, loggerMock.Object);
 
-		var method = typeof(UpdateFileHashBackgroundService).GetMethod("UpdateFullHashAsync", BindingFlags.NonPublic | BindingFlags.Instance);
-		method.ShouldNotBeNull();
-
 		// Act
 		service.FullHashUpdateQueue.Enqueue(mediaFileId);
-		var task = (Task)method.Invoke(service, null)!;
-		await task;
+		service.FullHashTargetCount.Value++;
+		await this.WaitUntilAsync(service.FullHashCompletedCount, 1L);
 
 		// Assert
 		using (var context = new MediaDeckDbContext(this._options)) {
@@ -309,11 +319,12 @@ public class UpdateFileHashBackgroundServiceTests : IDisposable {
 		method.ShouldNotBeNull();
 
 		// Act
-		var task = (Task)method.Invoke(service, null)!;
+		// Invokeには object[] で渡す必要がある
+		var task = (Task)method.Invoke(service, new object[] { CancellationToken.None })!;
 		await task;
 
 		// Assert
-		service.FullHashUpdateQueue.Count.ShouldBeGreaterThanOrEqualTo(2);
+		// キューのカウントはバックグラウンド処理で0になる可能性があるため、TargetCountを確認
 		service.FullHashTargetCount.Value.ShouldBe(2);
 	}
 }
