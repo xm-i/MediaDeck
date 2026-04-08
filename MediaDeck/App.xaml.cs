@@ -79,7 +79,7 @@ public partial class App {
 	private static void BuildConfigureServices() {
 		// Serilog設定
 		string[] logFields = [
-			"{Timestamp:HH:mm:ss.fff}",
+			"{Timestamp:yyyy-MM-dd HH:mm:ss.fff}",
 			"{Level:u4}",
 			"{ThreadId:00}",
 			"{Message:j}",
