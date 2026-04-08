@@ -43,20 +43,6 @@ public class RateFilterItemObject : IFilterItemObject {
 		set;
 	}
 
-	[Obsolete("for serialize")]
 	public RateFilterItemObject() {
-	}
-
-	/// <summary>
-	/// コンストラクタ
-	/// </summary>
-	/// <param name="rate">評価</param>
-	/// <param name="searchType">検索タイプ</param>
-	public RateFilterItemObject(int rate, SearchTypeComparison searchType) {
-		if (!Enum.IsDefined(typeof(SearchTypeComparison), searchType)) {
-			throw new ArgumentException();
-		}
-		this.Rate = rate;
-		this.SearchType = searchType;
 	}
 }

@@ -4,6 +4,7 @@ using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Composition.Interfaces.FileTypes.ViewModels;
 using MediaDeck.Core.Models.FileDetailManagers;
 using MediaDeck.Core.Models.FileDetailManagers.Objects;
+using MediaDeck.Core.Models.Files;
 using MediaDeck.Core.Models.Files.SearchConditions;
 using MediaDeck.Core.Models.NotificationDispatcher;
 using MediaDeck.Core.Primitives;
@@ -71,7 +72,7 @@ public class DetailSelectorViewModel : ViewModelBase {
 			this.Text.Value = "";
 		});
 		this.SearchTaggedFilesCommand.Subscribe(x => {
-			searchConditionNotificationDispatcher.AddRequest.OnNext(new TagSearchCondition(x.Value.Model));
+			searchConditionNotificationDispatcher.AddRequest.OnNext(new TagSearchCondition { TargetTag = (TagModel)x.Value.Model });
 		});
 	}
 

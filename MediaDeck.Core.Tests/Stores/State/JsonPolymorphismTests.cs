@@ -1,6 +1,7 @@
 using System.Text.Json;
 using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Stores.State.Model;
+using MediaDeck.Core.Models.Files;
 using MediaDeck.Core.Models.Files.Filter.FilterItemObjects;
 using MediaDeck.Core.Models.Files.SearchConditions;
 using MediaDeck.Stores.SerializerContext;
@@ -39,8 +40,9 @@ public class JsonPolymorphismTests {
 	[Fact]
 	public void TagSearchCondition_RoundTrip_Works() {
 		// Arrange
-		var condition = new TagSearchCondition();
-		// TagSearchCondition のプロパティ設定が必要ならここで行う
+		var condition = new TagSearchCondition {
+			TargetTag = new TagModel { TagName = "TestTag" }
+		};
 
 		// Act & Assert
 		this.VerifyRoundTrip<ISearchCondition, TagSearchCondition>(condition, "tag");
@@ -49,7 +51,9 @@ public class JsonPolymorphismTests {
 	[Fact]
 	public void TagFilterItemObject_RoundTrip_Works() {
 		// Arrange
-		var filter = new TagFilterItemObject();
+		var filter = new TagFilterItemObject {
+			TagName = "testTag"
+		};
 
 		// Act & Assert
 		this.VerifyRoundTrip<IFilterItemObject, TagFilterItemObject>(filter, "tagFilter");

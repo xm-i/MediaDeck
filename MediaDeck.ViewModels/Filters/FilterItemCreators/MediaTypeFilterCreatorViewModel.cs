@@ -44,7 +44,9 @@ public class MediaTypeFilterCreatorViewModel : ViewModelBase, IFilterCreatorView
 	public MediaTypeFilterCreatorViewModel(ReactiveProperty<FilteringConditionEditorViewModel?> target) {
 		this.MediaType.Value = this.MediaTypeList.First();
 		this.AddFilterCommand.Subscribe(vm => {
-			var filter = new MediaTypeFilterItemObject(this.MediaType.Value.Value);
+			var filter = new MediaTypeFilterItemObject {
+				IsVideo = this.MediaType.Value.Value
+			};
 			target.Value?.AddFilter(filter);
 		});
 	}

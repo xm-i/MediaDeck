@@ -79,7 +79,7 @@ public class FolderRepository : RepositoryBase {
 	public void SetRepositoryCandidate(FolderObject folderObject, bool includeSubDirectory) {
 		this._searchConditionNotificationDispatcher.UpdateRequest.OnNext(x => {
 			x.RemoveRange(x.Where(x => x is FolderSearchCondition));
-			x.Add(new FolderSearchCondition(folderObject) { IncludeSubDirectories = includeSubDirectory });
+			x.Add(new FolderSearchCondition { FolderPath = folderObject.FolderPath, IncludeSubDirectories = includeSubDirectory });
 		});
 	}
 

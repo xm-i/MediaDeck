@@ -13,18 +13,17 @@ namespace MediaDeck.Core.Models.Files.SearchConditions;
 [JsonConfigDerivedType("word")]
 [Inject(InjectServiceLifetime.Transient)]
 public class WordSearchCondition : ISearchCondition {
-	[Obsolete("for serialize")]
 	public WordSearchCondition() {
-		this.Word = null!;
-	}
-
-	public WordSearchCondition(string word) {
-		this.Word = word;
 	}
 
 	public string Word {
-		get;
-		set;
+		get {
+			return field ?? throw new InvalidOperationException($"{nameof(this.Word)} is not initialized.");
+		}
+
+		set {
+			field = value;
+		}
 	}
 
 	public string DisplayText {

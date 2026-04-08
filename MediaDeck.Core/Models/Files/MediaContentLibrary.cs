@@ -18,8 +18,8 @@ public class MediaContentLibrary : ModelBase {
 		this._filesLoader = filesLoader;
 		this.SearchConditions.ObserveChanged().ThrottleLast(TimeSpan.FromMilliseconds(100)).Subscribe(async _ => await this.SearchAsync());
 		tagsManager.Load().Wait();
-		this.SearchConditionCandidates.AddRange(tagsManager.Tags.Select(x => new TagSearchCondition(x) as ISearchCondition));
-		this.SearchConditionCandidates.AddRange(folderRepository.GetAllFolders().Select(x => new FolderSearchCondition(x) as ISearchCondition));
+		this.SearchConditionCandidates.AddRange(tagsManager.Tags.Select(x => new TagSearchCondition { TargetTag = (TagModel)x } as ISearchCondition));
+		this.SearchConditionCandidates.AddRange(folderRepository.GetAllFolders().Select(x => new FolderSearchCondition { FolderPath = x.FolderPath } as ISearchCondition));
 		searchConditionNotificationDispatcher.AddRequest.Subscribe(this.SearchConditions.Add);
 		searchConditionNotificationDispatcher.RemoveRequest.Subscribe(x => this.SearchConditions.Remove(x));
 		searchConditionNotificationDispatcher.UpdateRequest.Subscribe(x => x(this.SearchConditions));

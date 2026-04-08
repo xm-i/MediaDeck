@@ -32,15 +32,6 @@ public class MediaTypeFilterItemObject : IFilterItemObject {
 		set;
 	}
 
-	[Obsolete("for serialize")]
 	public MediaTypeFilterItemObject() {
-	}
-
-	/// <summary>
-	/// コンストラクタ
-	/// </summary>
-	/// <param name="isVideo">動画ファイルか否か</param>
-	public MediaTypeFilterItemObject(bool isVideo) {
-		this.IsVideo = isVideo;
 	}
 }

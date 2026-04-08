@@ -44,7 +44,9 @@ public class LocationFilterCreatorViewModel : ViewModelBase, IFilterCreatorViewM
 	public LocationFilterCreatorViewModel(ReactiveProperty<FilteringConditionEditorViewModel?> target) {
 		this.HasLocation.Value = this.HasLocationList.First();
 		this.AddFilterCommand.Subscribe(vm => {
-			var filter = new LocationFilterItemObject(this.HasLocation.Value.Value);
+			var filter = new LocationFilterItemObject {
+				Contains = this.HasLocation.Value.Value
+			};
 			target.Value?.AddFilter(filter);
 		});
 	}

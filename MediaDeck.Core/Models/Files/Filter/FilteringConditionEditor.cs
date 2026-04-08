@@ -57,7 +57,7 @@ public class FilteringConditionEditor : ModelBase {
 	/// <param name="tagName">タグ名</param>
 	/// <param name="searchType">検索タイプ</param>
 	public void AddTagFilter(string tagName, SearchTypeInclude searchType) {
-		this.FilterItemObjects.Add(new TagFilterItemObject(tagName, searchType));
+		this.FilterItemObjects.Add(new TagFilterItemObject { TagName = tagName, SearchType = searchType });
 	}
 
 	/// <summary>
@@ -66,7 +66,7 @@ public class FilteringConditionEditor : ModelBase {
 	/// <param name="text">ファイルパスに含まれる文字列</param>
 	/// <param name="searchType">検索タイプ</param>
 	public void AddFilePathFilter(string text, SearchTypeInclude searchType) {
-		this.FilterItemObjects.Add(new FilePathFilterItemObject(text, searchType));
+		this.FilterItemObjects.Add(new FilePathFilterItemObject { Text = text, SearchType = searchType });
 	}
 
 	/// <summary>
@@ -75,7 +75,7 @@ public class FilteringConditionEditor : ModelBase {
 	/// <param name="rate">評価</param>
 	/// <param name="searchType">検索タイプ</param>
 	public void AddRateFilter(int rate, SearchTypeComparison searchType) {
-		this.FilterItemObjects.Add(new RateFilterItemObject(rate, searchType));
+		this.FilterItemObjects.Add(new RateFilterItemObject { Rate = rate, SearchType = searchType });
 	}
 
 	/// <summary>
@@ -87,9 +87,9 @@ public class FilteringConditionEditor : ModelBase {
 	public void AddResolutionFilter(int? width, int? height, SearchTypeComparison searchType) {
 		IFilterItemObject filterItemObject;
 		if (width is { } w && height is { } h) {
-			filterItemObject = new ResolutionFilterItemObject(new ComparableSize(w, h), searchType);
+			filterItemObject = new ResolutionFilterItemObject { Resolution = new ComparableSize(w, h), SearchType = searchType };
 		} else {
-			filterItemObject = new ResolutionFilterItemObject(width, height, searchType);
+			filterItemObject = new ResolutionFilterItemObject { Width = width, Height = height, SearchType = searchType };
 		}
 		this.FilterItemObjects.Add(filterItemObject);
 	}
@@ -99,7 +99,7 @@ public class FilteringConditionEditor : ModelBase {
 	/// </summary>
 	/// <param name="isVideo">動画か否か</param>
 	public void AddMediaTypeFilter(bool isVideo) {
-		this.FilterItemObjects.Add(new MediaTypeFilterItemObject(isVideo));
+		this.FilterItemObjects.Add(new MediaTypeFilterItemObject { IsVideo = isVideo });
 	}
 
 	/// <summary>
@@ -107,7 +107,7 @@ public class FilteringConditionEditor : ModelBase {
 	/// </summary>
 	/// <param name="hasLocation">座標情報を含むか否か</param>
 	public void AddLocationFilter(bool hasLocation) {
-		this.FilterItemObjects.Add(new LocationFilterItemObject(hasLocation));
+		this.FilterItemObjects.Add(new LocationFilterItemObject { Contains = hasLocation });
 	}
 
 	/// <summary>
@@ -115,7 +115,7 @@ public class FilteringConditionEditor : ModelBase {
 	/// </summary>
 	/// <param name="exists">ファイルが存在するか否か</param>
 	public void AddExistsFilter(bool exists) {
-		this.FilterItemObjects.Add(new ExistsFilterItemObject(exists));
+		this.FilterItemObjects.Add(new ExistsFilterItemObject { Exists = exists });
 	}
 
 	/// <summary>

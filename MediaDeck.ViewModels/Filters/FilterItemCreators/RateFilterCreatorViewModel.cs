@@ -67,7 +67,10 @@ public class RateFilterCreatorViewModel : ViewModelBase, IFilterCreatorViewModel
 		this.AddFilterCommand
 			.Subscribe(vm => {
 				if (int.TryParse(this.RateText.Value, out var r)) {
-					var filter = new RateFilterItemObject(r, this.SearchType.Value.Value);
+					var filter = new RateFilterItemObject {
+						Rate = r,
+						SearchType = this.SearchType.Value.Value
+					};
 					target.Value?.AddFilter(filter);
 				}
 			});

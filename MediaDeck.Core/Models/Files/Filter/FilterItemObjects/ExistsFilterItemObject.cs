@@ -27,15 +27,6 @@ public class ExistsFilterItemObject : IFilterItemObject {
 		set;
 	}
 
-	[Obsolete("for serialize")]
 	public ExistsFilterItemObject() {
-	}
-
-	/// <summary>
-	/// コンストラクタ
-	/// </summary>
-	/// <param name="exists">ファイルが存在するか否か</param>
-	public ExistsFilterItemObject(bool exists) {
-		this.Exists = exists;
 	}
 }

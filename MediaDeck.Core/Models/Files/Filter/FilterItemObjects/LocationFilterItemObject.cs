@@ -69,33 +69,6 @@ public class LocationFilterItemObject : IFilterItemObject {
 		set;
 	}
 
-	[Obsolete("for serialize")]
 	public LocationFilterItemObject() {
-	}
-
-	/// <summary>
-	/// コンストラクタ
-	/// </summary>
-	/// <param name="text">地名に含まれる文字列</param>
-	public LocationFilterItemObject(string text) {
-		this.Text = text;
-	}
-
-	/// <summary>
-	/// コンストラクタ
-	/// </summary>
-	/// <param name="contains">地名に含まれる文字列</param>
-	public LocationFilterItemObject(bool contains) {
-		this.Contains = contains;
-	}
-
-	/// <summary>
-	/// コンストラクタ
-	/// </summary>
-	/// <param name="leftTop">左上座標</param>
-	/// <param name="rightBottom">右下座標</param>
-	public LocationFilterItemObject(GpsLocation leftTop, GpsLocation rightBottom) {
-		this.LeftTop = leftTop;
-		this.RightBottom = rightBottom;
 	}
 }

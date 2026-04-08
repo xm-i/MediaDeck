@@ -24,8 +24,12 @@ public class TagFilterItemObject : IFilterItemObject {
 	/// タグ名
 	/// </summary>
 	public string TagName {
-		get;
-		set;
+		get {
+			return field ?? throw new InvalidOperationException($"{nameof(this.TagName)} is not initialized.");
+		}
+		set {
+			field = value;
+		}
 	}
 
 	/// <summary>
@@ -36,21 +40,6 @@ public class TagFilterItemObject : IFilterItemObject {
 		set;
 	}
 
-	[Obsolete("for serialize")]
 	public TagFilterItemObject() {
-		this.TagName = null!;
-	}
-
-	/// <summary>
-	/// コンストラクタ
-	/// </summary>
-	/// <param name="tagName">タグ名</param>
-	/// <param name="searchType">検索タイプ</param>
-	public TagFilterItemObject(string tagName, SearchTypeInclude searchType) {
-		if (tagName == null || !Enum.IsDefined(typeof(SearchTypeInclude), searchType)) {
-			throw new ArgumentException();
-		}
-		this.TagName = tagName;
-		this.SearchType = searchType;
 	}
 }

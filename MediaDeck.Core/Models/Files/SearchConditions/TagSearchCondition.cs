@@ -13,18 +13,16 @@ namespace MediaDeck.Core.Models.Files.SearchConditions;
 [JsonConfigDerivedType("tag")]
 [Inject(InjectServiceLifetime.Transient)]
 public class TagSearchCondition : ISearchCondition {
-	[Obsolete("for serialize")]
 	public TagSearchCondition() {
-		this.TargetTag = null!;
 	}
 
-	public TagSearchCondition(ITagModel targetTag) {
-		this.TargetTag = targetTag;
-	}
-
-	public ITagModel TargetTag {
-		get;
-		set;
+	public TagModel TargetTag {
+		get {
+			return (TagModel)field ?? throw new InvalidOperationException($"{nameof(this.TargetTag)} is not initialized.");
+		}
+		set {
+			field = value;
+		}
 	}
 
 	public string DisplayText {

@@ -69,35 +69,6 @@ public class ResolutionFilterItemObject : IFilterItemObject {
 		set;
 	}
 
-	[Obsolete("for serialize")]
 	public ResolutionFilterItemObject() {
-	}
-
-	/// <summary>
-	/// コンストラクタ
-	/// </summary>
-	/// <param name="resolution">解像度</param>
-	/// <param name="searchType">検索タイプ</param>
-	public ResolutionFilterItemObject(ComparableSize resolution, SearchTypeComparison searchType) {
-		if (!Enum.IsDefined(typeof(SearchTypeComparison), searchType)) {
-			throw new ArgumentException();
-		}
-		this.Resolution = resolution;
-		this.SearchType = searchType;
-	}
-
-	/// <summary>
-	/// コンストラクタ
-	/// </summary>
-	/// <param name="width">幅</param>
-	/// <param name="height">高さ</param>
-	/// <param name="searchType">検索タイプ</param>
-	public ResolutionFilterItemObject(int? width, int? height, SearchTypeComparison searchType) {
-		if (!(width == null ^ height == null) || !Enum.IsDefined(typeof(SearchTypeComparison), searchType)) {
-			throw new ArgumentException();
-		}
-		this.Width = width;
-		this.Height = height;
-		this.SearchType = searchType;
 	}
 }

@@ -13,18 +13,16 @@ namespace MediaDeck.Core.Models.Files.SearchConditions;
 [JsonConfigDerivedType("folder")]
 [Inject(InjectServiceLifetime.Transient)]
 public class FolderSearchCondition : ISearchCondition {
-	[Obsolete("for serialize")]
 	public FolderSearchCondition() {
-		this.FolderPath = null!;
-	}
-
-	public FolderSearchCondition(FolderObject folderObject) {
-		this.FolderPath = folderObject.FolderPath;
 	}
 
 	public string FolderPath {
-		get;
-		set;
+		get {
+			return field ?? throw new InvalidOperationException($"{nameof(this.FolderPath)} is not initialized.");
+		}
+		set {
+			field = value;
+		}
 	}
 
 	public bool IncludeSubDirectories {

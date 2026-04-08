@@ -106,7 +106,7 @@ public class ViewerPaneBase : UserControlBase<ViewerSelectorViewModel> {
 
 	protected void TokenizingTextBox_TokenItemAdding(TokenizingTextBox sender, TokenItemAddingEventArgs args) {
 		args.Cancel = true;
-		this.ViewModel?.MediaContentLibraryViewModel.SearchConditionNotificationDispatcher.AddRequest.OnNext(new WordSearchCondition(args.TokenText));
+		this.ViewModel?.MediaContentLibraryViewModel.SearchConditionNotificationDispatcher.AddRequest.OnNext(new WordSearchCondition { Word = args.TokenText });
 	}
 
 	protected void TokenizingTextBox_TokenItemRemoving(TokenizingTextBox sender, TokenItemRemovingEventArgs args) {

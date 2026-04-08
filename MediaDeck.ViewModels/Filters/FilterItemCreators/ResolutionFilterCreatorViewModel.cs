@@ -92,9 +92,16 @@ public class ResolutionFilterCreatorViewModel : ViewModelBase, IFilterCreatorVie
 
 				IFilterItemObject filterItemObject;
 				if (width is { } w2 && height is { } h2) {
-					filterItemObject = new ResolutionFilterItemObject(new ComparableSize(w2, h2), this.SearchType.Value.Value);
+					filterItemObject = new ResolutionFilterItemObject {
+						Resolution = new ComparableSize(w2, h2),
+						SearchType = this.SearchType.Value.Value
+					};
 				} else {
-					filterItemObject = new ResolutionFilterItemObject(width, height, this.SearchType.Value.Value);
+					filterItemObject = new ResolutionFilterItemObject {
+						Width = width,
+						Height = height,
+						SearchType = this.SearchType.Value.Value
+					};
 				}
 				target.Value?.AddFilter(filterItemObject);
 			});

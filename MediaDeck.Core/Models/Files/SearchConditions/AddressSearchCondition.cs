@@ -14,18 +14,16 @@ namespace MediaDeck.Core.Models.Files.SearchConditions;
 [JsonConfigDerivedType("address")]
 [Inject(InjectServiceLifetime.Transient)]
 public class AddressSearchCondition : ISearchCondition {
-	[Obsolete("for serialize")]
 	public AddressSearchCondition() {
-		this.Address = null!;
-	}
-
-	public AddressSearchCondition(Address address) {
-		this.Address = address;
 	}
 
 	public Address Address {
-		get;
-		set;
+		get {
+			return field ?? throw new InvalidOperationException($"{nameof(this.Address)} is not initialized.");
+		}
+		set {
+			field = value;
+		}
 	}
 
 	public bool IncludeSubDirectories {
