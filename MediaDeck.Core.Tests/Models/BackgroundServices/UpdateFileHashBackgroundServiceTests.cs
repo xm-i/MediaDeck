@@ -59,7 +59,7 @@ public class UpdateFileHashBackgroundServiceTests : IDisposable {
 		// Arrange
 		var dbFactoryMock = this.CreateDbFactoryMock();
 		var loggerMock = new Mock<ILogger<UpdateFileHashBackgroundService>>();
-		var service = new UpdateFileHashBackgroundService(dbFactoryMock.Object, loggerMock.Object);
+		using var service = new UpdateFileHashBackgroundService(dbFactoryMock.Object, loggerMock.Object);
 
 		// Act
 		service.EnqueueHashUpdate(1L);
@@ -78,7 +78,7 @@ public class UpdateFileHashBackgroundServiceTests : IDisposable {
 		// Arrange
 		var dbFactoryMock = this.CreateDbFactoryMock();
 		var loggerMock = new Mock<ILogger<UpdateFileHashBackgroundService>>();
-		var service = new UpdateFileHashBackgroundService(dbFactoryMock.Object, loggerMock.Object);
+		using var service = new UpdateFileHashBackgroundService(dbFactoryMock.Object, loggerMock.Object);
 		var ids = new List<long> { 1L, 2L, 3L };
 
 		// Act
@@ -103,7 +103,7 @@ public class UpdateFileHashBackgroundServiceTests : IDisposable {
 
 		var dbFactoryMock = this.CreateDbFactoryMock();
 		var loggerMock = new Mock<ILogger<UpdateFileHashBackgroundService>>();
-		var service = new UpdateFileHashBackgroundService(dbFactoryMock.Object, loggerMock.Object);
+		using var service = new UpdateFileHashBackgroundService(dbFactoryMock.Object, loggerMock.Object);
 
 		// Act
 		await service.CheckAndEnqueueFullHashUpdatesAsync();
@@ -122,7 +122,7 @@ public class UpdateFileHashBackgroundServiceTests : IDisposable {
 		// Arrange
 		var dbFactoryMock = this.CreateDbFactoryMock();
 		var loggerMock = new Mock<ILogger<UpdateFileHashBackgroundService>>();
-		var service = new UpdateFileHashBackgroundService(dbFactoryMock.Object, loggerMock.Object);
+		using var service = new UpdateFileHashBackgroundService(dbFactoryMock.Object, loggerMock.Object);
 
 		// キューに要素を追加しておく
 		service.HashUpdateQueue.Enqueue(1L);
@@ -153,7 +153,7 @@ public class UpdateFileHashBackgroundServiceTests : IDisposable {
 
 		var mockFactory = this.CreateDbFactoryMock();
 		var loggerMock = new Mock<ILogger<UpdateFileHashBackgroundService>>();
-		var service = new UpdateFileHashBackgroundService(mockFactory.Object, loggerMock.Object);
+		using var service = new UpdateFileHashBackgroundService(mockFactory.Object, loggerMock.Object);
 
 		var method = typeof(UpdateFileHashBackgroundService).GetMethod("UpdateHashAsync", BindingFlags.NonPublic | BindingFlags.Instance);
 		method.ShouldNotBeNull();
@@ -189,7 +189,7 @@ public class UpdateFileHashBackgroundServiceTests : IDisposable {
 
 		var mockFactory = this.CreateDbFactoryMock();
 		var loggerMock = new Mock<ILogger<UpdateFileHashBackgroundService>>();
-		var service = new UpdateFileHashBackgroundService(mockFactory.Object, loggerMock.Object);
+		using var service = new UpdateFileHashBackgroundService(mockFactory.Object, loggerMock.Object);
 
 		var method = typeof(UpdateFileHashBackgroundService).GetMethod("UpdateHashAsync", BindingFlags.NonPublic | BindingFlags.Instance);
 
@@ -223,7 +223,7 @@ public class UpdateFileHashBackgroundServiceTests : IDisposable {
 
 		var mockFactory = this.CreateDbFactoryMock();
 		var loggerMock = new Mock<ILogger<UpdateFileHashBackgroundService>>();
-		var service = new UpdateFileHashBackgroundService(mockFactory.Object, loggerMock.Object);
+		using var service = new UpdateFileHashBackgroundService(mockFactory.Object, loggerMock.Object);
 
 		var method = typeof(UpdateFileHashBackgroundService).GetMethod("UpdateHashAsync", BindingFlags.NonPublic | BindingFlags.Instance);
 
@@ -264,7 +264,7 @@ public class UpdateFileHashBackgroundServiceTests : IDisposable {
 
 		var mockFactory = this.CreateDbFactoryMock();
 		var loggerMock = new Mock<ILogger<UpdateFileHashBackgroundService>>();
-		var service = new UpdateFileHashBackgroundService(mockFactory.Object, loggerMock.Object);
+		using var service = new UpdateFileHashBackgroundService(mockFactory.Object, loggerMock.Object);
 
 		var method = typeof(UpdateFileHashBackgroundService).GetMethod("UpdateFullHashAsync", BindingFlags.NonPublic | BindingFlags.Instance);
 		method.ShouldNotBeNull();
@@ -303,7 +303,7 @@ public class UpdateFileHashBackgroundServiceTests : IDisposable {
 
 		var mockFactory = this.CreateDbFactoryMock();
 		var loggerMock = new Mock<ILogger<UpdateFileHashBackgroundService>>();
-		var service = new UpdateFileHashBackgroundService(mockFactory.Object, loggerMock.Object);
+		using var service = new UpdateFileHashBackgroundService(mockFactory.Object, loggerMock.Object);
 
 		var method = typeof(UpdateFileHashBackgroundService).GetMethod("EnqueueFullHashUpdatesForDuplicatePreHashAsync", BindingFlags.NonPublic | BindingFlags.Instance);
 		method.ShouldNotBeNull();

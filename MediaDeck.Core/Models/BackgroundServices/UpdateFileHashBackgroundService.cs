@@ -1,3 +1,4 @@
+using MediaDeck.Common.Base;
 using MediaDeck.Common.Utilities;
 using MediaDeck.Database;
 
@@ -11,7 +12,7 @@ namespace MediaDeck.Core.Models.BackgroundServices;
 /// PreHashが重複する場合にのみFullHashを計算し、重複がなくなった場合はFullHashをクリアする。
 /// </summary>
 [Inject(InjectServiceLifetime.Singleton, typeof(IUpdateFileHashBackgroundService))]
-public class UpdateFileHashBackgroundService : IUpdateFileHashBackgroundService {
+public class UpdateFileHashBackgroundService : ServiceBase, IUpdateFileHashBackgroundService {
 	private readonly IDbContextFactory<MediaDeckDbContext> _dbFactory;
 	private readonly ILogger<UpdateFileHashBackgroundService> _logger;
 
@@ -73,7 +74,8 @@ public class UpdateFileHashBackgroundService : IUpdateFileHashBackgroundService 
 			.SubscribeAwait(async (x, ct) =>
 					await this.UpdateHashAsync().ConfigureAwait(false),
 				AwaitOperation.Sequential,
-				false);
+				false)
+			.AddTo(this.CompositeDisposable);
 
 		this.FullHashUpdateQueue
 			.ObserveAdd()
@@ -82,7 +84,8 @@ public class UpdateFileHashBackgroundService : IUpdateFileHashBackgroundService 
 			.SubscribeAwait(async (x, ct) =>
 					await this.UpdateFullHashAsync().ConfigureAwait(false),
 				AwaitOperation.Sequential,
-				false);
+				false)
+			.AddTo(this.CompositeDisposable);
 	}
 
 	/// <summary>
