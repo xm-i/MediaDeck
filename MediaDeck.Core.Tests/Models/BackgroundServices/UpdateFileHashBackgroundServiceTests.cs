@@ -77,7 +77,7 @@ public class UpdateFileHashBackgroundServiceTests : IDisposable {
 		service.EnqueueHashUpdate(1L);
 		// バックグラウンドスレッドが即座にdequeueする可能性があるため、TargetCountの増分を即座に確認
 		service.TargetCount.Value.ShouldBe(1);
-		
+
 		// 完了を待機
 		await this.WaitUntilAsync(service.CompletedCount, 1L);
 
