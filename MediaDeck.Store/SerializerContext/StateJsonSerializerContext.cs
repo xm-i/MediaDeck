@@ -37,7 +37,7 @@ public partial class StateJsonSerializerContext : JsonSerializerContext {
 	}
 
 	static StateJsonSerializerContext() {
-		DefaultOptions = new JsonSerializerOptions(Default.Options) {
+		DefaultOptions = new JsonSerializerOptions() {
 			TypeInfoResolver = Default.WithAddedModifier(global::R3.JsonConfig.ForJsonConverterRegistry.ApplyPolymorphism)
 		};
 	}

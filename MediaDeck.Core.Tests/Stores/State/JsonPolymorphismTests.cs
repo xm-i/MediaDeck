@@ -18,6 +18,10 @@ public class JsonPolymorphismTests {
 		var services = new ServiceCollection();
 		// 必要に応じて依存関係を登録
 		services.AddTransient<StateModel>();
+		services.AddTransient<FolderSearchCondition>();
+		services.AddTransient<TagSearchCondition>();
+		services.AddTransient<TagFilterItemObject>();
+		services.AddTransient<RateFilterItemObject>();
 		this._serviceProvider = services.BuildServiceProvider();
 	}
 
