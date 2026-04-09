@@ -68,9 +68,11 @@
 			<controls:Case Value="{x:Bind ViewModel.DetailViewerViewModel}" >
 				<local:DetailViewer DataContext="{x:Bind ViewModel}" />
 			</controls:Case>
+			<!-- Mapはちゃんと作るまでコメントアウト
 			<controls:Case Value="{x:Bind ViewModel.MapViewerViewModel}" >
 				<local:MapViewer DataContext="{x:Bind ViewModel}" />
 			</controls:Case>
+			-->
 		</controls:SwitchPresenter>
 		<controls:DockPanel Grid.Row="2" >
 			<TextBlock>
