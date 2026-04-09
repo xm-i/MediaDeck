@@ -1,5 +1,10 @@
+using MediaDeck.Database.Tables;
+
+using R3.JsonConfig.Attributes;
+
 namespace MediaDeck.Composition.Interfaces.Files;
 
+[GenerateR3JsonConfigDto]
 public interface ITagModel {
 	/// <summary>
 	/// タグID
@@ -52,8 +57,11 @@ public interface ITagModel {
 		get;
 		set;
 	}
+
+	public void Initialize(Tag tag, ITagModelFactory factory);
 }
 
+[GenerateR3JsonConfigDto]
 public interface ITagCategoryModel {
 	/// <summary>
 	/// タグ分類ID
@@ -78,8 +86,11 @@ public interface ITagCategoryModel {
 		get;
 		set;
 	}
+
+	public void Initialize(TagCategory tagCategory);
 }
 
+[GenerateR3JsonConfigDto]
 public interface ITagAliasModel {
 	/// <summary>
 	/// タグ別名ID
@@ -113,8 +124,10 @@ public interface ITagAliasModel {
 		set;
 	}
 
-	public string? Romaji {
+	public string Romaji {
 		get;
 		set;
 	}
+
+	public void Initialize(TagAlias tagAlias);
 }

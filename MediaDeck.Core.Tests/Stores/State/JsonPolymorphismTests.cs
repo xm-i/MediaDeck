@@ -29,6 +29,12 @@ public class JsonPolymorphismTests {
 		services.AddTransient<TagSearchCondition>();
 		services.AddTransient<TagFilterItemObject>();
 		services.AddTransient<RateFilterItemObject>();
+		services.AddTransient<TagModel>();
+		services.AddTransient<ITagModel, TagModel>();
+		services.AddTransient<TagCategoryModel>();
+		services.AddTransient<ITagCategoryModel, TagCategoryModel>();
+		services.AddTransient<TagAliasModel>();
+		services.AddTransient<ITagAliasModel, TagAliasModel>();
 		this._serviceProvider = services.BuildServiceProvider();
 	}
 
@@ -47,7 +53,15 @@ public class JsonPolymorphismTests {
 	public void TagSearchCondition_RoundTrip_Works() {
 		// Arrange
 		var condition = new TagSearchCondition {
-			TargetTag = new TagModel { TagName = "TestTag" }
+			TargetTag = new TagModel {
+				TagId = 1,
+				TagCategoryId = 1,
+				TagCategory = new TagCategoryModel { TagCategoryId = 1, TagCategoryName = "Cat", Detail = "" },
+				TagName = "TestTag",
+				Detail = "",
+				Romaji = "testtag",
+				TagAliases = []
+			}
 		};
 
 		// Act & Assert

@@ -16,9 +16,9 @@ public class TagSearchCondition : ISearchCondition {
 	public TagSearchCondition() {
 	}
 
-	public TagModel TargetTag {
+	public ITagModel TargetTag {
 		get {
-			return (TagModel)field ?? throw new InvalidOperationException($"{nameof(this.TargetTag)} is not initialized.");
+			return field ?? throw new InvalidOperationException($"{nameof(this.TargetTag)} is not initialized.");
 		}
 		set {
 			field = value;

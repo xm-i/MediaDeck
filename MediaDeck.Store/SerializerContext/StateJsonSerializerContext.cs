@@ -1,9 +1,7 @@
-using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Text.Json.Serialization.Metadata;
-
 using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Stores.State.Model;
+using MediaDeck.Core.Models.Files;
 using MediaDeck.Core.Models.Files.Filter.FilterItemObjects;
 using MediaDeck.Core.Models.Files.SearchConditions;
 using MediaDeck.Store.Converters;
@@ -28,6 +26,9 @@ namespace MediaDeck.Stores.SerializerContext;
 [JsonSerializable(typeof(RateFilterItemObjectForJson))]
 [JsonSerializable(typeof(TagFilterItemObjectForJson))]
 [JsonSerializable(typeof(ResolutionFilterItemObjectForJson))]
+[JsonSerializable(typeof(TagModelForJson))]
+[JsonSerializable(typeof(TagAliasModelForJson))]
+[JsonSerializable(typeof(TagCategoryModelForJson))]
 public partial class StateJsonSerializerContext : JsonSerializerContext {
 	static StateJsonSerializerContext() {
 	}
