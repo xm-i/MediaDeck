@@ -1,6 +1,4 @@
-using MediaDeck.Common.Extensions;
 using MediaDeck.Composition.Interfaces.Files;
-using MediaDeck.Database.Tables;
 
 namespace MediaDeck.ViewModels.Tags;
 
@@ -8,19 +6,24 @@ public class TagAliasViewModel {
 	public TagAliasViewModel(ITagAliasModel tagAlias, TagViewModel parent) {
 		this.Model = tagAlias;
 		this.Alias.Value = tagAlias.Alias;
-		this.Ruby.Value = tagAlias.Ruby;
-		this.Ruby.ToUnit()
-			.Concat(this.Alias.ToUnit())
-			.Subscribe(_ => {
-				parent.MarkAsEdited();
-			});
-	}
+		this.Ruby.Value = tagAlias.Ruby ?? string.Empty;
+		this.Parent = parent;
 
-	public TagAliasViewModel() {
-		this.Model = null!;
+		this.Alias.Subscribe(x => {
+			tagAlias.Alias = x;
+			parent.MarkAsEdited();
+		});
+		this.Ruby.Subscribe(x => {
+			tagAlias.Ruby = string.IsNullOrEmpty(x) ? null : x;
+			parent.MarkAsEdited();
+		});
 	}
 
 	public ITagAliasModel Model {
+		get;
+	}
+
+	public TagViewModel Parent {
 		get;
 	}
 
@@ -28,7 +31,7 @@ public class TagAliasViewModel {
 		get;
 	} = new();
 
-	public BindableReactiveProperty<string?> Ruby {
+	public BindableReactiveProperty<string> Ruby {
 		get;
 	} = new();
 }

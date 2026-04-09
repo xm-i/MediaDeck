@@ -7,17 +7,14 @@ using MediaDeck.Database.Tables;
 namespace MediaDeck.ViewModels.Tags;
 
 public class TagCategoryViewModel {
-	public TagCategoryViewModel(ITagCategoryModel tagCategory, TagsManager tagsManager, IEnumerable<ITagModel>? tags = null) {
+	public TagCategoryViewModel(ITagCategoryModel tagCategory, TagsManager tagsManager, ITagModelFactory tagModelFactory) {
 		this.Model = tagCategory;
 		this.TagCategoryId = tagCategory.TagCategoryId;
 		this.TagCategoryName.Value = tagCategory.TagCategoryName;
 		this.Detail.Value = tagCategory.Detail;
-		this.Tags = this._tags.CreateView(x => x);
+		this.Tags = tagCategory.Tags.CreateView(x => new TagViewModel(this, x, tagsManager, tagModelFactory));
 		this.FilteredTags = this.Tags.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
 
-		if (tags != null) {
-			this._tags.AddRange(tags.Select(x => new TagViewModel(this, x, tagsManager)));
-		}
 		this.UpdateTagCategoryCommand = this.TagCategoryName.CombineLatest(this.Detail, (x, y) => !string.IsNullOrWhiteSpace(x) && !string.IsNullOrWhiteSpace(y)).ToReactiveCommand();
 		this.UpdateTagCategoryCommand.Subscribe(async _ => {
 			if (tagCategory.TagCategoryId != -1) {
@@ -36,8 +33,6 @@ public class TagCategoryViewModel {
 			});
 	}
 
-	private readonly ObservableList<TagViewModel> _tags = [];
-
 	public ITagCategoryModel Model {
 		get;
 	}
@@ -46,7 +41,7 @@ public class TagCategoryViewModel {
 		get;
 	}
 
-	public ISynchronizedView<TagViewModel, TagViewModel> Tags {
+	public ISynchronizedView<ITagModel, TagViewModel> Tags {
 		get;
 	}
 
@@ -80,19 +75,19 @@ public class TagCategoryViewModel {
 			if (text.Length == 0) {
 				return true;
 			}
-			if (tag.TagName.Value.Contains(text) ||
-				(tag.TagName.Value.KatakanaToHiragana().HiraganaToRomaji()?.Contains(text, StringComparison.CurrentCultureIgnoreCase) ?? false)) {
-				tag.RepresentativeTextForSearch.Value = null;
+			if (tag.TagName.Contains(text) ||
+				(tag.TagName.KatakanaToHiragana().HiraganaToRomaji()?.Contains(text, StringComparison.CurrentCultureIgnoreCase) ?? false)) {
+				tag.RepresentativeText.Value = null;
 				return true;
 			}
 			var result =
 				tag
 					.TagAliases
 					.FirstOrDefault(x =>
-						x.Alias.Value.Contains(text, StringComparison.CurrentCultureIgnoreCase) ||
-						(x.Ruby.Value?.Contains(text) ?? false) ||
-						((x.Ruby.Value ?? x.Alias.Value.KatakanaToHiragana()).HiraganaToRomaji()?.Contains(text, StringComparison.CurrentCultureIgnoreCase) ?? false));
-			tag.RepresentativeTextForSearch.Value = result?.Alias.Value;
+						x.Alias.Contains(text, StringComparison.CurrentCultureIgnoreCase) ||
+						(x.Ruby?.Contains(text) ?? false) ||
+						((x.Ruby ?? x.Alias.KatakanaToHiragana()).HiraganaToRomaji()?.Contains(text, StringComparison.CurrentCultureIgnoreCase) ?? false));
+			tag.RepresentativeText.Value = result?.Alias;
 			return result != null;
 		});
 	}

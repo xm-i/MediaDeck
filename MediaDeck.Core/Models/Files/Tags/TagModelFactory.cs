@@ -14,13 +14,19 @@ public class TagModelFactory : ITagModelFactory {
 
 	public ITagModel Create(Tag tag) {
 		var model = this._serviceProvider.GetRequiredService<ITagModel>();
-		model.Initialize(tag, this);
+		model.Initialize(tag, null, this);
+		return model;
+	}
+
+	public ITagModel Create(Tag tag, ITagCategoryModel category) {
+		var model = this._serviceProvider.GetRequiredService<ITagModel>();
+		model.Initialize(tag, category, this);
 		return model;
 	}
 
 	public ITagCategoryModel Create(TagCategory tagCategory) {
 		var model = this._serviceProvider.GetRequiredService<ITagCategoryModel>();
-		model.Initialize(tagCategory);
+		model.Initialize(tagCategory, this);
 		return model;
 	}
 
@@ -28,5 +34,13 @@ public class TagModelFactory : ITagModelFactory {
 		var model = this._serviceProvider.GetRequiredService<ITagAliasModel>();
 		model.Initialize(tagAlias);
 		return model;
+	}
+
+	public ITagCategoryModel CreateCategory() {
+		return this._serviceProvider.GetRequiredService<ITagCategoryModel>();
+	}
+
+	public ITagAliasModel CreateAlias() {
+		return this._serviceProvider.GetRequiredService<ITagAliasModel>();
 	}
 }

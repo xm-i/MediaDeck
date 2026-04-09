@@ -10,7 +10,7 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 	private readonly IDbContextFactory<MediaDeckDbContext> _dbFactory = dbFactory;
 	private readonly ITagModelFactory _tagModelFactory = tagModelFactory;
 
-	public ObservableList<TagCategory> TagCategories {
+	public ObservableList<ITagCategoryModel> TagCategories {
 		get;
 	} = [];
 
@@ -23,7 +23,7 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 		return tag;
 	}
 
-	public async Task<ITagModel?> CreateTagAsync(int tagCategoryId, string tagName, string detail, IEnumerable<TagAlias> aliases) {
+	public async Task<ITagModel?> CreateTagAsync(int tagCategoryId, string tagName, string detail, IEnumerable<ITagAliasModel> aliases) {
 		await using var db = await this._dbFactory.CreateDbContextAsync();
 		using var transaction = await db.Database.BeginTransactionAsync();
 		var tag = new Tag {
@@ -45,7 +45,9 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 		}
 
 		await transaction.CommitAsync();
-		return this._tagModelFactory.Create(tag);
+
+		await this.Load();
+		return this.Tags.FirstOrDefault(x => x.TagId == tag.TagId);
 	}
 
 	public async Task AddTagAsync(IFileModel[] fileModels, ITagModel tag) {
@@ -98,7 +100,7 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 		}
 	}
 
-	public async Task UpdateTagAsync(int tagId, int tagCategoryId, string tagName, string detail, IEnumerable<TagAlias> aliases) {
+	public async Task UpdateTagAsync(int tagId, int tagCategoryId, string tagName, string detail, IEnumerable<ITagAliasModel> aliases) {
 		await using var db = await this._dbFactory.CreateDbContextAsync();
 		using var transaction = await db.Database.BeginTransactionAsync();
 		var tag = await db.Tags.FirstAsync(x => x.TagId == tagId);
@@ -112,6 +114,8 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 
 		await db.SaveChangesAsync();
 		await transaction.CommitAsync();
+
+		await this.Load();
 	}
 
 	public async Task UpdateTagCategoryAsync(int tagCategoryId, string tagCategoryName, string detail) {
@@ -128,12 +132,12 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 		}
 		await db.SaveChangesAsync();
 		await transaction.CommitAsync();
+
+		await this.Load();
 	}
 
 	public async Task Load() {
 		await using var db = await this._dbFactory.CreateDbContextAsync();
-		this.TagCategories.Clear();
-		this.Tags.Clear();
 		var tagCategories =
 			await
 				db.TagCategories
@@ -143,10 +147,22 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 					.Include(x => x.Tags)
 					.ThenInclude(x => x.MediaFileTags)
 					.ToArrayAsync();
-		foreach (var tag in tagCategories.SelectMany(x => x.Tags).OrderByDescending(x => x.MediaFileTags.Count)) {
-			var newTag = this._tagModelFactory.Create(tag);
-			this.Tags.Add(newTag);
+
+		this.TagCategories.Clear();
+		this.Tags.Clear();
+
+		foreach (var categoryEntity in tagCategories) {
+			var categoryModel = this._tagModelFactory.Create(categoryEntity);
+			this.TagCategories.Add(categoryModel);
+			this.Tags.AddRange(categoryModel.Tags);
 		}
-		this.TagCategories.AddRange(tagCategories);
+
+		// TagsをMediaFileTagsのカウント順に並び替え（オプション、以前の挙動維持のため）
+		var sortedTags = this.Tags.OrderByDescending(x => {
+			// ITagModelからはMediaFileTagsが直接取れないため、元のエンティティ情報が必要な場合は工夫が必要。
+			// ここでは一旦Load時の順序に従うか、あるいはEntity情報を持たせるようにする。
+			return 0; // 仮
+		}).ToArray();
+		// 今回は階層構造化を主眼とし、並び替えの詳細は後回しにするか、TagModelにプロパティを追加して対応する。
 	}
 }

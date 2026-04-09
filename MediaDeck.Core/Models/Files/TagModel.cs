@@ -23,13 +23,14 @@ public class TagModel : ITagModel {
 	}
 
 	[MemberNotNull(nameof(_tagId), nameof(_tagCategoryId), nameof(_tagCategory), nameof(_tagName), nameof(_detail), nameof(_romaji), nameof(_tagAliases))]
-	public void Initialize(Tag tag, ITagModelFactory factory) {
+	public void Initialize(Tag tag, ITagCategoryModel? category, ITagModelFactory factory) {
 		this.TagId = tag.TagId;
 		this.TagCategoryId = tag.TagCategoryId;
-		this.TagCategory = factory.Create(tag.TagCategory);
+		this.TagCategory = category ?? factory.Create(tag.TagCategory);
 		this.TagName = tag.TagName;
 		this.Detail = tag.Detail;
 		this.Romaji = tag.TagName.KatakanaToHiragana().HiraganaToRomaji();
+		this.UsageCount = tag.MediaFileTags.Count;
 		this.TagAliases = [.. tag.TagAliases.Select(factory.Create)];
 	}
 
@@ -37,60 +38,95 @@ public class TagModel : ITagModel {
 	/// タグID
 	/// </summary>
 	public int TagId {
-		get => this._tagId ?? throw new InvalidOperationException($"{nameof(this.TagId)} is not initialized.");
-		[MemberNotNull(nameof(_tagId))]
-		set => this._tagId = value;
+		get {
+			return this._tagId ?? throw new InvalidOperationException($"{nameof(this.TagId)} is not initialized.");
+		}
+
+		set {
+			this._tagId = value;
+		}
 	}
 
 	/// <summary>
 	/// タグ分類
 	/// </summary>
 	public int TagCategoryId {
-		get => this._tagCategoryId ?? throw new InvalidOperationException($"{nameof(this.TagCategoryId)} is not initialized.");
-		[MemberNotNull(nameof(_tagCategoryId))]
-		set => this._tagCategoryId = value;
+		get {
+			return this._tagCategoryId ?? throw new InvalidOperationException($"{nameof(this.TagCategoryId)} is not initialized.");
+		}
+
+		set {
+			this._tagCategoryId = value;
+		}
 	}
 
 	public ITagCategoryModel TagCategory {
-		get => this._tagCategory ?? throw new InvalidOperationException($"{nameof(this.TagCategory)} is not initialized.");
+		get {
+			return this._tagCategory ?? throw new InvalidOperationException($"{nameof(this.TagCategory)} is not initialized.");
+		}
+
 		[MemberNotNull(nameof(_tagCategory))]
-		set => this._tagCategory = value;
+		set {
+			this._tagCategory = value;
+		}
 	}
 
 	/// <summary>
 	/// タグ名
 	/// </summary>
 	public string TagName {
-		get => this._tagName ?? throw new InvalidOperationException($"{nameof(this.TagName)} is not initialized.");
-		[MemberNotNull(nameof(_tagName))]
-		set => this._tagName = value;
+		get {
+			return this._tagName ?? throw new InvalidOperationException($"{nameof(this.TagName)} is not initialized.");
+		}
+
+		set {
+			this._tagName = value;
+		}
 	}
 
 	/// <summary>
 	/// タグ説明
 	/// </summary>
 	public string Detail {
-		get => this._detail ?? throw new InvalidOperationException($"{nameof(this.Detail)} is not initialized.");
-		[MemberNotNull(nameof(_detail))]
-		set => this._detail = value;
+		get {
+			return this._detail ?? throw new InvalidOperationException($"{nameof(this.Detail)} is not initialized.");
+		}
+
+		set {
+			this._detail = value;
+		}
 	}
 
 	public string Romaji {
-		get => this._romaji ?? throw new InvalidOperationException($"{nameof(this.Romaji)} is not initialized.");
-		[MemberNotNull(nameof(_romaji))]
-		set => this._romaji = value;
+		get {
+			return this._romaji ?? throw new InvalidOperationException($"{nameof(this.Romaji)} is not initialized.");
+		}
+
+		set {
+			this._romaji = value;
+		}
 	}
 
 	public List<ITagAliasModel> TagAliases {
-		get => this._tagAliases ?? throw new InvalidOperationException($"{nameof(this.TagAliases)} is not initialized.");
+		get {
+			return this._tagAliases ?? throw new InvalidOperationException($"{nameof(this.TagAliases)} is not initialized.");
+		}
+
 		[MemberNotNull(nameof(_tagAliases))]
-		set => this._tagAliases = value;
+		set {
+			this._tagAliases = value;
+		}
 	}
 
 	public ReactiveProperty<string?> RepresentativeText {
 		get;
 		set;
 	} = new();
+
+	public int UsageCount {
+		get;
+		set;
+	}
 }
 
 [GenerateR3JsonConfigDto]
@@ -101,42 +137,63 @@ public class TagCategoryModel : ITagCategoryModel {
 	private int? _tagCategoryId;
 	private string? _tagCategoryName;
 	private string? _detail;
+	private ObservableList<ITagModel>? _tags;
 
 	public TagCategoryModel() {
 	}
 
+	public ObservableList<ITagModel> Tags {
+		get {
+			return this._tags ??= [];
+		}
+	}
+
 	[MemberNotNull(nameof(_tagCategoryId), nameof(_tagCategoryName), nameof(_detail))]
-	public void Initialize(TagCategory tagCategory) {
+	public void Initialize(TagCategory tagCategory, ITagModelFactory factory) {
 		this.TagCategoryId = tagCategory.TagCategoryId;
 		this.TagCategoryName = tagCategory.TagCategoryName;
 		this.Detail = tagCategory.Detail;
+		this.Tags.Clear();
+		this.Tags.AddRange(tagCategory.Tags.OrderByDescending(x => x.MediaFileTags.Count).Select(t => factory.Create(t, this)));
 	}
 
 	/// <summary>
 	/// タグ分類ID
 	/// </summary>
 	public int TagCategoryId {
-		get => this._tagCategoryId ?? throw new InvalidOperationException($"{nameof(this.TagCategoryId)} is not initialized.");
-		[MemberNotNull(nameof(_tagCategoryId))]
-		set => this._tagCategoryId = value;
+		get {
+			return this._tagCategoryId ?? throw new InvalidOperationException($"{nameof(this.TagCategoryId)} is not initialized.");
+		}
+
+		set {
+			this._tagCategoryId = value;
+		}
 	}
 
 	/// <summary>
 	/// タグ分類名
 	/// </summary>
 	public string TagCategoryName {
-		get => this._tagCategoryName ?? throw new InvalidOperationException($"{nameof(this.TagCategoryName)} is not initialized.");
-		[MemberNotNull(nameof(_tagCategoryName))]
-		set => this._tagCategoryName = value;
+		get {
+			return this._tagCategoryName ?? throw new InvalidOperationException($"{nameof(this.TagCategoryName)} is not initialized.");
+		}
+
+		set {
+			this._tagCategoryName = value;
+		}
 	}
 
 	/// <summary>
 	/// タグ分類の説明
 	/// </summary>
 	public string Detail {
-		get => this._detail ?? throw new InvalidOperationException($"{nameof(this.Detail)} is not initialized.");
-		[MemberNotNull(nameof(_detail))]
-		set => this._detail = value;
+		get {
+			return this._detail ?? throw new InvalidOperationException($"{nameof(this.Detail)} is not initialized.");
+		}
+
+		set {
+			this._detail = value;
+		}
 	}
 }
 
@@ -166,27 +223,39 @@ public class TagAliasModel : ITagAliasModel {
 	/// タグ別名ID
 	/// </summary>
 	public int TagAliasId {
-		get => this._tagAliasId ?? throw new InvalidOperationException($"{nameof(this.TagAliasId)} is not initialized.");
-		[MemberNotNull(nameof(_tagAliasId))]
-		set => this._tagAliasId = value;
+		get {
+			return this._tagAliasId ?? throw new InvalidOperationException($"{nameof(this.TagAliasId)} is not initialized.");
+		}
+
+		set {
+			this._tagAliasId = value;
+		}
 	}
 
 	/// <summary>
 	/// タグID
 	/// </summary>
 	public int TagId {
-		get => this._tagId ?? throw new InvalidOperationException($"{nameof(this.TagId)} is not initialized.");
-		[MemberNotNull(nameof(_tagId))]
-		set => this._tagId = value;
+		get {
+			return this._tagId ?? throw new InvalidOperationException($"{nameof(this.TagId)} is not initialized.");
+		}
+
+		set {
+			this._tagId = value;
+		}
 	}
 
 	/// <summary>
 	/// 別名
 	/// </summary>
 	public string Alias {
-		get => this._alias ?? throw new InvalidOperationException($"{nameof(this.Alias)} is not initialized.");
-		[MemberNotNull(nameof(_alias))]
-		set => this._alias = value;
+		get {
+			return this._alias ?? throw new InvalidOperationException($"{nameof(this.Alias)} is not initialized.");
+		}
+
+		set {
+			this._alias = value;
+		}
 	}
 
 	/// <summary>
@@ -198,8 +267,12 @@ public class TagAliasModel : ITagAliasModel {
 	}
 
 	public string Romaji {
-		get => this._romaji ?? throw new InvalidOperationException($"{nameof(this.Romaji)} is not initialized.");
-		[MemberNotNull(nameof(_romaji))]
-		set => this._romaji = value;
+		get {
+			return this._romaji ?? throw new InvalidOperationException($"{nameof(this.Romaji)} is not initialized.");
+		}
+
+		set {
+			this._romaji = value;
+		}
 	}
 }

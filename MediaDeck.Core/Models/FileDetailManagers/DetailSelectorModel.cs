@@ -2,7 +2,6 @@ using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Core.Models.FileDetailManagers.Objects;
 using MediaDeck.Core.Primitives;
-using MediaDeck.Database.Tables;
 
 namespace MediaDeck.Core.Models.FileDetailManagers;
 
@@ -43,7 +42,7 @@ public class DetailSelectorModel : IDisposable {
 	/// <summary>
 	/// タグカテゴリ
 	/// </summary>
-	public ObservableList<TagCategory> TagCategories {
+	public ObservableList<ITagCategoryModel> TagCategories {
 		get {
 			return this._tagsManager.TagCategories;
 		}
@@ -175,6 +174,17 @@ public class DetailSelectorModel : IDisposable {
 	}
 
 	/// <summary>
+	/// タグを名前で追加する。存在しない場合は新規作成する。
+	/// </summary>
+	public async Task AddTagByNameAsync(IFileModel[] files, string tagName) {
+		var tag = await this.FindTagByNameAsync(tagName) ?? await this._tagsManager.CreateTagAsync(1, tagName, string.Empty, []);
+
+		if (tag != null) {
+			await this.AddTagAsync(files, tag);
+		}
+	}
+
+	/// <summary>
 	/// タグ候補を読み込む
 	/// </summary>
 	public Task LoadTagCandidatesAsync() {
@@ -209,7 +219,8 @@ public class DetailSelectorModel : IDisposable {
 		if (string.IsNullOrEmpty(text)) {
 			return false;
 		}
-		if (tag.TagName.Contains(text)) {
+		if (tag.TagName.Contains(text) ||
+			(tag.Romaji?.Contains(text, StringComparison.CurrentCultureIgnoreCase) ?? false)) {
 			return true;
 		}
 		var result =

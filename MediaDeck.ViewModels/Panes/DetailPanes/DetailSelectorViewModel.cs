@@ -8,17 +8,24 @@ using MediaDeck.Core.Models.Files;
 using MediaDeck.Core.Models.Files.SearchConditions;
 using MediaDeck.Core.Models.NotificationDispatcher;
 using MediaDeck.Core.Primitives;
-using MediaDeck.Database.Tables;
 using MediaDeck.ViewModels.Tags;
 
 namespace MediaDeck.ViewModels.Panes.DetailPanes;
 
+public record NewTagRequestedContext(string TagName, IEnumerable<ITagCategoryModel> TagCategories);
+
 [Inject(InjectServiceLifetime.Transient)]
 public class DetailSelectorViewModel : ViewModelBase {
+	public Subject<NewTagRequestedContext> NewTagRequested {
+		get;
+	} = new();
+
 	private readonly DetailSelectorModel _model;
 	private readonly System.Collections.Concurrent.ConcurrentDictionary<int, TagCategoryViewModel> _categoryViewModels = new();
 
-	public DetailSelectorViewModel(DetailSelectorModel model, SearchConditionNotificationDispatcher searchConditionNotificationDispatcher) {
+	public DetailSelectorViewModel(DetailSelectorModel model,
+		SearchConditionNotificationDispatcher searchConditionNotificationDispatcher,
+		ITagModelFactory tagModelFactory) {
 		this._model = model;
 		this.RepresentativeFilePath = model.RepresentativeFilePath.ToBindableReactiveProperty(string.Empty);
 		this.Properties = model.Properties.ToBindableReactiveProperty([]);
@@ -28,13 +35,13 @@ public class DetailSelectorViewModel : ViewModelBase {
 		this._model.AddTo(this.CompositeDisposable);
 
 		this.TagCandidates = model.TagModels.CreateView(x => {
-			var categoryViewModel = this._categoryViewModels.GetOrAdd(x.TagCategoryId, _ => new TagCategoryViewModel(x.TagCategory, model.TagsManager));
-			return new TagViewModel(categoryViewModel, x, model.TagsManager);
+			var categoryViewModel = this._categoryViewModels.GetOrAdd(x.TagCategoryId, _ => new TagCategoryViewModel(x.TagCategory, model.TagsManager, tagModelFactory));
+			return new TagViewModel(categoryViewModel, x, model.TagsManager, tagModelFactory);
 		});
 		this.FilteredTagCandidates = this.TagCandidates.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
 		this.Tags = model.Tags.CreateView(x => {
-			var categoryViewModel = this._categoryViewModels.GetOrAdd(x.Value.TagCategoryId, _ => new TagCategoryViewModel(x.Value.TagCategory, model.TagsManager));
-			return new ValueCountPair<TagViewModel>(new TagViewModel(categoryViewModel, x.Value, model.TagsManager), x.Count);
+			var categoryViewModel = this._categoryViewModels.GetOrAdd(x.Value.TagCategoryId, _ => new TagCategoryViewModel(x.Value.TagCategory, model.TagsManager, tagModelFactory));
+			return new ValueCountPair<TagViewModel>(new TagViewModel(categoryViewModel, x.Value, model.TagsManager, tagModelFactory), x.Count);
 		})
 			.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
 
@@ -62,38 +69,40 @@ public class DetailSelectorViewModel : ViewModelBase {
 				return;
 			}
 
-			var tag = await model.FindTagByNameAsync(this.Text.Value);
-			if (tag is null) {
-				this.NewTagRequested.OnNext(new NewTagRequestedContext(this.Text.Value, model.TagCategories));
-				return;
-			}
-
-			await model.AddTagAsync(this.TargetFileModels, tag);
-			this.Text.Value = "";
+			await model.AddTagByNameAsync(this.TargetFileModels, this.Text.Value);
+			this.Text.Value = string.Empty;
 		});
+
 		this.SearchTaggedFilesCommand.Subscribe(x => {
-			searchConditionNotificationDispatcher.AddRequest.OnNext(new TagSearchCondition { TargetTag = (TagModel)x.Value.Model });
+			searchConditionNotificationDispatcher.UpdateRequest.OnNext(conditions => {
+				conditions.Clear();
+				var condition = new TagSearchCondition {
+					TargetTag = x.Value.Model
+				};
+				conditions.Add(condition);
+			});
 		});
-	}
 
-	private IFileModel[] TargetFileModels {
-		get {
-			var files = this.TargetFiles.Value;
-			return files is null ? [] : [.. files.Select(x => x.FileModel)];
-		}
+		this.Text.Subscribe(_ => this.RefreshTagCandidateFilter());
 	}
-
-	public BindableReactiveProperty<IFileViewModel[]> TargetFiles {
-		get;
-	} = new([]);
 
 	public BindableReactiveProperty<string> RepresentativeFilePath {
 		get;
 	}
 
-	public BindableReactiveProperty<string> Text {
+	public BindableReactiveProperty<IFileModel[]?> TargetFiles {
 		get;
 	} = new();
+
+	private IFileModel[] TargetFileModels {
+		get {
+			return this.TargetFiles.Value ?? Array.Empty<IFileModel>();
+		}
+	}
+
+	public BindableReactiveProperty<string> Text {
+		get;
+	} = new(string.Empty);
 
 	public ISynchronizedView<ITagModel, TagViewModel> TagCandidates {
 		get;
@@ -103,11 +112,11 @@ public class DetailSelectorViewModel : ViewModelBase {
 		get;
 	}
 
-	public ReactiveCommand RefreshFilteredTagCandidatesCommand {
+	public ReactiveCommand LoadTagCandidatesCommand {
 		get;
 	} = new();
 
-	public ReactiveCommand LoadTagCandidatesCommand {
+	public ReactiveCommand RefreshFilteredTagCandidatesCommand {
 		get;
 	} = new();
 
@@ -147,26 +156,18 @@ public class DetailSelectorViewModel : ViewModelBase {
 		get;
 	} = new();
 
-	public Subject<NewTagRequestedContext> NewTagRequested {
-		get;
-	} = new();
-
-	public async Task OnNewTagCreated(ITagModel tag) {
-		await this._model.AddTagAsync(this.TargetFileModels, tag);
-		this.Text.Value = "";
-	}
-
 	public TagsManager GetTagsManager() {
 		return this._model.TagsManager;
 	}
 
+	public async Task OnNewTagCreated(ITagModel tag) {
+		await this._model.AddTagAsync(this.TargetFileModels, tag);
+		this.Text.Value = string.Empty;
+	}
+
 	private void RefreshTagCandidateFilter() {
-		this.TagCandidates.AttachFilter(tag => {
-			var matched = DetailSelectorModel.MatchesTagFilter(tag, this.Text.Value ?? "", out var representativeText);
-			tag.RepresentativeText.Value = representativeText;
-			return matched;
+		this.TagCandidates.AttachFilter(x => {
+			return DetailSelectorModel.MatchesTagFilter(x, this.Text.Value, out _);
 		});
 	}
 }
-
-public record NewTagRequestedContext(string TagName, ObservableList<TagCategory> TagCategories);

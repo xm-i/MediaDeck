@@ -72,8 +72,10 @@ public class FileChangeTrackerTests {
 		var method = typeof(FileChangeTracker).GetMethod("ProcessPendingChangesAsync",
 			System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
 
-		var task = (Task)method.Invoke(tracker, null);
-		await task;
+		var task = (Task?)method?.Invoke(tracker, null);
+		if (task != null) {
+			await task;
+		}
 
 		stopwatch.Stop();
 

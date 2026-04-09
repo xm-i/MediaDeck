@@ -22,7 +22,7 @@ public class MainWindowViewModel : ViewModelBase {
 		this.DetailSelectorViewModel = detailSelectorViewModel;
 		this.RepositorySelectorViewModel = repositorySelectorViewModel;
 		this.ViewerSelectorViewModel.MediaContentLibraryViewModel.SelectedFiles.Subscribe(x => {
-			this.DetailSelectorViewModel.TargetFiles.Value = x;
+			this.DetailSelectorViewModel.TargetFiles.Value = x.Select(v => v.FileModel).ToArray();
 		});
 		this.WindowActivatedCommand.Subscribe(_ => {
 			backgroundTasksViewModel.Start();

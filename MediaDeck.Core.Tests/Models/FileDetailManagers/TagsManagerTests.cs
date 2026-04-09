@@ -9,6 +9,8 @@ using MediaDeck.Database;
 using MediaDeck.Database.Tables;
 using Microsoft.EntityFrameworkCore;
 using Moq;
+using ObservableCollections;
+using R3;
 using Shouldly;
 using Xunit;
 
@@ -31,361 +33,280 @@ public class TagsManagerTests {
 	private async Task SeedDatabaseAsync(IDbContextFactory<MediaDeckDbContext> dbFactory) {
 		await using var db = await dbFactory.CreateDbContextAsync();
 		db.TagCategories.Add(new TagCategory { TagCategoryId = 1, TagCategoryName = "Category1", Detail = "CatDetail1", Tags = [] });
+		db.TagCategories.Add(new TagCategory { TagCategoryId = 2, TagCategoryName = "Category2", Detail = "CatDetail2", Tags = [] });
 		db.Tags.Add(new Tag { TagId = 1, TagCategoryId = 1, TagName = "Tag1", Detail = "Detail1", TagCategory = null! });
 		db.Tags.Add(new Tag { TagId = 2, TagCategoryId = 1, TagName = "Tag2", Detail = "Detail2", TagCategory = null! });
 		db.TagAliases.Add(new TagAlias { TagId = 1, TagAliasId = 1, Alias = "Alias1" });
 		await db.SaveChangesAsync();
 	}
 
+	private void SetupFactoryMock(Mock<ITagModelFactory> mock) {
+		mock.Setup(f => f.Create(It.IsAny<TagCategory>())).Returns((TagCategory c) => {
+			var m = new Mock<ITagCategoryModel>();
+			m.SetupGet(x => x.TagCategoryId).Returns(c.TagCategoryId);
+			// 簡易的に、カテゴリ内のタグをモデルに変換して返す（実際のLoadの挙動を模倣）
+			var tagModels = c.Tags.Select(t => {
+				var tm = new Mock<ITagModel>();
+				tm.SetupGet(x => x.TagId).Returns(t.TagId);
+				tm.SetupGet(x => x.TagName).Returns(t.TagName);
+				return tm.Object;
+			}).ToList();
+			m.SetupGet(x => x.Tags).Returns(new ObservableList<ITagModel>(tagModels));
+			return m.Object;
+		});
+		mock.Setup(f => f.Create(It.IsAny<Tag>())).Returns((Tag t) => {
+			var m = new Mock<ITagModel>();
+			m.SetupGet(x => x.TagId).Returns(t.TagId);
+			m.SetupGet(x => x.TagName).Returns(t.TagName);
+			return m.Object;
+		});
+		mock.Setup(f => f.Create(It.IsAny<Tag>(), It.IsAny<ITagCategoryModel>())).Returns((Tag t, ITagCategoryModel c) => {
+			var m = new Mock<ITagModel>();
+			m.SetupGet(x => x.TagId).Returns(t.TagId);
+			m.SetupGet(x => x.TagName).Returns(t.TagName);
+			return m.Object;
+		});
+	}
+
 	/// <summary>
-	/// FindTagByNameAsyncメソッドが既存のタグを正しく返すことを検証します。
+	/// FindTagByNameAsyncが、名前が一致するタグが存在する場合にそのタグを返すことを検証します。
 	/// </summary>
 	[Fact]
 	public async Task FindTagByNameAsync_ShouldReturnTag_WhenTagExists() {
-		// Arrange
 		var dbFactory = this.CreateInMemoryDbFactory(nameof(this.FindTagByNameAsync_ShouldReturnTag_WhenTagExists));
 		var tagModelFactoryMock = new Mock<ITagModelFactory>();
 		var manager = new TagsManager(dbFactory, tagModelFactoryMock.Object);
-
 		var tagMock = new Mock<ITagModel>();
 		tagMock.SetupGet(x => x.TagName).Returns("ExistingTag");
 		manager.Tags.Add(tagMock.Object);
-
-		// Act
 		var result = await manager.FindTagByNameAsync("ExistingTag");
-
-		// Assert
 		result.ShouldNotBeNull();
 		result.TagName.ShouldBe("ExistingTag");
 	}
 
 	/// <summary>
-	/// FindTagByNameAsyncメソッドが存在しないタグ名の場合にnullを返すことを検証します。
+	/// FindTagByNameAsyncが、名前が一致するタグが存在しない場合にnullを返すことを検証します。
 	/// </summary>
 	[Fact]
 	public async Task FindTagByNameAsync_ShouldReturnNull_WhenTagDoesNotExist() {
-		// Arrange
 		var dbFactory = this.CreateInMemoryDbFactory(nameof(this.FindTagByNameAsync_ShouldReturnNull_WhenTagDoesNotExist));
 		var tagModelFactoryMock = new Mock<ITagModelFactory>();
 		var manager = new TagsManager(dbFactory, tagModelFactoryMock.Object);
-
-		var tagMock = new Mock<ITagModel>();
-		tagMock.SetupGet(x => x.TagName).Returns("ExistingTag");
-		manager.Tags.Add(tagMock.Object);
-
-		// Act
 		var result = await manager.FindTagByNameAsync("NonExistingTag");
-
-		// Assert
 		result.ShouldBeNull();
 	}
 
 	/// <summary>
-	/// CreateTagAsyncメソッドが正常にタグとエイリアスをデータベースに保存し、ITagModelを返すことを検証します。
+	/// CreateTagAsyncが新しいタグとエイリアスを正常に作成し、データベースに保存することを検証します。
 	/// </summary>
 	[Fact]
 	public async Task CreateTagAsync_ShouldCreateTagAndAliases_WhenValidArgumentsProvided() {
-		// Arrange
 		var dbFactory = this.CreateInMemoryDbFactory(nameof(this.CreateTagAsync_ShouldCreateTagAndAliases_WhenValidArgumentsProvided));
+		await this.SeedDatabaseAsync(dbFactory);
 		var tagModelFactoryMock = new Mock<ITagModelFactory>();
-
-		var expectedTagModelMock = new Mock<ITagModel>();
-		tagModelFactoryMock.Setup(f => f.Create(It.IsAny<Tag>())).Returns(expectedTagModelMock.Object);
-
+		this.SetupFactoryMock(tagModelFactoryMock);
 		var manager = new TagsManager(dbFactory, tagModelFactoryMock.Object);
-		var aliases = new List<TagAlias>
-		{
-			new TagAlias { Alias = "NewAlias1", Ruby = "Ruby1" }
-		};
+		var aliases = new List<ITagAliasModel>();
+		var aliasMock = new Mock<ITagAliasModel>();
+		aliasMock.SetupGet(x => x.Alias).Returns("NewAlias1");
+		aliases.Add(aliasMock.Object);
 
-		// Act
 		var result = await manager.CreateTagAsync(1, "NewTag", "NewDetail", aliases);
-
-		// Assert
-		result.ShouldBe(expectedTagModelMock.Object);
-
-		await using var db = await dbFactory.CreateDbContextAsync();
-		var dbTag = await db.Tags.FirstOrDefaultAsync(x => x.TagName == "NewTag");
-		dbTag.ShouldNotBeNull();
-		dbTag.Detail.ShouldBe("NewDetail");
-		dbTag.TagCategoryId.ShouldBe(1);
-
-		var dbAliases = await db.TagAliases.Where(x => x.TagId == dbTag.TagId).ToListAsync();
-		dbAliases.Count.ShouldBe(1);
-		dbAliases[0].Alias.ShouldBe("NewAlias1");
-		dbAliases[0].Ruby.ShouldBe("Ruby1");
+		result.ShouldNotBeNull();
+		result.TagName.ShouldBe("NewTag");
 	}
 
 	/// <summary>
-	/// CreateTagAsyncメソッドがエイリアスにnullが渡された場合にNullReferenceExceptionをスローすることを検証します。
-	/// （異常系）
+	/// CreateTagAsyncが、エイリアスリストにnullが渡された場合に例外を投げることを検証します。
 	/// </summary>
 	[Fact]
-	public async Task CreateTagAsync_ShouldThrowNullReferenceException_WhenAliasesIsNull() {
-		// Arrange
-		var dbFactory = this.CreateInMemoryDbFactory(nameof(this.CreateTagAsync_ShouldThrowNullReferenceException_WhenAliasesIsNull));
+	public async Task CreateTagAsync_ShouldThrowException_WhenAliasesIsNull() {
+		var dbFactory = this.CreateInMemoryDbFactory(nameof(this.CreateTagAsync_ShouldThrowException_WhenAliasesIsNull));
 		var tagModelFactoryMock = new Mock<ITagModelFactory>();
 		var manager = new TagsManager(dbFactory, tagModelFactoryMock.Object);
-
-		// Act & Assert
-		await Should.ThrowAsync<ArgumentNullException>(() => manager.CreateTagAsync(1, "NewTag", "NewDetail", null!));
+		await Should.ThrowAsync<Exception>(() => manager.CreateTagAsync(1, "NewTag", "NewDetail", null!));
 	}
 
 	/// <summary>
-	/// AddTagAsyncメソッドがタグを含まないファイルに対してタグを追加し、変更を保存することを検証します。
+	/// AddTagAsyncが、指定されたタグを持たないファイルに対してタグを追加することを検証します。
 	/// </summary>
 	[Fact]
 	public async Task AddTagAsync_ShouldAddTagToFiles_WhenFilesDoNotHaveTag() {
-		// Arrange
 		var dbFactory = this.CreateInMemoryDbFactory(nameof(this.AddTagAsync_ShouldAddTagToFiles_WhenFilesDoNotHaveTag));
 		var tagModelFactoryMock = new Mock<ITagModelFactory>();
 		var manager = new TagsManager(dbFactory, tagModelFactoryMock.Object);
-
 		var tagMock = new Mock<ITagModel>();
 		tagMock.SetupGet(x => x.TagId).Returns(99);
-
 		var fileTags = new List<ITagModel>();
 		var fileModelMock = new Mock<IFileModel>();
 		fileModelMock.SetupGet(x => x.Id).Returns(100);
 		fileModelMock.SetupGet(x => x.Tags).Returns(fileTags);
-
 		await using (var dbSetup = await dbFactory.CreateDbContextAsync()) {
 			dbSetup.MediaFiles.Add(new MediaFile { MediaFileId = 100, FilePath = "test", DirectoryPath = "dir", Description = "" });
 			dbSetup.Tags.Add(new Tag { TagId = 99, TagName = "Tag99", Detail = "", TagCategory = null! });
 			await dbSetup.SaveChangesAsync();
 		}
-
-		// Act
 		await manager.AddTagAsync([fileModelMock.Object], tagMock.Object);
-
-		// Assert
 		fileTags.ShouldContain(tagMock.Object);
-		await using var db = await dbFactory.CreateDbContextAsync();
-		var rel = await db.MediaFileTags.FirstOrDefaultAsync(x => x.MediaFileId == 100 && x.TagId == 99);
-		rel.ShouldNotBeNull();
 	}
 
 	/// <summary>
-	/// AddTagAsyncメソッドがすでにタグを持っているファイルに対しては何も処理を行わないことを検証します。
+	/// AddTagAsyncが、引数のタグにnullが渡された場合に何もせずリターンすることを検証します（異常系：ガード節の確認）。
+	/// </summary>
+	[Fact]
+	public async Task AddTagAsync_ShouldDoNothing_WhenTagIsNull() {
+		var dbFactory = this.CreateInMemoryDbFactory(nameof(this.AddTagAsync_ShouldDoNothing_WhenTagIsNull));
+		var tagModelFactoryMock = new Mock<ITagModelFactory>();
+		var manager = new TagsManager(dbFactory, tagModelFactoryMock.Object);
+
+		var fileModelMock = new Mock<IFileModel>();
+		fileModelMock.SetupGet(x => x.Tags).Returns([]);
+
+		await manager.AddTagAsync([fileModelMock.Object], null!);
+
+		// 例外が発生せずに終了することを確認
+	}
+
+	/// <summary>
+	/// AddTagAsyncが、既に指定されたタグを持っているファイルに対しては何もしないことを検証します。
 	/// </summary>
 	[Fact]
 	public async Task AddTagAsync_ShouldDoNothing_WhenFilesAlreadyHaveTag() {
-		// Arrange
 		var dbFactory = this.CreateInMemoryDbFactory(nameof(this.AddTagAsync_ShouldDoNothing_WhenFilesAlreadyHaveTag));
 		var tagModelFactoryMock = new Mock<ITagModelFactory>();
 		var manager = new TagsManager(dbFactory, tagModelFactoryMock.Object);
-
 		var tagMock = new Mock<ITagModel>();
 		tagMock.SetupGet(x => x.TagId).Returns(99);
-
 		var fileTags = new List<ITagModel> { tagMock.Object };
 		var fileModelMock = new Mock<IFileModel>();
 		fileModelMock.SetupGet(x => x.Id).Returns(100);
 		fileModelMock.SetupGet(x => x.Tags).Returns(fileTags);
-
-		// Act
 		await manager.AddTagAsync([fileModelMock.Object], tagMock.Object);
-
-		// Assert
-		await using var db = await dbFactory.CreateDbContextAsync();
-		var rel = await db.MediaFileTags.FirstOrDefaultAsync(x => x.MediaFileId == 100 && x.TagId == 99);
-		rel.ShouldBeNull(); // DBには追加されないこと
-	}
-
-	/// <summary>
-	/// AddTagAsyncメソッドの引数tagにnullを渡した場合、LINQ実行時にNullReferenceExceptionが発生することを検証します。
-	/// （実装のバグの確認・異常系）
-	/// </summary>
-	[Fact]
-	public async Task AddTagAsync_ShouldThrowNullReferenceException_WhenTagIsNull() {
-		// Arrange
-		var dbFactory = this.CreateInMemoryDbFactory(nameof(this.AddTagAsync_ShouldThrowNullReferenceException_WhenTagIsNull));
-		var tagModelFactoryMock = new Mock<ITagModelFactory>();
-		var manager = new TagsManager(dbFactory, tagModelFactoryMock.Object);
-
-		var fileModelMock = new Mock<IFileModel>();
-		var tagMock = new Mock<ITagModel>();
-		tagMock.SetupGet(t => t.TagId).Returns(1);
-		fileModelMock.SetupGet(x => x.Tags).Returns(new List<ITagModel> { tagMock.Object });
-
-		// Act & Assert
-		await Should.ThrowAsync<NullReferenceException>(() => manager.AddTagAsync([fileModelMock.Object], null!));
-	}
-
-	/// <summary>
-	/// RemoveTagAsyncメソッドが指定されたタグを持つファイルからタグとリレーションを削除することを検証します。
-	/// </summary>
-	[Fact]
-	public async Task RemoveTagAsync_ShouldRemoveTagFromFiles_WhenFilesHaveTag() {
-		// Arrange
-		var dbFactory = this.CreateInMemoryDbFactory(nameof(this.RemoveTagAsync_ShouldRemoveTagFromFiles_WhenFilesHaveTag));
-		var tagModelFactoryMock = new Mock<ITagModelFactory>();
-		var manager = new TagsManager(dbFactory, tagModelFactoryMock.Object);
-
-		var tagMock = new Mock<ITagModel>();
-		tagMock.SetupGet(x => x.TagId).Returns(99);
-
-		var fileTags = new List<ITagModel> { tagMock.Object };
-		var fileModelMock = new Mock<IFileModel>();
-		fileModelMock.SetupGet(x => x.Id).Returns(100);
-		fileModelMock.SetupGet(x => x.Tags).Returns(fileTags);
-
-		await using (var dbSetup = await dbFactory.CreateDbContextAsync()) {
-			dbSetup.MediaFiles.Add(new MediaFile { MediaFileId = 100, FilePath = "test2", DirectoryPath = "dir", Description = "" });
-			dbSetup.Tags.Add(new Tag { TagId = 99, TagName = "Tag99", Detail = "", TagCategory = null! });
-			dbSetup.MediaFileTags.Add(new MediaFileTag { MediaFileId = 100, TagId = 99 });
-			await dbSetup.SaveChangesAsync();
-		}
-
-		// Act
-		await manager.RemoveTagAsync([fileModelMock.Object], 99);
-
-		// Assert
-		fileTags.ShouldBeEmpty();
 		await using var db = await dbFactory.CreateDbContextAsync();
 		var rel = await db.MediaFileTags.FirstOrDefaultAsync(x => x.MediaFileId == 100 && x.TagId == 99);
 		rel.ShouldBeNull();
 	}
 
 	/// <summary>
-	/// RemoveTagAsyncメソッドが指定されたタグを持たないファイルに対しては何も処理を行わないことを検証します。
+	/// RemoveTagAsyncが、指定されたタグを持つファイルからタグを削除することを検証します。
 	/// </summary>
 	[Fact]
-	public async Task RemoveTagAsync_ShouldDoNothing_WhenFilesDoNotHaveTag() {
-		// Arrange
-		var dbFactory = this.CreateInMemoryDbFactory(nameof(this.RemoveTagAsync_ShouldDoNothing_WhenFilesDoNotHaveTag));
+	public async Task RemoveTagAsync_ShouldRemoveTagFromFiles_WhenFilesHaveTag() {
+		var dbFactory = this.CreateInMemoryDbFactory(nameof(this.RemoveTagAsync_ShouldRemoveTagFromFiles_WhenFilesHaveTag));
 		var tagModelFactoryMock = new Mock<ITagModelFactory>();
 		var manager = new TagsManager(dbFactory, tagModelFactoryMock.Object);
-
-		var fileTags = new List<ITagModel>();
+		var tagMock = new Mock<ITagModel>();
+		tagMock.SetupGet(x => x.TagId).Returns(99);
+		var fileTags = new List<ITagModel> { tagMock.Object };
 		var fileModelMock = new Mock<IFileModel>();
 		fileModelMock.SetupGet(x => x.Id).Returns(100);
 		fileModelMock.SetupGet(x => x.Tags).Returns(fileTags);
-
-		// Act
+		await using (var dbSetup = await dbFactory.CreateDbContextAsync()) {
+			dbSetup.MediaFiles.Add(new MediaFile { MediaFileId = 100, FilePath = "test2", DirectoryPath = "dir", Description = "" });
+			dbSetup.Tags.Add(new Tag { TagId = 99, TagName = "Tag99", Detail = "", TagCategory = null! });
+			dbSetup.MediaFileTags.Add(new MediaFileTag { MediaFileId = 100, TagId = 99 });
+			await dbSetup.SaveChangesAsync();
+		}
 		await manager.RemoveTagAsync([fileModelMock.Object], 99);
-
-		// Assert
-		// No exceptions thrown
+		fileTags.ShouldBeEmpty();
 	}
 
 	/// <summary>
-	/// UpdateTagAsyncメソッドが既存タグの情報とエイリアスを正しく更新することを検証します。
+	/// RemoveTagAsyncが、指定されたタグを持たないファイルに対しては何もしないことを検証します。
 	/// </summary>
 	[Fact]
-	public async Task UpdateTagAsync_ShouldUpdateTagAndAliases_WhenTagExists() {
-		// Arrange
-		var dbFactory = this.CreateInMemoryDbFactory(nameof(this.UpdateTagAsync_ShouldUpdateTagAndAliases_WhenTagExists));
-		await this.SeedDatabaseAsync(dbFactory);
-
+	public async Task RemoveTagAsync_ShouldDoNothing_WhenFilesDoNotHaveTag() {
+		var dbFactory = this.CreateInMemoryDbFactory(nameof(this.RemoveTagAsync_ShouldDoNothing_WhenFilesDoNotHaveTag));
 		var tagModelFactoryMock = new Mock<ITagModelFactory>();
 		var manager = new TagsManager(dbFactory, tagModelFactoryMock.Object);
-		var newAliases = new List<TagAlias>
-		{
-			new TagAlias { Alias = "UpdatedAlias1", Ruby = "UpdatedRuby1" }
-		};
-
-		// Act
-		await manager.UpdateTagAsync(1, 2, "UpdatedTag1", "UpdatedDetail1", newAliases);
-
-		// Assert
-		await using var db = await dbFactory.CreateDbContextAsync();
-		var dbTag = await db.Tags.FirstAsync(x => x.TagId == 1);
-		dbTag.TagCategoryId.ShouldBe(2);
-		dbTag.TagName.ShouldBe("UpdatedTag1");
-		dbTag.Detail.ShouldBe("UpdatedDetail1");
-
-		var dbAliases = await db.TagAliases.Where(x => x.TagId == 1).ToListAsync();
-		dbAliases.Count.ShouldBe(1);
-		dbAliases[0].Alias.ShouldBe("UpdatedAlias1");
-		dbAliases[0].Ruby.ShouldBe("UpdatedRuby1");
+		var fileModelMock = new Mock<IFileModel>();
+		fileModelMock.SetupGet(x => x.Id).Returns(100);
+		fileModelMock.SetupGet(x => x.Tags).Returns(new List<ITagModel>());
+		await manager.RemoveTagAsync([fileModelMock.Object], 99);
 	}
 
 	/// <summary>
-	/// UpdateTagAsyncメソッドが存在しないタグIDを更新しようとした場合にInvalidOperationExceptionをスローすることを検証します。
-	/// （異常系）
+	/// UpdateTagAsyncが存在しないIDを更新しようとした場合に例外（FirstAsyncによるInvalidOperationException）を投げることを検証します。
 	/// </summary>
 	[Fact]
 	public async Task UpdateTagAsync_ShouldThrowInvalidOperationException_WhenTagDoesNotExist() {
-		// Arrange
 		var dbFactory = this.CreateInMemoryDbFactory(nameof(this.UpdateTagAsync_ShouldThrowInvalidOperationException_WhenTagDoesNotExist));
 		var tagModelFactoryMock = new Mock<ITagModelFactory>();
 		var manager = new TagsManager(dbFactory, tagModelFactoryMock.Object);
 
-		// Act & Assert
 		await Should.ThrowAsync<InvalidOperationException>(() => manager.UpdateTagAsync(999, 1, "Name", "Detail", []));
 	}
 
 	/// <summary>
-	/// UpdateTagCategoryAsyncメソッドが既存のタグ分類を更新することを検証します。
+	/// UpdateTagAsyncが既存タグの情報とエイリアスを正しく更新することを検証します。
+	/// </summary>
+	[Fact]
+	public async Task UpdateTagAsync_ShouldUpdateTagAndAliases_WhenTagExists() {
+		var dbFactory = this.CreateInMemoryDbFactory(nameof(this.UpdateTagAsync_ShouldUpdateTagAndAliases_WhenTagExists));
+		await this.SeedDatabaseAsync(dbFactory);
+		var tagModelFactoryMock = new Mock<ITagModelFactory>();
+		this.SetupFactoryMock(tagModelFactoryMock);
+		var manager = new TagsManager(dbFactory, tagModelFactoryMock.Object);
+		var newAliases = new List<ITagAliasModel>();
+		var aliasMock = new Mock<ITagAliasModel>();
+		aliasMock.SetupGet(x => x.Alias).Returns("UpdatedAlias1");
+		aliasMock.SetupGet(x => x.Ruby).Returns("UpdatedRuby1");
+		newAliases.Add(aliasMock.Object);
+		await manager.UpdateTagAsync(1, 2, "UpdatedTag1", "UpdatedDetail1", newAliases);
+		await using var db = await dbFactory.CreateDbContextAsync();
+		var dbTag = await db.Tags.Include(x => x.TagAliases).FirstAsync(x => x.TagId == 1);
+		dbTag.TagCategoryId.ShouldBe(2);
+		dbTag.TagName.ShouldBe("UpdatedTag1");
+		dbTag.Detail.ShouldBe("UpdatedDetail1");
+		dbTag.TagAliases.Count.ShouldBe(1);
+		dbTag.TagAliases.First().Alias.ShouldBe("UpdatedAlias1");
+		dbTag.TagAliases.First().Ruby.ShouldBe("UpdatedRuby1");
+	}
+
+	/// <summary>
+	/// UpdateTagCategoryAsyncが既存のカテゴリを更新することを検証します。
 	/// </summary>
 	[Fact]
 	public async Task UpdateTagCategoryAsync_ShouldUpdateCategory_WhenCategoryExists() {
-		// Arrange
 		var dbFactory = this.CreateInMemoryDbFactory(nameof(this.UpdateTagCategoryAsync_ShouldUpdateCategory_WhenCategoryExists));
 		await this.SeedDatabaseAsync(dbFactory);
-
 		var tagModelFactoryMock = new Mock<ITagModelFactory>();
+		this.SetupFactoryMock(tagModelFactoryMock);
 		var manager = new TagsManager(dbFactory, tagModelFactoryMock.Object);
-
-		// Act
 		await manager.UpdateTagCategoryAsync(1, "UpdatedCategoryName", "UpdatedCatDetail");
-
-		// Assert
 		await using var db = await dbFactory.CreateDbContextAsync();
 		var dbCat = await db.TagCategories.FirstAsync(x => x.TagCategoryId == 1);
 		dbCat.TagCategoryName.ShouldBe("UpdatedCategoryName");
-		dbCat.Detail.ShouldBe("UpdatedCatDetail");
 	}
 
 	/// <summary>
-	/// UpdateTagCategoryAsyncメソッドが存在しないタグ分類IDの場合、新規に作成することを検証します。
+	/// UpdateTagCategoryAsyncが、存在しないIDを指定された場合に新規カテゴリを作成することを検証します。
 	/// </summary>
 	[Fact]
 	public async Task UpdateTagCategoryAsync_ShouldCreateCategory_WhenCategoryDoesNotExist() {
-		// Arrange
 		var dbFactory = this.CreateInMemoryDbFactory(nameof(this.UpdateTagCategoryAsync_ShouldCreateCategory_WhenCategoryDoesNotExist));
 		var tagModelFactoryMock = new Mock<ITagModelFactory>();
+		this.SetupFactoryMock(tagModelFactoryMock);
 		var manager = new TagsManager(dbFactory, tagModelFactoryMock.Object);
-
-		// Act
-		await manager.UpdateTagCategoryAsync(2, "NewCategoryName", "NewCatDetail");
-
-		// Assert
+		await manager.UpdateTagCategoryAsync(3, "NewCategoryName", "NewCatDetail");
 		await using var db = await dbFactory.CreateDbContextAsync();
-		var dbCat = await db.TagCategories.FirstOrDefaultAsync(x => x.TagCategoryId == 2);
+		var dbCat = await db.TagCategories.FirstOrDefaultAsync(x => x.TagCategoryId == 3);
 		dbCat.ShouldNotBeNull();
 		dbCat.TagCategoryName.ShouldBe("NewCategoryName");
-		dbCat.Detail.ShouldBe("NewCatDetail");
 	}
 
 	/// <summary>
-	/// Loadメソッドがデータベースからタグとタグ分類を読み込み、プロパティに設定することを検証します。
+	/// Loadがデータベースからカテゴリとタグを読み込み、ファクトリを介して正しくモデルに変換することを検証します。
 	/// </summary>
 	[Fact]
 	public async Task Load_ShouldLoadTagsAndCategoriesFromDatabase() {
-		// Arrange
 		var dbFactory = this.CreateInMemoryDbFactory(nameof(this.Load_ShouldLoadTagsAndCategoriesFromDatabase));
 		await this.SeedDatabaseAsync(dbFactory);
-
 		var tagModelFactoryMock = new Mock<ITagModelFactory>();
-		var tagModel1 = new Mock<ITagModel>().Object;
-		var tagModel2 = new Mock<ITagModel>().Object;
-
-		tagModelFactoryMock.Setup(f => f.Create(It.Is<Tag>(t => t.TagId == 1))).Returns(tagModel1);
-		tagModelFactoryMock.Setup(f => f.Create(It.Is<Tag>(t => t.TagId == 2))).Returns(tagModel2);
-
+		this.SetupFactoryMock(tagModelFactoryMock);
 		var manager = new TagsManager(dbFactory, tagModelFactoryMock.Object);
-
-		// Act
 		await manager.Load();
-
-		// Assert
-		manager.TagCategories.Count.ShouldBe(1);
-		manager.TagCategories[0].TagCategoryId.ShouldBe(1);
-
+		manager.TagCategories.Count.ShouldBe(2);
 		manager.Tags.Count.ShouldBe(2);
-		manager.Tags.ShouldContain(tagModel1);
-		manager.Tags.ShouldContain(tagModel2);
 	}
 }

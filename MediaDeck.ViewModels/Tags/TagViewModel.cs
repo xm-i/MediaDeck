@@ -2,13 +2,12 @@ using MediaDeck.Common.Base;
 using MediaDeck.Common.Extensions;
 using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Core.Models.FileDetailManagers;
-using MediaDeck.Database.Tables;
 
 namespace MediaDeck.ViewModels.Tags;
 
 [Inject(InjectServiceLifetime.Transient)]
 public class TagViewModel : ViewModelBase {
-	public TagViewModel(TagCategoryViewModel parent, ITagModel tag, TagsManager tagsManager) {
+	public TagViewModel(TagCategoryViewModel parent, ITagModel tag, TagsManager tagsManager, ITagModelFactory tagModelFactory) {
 		this.Model = tag;
 		this.TagName.Value = tag.TagName;
 		this.Detail.Value = tag.Detail;
@@ -25,15 +24,19 @@ public class TagViewModel : ViewModelBase {
 				this.TagCategory.Value.TagCategoryId,
 				this.TagName.Value,
 				this.Detail.Value,
-				this.TagAliases.Select(x =>
-					new TagAlias() { Alias = x.Alias.Value, Ruby = string.IsNullOrEmpty(x.Ruby.Value) ? null : x.Ruby.Value }));
+				this.TagAliases.Select(x => {
+					var alias = x.Model;
+					alias.Alias = x.Alias.Value;
+					alias.Ruby = string.IsNullOrEmpty(x.Ruby.Value) ? null : x.Ruby.Value;
+					return alias;
+				}));
 			this._editedFlag = false;
 		});
 		this.RemoveTagAliasCommand.Subscribe(x => {
 			this._tagAliases.Remove(x);
 		});
 		this.AddTagAliasCommand.Subscribe(_ => {
-			this._tagAliases.Add(new());
+			this._tagAliases.Add(new(tagModelFactory.CreateAlias(), this));
 		});
 
 		this.TagName

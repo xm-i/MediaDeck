@@ -58,7 +58,12 @@ public interface ITagModel {
 		set;
 	}
 
-	public void Initialize(Tag tag, ITagModelFactory factory);
+	public int UsageCount {
+		get;
+		set;
+	}
+
+	public void Initialize(Tag tag, ITagCategoryModel? category, ITagModelFactory factory);
 }
 
 [GenerateR3JsonConfigDto]
@@ -87,7 +92,11 @@ public interface ITagCategoryModel {
 		set;
 	}
 
-	public void Initialize(TagCategory tagCategory);
+	public ObservableList<ITagModel> Tags {
+		get;
+	}
+
+	public void Initialize(TagCategory tagCategory, ITagModelFactory factory);
 }
 
 [GenerateR3JsonConfigDto]
