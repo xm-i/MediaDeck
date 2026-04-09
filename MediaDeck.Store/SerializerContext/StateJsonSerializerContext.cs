@@ -29,16 +29,6 @@ namespace MediaDeck.Stores.SerializerContext;
 [JsonSerializable(typeof(TagFilterItemObjectForJson))]
 [JsonSerializable(typeof(ResolutionFilterItemObjectForJson))]
 public partial class StateJsonSerializerContext : JsonSerializerContext {
-	/// <summary>
-	/// 実行時の型レジストリ設定を適用した JsonSerializerOptions。
-	/// </summary>
-	public static JsonSerializerOptions DefaultOptions {
-		get;
-	}
-
 	static StateJsonSerializerContext() {
-		DefaultOptions = new JsonSerializerOptions() {
-			TypeInfoResolver = Default.WithAddedModifier(global::R3.JsonConfig.ForJsonConverterRegistry.ApplyPolymorphism)
-		};
 	}
 }

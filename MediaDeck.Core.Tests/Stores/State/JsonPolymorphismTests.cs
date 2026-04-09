@@ -1,4 +1,6 @@
 using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
+
 using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Core.Models.Files;
@@ -14,6 +16,10 @@ namespace MediaDeck.Core.Tests.Stores.State;
 
 public class JsonPolymorphismTests {
 	private readonly IServiceProvider _serviceProvider;
+
+	private readonly JsonSerializerOptions DefaultOptions = new JsonSerializerOptions() {
+		TypeInfoResolver = StateJsonSerializerContext.Default.WithAddedModifier(global::R3.JsonConfig.ForJsonConverterRegistry.ApplyPolymorphism)
+	};
 
 	public JsonPolymorphismTests() {
 		var services = new ServiceCollection();
@@ -81,10 +87,10 @@ public class JsonPolymorphismTests {
 		string json;
 		if (original is ISearchCondition sc) {
 			var dto = ISearchConditionForJson.CreateJson(sc);
-			json = JsonSerializer.Serialize(dto, StateJsonSerializerContext.DefaultOptions);
+			json = JsonSerializer.Serialize(dto, this.DefaultOptions);
 		} else if (original is IFilterItemObject fio) {
 			var dto = IFilterItemObjectForJson.CreateJson(fio);
-			json = JsonSerializer.Serialize(dto, StateJsonSerializerContext.DefaultOptions);
+			json = JsonSerializer.Serialize(dto, this.DefaultOptions);
 		} else {
 			throw new ArgumentException("Unsupported type");
 		}
@@ -95,11 +101,11 @@ public class JsonPolymorphismTests {
 		// 2. 復元
 		object? restoredDto;
 		if (typeof(TInterface) == typeof(ISearchCondition)) {
-			restoredDto = JsonSerializer.Deserialize<ISearchConditionForJson>(json, StateJsonSerializerContext.DefaultOptions);
+			restoredDto = JsonSerializer.Deserialize<ISearchConditionForJson>(json, this.DefaultOptions);
 			var restored = ISearchConditionForJson.CreateModel((ISearchConditionForJson)restoredDto!, this._serviceProvider);
 			restored.ShouldBeOfType<TConcrete>();
 		} else {
-			restoredDto = JsonSerializer.Deserialize<IFilterItemObjectForJson>(json, StateJsonSerializerContext.DefaultOptions);
+			restoredDto = JsonSerializer.Deserialize<IFilterItemObjectForJson>(json, this.DefaultOptions);
 			var restored = IFilterItemObjectForJson.CreateModel((IFilterItemObjectForJson)restoredDto!, this._serviceProvider);
 			restored.ShouldBeOfType<TConcrete>();
 		}
