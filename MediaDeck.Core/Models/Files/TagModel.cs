@@ -30,7 +30,7 @@ public class TagModel : ITagModel {
 		this.TagName = tag.TagName;
 		this.Detail = tag.Detail;
 		this.Romaji = tag.TagName.KatakanaToHiragana().HiraganaToRomaji();
-		this.UsageCount = tag.MediaFileTags.Count;
+		this.UsageCount.Value = tag.MediaFileTags.Count;
 		this.TagAliases = [.. tag.TagAliases.Select(factory.Create)];
 	}
 
@@ -42,6 +42,7 @@ public class TagModel : ITagModel {
 			return this._tagId ?? throw new InvalidOperationException($"{nameof(this.TagId)} is not initialized.");
 		}
 
+		[MemberNotNull(nameof(_tagId))]
 		set {
 			this._tagId = value;
 		}
@@ -55,6 +56,7 @@ public class TagModel : ITagModel {
 			return this._tagCategoryId ?? throw new InvalidOperationException($"{nameof(this.TagCategoryId)} is not initialized.");
 		}
 
+		[MemberNotNull(nameof(_tagCategoryId))]
 		set {
 			this._tagCategoryId = value;
 		}
@@ -79,6 +81,7 @@ public class TagModel : ITagModel {
 			return this._tagName ?? throw new InvalidOperationException($"{nameof(this.TagName)} is not initialized.");
 		}
 
+		[MemberNotNull(nameof(_tagName))]
 		set {
 			this._tagName = value;
 		}
@@ -92,6 +95,7 @@ public class TagModel : ITagModel {
 			return this._detail ?? throw new InvalidOperationException($"{nameof(this.Detail)} is not initialized.");
 		}
 
+		[MemberNotNull(nameof(_detail))]
 		set {
 			this._detail = value;
 		}
@@ -102,6 +106,7 @@ public class TagModel : ITagModel {
 			return this._romaji ?? throw new InvalidOperationException($"{nameof(this.Romaji)} is not initialized.");
 		}
 
+		[MemberNotNull(nameof(_romaji))]
 		set {
 			this._romaji = value;
 		}
@@ -123,10 +128,10 @@ public class TagModel : ITagModel {
 		set;
 	} = new();
 
-	public int UsageCount {
+	public ReactiveProperty<int> UsageCount {
 		get;
 		set;
-	}
+	} = new();
 }
 
 [GenerateR3JsonConfigDto]
@@ -165,6 +170,7 @@ public class TagCategoryModel : ITagCategoryModel {
 			return this._tagCategoryId ?? throw new InvalidOperationException($"{nameof(this.TagCategoryId)} is not initialized.");
 		}
 
+		[MemberNotNull(nameof(_tagCategoryId))]
 		set {
 			this._tagCategoryId = value;
 		}
@@ -178,6 +184,7 @@ public class TagCategoryModel : ITagCategoryModel {
 			return this._tagCategoryName ?? throw new InvalidOperationException($"{nameof(this.TagCategoryName)} is not initialized.");
 		}
 
+		[MemberNotNull(nameof(_tagCategoryName))]
 		set {
 			this._tagCategoryName = value;
 		}
@@ -191,6 +198,7 @@ public class TagCategoryModel : ITagCategoryModel {
 			return this._detail ?? throw new InvalidOperationException($"{nameof(this.Detail)} is not initialized.");
 		}
 
+		[MemberNotNull(nameof(_detail))]
 		set {
 			this._detail = value;
 		}
@@ -227,6 +235,7 @@ public class TagAliasModel : ITagAliasModel {
 			return this._tagAliasId ?? throw new InvalidOperationException($"{nameof(this.TagAliasId)} is not initialized.");
 		}
 
+		[MemberNotNull(nameof(_tagAliasId))]
 		set {
 			this._tagAliasId = value;
 		}
@@ -240,6 +249,7 @@ public class TagAliasModel : ITagAliasModel {
 			return this._tagId ?? throw new InvalidOperationException($"{nameof(this.TagId)} is not initialized.");
 		}
 
+		[MemberNotNull(nameof(_tagId))]
 		set {
 			this._tagId = value;
 		}
@@ -253,6 +263,7 @@ public class TagAliasModel : ITagAliasModel {
 			return this._alias ?? throw new InvalidOperationException($"{nameof(this.Alias)} is not initialized.");
 		}
 
+		[MemberNotNull(nameof(_alias))]
 		set {
 			this._alias = value;
 		}
@@ -271,6 +282,7 @@ public class TagAliasModel : ITagAliasModel {
 			return this._romaji ?? throw new InvalidOperationException($"{nameof(this.Romaji)} is not initialized.");
 		}
 
+		[MemberNotNull(nameof(_romaji))]
 		set {
 			this._romaji = value;
 		}

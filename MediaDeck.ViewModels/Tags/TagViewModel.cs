@@ -12,6 +12,7 @@ public class TagViewModel : ViewModelBase {
 		this.TagName.Value = tag.TagName;
 		this.Detail.Value = tag.Detail;
 		this.RepresentativeText = tag.RepresentativeText.ToBindableReactiveProperty().AddTo(this.CompositeDisposable);
+		this.UsageCount = tag.UsageCount.ToBindableReactiveProperty().AddTo(this.CompositeDisposable);
 		this._tagAliases.AddRange(tag.TagAliases.Select(x => new TagAliasViewModel(x, this)));
 		this.TagAliases = this._tagAliases.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
 		this.TagCategory.Value = parent;
@@ -86,6 +87,10 @@ public class TagViewModel : ViewModelBase {
 	} = new();
 
 	public BindableReactiveProperty<string?> RepresentativeText {
+		get;
+	}
+
+	public BindableReactiveProperty<int> UsageCount {
 		get;
 	}
 

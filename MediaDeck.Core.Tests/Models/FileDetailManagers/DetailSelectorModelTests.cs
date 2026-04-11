@@ -156,8 +156,10 @@ public class DetailSelectorModelTests {
 
 		var tag1 = new Mock<ITagModel>();
 		tag1.SetupGet(x => x.TagId).Returns(1);
+		tag1.SetupGet(x => x.UsageCount).Returns(new ReactiveProperty<int>(0));
 		var tag2 = new Mock<ITagModel>();
 		tag2.SetupGet(x => x.TagId).Returns(2);
+		tag2.SetupGet(x => x.UsageCount).Returns(new ReactiveProperty<int>(0));
 
 		var fileMock1 = new Mock<IFileModel>();
 		fileMock1.SetupGet(x => x.Tags).Returns([tag1.Object, tag2.Object]);
@@ -187,6 +189,7 @@ public class DetailSelectorModelTests {
 
 		var tagMock = new Mock<ITagModel>();
 		tagMock.SetupGet(x => x.TagName).Returns("TestTag");
+		tagMock.SetupGet(x => x.UsageCount).Returns(new ReactiveProperty<int>(0));
 		tagsManager.Tags.Add(tagMock.Object);
 
 		// Act
@@ -262,6 +265,7 @@ public class DetailSelectorModelTests {
 
 		var tagMock = new Mock<ITagModel>();
 		tagMock.SetupGet(x => x.TagId).Returns(1);
+		tagMock.SetupGet(x => x.UsageCount).Returns(new ReactiveProperty<int>(0));
 
 		// By setting Id to 0 (or simply not verifying DB integrity strongly) we might still get FK issues.
 		// So let's intercept DbFactory if needed, OR just mock the Tags list so the test passes.
@@ -313,6 +317,7 @@ public class DetailSelectorModelTests {
 		// Arrange
 		var tagMock = new Mock<ITagModel>();
 		tagMock.SetupGet(x => x.TagName).Returns(tagName);
+		tagMock.SetupGet(x => x.UsageCount).Returns(new ReactiveProperty<int>(0));
 
 		var aliasList = new List<ITagAliasModel>();
 		if (tagName == "tag") {
@@ -368,6 +373,7 @@ public class DetailSelectorModelTests {
 		var tagMock = new Mock<ITagModel>();
 		tagMock.SetupGet(x => x.TagName).Returns("ExistingTag");
 		tagMock.SetupGet(x => x.TagId).Returns(1);
+		tagMock.SetupGet(x => x.UsageCount).Returns(new ReactiveProperty<int>(0));
 		tagsManager.Tags.Add(tagMock.Object);
 
 		using var model = new DetailSelectorModel(tagsManager);
@@ -412,6 +418,7 @@ public class DetailSelectorModelTests {
 			var m = new Mock<ITagModel>();
 			m.SetupGet(x => x.TagName).Returns(t.TagName);
 			m.SetupGet(x => x.TagId).Returns(t.TagId);
+			m.SetupGet(x => x.UsageCount).Returns(new ReactiveProperty<int>(0));
 			return m.Object;
 		});
 		tagModelFactoryMock.Setup(x => x.Create(It.IsAny<TagCategory>())).Returns((TagCategory c) => {
@@ -422,6 +429,7 @@ public class DetailSelectorModelTests {
 				var tm = new Mock<ITagModel>();
 				tm.SetupGet(x => x.TagId).Returns(t.TagId);
 				tm.SetupGet(x => x.TagName).Returns(t.TagName);
+				tm.SetupGet(x => x.UsageCount).Returns(new ReactiveProperty<int>(0));
 				catTags.Add(tm.Object);
 			}
 			m.SetupGet(x => x.Tags).Returns(catTags);

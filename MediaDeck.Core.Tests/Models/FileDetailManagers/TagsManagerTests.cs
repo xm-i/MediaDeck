@@ -49,6 +49,7 @@ public class TagsManagerTests {
 				var tm = new Mock<ITagModel>();
 				tm.SetupGet(x => x.TagId).Returns(t.TagId);
 				tm.SetupGet(x => x.TagName).Returns(t.TagName);
+				tm.SetupGet(x => x.UsageCount).Returns(new ReactiveProperty<int>(t.MediaFileTags?.Count ?? 0));
 				return tm.Object;
 			}).ToList();
 			m.SetupGet(x => x.Tags).Returns(new ObservableList<ITagModel>(tagModels));
@@ -58,12 +59,14 @@ public class TagsManagerTests {
 			var m = new Mock<ITagModel>();
 			m.SetupGet(x => x.TagId).Returns(t.TagId);
 			m.SetupGet(x => x.TagName).Returns(t.TagName);
+			m.SetupGet(x => x.UsageCount).Returns(new ReactiveProperty<int>(t.MediaFileTags?.Count ?? 0));
 			return m.Object;
 		});
 		mock.Setup(f => f.Create(It.IsAny<Tag>(), It.IsAny<ITagCategoryModel>())).Returns((Tag t, ITagCategoryModel c) => {
 			var m = new Mock<ITagModel>();
 			m.SetupGet(x => x.TagId).Returns(t.TagId);
 			m.SetupGet(x => x.TagName).Returns(t.TagName);
+			m.SetupGet(x => x.UsageCount).Returns(new ReactiveProperty<int>(t.MediaFileTags?.Count ?? 0));
 			return m.Object;
 		});
 	}
@@ -78,6 +81,7 @@ public class TagsManagerTests {
 		var manager = new TagsManager(dbFactory, tagModelFactoryMock.Object);
 		var tagMock = new Mock<ITagModel>();
 		tagMock.SetupGet(x => x.TagName).Returns("ExistingTag");
+		tagMock.SetupGet(x => x.UsageCount).Returns(new ReactiveProperty<int>(0));
 		manager.Tags.Add(tagMock.Object);
 		var result = await manager.FindTagByNameAsync("ExistingTag");
 		result.ShouldNotBeNull();
@@ -137,6 +141,7 @@ public class TagsManagerTests {
 		var manager = new TagsManager(dbFactory, tagModelFactoryMock.Object);
 		var tagMock = new Mock<ITagModel>();
 		tagMock.SetupGet(x => x.TagId).Returns(99);
+		tagMock.SetupGet(x => x.UsageCount).Returns(new ReactiveProperty<int>(0));
 		var fileTags = new List<ITagModel>();
 		var fileModelMock = new Mock<IFileModel>();
 		fileModelMock.SetupGet(x => x.Id).Returns(100);
@@ -177,6 +182,7 @@ public class TagsManagerTests {
 		var manager = new TagsManager(dbFactory, tagModelFactoryMock.Object);
 		var tagMock = new Mock<ITagModel>();
 		tagMock.SetupGet(x => x.TagId).Returns(99);
+		tagMock.SetupGet(x => x.UsageCount).Returns(new ReactiveProperty<int>(0));
 		var fileTags = new List<ITagModel> { tagMock.Object };
 		var fileModelMock = new Mock<IFileModel>();
 		fileModelMock.SetupGet(x => x.Id).Returns(100);
@@ -197,6 +203,7 @@ public class TagsManagerTests {
 		var manager = new TagsManager(dbFactory, tagModelFactoryMock.Object);
 		var tagMock = new Mock<ITagModel>();
 		tagMock.SetupGet(x => x.TagId).Returns(99);
+		tagMock.SetupGet(x => x.UsageCount).Returns(new ReactiveProperty<int>(1));
 		var fileTags = new List<ITagModel> { tagMock.Object };
 		var fileModelMock = new Mock<IFileModel>();
 		fileModelMock.SetupGet(x => x.Id).Returns(100);

@@ -58,7 +58,7 @@ public interface ITagModel {
 		set;
 	}
 
-	public int UsageCount {
+	public ReactiveProperty<int> UsageCount {
 		get;
 		set;
 	}

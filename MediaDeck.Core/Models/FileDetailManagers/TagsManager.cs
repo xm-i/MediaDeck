@@ -68,6 +68,7 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 		foreach (var file in target) {
 			file.Tags.Add(tag);
 		}
+		tag.UsageCount.Value += target.Length;
 		await transaction.CommitAsync();
 	}
 
@@ -96,6 +97,8 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 					file.Tags.RemoveAll(x => x.TagId == tagId);
 				}
 			}
+			var tag = this.Tags.FirstOrDefault(x => x.TagId == tagId);
+			tag?.UsageCount.Value -= rel.Length;
 			await transaction.CommitAsync();
 		}
 	}
@@ -157,12 +160,9 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 			this.Tags.AddRange(categoryModel.Tags);
 		}
 
-		// TagsをMediaFileTagsのカウント順に並び替え（オプション、以前の挙動維持のため）
-		var sortedTags = this.Tags.OrderByDescending(x => {
-			// ITagModelからはMediaFileTagsが直接取れないため、元のエンティティ情報が必要な場合は工夫が必要。
-			// ここでは一旦Load時の順序に従うか、あるいはEntity情報を持たせるようにする。
-			return 0; // 仮
-		}).ToArray();
-		// 今回は階層構造化を主眼とし、並び替えの詳細は後回しにするか、TagModelにプロパティを追加して対応する。
+		// TagsをMediaFileTagsのカウント順に並び替え
+		var sortedTags = this.Tags.OrderByDescending(x => x.UsageCount.Value).ThenBy(x => x.TagName).ToArray();
+		this.Tags.Clear();
+		this.Tags.AddRange(sortedTags);
 	}
 }
