@@ -1,5 +1,7 @@
 using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
+using MediaDeck.Composition.Interfaces.Tags;
+using MediaDeck.Core.Models.Tags;
 using MediaDeck.Database;
 using MediaDeck.Database.Tables;
 
@@ -155,7 +157,7 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 		this.Tags.Clear();
 
 		foreach (var categoryEntity in tagCategories) {
-			var categoryModel = this._tagModelFactory.Create(categoryEntity);
+			var categoryModel = this._tagModelFactory.CreateCategory(categoryEntity);
 			this.TagCategories.Add(categoryModel);
 			this.Tags.AddRange(categoryModel.Tags);
 		}

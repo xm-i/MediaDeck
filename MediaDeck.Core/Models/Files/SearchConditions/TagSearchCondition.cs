@@ -1,10 +1,9 @@
 using System.Linq.Expressions;
-
 using MediaDeck.Common.Utilities;
 using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
+using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Database.Tables;
-
 using R3.JsonConfig.Attributes;
 
 namespace MediaDeck.Core.Models.Files.SearchConditions;

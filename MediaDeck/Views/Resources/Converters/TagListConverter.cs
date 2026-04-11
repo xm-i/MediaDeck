@@ -1,7 +1,6 @@
 using System.Collections.Generic;
-
 using MediaDeck.Composition.Interfaces.Files;
-
+using MediaDeck.Composition.Interfaces.Tags;
 using Microsoft.UI.Xaml.Data;
 
 namespace MediaDeck.Views.Resources.Converters;

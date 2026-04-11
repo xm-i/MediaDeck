@@ -9,6 +9,7 @@ using MediaDeck.Core.Models.Files.Loaders;
 using MediaDeck.Core.Models.Files.SearchConditions;
 using MediaDeck.Core.Models.NotificationDispatcher;
 using MediaDeck.Core.Models.Repositories;
+using MediaDeck.Core.Models.Tags;
 
 namespace MediaDeck.Core.Models.Files;
 

@@ -2,6 +2,7 @@ using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Composition.Interfaces.Primitives;
+using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Composition.Objects;
 using R3;
 

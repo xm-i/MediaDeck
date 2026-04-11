@@ -1,5 +1,6 @@
 using System;
 using MediaDeck.Core.Models.Files;
+using MediaDeck.Core.Models.Tags;
 using Shouldly;
 using Xunit;
 

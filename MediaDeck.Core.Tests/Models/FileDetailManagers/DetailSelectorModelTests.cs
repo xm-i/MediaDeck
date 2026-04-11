@@ -1,9 +1,10 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
+using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Core.Models.FileDetailManagers;
 using MediaDeck.Core.Models.FileDetailManagers.Objects;
 using MediaDeck.Core.Primitives;
@@ -352,7 +353,7 @@ public class DetailSelectorModelTests {
 		dbFactoryMock.Setup(x => x.CreateDbContextAsync(It.IsAny<CancellationToken>())).ReturnsAsync(() => new MediaDeckDbContext(dbOptions));
 
 		var tagModelFactoryMock = new Mock<ITagModelFactory>();
-		tagModelFactoryMock.Setup(x => x.Create(It.IsAny<TagCategory>())).Returns((TagCategory c) => {
+		tagModelFactoryMock.Setup(x => x.CreateCategory(It.IsAny<TagCategory>())).Returns((TagCategory c) => {
 			var m = new Mock<ITagCategoryModel>();
 			m.SetupGet(x => x.TagCategoryId).Returns(c.TagCategoryId);
 			var catTags = new ObservableList<ITagModel>();
@@ -414,14 +415,14 @@ public class DetailSelectorModelTests {
 			await db.SaveChangesAsync();
 		}
 
-		tagModelFactoryMock.Setup(x => x.Create(It.IsAny<Tag>())).Returns((Tag t) => {
+		tagModelFactoryMock.Setup(f => f.Create(It.IsAny<Tag>(), It.IsAny<ITagCategoryModel>())).Returns((Tag t, ITagCategoryModel? c) => {
 			var m = new Mock<ITagModel>();
-			m.SetupGet(x => x.TagName).Returns(t.TagName);
 			m.SetupGet(x => x.TagId).Returns(t.TagId);
-			m.SetupGet(x => x.UsageCount).Returns(new ReactiveProperty<int>(0));
+			m.SetupGet(x => x.TagName).Returns(t.TagName);
+			m.SetupGet(x => x.UsageCount).Returns(new ReactiveProperty<int>(t.MediaFileTags?.Count ?? 0));
 			return m.Object;
 		});
-		tagModelFactoryMock.Setup(x => x.Create(It.IsAny<TagCategory>())).Returns((TagCategory c) => {
+		tagModelFactoryMock.Setup(x => x.CreateCategory(It.IsAny<TagCategory>())).Returns((TagCategory c) => {
 			var m = new Mock<ITagCategoryModel>();
 			m.SetupGet(x => x.TagCategoryId).Returns(c.TagCategoryId);
 			var catTags = new ObservableList<ITagModel>();

@@ -2,11 +2,13 @@ using MediaDeck.Common.Base;
 using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Composition.Interfaces.FileTypes.ViewModels;
+using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Core.Models.FileDetailManagers;
 using MediaDeck.Core.Models.FileDetailManagers.Objects;
 using MediaDeck.Core.Models.Files;
 using MediaDeck.Core.Models.Files.SearchConditions;
 using MediaDeck.Core.Models.NotificationDispatcher;
+using MediaDeck.Core.Models.Tags;
 using MediaDeck.Core.Primitives;
 using MediaDeck.ViewModels.Tags;
 

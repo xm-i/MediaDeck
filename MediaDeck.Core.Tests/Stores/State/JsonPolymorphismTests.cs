@@ -1,13 +1,13 @@
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
-
 using MediaDeck.Composition.Interfaces.Files;
+using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Core.Models.Files;
 using MediaDeck.Core.Models.Files.Filter.FilterItemObjects;
 using MediaDeck.Core.Models.Files.SearchConditions;
+using MediaDeck.Core.Models.Tags;
 using MediaDeck.Stores.SerializerContext;
-
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 using Xunit;

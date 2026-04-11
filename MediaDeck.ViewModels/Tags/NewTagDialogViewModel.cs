@@ -1,5 +1,6 @@
 using MediaDeck.Common.Base;
 using MediaDeck.Composition.Interfaces.Files;
+using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Core.Models.FileDetailManagers;
 
 namespace MediaDeck.ViewModels.Tags;

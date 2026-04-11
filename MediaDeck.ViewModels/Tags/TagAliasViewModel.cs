@@ -1,4 +1,5 @@
 using MediaDeck.Composition.Interfaces.Files;
+using MediaDeck.Composition.Interfaces.Tags;
 
 namespace MediaDeck.ViewModels.Tags;
 

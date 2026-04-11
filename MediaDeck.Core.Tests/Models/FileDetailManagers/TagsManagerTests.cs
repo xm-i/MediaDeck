@@ -1,9 +1,10 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
+using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Core.Models.FileDetailManagers;
 using MediaDeck.Database;
 using MediaDeck.Database.Tables;
@@ -41,7 +42,7 @@ public class TagsManagerTests {
 	}
 
 	private void SetupFactoryMock(Mock<ITagModelFactory> mock) {
-		mock.Setup(f => f.Create(It.IsAny<TagCategory>())).Returns((TagCategory c) => {
+		mock.Setup(f => f.CreateCategory(It.IsAny<TagCategory>())).Returns((TagCategory c) => {
 			var m = new Mock<ITagCategoryModel>();
 			m.SetupGet(x => x.TagCategoryId).Returns(c.TagCategoryId);
 			// 簡易的に、カテゴリ内のタグをモデルに変換して返す（実際のLoadの挙動を模倣）
@@ -55,7 +56,7 @@ public class TagsManagerTests {
 			m.SetupGet(x => x.Tags).Returns(new ObservableList<ITagModel>(tagModels));
 			return m.Object;
 		});
-		mock.Setup(f => f.Create(It.IsAny<Tag>())).Returns((Tag t) => {
+		mock.Setup(f => f.Create(It.IsAny<Tag>(), It.IsAny<ITagCategoryModel>())).Returns((Tag t, ITagCategoryModel? c) => {
 			var m = new Mock<ITagModel>();
 			m.SetupGet(x => x.TagId).Returns(t.TagId);
 			m.SetupGet(x => x.TagName).Returns(t.TagName);
