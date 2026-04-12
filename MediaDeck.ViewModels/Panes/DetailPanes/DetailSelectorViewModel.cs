@@ -168,7 +168,7 @@ public class DetailSelectorViewModel : ViewModelBase {
 		get;
 	} = new();
 
-	public ReactiveCommand<double> UpdateRateCommand{
+	public ReactiveCommand<double> UpdateRateCommand {
 		get;
 	} = new();
 

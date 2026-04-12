@@ -3,6 +3,8 @@ using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Store.Config;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using MediaDeck.Core.Models.NotificationDispatcher;
 using Shouldly;
 
 namespace MediaDeck.Core.Tests.Stores.Config;
@@ -52,6 +54,8 @@ public class ConfigStoreTests : IDisposable {
 		var services = new ServiceCollection();
 		var mockConfig = (ConfigModel)RuntimeHelpers.GetUninitializedObject(typeof(ConfigModel));
 		services.AddSingleton(mockConfig);
+		services.AddLogging();
+		services.AddSingleton<AppNotificationDispatcher>();
 		var serviceProvider = services.BuildServiceProvider();
 
 		// Act
@@ -72,6 +76,8 @@ public class ConfigStoreTests : IDisposable {
 		var services = new ServiceCollection();
 		var mockConfig = (ConfigModel)RuntimeHelpers.GetUninitializedObject(typeof(ConfigModel));
 		services.AddSingleton(mockConfig);
+		services.AddLogging();
+		services.AddSingleton<AppNotificationDispatcher>();
 		var serviceProvider = services.BuildServiceProvider();
 
 		var store = new TestableConfigStore(serviceProvider);
@@ -89,6 +95,8 @@ public class ConfigStoreTests : IDisposable {
 		var services = new ServiceCollection();
 		var mockConfig = (ConfigModel)RuntimeHelpers.GetUninitializedObject(typeof(ConfigModel));
 		services.AddSingleton(mockConfig);
+		services.AddLogging();
+		services.AddSingleton<AppNotificationDispatcher>();
 		var serviceProvider = services.BuildServiceProvider();
 
 		var store = new TestableConfigStore(serviceProvider);
@@ -110,6 +118,8 @@ public class ConfigStoreTests : IDisposable {
 			var services = new ServiceCollection();
 			var mockConfig = (ConfigModel)RuntimeHelpers.GetUninitializedObject(typeof(ConfigModel));
 			services.AddSingleton(mockConfig);
+			services.AddLogging();
+			services.AddSingleton<AppNotificationDispatcher>();
 			var serviceProvider = services.BuildServiceProvider();
 
 			var store = new TestableConfigStore(serviceProvider);

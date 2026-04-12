@@ -3,6 +3,9 @@ using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Store.State;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using MediaDeck.Core.Models.NotificationDispatcher;
 using Moq;
 using Shouldly;
 
@@ -48,6 +51,12 @@ public class StateStoreTests : IDisposable {
 
 		this._serviceProviderMock.Setup(x => x.GetService(typeof(StateModel)))
 			.Returns((StateModel)RuntimeHelpers.GetUninitializedObject(typeof(StateModel)));
+
+		this._serviceProviderMock.Setup(x => x.GetService(typeof(ILogger<StateStore>)))
+			.Returns(NullLogger<StateStore>.Instance);
+
+		this._serviceProviderMock.Setup(x => x.GetService(typeof(AppNotificationDispatcher)))
+			.Returns(new AppNotificationDispatcher());
 
 		this._tempDirectory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
 		Directory.CreateDirectory(this._tempDirectory);

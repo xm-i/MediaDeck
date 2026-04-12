@@ -5,16 +5,21 @@ using System.Text.Json.Serialization.Metadata;
 using AutoDiAttributes;
 
 using MediaDeck.Composition.Constants;
+using MediaDeck.Composition.Objects;
 using MediaDeck.Composition.Stores.State.Model;
+using MediaDeck.Core.Models.NotificationDispatcher;
 using MediaDeck.Core.Stores.State;
 using MediaDeck.Stores.SerializerContext;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace MediaDeck.Store.State;
 
 [Inject(InjectServiceLifetime.Singleton, typeof(IStateStore))]
 public class StateStore : IStateStore {
+	private readonly ILogger<StateStore> _logger;
+	private readonly AppNotificationDispatcher _notificationDispatcher;
 	public IServiceProvider ScopedService {
 		get;
 	}
@@ -23,6 +28,7 @@ public class StateStore : IStateStore {
 		get;
 		private set;
 	}
+
 
 	// Protected property to allow overriding the file path during testing.
 	protected virtual string StateFilePath {
@@ -33,6 +39,8 @@ public class StateStore : IStateStore {
 
 	public StateStore(IServiceProvider service) {
 		this.ScopedService = service;
+		this._logger = service.GetRequiredService<ILogger<StateStore>>();
+		this._notificationDispatcher = service.GetRequiredService<AppNotificationDispatcher>();
 		this.Load();
 	}
 
@@ -52,17 +60,40 @@ public class StateStore : IStateStore {
 		var scope = this.ScopedService.CreateScope();
 		try {
 			if (File.Exists(this.StateFilePath)) {
-				var json = File.ReadAllText(this.StateFilePath);
-				var loaded = JsonSerializer.Deserialize<StateModelForJson>(json, this.JsonSerializerOptions);
-				if (loaded != null) {
-					this.State = StateModelForJson.CreateModel(loaded, scope.ServiceProvider);
-					return;
+				try {
+					var json = File.ReadAllText(this.StateFilePath);
+					var loaded = JsonSerializer.Deserialize<StateModelForJson>(json, this.JsonSerializerOptions);
+					if (loaded != null) {
+						this.State = StateModelForJson.CreateModel(loaded, scope.ServiceProvider);
+						this._logger.LogInformation("状態設定の読み込みに成功しました");
+						return;
+					}
+				} catch (JsonException je) {
+					this._logger.LogError(je, "状態設定ファイルのJSON解析に失敗しました: {FilePath}", this.StateFilePath);
+					this._notificationDispatcher.Notify.OnNext(
+						AppNotification.Error("状態設定ファイルが破損しています。デフォルト設定を使用します。", "設定読み込みエラー", 0));
+				} catch (IOException ie) {
+					this._logger.LogError(ie, "状態設定ファイルの読み込みに失敗しました: {FilePath}", this.StateFilePath);
+					this._notificationDispatcher.Notify.OnNext(
+						AppNotification.Error("状態設定ファイルを読み込めません。デフォルト設定を使用します。", "設定読み込みエラー", 0));
+				} catch (Exception ex) {
+					this._logger.LogError(ex, "状態設定の読み込み処理中に予期しないエラーが発生しました: {FilePath}", this.StateFilePath);
+					this._notificationDispatcher.Notify.OnNext(
+						AppNotification.Error("状態設定の読み込み中にエラーが発生しました。デフォルト設定を使用します。", "設定読み込みエラー", 0));
 				}
 			}
-		} catch (Exception) {
-			// TODO: 失敗通知
+		} catch (Exception ex) {
+			this._logger.LogError(ex, "状態設定読み込みのスコープ生成に失敗しました");
 		}
-		this.State = scope.ServiceProvider.GetRequiredService<StateModel>();
+
+		// デフォルト状態を作成
+		try {
+			this.State = scope.ServiceProvider.GetRequiredService<StateModel>();
+			this._logger.LogWarning("デフォルトの状態設定を使用します");
+		} catch (Exception ex) {
+			this._logger.LogError(ex, "デフォルト状態設定の作成に失敗しました");
+			throw;
+		}
 	}
 
 	/// <summary>
@@ -75,8 +106,19 @@ public class StateStore : IStateStore {
 			var jsonDto = StateModelForJson.CreateJson(this.State);
 			var json = JsonSerializer.Serialize(jsonDto, this.JsonSerializerOptions);
 			File.WriteAllText(this.StateFilePath, json);
-		} catch (Exception) {
-			// TODO: 失敗通知
+			this._logger.LogInformation("状態設定を保存しました: {FilePath}", this.StateFilePath);
+		} catch (IOException ie) {
+			this._logger.LogError(ie, "状態設定ファイルの保存に失敗しました: {FilePath}", this.StateFilePath);
+			this._notificationDispatcher.Notify.OnNext(
+				AppNotification.Error("状態設定を保存できません。", "保存エラー"));
+		} catch (JsonException je) {
+			this._logger.LogError(je, "状態設定のシリアライズに失敗しました");
+			this._notificationDispatcher.Notify.OnNext(
+				AppNotification.Error("状態設定のシリアライズに失敗しました。", "保存エラー"));
+		} catch (Exception ex) {
+			this._logger.LogError(ex, "状態設定の保存中に予期しないエラーが発生しました");
+			this._notificationDispatcher.Notify.OnNext(
+				AppNotification.Error("状態設定の保存中にエラーが発生しました。", "保存エラー"));
 		}
 	}
 }

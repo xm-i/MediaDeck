@@ -6,11 +6,10 @@ public sealed partial class PropertiesDetail {
 	}
 
 	private void RatingControl_ValueChanged(Microsoft.UI.Xaml.Controls.RatingControl sender, object args) {
-		if(this.ViewModel is not { } vm)
-		{
+		if (this.ViewModel is not { } vm) {
 			return;
 		}
 
 		vm.UpdateRateCommand.Execute(sender.Value);
-    }
+	}
 }

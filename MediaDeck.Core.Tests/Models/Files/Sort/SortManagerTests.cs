@@ -6,7 +6,10 @@ using MediaDeck.Core.Stores.State;
 using MediaDeck.Store.State;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
+using MediaDeck.Core.Models.NotificationDispatcher;
 
 namespace MediaDeck.Core.Tests.Models.Files.Sort;
 
@@ -25,6 +28,8 @@ public class SortManagerTests {
 		services.AddSingleton<FolderManagerStateModel>();
 		services.AddSingleton<ViewerStateModel>();
 		services.AddSingleton<StateModel>();
+		services.AddLogging();
+		services.AddSingleton<AppNotificationDispatcher>();
 
 		var realServiceProvider = services.BuildServiceProvider();
 
@@ -35,6 +40,9 @@ public class SortManagerTests {
 		this._mockServiceProvider.Setup(x => x.GetService(typeof(IServiceScopeFactory))).Returns(mockScopeFactory.Object);
 		mockScopeFactory.Setup(x => x.CreateScope()).Returns(mockScope.Object);
 		mockScope.Setup(x => x.ServiceProvider).Returns(realServiceProvider);
+
+		this._mockServiceProvider.Setup(x => x.GetService(typeof(ILogger<StateStore>))).Returns(realServiceProvider.GetRequiredService<ILogger<StateStore>>());
+		this._mockServiceProvider.Setup(x => x.GetService(typeof(AppNotificationDispatcher))).Returns(realServiceProvider.GetRequiredService<AppNotificationDispatcher>());
 
 		this._stateStore = new StateStore(this._mockServiceProvider.Object);
 	}
