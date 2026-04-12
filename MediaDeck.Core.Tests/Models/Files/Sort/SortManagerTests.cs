@@ -2,14 +2,12 @@ using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Composition.Stores.State.Model.Objects;
 using MediaDeck.Core.Models.Files.Sort;
+using MediaDeck.Core.Models.NotificationDispatcher;
 using MediaDeck.Core.Stores.State;
 using MediaDeck.Store.State;
-
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using MediaDeck.Core.Models.NotificationDispatcher;
 
 namespace MediaDeck.Core.Tests.Models.Files.Sort;
 

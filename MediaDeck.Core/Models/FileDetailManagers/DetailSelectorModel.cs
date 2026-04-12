@@ -173,14 +173,6 @@ public class DetailSelectorModel : IDisposable {
 		return this._tagsManager.FindTagByNameAsync(tagName);
 	}
 
-
-	/// <summary>
-	/// タグ候補を読み込む
-	/// </summary>
-	public Task LoadTagCandidatesAsync() {
-		return this._tagsManager.Load();
-	}
-
 	/// <summary>
 	/// 説明を更新する
 	/// </summary>

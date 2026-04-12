@@ -1,11 +1,10 @@
 using System.Runtime.CompilerServices;
 using MediaDeck.Composition.Stores.State.Model;
+using MediaDeck.Core.Models.NotificationDispatcher;
 using MediaDeck.Store.State;
-
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using MediaDeck.Core.Models.NotificationDispatcher;
 using Moq;
 using Shouldly;
 

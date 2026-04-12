@@ -1,3 +1,4 @@
+using MediaDeck.Common.Utilities;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Database;
@@ -9,6 +10,7 @@ namespace MediaDeck.Core.Models.Tags;
 public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagModelFactory tagModelFactory) : ITagsManager {
 	private readonly IDbContextFactory<MediaDeckDbContext> _dbFactory = dbFactory;
 	private readonly ITagModelFactory _tagModelFactory = tagModelFactory;
+	private bool _isInitialized;
 
 	public ObservableList<ITagCategoryModel> TagCategories {
 		get;
@@ -120,25 +122,59 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 
 		await db.SaveChangesAsync();
 		await transaction.CommitAsync();
+
+		var cachedTag = this.Tags.FirstOrDefault(x => x.TagId == tagId);
+		if (cachedTag != null) {
+			var oldCategoryId = cachedTag.TagCategoryId;
+			cachedTag.TagCategoryId = tagCategoryId;
+			cachedTag.TagName = tagName;
+			cachedTag.Detail = detail;
+			cachedTag.Romaji = tagName.KatakanaToHiragana().HiraganaToRomaji();
+			cachedTag.TagAliases = [.. aliases];
+
+			if (oldCategoryId != tagCategoryId) {
+				var oldCategory = this.TagCategories.FirstOrDefault(x => x.TagCategoryId == oldCategoryId);
+				oldCategory?.Tags.Remove(cachedTag);
+
+				var newCategory = this.TagCategories.FirstOrDefault(x => x.TagCategoryId == tagCategoryId);
+				newCategory?.Tags.Add(cachedTag);
+				cachedTag.TagCategory = newCategory;
+			}
+		}
 	}
 
 	public async Task UpdateTagCategoryAsync(int tagCategoryId, string tagCategoryName, string detail) {
 		await using var db = await this._dbFactory.CreateDbContextAsync();
 		using var transaction = await db.Database.BeginTransactionAsync();
-		var tagCategory = await db.TagCategories.FirstOrDefaultAsync(x => x.TagCategoryId == tagCategoryId);
-		if (tagCategory != null) {
-			tagCategory.TagCategoryName = tagCategoryName;
-			tagCategory.Detail = detail;
-			db.TagCategories.Update(tagCategory);
+		var tagCategoryEntity = await db.TagCategories.FirstOrDefaultAsync(x => x.TagCategoryId == tagCategoryId);
+		bool isNew = tagCategoryEntity == null;
+		if (!isNew) {
+			tagCategoryEntity!.TagCategoryName = tagCategoryName;
+			tagCategoryEntity.Detail = detail;
+			db.TagCategories.Update(tagCategoryEntity);
 		} else {
-			tagCategory = new TagCategory() { TagCategoryId = tagCategoryId, TagCategoryName = tagCategoryName, Detail = detail, Tags = [] };
-			await db.TagCategories.AddAsync(tagCategory);
+			tagCategoryEntity = new TagCategory() { TagCategoryId = tagCategoryId, TagCategoryName = tagCategoryName, Detail = detail, Tags = [] };
+			await db.TagCategories.AddAsync(tagCategoryEntity);
 		}
 		await db.SaveChangesAsync();
 		await transaction.CommitAsync();
+
+		var cachedCategory = this.TagCategories.FirstOrDefault(x => x.TagCategoryId == tagCategoryId);
+		if (cachedCategory != null) {
+			cachedCategory.TagCategoryName = tagCategoryName;
+			cachedCategory.Detail = detail;
+		} else if (isNew) {
+			var newCategory = this._tagModelFactory.CreateCategory(tagCategoryEntity);
+			this.TagCategories.Add(newCategory);
+		}
 	}
 
-	public async Task Load() {
+	public async Task InitializeAsync() {
+		if (this._isInitialized) {
+			return;
+		}
+		this._isInitialized = true;
+
 		await using var db = await this._dbFactory.CreateDbContextAsync();
 		var tagCategories =
 			await

@@ -1,10 +1,8 @@
 using System.Runtime.CompilerServices;
 using MediaDeck.Composition.Stores.Config.Model;
-using MediaDeck.Store.Config;
-
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using MediaDeck.Core.Models.NotificationDispatcher;
+using MediaDeck.Store.Config;
+using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 
 namespace MediaDeck.Core.Tests.Stores.Config;

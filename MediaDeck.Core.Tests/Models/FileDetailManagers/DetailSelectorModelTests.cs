@@ -200,22 +200,6 @@ public class DetailSelectorModelTests {
 	}
 
 	/// <summary>
-	/// LoadTagCandidatesAsyncがTagsManagerに委譲していることを検証する。
-	/// </summary>
-	[Fact]
-	public async Task LoadTagCandidatesAsync_ShouldDelegateToTagsManager() {
-		// Arrange
-		var tagsManager = this.CreateTagsManager(out var dbFactoryMock, out var tagModelFactoryMock);
-		using var model = new DetailSelectorModel(tagsManager);
-
-		// Act
-		await model.LoadTagCandidatesAsync();
-
-		// Assert
-		dbFactoryMock.Verify(x => x.CreateDbContextAsync(It.IsAny<System.Threading.CancellationToken>()), Times.Once);
-	}
-
-	/// <summary>
 	/// UpdateDescriptionAsyncがIFileModelに委譲していることを検証する。
 	/// </summary>
 	[Fact]

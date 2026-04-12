@@ -74,8 +74,8 @@ public interface ITagsManager {
 	public Task UpdateTagCategoryAsync(int tagCategoryId, string tagCategoryName, string detail);
 
 	/// <summary>
-	/// データをロードする
+	/// データを初期化（ロード）する
 	/// </summary>
 	/// <returns>タスク</returns>
-	public Task Load();
+	public Task InitializeAsync();
 }

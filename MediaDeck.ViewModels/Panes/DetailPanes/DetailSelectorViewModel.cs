@@ -55,9 +55,6 @@ public class DetailSelectorViewModel : ViewModelBase {
 			await model.UpdateRateAsync(this.TargetFileModels, (int)x);
 		}, AwaitOperation.Drop).AddTo(this.CompositeDisposable);
 
-		this.LoadTagCandidatesCommand.SubscribeAwait(async (_, ct) => await model.LoadTagCandidatesAsync(), AwaitOperation.Drop)
-			.AddTo(this.CompositeDisposable);
-
 		this.RefreshFilteredTagCandidatesCommand.Subscribe(_ => this.RefreshTagCandidateFilter())
 			.AddTo(this.CompositeDisposable);
 

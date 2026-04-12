@@ -14,7 +14,6 @@ public class NewTagDialogViewModel : ViewModelBase {
 				this.TagName.Value,
 				this.Detail.Value,
 				[]);
-			await tagsManager.Load();
 			this.Result.Value = DialogResult.Confirmed;
 		});
 		this.CancelCommand.Subscribe(_ => {

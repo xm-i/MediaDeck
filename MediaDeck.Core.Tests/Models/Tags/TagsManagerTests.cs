@@ -317,16 +317,16 @@ public class TagsManagerTests {
 	}
 
 	/// <summary>
-	/// Loadがデータベースからカテゴリとタグを読み込み、ファクトリを介して正しくモデルに変換することを検証します。
+	/// InitializeAsyncがデータベースからカテゴリとタグを読み込み、ファクトリを介して正しくモデルに変換することを検証します。
 	/// </summary>
 	[Fact]
-	public async Task Load_ShouldLoadTagsAndCategoriesFromDatabase() {
-		var dbFactory = this.CreateInMemoryDbFactory(nameof(this.Load_ShouldLoadTagsAndCategoriesFromDatabase));
+	public async Task InitializeAsync_ShouldLoadTagsAndCategoriesFromDatabase() {
+		var dbFactory = this.CreateInMemoryDbFactory(nameof(this.InitializeAsync_ShouldLoadTagsAndCategoriesFromDatabase));
 		await this.SeedDatabaseAsync(dbFactory);
 		var tagModelFactoryMock = new Mock<ITagModelFactory>();
 		this.SetupFactoryMock(tagModelFactoryMock);
 		var manager = new TagsManager(dbFactory, tagModelFactoryMock.Object);
-		await manager.Load();
+		await manager.InitializeAsync();
 		manager.TagCategories.Count.ShouldBe(3); // +1 Virtual Category for No Category tags
 		manager.Tags.Count.ShouldBe(2);
 	}
