@@ -109,8 +109,12 @@
 					<ItemsControl.ItemTemplate>
 						<DataTemplate x:DataType="tags:TagViewModel" >
 							<StackPanel Spacing="2" >
-								<TextBlock Text="{x:Bind TagName.Value}"
-									TextTrimming="CharacterEllipsis" />
+								<TextBlock TextTrimming="CharacterEllipsis" >
+									<Run Text="{x:Bind TagName.Value, Mode=OneWay}" />
+									<Run Text=" (" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+									<Run Text="{x:Bind UsageCount.Value, Mode=OneWay}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+									<Run Text=")" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+								</TextBlock>
 								<TextBlock
 									Visibility="{x:Bind RepresentativeTextForSearch.Value, Mode=OneWay, Converter={StaticResource NullToCollapseConverter}}"
 									Text="{x:Bind RepresentativeTextForSearch.Value, Mode=OneWay}"

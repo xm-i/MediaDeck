@@ -41,7 +41,12 @@
 					<DataTemplate x:DataType="tags:TagViewModel" >
 						<StackPanel Spacing="2"
 							Padding="4" >
-							<TextBlock Text="{x:Bind TagName.Value}" />
+							<TextBlock>
+								<Run Text="{x:Bind TagName.Value, Mode=OneWay}" />
+								<Run Text=" (" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+								<Run Text="{x:Bind UsageCount.Value, Mode=OneWay}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+								<Run Text=")" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+							</TextBlock>
 							<TextBlock Text="{x:Bind RepresentativeText.Value, Mode=OneWay}"
 								Style="{ThemeResource CaptionTextBlockStyle}"
 								Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
@@ -86,6 +91,8 @@
 							<TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" >
 								<Run Text="(" />
 								<Run Text="{Binding Count}" />
+								<Run Text=" / " />
+								<Run Text="{Binding Value.UsageCount.Value, Mode=OneWay}" />
 								<Run Text=")" />
 							</TextBlock>
 						</StackPanel>
