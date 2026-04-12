@@ -25,51 +25,64 @@ public class DetailSelectorViewModel : ViewModelBase {
 		SearchConditionNotificationDispatcher searchConditionNotificationDispatcher,
 		ITagModelFactory tagModelFactory) {
 		this._model = model;
-		this.RepresentativeFilePath = model.RepresentativeFilePath.ToBindableReactiveProperty(string.Empty);
-		this.Properties = model.Properties.ToBindableReactiveProperty([]);
-		this.Rate = model.Rate.ToBindableReactiveProperty();
-		this.Description = model.Description.ToBindableReactiveProperty(string.Empty);
-		this.UsageCount = model.UsageCount.ToBindableReactiveProperty();
+		this.RepresentativeFilePath = model.RepresentativeFilePath.ToBindableReactiveProperty(string.Empty).AddTo(this.CompositeDisposable);
+		this.Properties = model.Properties.ToBindableReactiveProperty([]).AddTo(this.CompositeDisposable);
+		this.Rate = model.Rate.ToBindableReactiveProperty().AddTo(this.CompositeDisposable);
+		this.Description = model.Description.ToBindableReactiveProperty(string.Empty).AddTo(this.CompositeDisposable);
+		this.UsageCount = model.UsageCount.ToBindableReactiveProperty().AddTo(this.CompositeDisposable);
 		this._model.AddTo(this.CompositeDisposable);
 
 		this.TagCandidates = model.TagModels.CreateView(x => {
 			var categoryViewModel = this._categoryViewModels.GetOrAdd(x.TagCategoryId, _ => new TagCategoryViewModel(x.TagCategory, model.TagsManager, tagModelFactory));
 			return new TagViewModel(categoryViewModel, x, model.TagsManager, tagModelFactory);
 		});
-		this.FilteredTagCandidates = this.TagCandidates.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
+		this.FilteredTagCandidates = this.TagCandidates.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current).AddTo(this.CompositeDisposable);
 		this.Tags = model.Tags.CreateView(x => {
 			var categoryViewModel = this._categoryViewModels.GetOrAdd(x.Value.TagCategoryId, _ => new TagCategoryViewModel(x.Value.TagCategory, model.TagsManager, tagModelFactory));
 			return new ValueCountPair<TagViewModel>(new TagViewModel(categoryViewModel, x.Value, model.TagsManager, tagModelFactory), x.Count);
 		})
-			.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
+			.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current).AddTo(this.CompositeDisposable);
 
 		Observable.Merge(this.TargetFiles.Where(x => x != null).Select(_ => Unit.Default),
 				model.ContentChanged.AsObservable())
-			.Subscribe(_ => this._model.Refresh(this.TargetFileModels));
+			.Subscribe(_ => this._model.Refresh(this.TargetFileModels))
+			.AddTo(this.CompositeDisposable);
 
-		this.Rate.Subscribe(async x => {
+		this.Rate.SubscribeAwait(async (x, ct) => {
 			if (!double.IsInteger(x) || this.TargetFiles.Value is null) {
 				return;
 			}
 			await model.UpdateRateAsync(this.TargetFileModels, (int)x);
-		});
+		}, AwaitOperation.Drop).AddTo(this.CompositeDisposable);
 
-		this.LoadTagCandidatesCommand.Subscribe(async _ => await model.LoadTagCandidatesAsync());
-		this.RefreshFilteredTagCandidatesCommand.Subscribe(_ => this.RefreshTagCandidateFilter());
-		this.UpdateDescriptionCommand.Subscribe(async _ => {
+		this.LoadTagCandidatesCommand.SubscribeAwait(async (_, ct) => await model.LoadTagCandidatesAsync(), AwaitOperation.Drop)
+			.AddTo(this.CompositeDisposable);
+
+		this.RefreshFilteredTagCandidatesCommand.Subscribe(_ => this.RefreshTagCandidateFilter())
+			.AddTo(this.CompositeDisposable);
+
+		this.UpdateDescriptionCommand.SubscribeAwait(async (_, ct) => {
 			await model.UpdateDescriptionAsync(this.TargetFileModels.First(), this.Description.Value);
-		});
-		this.RemoveTagCommand.Subscribe(async x => {
+		}, AwaitOperation.Drop).AddTo(this.CompositeDisposable);
+
+		this.RemoveTagCommand.SubscribeAwait(async (x, ct) => {
 			await model.RemoveTagAsync(this.TargetFileModels, x.Value.Model.TagId);
-		});
-		this.AddTagCommand.Subscribe(async _ => {
+		}, AwaitOperation.Drop).AddTo(this.CompositeDisposable);
+
+		this.AddTagCommand.SubscribeAwait(async (_, ct) => {
 			if (string.IsNullOrEmpty(this.Text.Value)) {
 				return;
 			}
 
-			await model.AddTagByNameAsync(this.TargetFileModels, this.Text.Value);
+			var tag = await model.FindTagByNameAsync(this.Text.Value);
+			if (tag is null) {
+				this.NewTagRequested.OnNext(new NewTagRequestedContext(this.Text.Value, model.TagCategories));
+				return;
+			}
+
+			await model.AddTagAsync(this.TargetFileModels, tag);
 			this.Text.Value = string.Empty;
-		});
+		}, AwaitOperation.Drop).AddTo(this.CompositeDisposable);
 
 		this.SearchTaggedFilesCommand.Subscribe(x => {
 			searchConditionNotificationDispatcher.UpdateRequest.OnNext(conditions => {
@@ -79,9 +92,10 @@ public class DetailSelectorViewModel : ViewModelBase {
 				};
 				conditions.Add(condition);
 			});
-		});
+		}).AddTo(this.CompositeDisposable);
 
-		this.Text.Subscribe(_ => this.RefreshTagCandidateFilter());
+		this.Text.Subscribe(_ => this.RefreshTagCandidateFilter())
+			.AddTo(this.CompositeDisposable);
 	}
 
 	public BindableReactiveProperty<string> RepresentativeFilePath {

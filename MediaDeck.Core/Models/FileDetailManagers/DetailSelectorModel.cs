@@ -174,16 +174,6 @@ public class DetailSelectorModel : IDisposable {
 		return this._tagsManager.FindTagByNameAsync(tagName);
 	}
 
-	/// <summary>
-	/// タグを名前で追加する。存在しない場合は新規作成する。
-	/// </summary>
-	public async Task AddTagByNameAsync(IFileModel[] files, string tagName) {
-		var tag = await this.FindTagByNameAsync(tagName) ?? await this._tagsManager.CreateTagAsync(1, tagName, string.Empty, []);
-
-		if (tag != null) {
-			await this.AddTagAsync(files, tag);
-		}
-	}
 
 	/// <summary>
 	/// タグ候補を読み込む
