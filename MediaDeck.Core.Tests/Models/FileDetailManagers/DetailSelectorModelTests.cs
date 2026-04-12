@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,6 +7,7 @@ using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Core.Models.FileDetailManagers;
 using MediaDeck.Core.Models.FileDetailManagers.Objects;
+using MediaDeck.Core.Models.Tags;
 using MediaDeck.Core.Primitives;
 using MediaDeck.Database;
 using MediaDeck.Database.Tables;
@@ -23,7 +24,7 @@ namespace MediaDeck.Core.Tests.Models.FileDetailManagers;
 /// DetailSelectorModelの単体テスト
 /// </summary>
 public class DetailSelectorModelTests {
-	private TagsManager CreateTagsManager(out Mock<IDbContextFactory<MediaDeckDbContext>> dbFactoryMock, out Mock<ITagModelFactory> tagModelFactoryMock) {
+	private ITagsManager CreateTagsManager(out Mock<IDbContextFactory<MediaDeckDbContext>> dbFactoryMock, out Mock<ITagModelFactory> tagModelFactoryMock) {
 		dbFactoryMock = new Mock<IDbContextFactory<MediaDeckDbContext>>();
 		tagModelFactoryMock = new Mock<ITagModelFactory>();
 

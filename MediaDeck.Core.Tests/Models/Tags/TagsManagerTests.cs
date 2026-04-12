@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Composition.Interfaces.Tags;
-using MediaDeck.Core.Models.FileDetailManagers;
+using MediaDeck.Core.Models.Tags;
 using MediaDeck.Database;
 using MediaDeck.Database.Tables;
 using Microsoft.EntityFrameworkCore;
@@ -15,7 +15,7 @@ using R3;
 using Shouldly;
 using Xunit;
 
-namespace MediaDeck.Core.Tests.Models.FileDetailManagers;
+namespace MediaDeck.Core.Tests.Models.Tags;
 
 public class TagsManagerTests {
 	private IDbContextFactory<MediaDeckDbContext> CreateInMemoryDbFactory(string dbName) {

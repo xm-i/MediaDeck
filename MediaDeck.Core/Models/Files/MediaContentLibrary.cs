@@ -3,8 +3,8 @@ using System.Diagnostics;
 using MediaDeck.Common.Base;
 using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
+using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Composition.Stores.State.Model;
-using MediaDeck.Core.Models.FileDetailManagers;
 using MediaDeck.Core.Models.Files.Loaders;
 using MediaDeck.Core.Models.Files.SearchConditions;
 using MediaDeck.Core.Models.NotificationDispatcher;
@@ -15,7 +15,7 @@ namespace MediaDeck.Core.Models.Files;
 
 [Inject(InjectServiceLifetime.Singleton)]
 public class MediaContentLibrary : ModelBase {
-	public MediaContentLibrary(FilesLoader filesLoader, SearchConditionNotificationDispatcher searchConditionNotificationDispatcher, TagsManager tagsManager, FolderRepository folderRepository, StateModel states) {
+	public MediaContentLibrary(FilesLoader filesLoader, SearchConditionNotificationDispatcher searchConditionNotificationDispatcher, ITagsManager tagsManager, FolderRepository folderRepository, StateModel states) {
 		this._filesLoader = filesLoader;
 		this.SearchConditions.ObserveChanged().ThrottleLast(TimeSpan.FromMilliseconds(100)).Subscribe(async _ => await this.SearchAsync());
 		tagsManager.Load().Wait();

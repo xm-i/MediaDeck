@@ -12,7 +12,7 @@ namespace MediaDeck.Core.Models.FileDetailManagers;
 [Inject(InjectServiceLifetime.Transient)]
 public class DetailSelectorModel : IDisposable {
 	private readonly SerialDisposable _propertyChangedSubscription = new();
-	private readonly TagsManager _tagsManager;
+	private readonly ITagsManager _tagsManager;
 	private readonly ObservableList<ValueCountPair<ITagModel>> _tags = [];
 
 	/// <summary>
@@ -34,7 +34,7 @@ public class DetailSelectorModel : IDisposable {
 	/// <summary>
 	/// TagsManagerへのアクセス
 	/// </summary>
-	public TagsManager TagsManager {
+	public ITagsManager TagsManager {
 		get {
 			return this._tagsManager;
 		}
@@ -93,7 +93,7 @@ public class DetailSelectorModel : IDisposable {
 		get;
 	} = new(string.Empty);
 
-	public DetailSelectorModel(TagsManager tagsManager) {
+	public DetailSelectorModel(ITagsManager tagsManager) {
 		this._tagsManager = tagsManager;
 	}
 

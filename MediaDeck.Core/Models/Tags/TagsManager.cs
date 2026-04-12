@@ -1,14 +1,12 @@
-using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Composition.Interfaces.Tags;
-using MediaDeck.Core.Models.Tags;
 using MediaDeck.Database;
 using MediaDeck.Database.Tables;
 
-namespace MediaDeck.Core.Models.FileDetailManagers;
+namespace MediaDeck.Core.Models.Tags;
 
-[Inject(InjectServiceLifetime.Singleton)]
-public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagModelFactory tagModelFactory) {
+[Inject(InjectServiceLifetime.Singleton, typeof(ITagsManager))]
+public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagModelFactory tagModelFactory) : ITagsManager {
 	private readonly IDbContextFactory<MediaDeckDbContext> _dbFactory = dbFactory;
 	private readonly ITagModelFactory _tagModelFactory = tagModelFactory;
 

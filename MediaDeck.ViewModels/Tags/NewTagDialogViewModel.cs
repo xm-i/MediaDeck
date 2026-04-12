@@ -1,13 +1,12 @@
 using MediaDeck.Common.Base;
 using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Interfaces.Tags;
-using MediaDeck.Core.Models.FileDetailManagers;
 
 namespace MediaDeck.ViewModels.Tags;
 
 [Inject(InjectServiceLifetime.Transient)]
 public class NewTagDialogViewModel : ViewModelBase {
-	public NewTagDialogViewModel(TagsManager tagsManager) {
+	public NewTagDialogViewModel(ITagsManager tagsManager) {
 		this.TagCategories = tagsManager.TagCategories.ToArray();
 		this.SelectedCategory.Value = this.TagCategories.FirstOrDefault();
 		this.ConfirmCommand.Subscribe(async _ => {

@@ -1,7 +1,6 @@
 using MediaDeck.Common.Base;
 using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Interfaces.Tags;
-using MediaDeck.Core.Models.FileDetailManagers;
 using MediaDeck.Core.Models.Tags;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -9,7 +8,7 @@ namespace MediaDeck.ViewModels.Tags;
 
 [Inject(InjectServiceLifetime.Transient)]
 public class TagManagerViewModel : ViewModelBase {
-	public TagManagerViewModel(TagsManager tagsManager, ITagModelFactory tagModelFactory) {
+	public TagManagerViewModel(ITagsManager tagsManager, ITagModelFactory tagModelFactory) {
 		this._tagCategories = tagsManager.TagCategories.CreateView(x => new TagCategoryViewModel(x, tagsManager, tagModelFactory));
 		this.TagCategories = this._tagCategories.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
 		this.LoadCommand.Subscribe(async _ => await tagsManager.Load());
