@@ -33,12 +33,12 @@ public class DetailSelectorViewModel : ViewModelBase {
 		this._model.AddTo(this.CompositeDisposable);
 
 		this.TagCandidates = model.TagModels.CreateView(x => {
-			var categoryViewModel = this._categoryViewModels.GetOrAdd(x.TagCategoryId, _ => new TagCategoryViewModel(x.TagCategory, model.TagsManager, tagModelFactory));
+			var categoryViewModel = this.GetCategoryViewModel(x.TagCategory, model.TagsManager, tagModelFactory);
 			return new TagViewModel(categoryViewModel, x, model.TagsManager, tagModelFactory);
 		});
 		this.FilteredTagCandidates = this.TagCandidates.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current).AddTo(this.CompositeDisposable);
 		this.Tags = model.Tags.CreateView(x => {
-			var categoryViewModel = this._categoryViewModels.GetOrAdd(x.Value.TagCategoryId, _ => new TagCategoryViewModel(x.Value.TagCategory, model.TagsManager, tagModelFactory));
+			var categoryViewModel = this.GetCategoryViewModel(x.Value.TagCategory, model.TagsManager, tagModelFactory);
 			return new ValueCountPair<TagViewModel>(new TagViewModel(categoryViewModel, x.Value, model.TagsManager, tagModelFactory), x.Count);
 		})
 			.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current).AddTo(this.CompositeDisposable);
@@ -181,5 +181,12 @@ public class DetailSelectorViewModel : ViewModelBase {
 		this.TagCandidates.AttachFilter(x => {
 			return DetailSelectorModel.MatchesTagFilter(x, this.Text.Value, out _);
 		});
+	}
+
+	private TagCategoryViewModel GetCategoryViewModel(ITagCategoryModel? category, ITagsManager tagsManager, ITagModelFactory factory) {
+		// ConcurrentDictionaryのキーはnotnull制約があるため、IDがnull(未設定)の場合は-1をキーとして使用します。
+		// このマジックナンバーはキャッシュ管理のためだけに内部で使用され、外部（モデルやUI）には影響しません。
+		var key = category?.TagCategoryId ?? int.MinValue;
+		return this._categoryViewModels.GetOrAdd(key, _ => new TagCategoryViewModel(category, tagsManager, factory));
 	}
 }

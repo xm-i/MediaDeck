@@ -20,7 +20,7 @@ public interface ITagModel {
 	/// <summary>
 	/// タグカテゴリーID
 	/// </summary>
-	public int TagCategoryId {
+	public int? TagCategoryId {
 		get;
 		set;
 	}
@@ -28,7 +28,7 @@ public interface ITagModel {
 	/// <summary>
 	/// タグカテゴリー
 	/// </summary>
-	public ITagCategoryModel TagCategory {
+	public ITagCategoryModel? TagCategory {
 		get;
 		set;
 	}

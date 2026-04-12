@@ -36,7 +36,7 @@ public interface ITagsManager {
 	/// <param name="detail">詳細</param>
 	/// <param name="aliases">別名リスト</param>
 	/// <returns>作成されたタグ</returns>
-	public Task<ITagModel?> CreateTagAsync(int tagCategoryId, string tagName, string detail, IEnumerable<ITagAliasModel> aliases);
+	public Task<ITagModel?> CreateTagAsync(int? tagCategoryId, string tagName, string detail, IEnumerable<ITagAliasModel> aliases);
 
 	/// <summary>
 	/// ファイルにタグを追加する
@@ -63,7 +63,7 @@ public interface ITagsManager {
 	/// <param name="detail">詳細</param>
 	/// <param name="aliases">別名リスト</param>
 	/// <returns>タスク</returns>
-	public Task UpdateTagAsync(int tagId, int tagCategoryId, string tagName, string detail, IEnumerable<ITagAliasModel> aliases);
+	public Task UpdateTagAsync(int tagId, int? tagCategoryId, string tagName, string detail, IEnumerable<ITagAliasModel> aliases);
 
 	/// <summary>
 	/// タグカテゴリーを更新または作成する

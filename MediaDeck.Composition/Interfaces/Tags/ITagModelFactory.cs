@@ -15,7 +15,7 @@ public interface ITagModelFactory {
 	/// <summary>
 	/// タグカテゴリーモデルを作成します。
 	/// </summary>
-	public ITagCategoryModel CreateCategory(TagCategory tagCategory);
+	public ITagCategoryModel CreateCategory(TagCategory? tagCategory);
 
 	/// <summary>
 	/// 新しいタグカテゴリーモデルを作成します。

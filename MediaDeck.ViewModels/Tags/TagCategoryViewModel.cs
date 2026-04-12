@@ -8,18 +8,18 @@ using MediaDeck.Database.Tables;
 namespace MediaDeck.ViewModels.Tags;
 
 public class TagCategoryViewModel {
-	public TagCategoryViewModel(ITagCategoryModel tagCategory, ITagsManager tagsManager, ITagModelFactory tagModelFactory) {
+	public TagCategoryViewModel(ITagCategoryModel? tagCategory, ITagsManager tagsManager, ITagModelFactory tagModelFactory) {
 		this.Model = tagCategory;
-		this.TagCategoryId = tagCategory.TagCategoryId;
-		this.TagCategoryName.Value = tagCategory.TagCategoryName;
-		this.Detail.Value = tagCategory.Detail;
-		this.Tags = tagCategory.Tags.CreateView(x => new TagViewModel(this, x, tagsManager, tagModelFactory));
+		this.TagCategoryId = tagCategory?.TagCategoryId;
+		this.TagCategoryName.Value = tagCategory?.TagCategoryName ?? "未設定";
+		this.Detail.Value = tagCategory?.Detail ?? "カテゴリーが設定されていないタグ";
+		this.Tags = tagCategory!.Tags.CreateView(x => new TagViewModel(this, x, tagsManager, tagModelFactory));
 		this.FilteredTags = this.Tags.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
 
 		this.UpdateTagCategoryCommand = this.TagCategoryName.CombineLatest(this.Detail, (x, y) => !string.IsNullOrWhiteSpace(x) && !string.IsNullOrWhiteSpace(y)).ToReactiveCommand();
 		this.UpdateTagCategoryCommand.Subscribe(async _ => {
-			if (tagCategory.TagCategoryId != -1) {
-				await tagsManager.UpdateTagCategoryAsync(tagCategory.TagCategoryId,
+			if (tagCategory?.TagCategoryId.HasValue ?? false) {
+				await tagsManager.UpdateTagCategoryAsync(tagCategory.TagCategoryId.Value,
 					this.TagCategoryName.Value,
 					this.Detail.Value);
 			}
@@ -34,11 +34,11 @@ public class TagCategoryViewModel {
 			});
 	}
 
-	public ITagCategoryModel Model {
+	public ITagCategoryModel? Model {
 		get;
 	}
 
-	public int TagCategoryId {
+	public int? TagCategoryId {
 		get;
 	}
 

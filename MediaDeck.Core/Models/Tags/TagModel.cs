@@ -23,20 +23,22 @@ public class TagModel : ITagModel {
 	private string? _detail;
 	private string? _romaji;
 	private List<ITagAliasModel>? _tagAliases;
+	private bool _isInitialized;
 
 	public TagModel() {
 	}
 
-	[MemberNotNull(nameof(_tagId), nameof(_tagCategoryId), nameof(_tagCategory), nameof(_tagName), nameof(_detail), nameof(_romaji), nameof(_tagAliases))]
+	[MemberNotNull(nameof(_tagId), nameof(_tagName), nameof(_detail), nameof(_romaji), nameof(_tagAliases))]
 	public void Initialize(Tag tag, ITagCategoryModel? category, ITagModelFactory factory) {
-		this.TagId = tag.TagId;
-		this.TagCategoryId = tag.TagCategoryId;
-		this.TagCategory = category ?? factory.CreateCategory(tag.TagCategory);
-		this.TagName = tag.TagName;
-		this.Detail = tag.Detail;
-		this.Romaji = tag.TagName.KatakanaToHiragana().HiraganaToRomaji();
+		this._tagId = tag.TagId;
+		this._tagCategoryId = tag.TagCategoryId;
+		this._tagCategory = category ?? factory.CreateCategory(tag.TagCategory);
+		this._tagName = tag.TagName;
+		this._detail = tag.Detail;
+		this._romaji = tag.TagName.KatakanaToHiragana().HiraganaToRomaji();
 		this.UsageCount.Value = tag.MediaFileTags.Count;
-		this.TagAliases = [.. tag.TagAliases.Select(factory.CreateAlias)];
+		this._tagAliases = [.. tag.TagAliases.Select(factory.CreateAlias)];
+		this._isInitialized = true;
 	}
 
 	/// <summary>
@@ -50,34 +52,41 @@ public class TagModel : ITagModel {
 		[MemberNotNull(nameof(_tagId))]
 		set {
 			this._tagId = value;
+			this._isInitialized = true;
 		}
 	}
 
 	/// <summary>
 	/// タグカテゴリーID
 	/// </summary>
-	public int TagCategoryId {
+	public int? TagCategoryId {
 		get {
-			return this._tagCategoryId ?? throw new InvalidOperationException($"{nameof(this.TagCategoryId)} is not initialized.");
+			if (!this._isInitialized) {
+				throw new InvalidOperationException($"{nameof(this.TagCategoryId)} is not initialized.");
+			}
+			return this._tagCategoryId;
 		}
 
-		[MemberNotNull(nameof(_tagCategoryId))]
 		set {
 			this._tagCategoryId = value;
+			this._isInitialized = true;
 		}
 	}
 
 	/// <summary>
 	/// タグカテゴリー
 	/// </summary>
-	public ITagCategoryModel TagCategory {
+	public ITagCategoryModel? TagCategory {
 		get {
-			return this._tagCategory ?? throw new InvalidOperationException($"{nameof(this.TagCategory)} is not initialized.");
+			if (!this._isInitialized) {
+				throw new InvalidOperationException($"{nameof(this.TagCategory)} is not initialized.");
+			}
+			return this._tagCategory;
 		}
 
-		[MemberNotNull(nameof(_tagCategory))]
 		set {
 			this._tagCategory = value;
+			this._isInitialized = true;
 		}
 	}
 
@@ -92,6 +101,7 @@ public class TagModel : ITagModel {
 		[MemberNotNull(nameof(_tagName))]
 		set {
 			this._tagName = value;
+			this._isInitialized = true;
 		}
 	}
 
@@ -106,6 +116,7 @@ public class TagModel : ITagModel {
 		[MemberNotNull(nameof(_detail))]
 		set {
 			this._detail = value;
+			this._isInitialized = true;
 		}
 	}
 
@@ -120,6 +131,7 @@ public class TagModel : ITagModel {
 		[MemberNotNull(nameof(_romaji))]
 		set {
 			this._romaji = value;
+			this._isInitialized = true;
 		}
 	}
 
@@ -134,6 +146,7 @@ public class TagModel : ITagModel {
 		[MemberNotNull(nameof(_tagAliases))]
 		set {
 			this._tagAliases = value;
+			this._isInitialized = true;
 		}
 	}
 

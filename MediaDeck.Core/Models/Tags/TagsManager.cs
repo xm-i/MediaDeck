@@ -23,7 +23,7 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 		return tag;
 	}
 
-	public async Task<ITagModel?> CreateTagAsync(int tagCategoryId, string tagName, string detail, IEnumerable<ITagAliasModel> aliases) {
+	public async Task<ITagModel?> CreateTagAsync(int? tagCategoryId, string tagName, string detail, IEnumerable<ITagAliasModel> aliases) {
 		await using var db = await this._dbFactory.CreateDbContextAsync();
 		using var transaction = await db.Database.BeginTransactionAsync();
 		var tag = new Tag {
@@ -31,7 +31,7 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 			TagName = tagName,
 			Detail = detail,
 			TagAliases = [],
-			TagCategory = null!
+			TagCategory = null
 		};
 		await db.AddAsync(tag);
 		await db.SaveChangesAsync();
@@ -103,7 +103,7 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 		}
 	}
 
-	public async Task UpdateTagAsync(int tagId, int tagCategoryId, string tagName, string detail, IEnumerable<ITagAliasModel> aliases) {
+	public async Task UpdateTagAsync(int tagId, int? tagCategoryId, string tagName, string detail, IEnumerable<ITagAliasModel> aliases) {
 		await using var db = await this._dbFactory.CreateDbContextAsync();
 		using var transaction = await db.Database.BeginTransactionAsync();
 		var tag = await db.Tags.FirstAsync(x => x.TagId == tagId);
@@ -151,6 +151,15 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 					.ThenInclude(x => x.MediaFileTags)
 					.ToArrayAsync();
 
+		var noCategoryTags =
+			await
+				db.Tags
+					.AsSplitQuery()
+					.Where(x => x.TagCategoryId == null)
+					.Include(x => x.TagAliases)
+					.Include(x => x.MediaFileTags)
+					.ToArrayAsync();
+
 		this.TagCategories.Clear();
 		this.Tags.Clear();
 
@@ -158,6 +167,13 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 			var categoryModel = this._tagModelFactory.CreateCategory(categoryEntity);
 			this.TagCategories.Add(categoryModel);
 			this.Tags.AddRange(categoryModel.Tags);
+		}
+
+		if (noCategoryTags.Length > 0) {
+			var noCategoryModel = this._tagModelFactory.CreateCategory(null);
+			noCategoryModel.Tags.AddRange(noCategoryTags.Select(t => this._tagModelFactory.Create(t, noCategoryModel)));
+			this.TagCategories.Add(noCategoryModel);
+			this.Tags.AddRange(noCategoryModel.Tags);
 		}
 
 		// TagsをMediaFileTagsのカウント順に並び替え

@@ -44,7 +44,6 @@ public partial class App {
 		var dbFactory = Ioc.Default.GetRequiredService<IDbContextFactory<MediaDeckDbContext>>();
 		using (var db = dbFactory.CreateDbContext()) {
 			db.Database.EnsureCreated();
-			InitialDataRegisterer.Register(db);
 		}
 
 		this._configStore = Ioc.Default.GetRequiredService<IConfigStore>();

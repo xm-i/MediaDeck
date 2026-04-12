@@ -13,7 +13,7 @@ public interface ITagCategoryModel {
 	/// <summary>
 	/// タグカテゴリーID
 	/// </summary>
-	public int TagCategoryId {
+	public int? TagCategoryId {
 		get;
 		set;
 	}
@@ -41,5 +41,5 @@ public interface ITagCategoryModel {
 		get;
 	}
 
-	public void Initialize(TagCategory tagCategory, ITagModelFactory factory);
+	public void Initialize(TagCategory? tagCategory, ITagModelFactory factory);
 }

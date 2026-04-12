@@ -19,6 +19,7 @@ public class TagCategoryModel : ITagCategoryModel {
 	private string? _tagCategoryName;
 	private string? _detail;
 	private ObservableList<ITagModel>? _tags;
+	private bool _isInitialized;
 
 	public TagCategoryModel() {
 	}
@@ -29,26 +30,37 @@ public class TagCategoryModel : ITagCategoryModel {
 		}
 	}
 
-	[MemberNotNull(nameof(_tagCategoryId), nameof(_tagCategoryName), nameof(_detail))]
-	public void Initialize(TagCategory tagCategory, ITagModelFactory factory) {
-		this.TagCategoryId = tagCategory.TagCategoryId;
-		this.TagCategoryName = tagCategory.TagCategoryName;
-		this.Detail = tagCategory.Detail;
-		this.Tags.Clear();
-		this.Tags.AddRange(tagCategory.Tags.OrderByDescending(x => x.MediaFileTags.Count).Select(t => factory.Create(t, this)));
+	[MemberNotNull(nameof(_tagCategoryName), nameof(_detail))]
+	public void Initialize(TagCategory? tagCategory, ITagModelFactory factory) {
+		if (tagCategory != null) {
+			this._tagCategoryId = tagCategory.TagCategoryId;
+			this._tagCategoryName = tagCategory.TagCategoryName;
+			this._detail = tagCategory.Detail;
+			this.Tags.Clear();
+			this.Tags.AddRange(tagCategory.Tags.OrderByDescending(x => x.MediaFileTags.Count).Select(t => factory.Create(t, this)));
+		} else {
+			this._tagCategoryId = null;
+			this._tagCategoryName = "未設定";
+			this._detail = "カテゴリーが設定されていないタグ";
+			this.Tags.Clear();
+		}
+		this._isInitialized = true;
 	}
 
 	/// <summary>
 	/// タグカテゴリーID
 	/// </summary>
-	public int TagCategoryId {
+	public int? TagCategoryId {
 		get {
-			return this._tagCategoryId ?? throw new InvalidOperationException($"{nameof(this.TagCategoryId)} is not initialized.");
+			if (!this._isInitialized) {
+				throw new InvalidOperationException($"{nameof(this.TagCategoryId)} is not initialized.");
+			}
+			return this._tagCategoryId;
 		}
 
-		[MemberNotNull(nameof(_tagCategoryId))]
 		set {
 			this._tagCategoryId = value;
+			this._isInitialized = true;
 		}
 	}
 
@@ -63,6 +75,7 @@ public class TagCategoryModel : ITagCategoryModel {
 		[MemberNotNull(nameof(_tagCategoryName))]
 		set {
 			this._tagCategoryName = value;
+			this._isInitialized = true;
 		}
 	}
 
@@ -77,6 +90,7 @@ public class TagCategoryModel : ITagCategoryModel {
 		[MemberNotNull(nameof(_detail))]
 		set {
 			this._detail = value;
+			this._isInitialized = true;
 		}
 	}
 }

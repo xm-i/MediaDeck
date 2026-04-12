@@ -229,8 +229,10 @@ public class MediaDeckDbContext(DbContextOptions dbContextOptions) : DbContext(d
 
 		modelBuilder.Entity<TagCategory>()
 			.HasMany(tc => tc.Tags)
-			.WithOne(t => t.TagCategory)
-			.OnDelete(DeleteBehavior.Cascade);
+			.WithOne(t => t.TagCategory!)
+			.HasForeignKey(t => t.TagCategoryId)
+			.IsRequired(false)
+			.OnDelete(DeleteBehavior.SetNull);
 
 		modelBuilder.Entity<Jpeg>()
 			.HasOne(j => j.MediaFile)

@@ -25,7 +25,7 @@ public class TagModelFactory(IServiceProvider serviceProvider)
 	/// <summary>
 	/// タグカテゴリーモデルを作成します。
 	/// </summary>
-	public ITagCategoryModel CreateCategory(TagCategory tagCategory) {
+	public ITagCategoryModel CreateCategory(TagCategory? tagCategory) {
 		var model = this._serviceProvider.GetRequiredService<ITagCategoryModel>();
 		model.Initialize(tagCategory, this);
 		return model;
