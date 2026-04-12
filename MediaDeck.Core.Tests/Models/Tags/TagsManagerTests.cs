@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Core.Models.Tags;
@@ -13,7 +8,6 @@ using Moq;
 using ObservableCollections;
 using R3;
 using Shouldly;
-using Xunit;
 
 namespace MediaDeck.Core.Tests.Models.Tags;
 
@@ -35,39 +29,58 @@ public class TagsManagerTests {
 		await using var db = await dbFactory.CreateDbContextAsync();
 		db.TagCategories.Add(new TagCategory { TagCategoryId = 1, TagCategoryName = "Category1", Detail = "CatDetail1", Tags = [] });
 		db.TagCategories.Add(new TagCategory { TagCategoryId = 2, TagCategoryName = "Category2", Detail = "CatDetail2", Tags = [] });
-		db.Tags.Add(new Tag { TagId = 1, TagCategoryId = 1, TagName = "Tag1", Detail = "Detail1", TagCategory = null! });
-		db.Tags.Add(new Tag { TagId = 2, TagCategoryId = 1, TagName = "Tag2", Detail = "Detail2", TagCategory = null! });
+		db.Tags.Add(new Tag { TagId = 1, TagCategoryId = 1, TagName = "Tag1", Detail = "Detail1", TagCategory = null!, MediaFileTags = [], TagAliases = [] });
+		db.Tags.Add(new Tag { TagId = 2, TagCategoryId = 1, TagName = "Tag2", Detail = "Detail2", TagCategory = null!, MediaFileTags = [], TagAliases = [] });
 		db.TagAliases.Add(new TagAlias { TagId = 1, TagAliasId = 1, Alias = "Alias1" });
 		await db.SaveChangesAsync();
 	}
 
 	private void SetupFactoryMock(Mock<ITagModelFactory> mock) {
-		mock.Setup(f => f.CreateCategory(It.IsAny<TagCategory>())).Returns((TagCategory c) => {
+		mock.Setup(f => f.CreateCategory(It.IsAny<TagCategory?>())).Returns((TagCategory? c) => {
 			var m = new Mock<ITagCategoryModel>();
-			m.SetupGet(x => x.TagCategoryId).Returns(c.TagCategoryId);
-			// 簡易的に、カテゴリ内のタグをモデルに変換して返す（実際のLoadの挙動を模倣）
-			var tagModels = c.Tags.Select(t => {
-				var tm = new Mock<ITagModel>();
-				tm.SetupGet(x => x.TagId).Returns(t.TagId);
-				tm.SetupGet(x => x.TagName).Returns(t.TagName);
-				tm.SetupGet(x => x.UsageCount).Returns(new ReactiveProperty<int>(t.MediaFileTags?.Count ?? 0));
-				return tm.Object;
-			}).ToList();
-			m.SetupGet(x => x.Tags).Returns(new ObservableList<ITagModel>(tagModels));
+			if (c != null) {
+				m.SetupGet(x => x.TagCategoryId).Returns(c.TagCategoryId);
+				m.SetupGet(x => x.TagCategoryName).Returns(c.TagCategoryName);
+				// 簡易的に、カテゴリ内のタグをモデルに変換して返す（実際のLoadの挙動を模倣）
+				var tagModels = c.Tags.Select(t => {
+					var tm = new Mock<ITagModel>();
+					tm.SetupGet(x => x.TagId).Returns(t.TagId);
+					tm.SetupGet(x => x.TagName).Returns(t.TagName);
+					int usageCount = 0;
+					try {
+						usageCount = t.MediaFileTags?.Count ?? 0;
+					} catch (InvalidOperationException) { }
+					tm.SetupGet(x => x.UsageCount).Returns(new ReactiveProperty<int>(usageCount));
+					return tm.Object;
+				}).ToList();
+				m.SetupGet(x => x.Tags).Returns(new ObservableList<ITagModel>(tagModels));
+			} else {
+				m.SetupGet(x => x.TagCategoryId).Returns((int?)null);
+				m.SetupGet(x => x.TagCategoryName).Returns("未設定");
+				m.SetupGet(x => x.Tags).Returns([]);
+			}
 			return m.Object;
 		});
 		mock.Setup(f => f.Create(It.IsAny<Tag>(), It.IsAny<ITagCategoryModel>())).Returns((Tag t, ITagCategoryModel? c) => {
 			var m = new Mock<ITagModel>();
 			m.SetupGet(x => x.TagId).Returns(t.TagId);
 			m.SetupGet(x => x.TagName).Returns(t.TagName);
-			m.SetupGet(x => x.UsageCount).Returns(new ReactiveProperty<int>(t.MediaFileTags?.Count ?? 0));
+			int usageCount = 0;
+			try {
+				usageCount = t.MediaFileTags?.Count ?? 0;
+			} catch (InvalidOperationException) { }
+			m.SetupGet(x => x.UsageCount).Returns(new ReactiveProperty<int>(usageCount));
 			return m.Object;
 		});
 		mock.Setup(f => f.Create(It.IsAny<Tag>(), It.IsAny<ITagCategoryModel>())).Returns((Tag t, ITagCategoryModel c) => {
 			var m = new Mock<ITagModel>();
 			m.SetupGet(x => x.TagId).Returns(t.TagId);
 			m.SetupGet(x => x.TagName).Returns(t.TagName);
-			m.SetupGet(x => x.UsageCount).Returns(new ReactiveProperty<int>(t.MediaFileTags?.Count ?? 0));
+			int usageCount = 0;
+			try {
+				usageCount = t.MediaFileTags?.Count ?? 0;
+			} catch (InvalidOperationException) { }
+			m.SetupGet(x => x.UsageCount).Returns(new ReactiveProperty<int>(usageCount));
 			return m.Object;
 		});
 	}
@@ -149,7 +162,7 @@ public class TagsManagerTests {
 		fileModelMock.SetupGet(x => x.Tags).Returns(fileTags);
 		await using (var dbSetup = await dbFactory.CreateDbContextAsync()) {
 			dbSetup.MediaFiles.Add(new MediaFile { MediaFileId = 100, FilePath = "test", DirectoryPath = "dir", Description = "" });
-			dbSetup.Tags.Add(new Tag { TagId = 99, TagName = "Tag99", Detail = "", TagCategory = null! });
+			dbSetup.Tags.Add(new Tag { TagId = 99, TagName = "Tag99", Detail = "", TagCategory = null!, MediaFileTags = [], TagAliases = [] });
 			await dbSetup.SaveChangesAsync();
 		}
 		await manager.AddTagAsync([fileModelMock.Object], tagMock.Object);
@@ -211,7 +224,7 @@ public class TagsManagerTests {
 		fileModelMock.SetupGet(x => x.Tags).Returns(fileTags);
 		await using (var dbSetup = await dbFactory.CreateDbContextAsync()) {
 			dbSetup.MediaFiles.Add(new MediaFile { MediaFileId = 100, FilePath = "test2", DirectoryPath = "dir", Description = "" });
-			dbSetup.Tags.Add(new Tag { TagId = 99, TagName = "Tag99", Detail = "", TagCategory = null! });
+			dbSetup.Tags.Add(new Tag { TagId = 99, TagName = "Tag99", Detail = "", TagCategory = null!, MediaFileTags = [], TagAliases = [] });
 			dbSetup.MediaFileTags.Add(new MediaFileTag { MediaFileId = 100, TagId = 99 });
 			await dbSetup.SaveChangesAsync();
 		}
@@ -314,7 +327,7 @@ public class TagsManagerTests {
 		this.SetupFactoryMock(tagModelFactoryMock);
 		var manager = new TagsManager(dbFactory, tagModelFactoryMock.Object);
 		await manager.Load();
-		manager.TagCategories.Count.ShouldBe(2);
+		manager.TagCategories.Count.ShouldBe(3); // +1 Virtual Category for No Category tags
 		manager.Tags.Count.ShouldBe(2);
 	}
 }

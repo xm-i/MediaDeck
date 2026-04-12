@@ -46,8 +46,11 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 
 		await transaction.CommitAsync();
 
-		await this.Load();
-		return this.Tags.FirstOrDefault(x => x.TagId == tag.TagId);
+		var categoryModel = this.TagCategories.FirstOrDefault(x => x.TagCategoryId == tagCategoryId);
+		var newTagModel = this._tagModelFactory.Create(tag, categoryModel);
+		categoryModel?.Tags.Add(newTagModel);
+		this.Tags.Add(newTagModel);
+		return newTagModel;
 	}
 
 	public async Task AddTagAsync(IFileModel[] fileModels, ITagModel tag) {
@@ -117,8 +120,6 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 
 		await db.SaveChangesAsync();
 		await transaction.CommitAsync();
-
-		await this.Load();
 	}
 
 	public async Task UpdateTagCategoryAsync(int tagCategoryId, string tagCategoryName, string detail) {
@@ -135,8 +136,6 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 		}
 		await db.SaveChangesAsync();
 		await transaction.CommitAsync();
-
-		await this.Load();
 	}
 
 	public async Task Load() {
@@ -149,6 +148,7 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 					.ThenInclude(x => x.TagAliases)
 					.Include(x => x.Tags)
 					.ThenInclude(x => x.MediaFileTags)
+					.OrderBy(x => x.TagCategoryId)
 					.ToArrayAsync();
 
 		var noCategoryTags =
@@ -158,27 +158,28 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 					.Where(x => x.TagCategoryId == null)
 					.Include(x => x.TagAliases)
 					.Include(x => x.MediaFileTags)
+					.OrderByDescending(x => x.MediaFileTags.Count)
 					.ToArrayAsync();
 
 		this.TagCategories.Clear();
 		this.Tags.Clear();
 
+		var tags = new List<ITagModel>();
+
+		var noCategoryModel = this._tagModelFactory.CreateCategory(null);
+		noCategoryModel.Tags.AddRange(noCategoryTags.Select(t => this._tagModelFactory.Create(t, noCategoryModel)).OrderByDescending(x => x.UsageCount.Value));
+		this.TagCategories.Add(noCategoryModel);
+		tags.AddRange(noCategoryModel.Tags);
+
 		foreach (var categoryEntity in tagCategories) {
 			var categoryModel = this._tagModelFactory.CreateCategory(categoryEntity);
+			var list = categoryModel.Tags.OrderByDescending(x => x.UsageCount.Value).ToArray();
+			categoryModel.Tags.Clear();
+			categoryModel.Tags.AddRange(list);
 			this.TagCategories.Add(categoryModel);
-			this.Tags.AddRange(categoryModel.Tags);
+			tags.AddRange(categoryModel.Tags);
 		}
 
-		if (noCategoryTags.Length > 0) {
-			var noCategoryModel = this._tagModelFactory.CreateCategory(null);
-			noCategoryModel.Tags.AddRange(noCategoryTags.Select(t => this._tagModelFactory.Create(t, noCategoryModel)));
-			this.TagCategories.Add(noCategoryModel);
-			this.Tags.AddRange(noCategoryModel.Tags);
-		}
-
-		// TagsをMediaFileTagsのカウント順に並び替え
-		var sortedTags = this.Tags.OrderByDescending(x => x.UsageCount.Value).ThenBy(x => x.TagName).ToArray();
-		this.Tags.Clear();
-		this.Tags.AddRange(sortedTags);
+		this.Tags.AddRange(tags);
 	}
 }

@@ -1,22 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Core.Models.FileDetailManagers;
-using MediaDeck.Core.Models.FileDetailManagers.Objects;
 using MediaDeck.Core.Models.Tags;
-using MediaDeck.Core.Primitives;
 using MediaDeck.Database;
 using MediaDeck.Database.Tables;
 using Microsoft.EntityFrameworkCore;
 using Moq;
-using ObservableCollections;
 using R3;
 using Shouldly;
-using Xunit;
 
 namespace MediaDeck.Core.Tests.Models.FileDetailManagers;
 
@@ -40,6 +31,13 @@ public class DetailSelectorModelTests {
 				db.Database.EnsureCreated();
 				return db;
 			});
+
+		tagModelFactoryMock.Setup(x => x.CreateCategory(It.IsAny<TagCategory?>())).Returns((TagCategory? c) => {
+			var m = new Mock<ITagCategoryModel>();
+			m.SetupGet(x => x.TagCategoryId).Returns(c?.TagCategoryId);
+			m.SetupGet(x => x.Tags).Returns([]);
+			return m.Object;
+		});
 
 		return new TagsManager(dbFactoryMock.Object, tagModelFactoryMock.Object);
 	}
