@@ -1,7 +1,6 @@
 using System.Runtime.CompilerServices;
 using MediaDeck.Core.Models.Repositories;
 using Shouldly;
-using Xunit;
 
 namespace MediaDeck.Core.Tests.Models.Repositories;
 

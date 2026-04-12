@@ -1,8 +1,6 @@
 using MediaDeck.Common.Base;
 using MediaDeck.Common.Extensions;
-using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Interfaces.Tags;
-using MediaDeck.Core.Models.Tags;
 
 namespace MediaDeck.ViewModels.Tags;
 

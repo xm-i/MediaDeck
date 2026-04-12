@@ -4,8 +4,6 @@ using MediaDeck.Database;
 using MediaDeck.Database.Tables;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
-using Moq;
-using Xunit;
 using Xunit.Abstractions;
 
 namespace MediaDeck.Core.Tests.Models.Services;

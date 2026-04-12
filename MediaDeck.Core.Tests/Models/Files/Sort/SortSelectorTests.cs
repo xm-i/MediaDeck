@@ -1,11 +1,9 @@
 using System.ComponentModel;
 using MediaDeck.Composition.Enum;
-using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Composition.Stores.State.Model.Objects;
 using MediaDeck.Core.Models.Files.Sort;
 using Microsoft.Extensions.DependencyInjection;
-using Moq;
 
 namespace MediaDeck.Core.Tests.Models.Files.Sort;
 

@@ -1,6 +1,4 @@
-using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Database.Tables;
-using ObservableCollections;
 using R3.JsonConfig.Attributes;
 
 namespace MediaDeck.Composition.Interfaces.Tags;

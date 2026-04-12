@@ -1,8 +1,5 @@
-using System;
-using System.Collections.Generic;
 using MediaDeck.Core.Models.FileDetailManagers.Objects;
 using MediaDeck.Core.Primitives;
-using Xunit;
 
 namespace MediaDeck.Core.Tests.Models.FileDetailManagers.Objects;
 

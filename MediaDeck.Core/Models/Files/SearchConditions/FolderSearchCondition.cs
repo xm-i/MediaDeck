@@ -2,7 +2,6 @@ using System.Linq.Expressions;
 
 using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
-using MediaDeck.Core.Models.Repositories.Objects;
 using MediaDeck.Database.Tables;
 
 using R3.JsonConfig.Attributes;

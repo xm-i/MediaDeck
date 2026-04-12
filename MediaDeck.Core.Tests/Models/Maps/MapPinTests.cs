@@ -1,11 +1,9 @@
-using System;
 using System.Drawing;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Composition.Interfaces.Primitives;
 using MediaDeck.Core.Models.Maps;
 using Moq;
 using Shouldly;
-using Xunit;
 using Rectangle = MediaDeck.Core.Models.Maps.Rectangle;
 
 namespace MediaDeck.Core.Tests.Models.Maps;

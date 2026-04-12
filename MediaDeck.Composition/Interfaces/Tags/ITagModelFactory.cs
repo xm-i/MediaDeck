@@ -1,4 +1,3 @@
-using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Database.Tables;
 
 namespace MediaDeck.Composition.Interfaces.Tags;

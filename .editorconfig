@@ -164,7 +164,7 @@ csharp_style_prefer_top_level_statements = true:silent
 csharp_style_prefer_primary_constructors = true:suggestion
 csharp_style_namespace_declarations = block_scoped:silent
 csharp_prefer_simple_using_statement = true:suggestion
-[*.cs]
+
 #### 命名スタイル ####
 
 # 名前付けルール
@@ -261,3 +261,10 @@ dotnet_naming_style.パスカル_ケース.required_prefix =
 dotnet_naming_style.パスカル_ケース.required_suffix = 
 dotnet_naming_style.パスカル_ケース.word_separator = 
 dotnet_naming_style.パスカル_ケース.capitalization = pascal_case
+
+
+# using整理
+[*.cs]
+dotnet_diagnostic.IDE0005.severity = warning
+[**/SerializerContext/*.cs]
+dotnet_diagnostic.IDE0005.severity = none

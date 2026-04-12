@@ -1,7 +1,5 @@
-using System.IO;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using MediaDeck.Composition.Enum;
-using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Interfaces.FileTypes;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Composition.Interfaces.FileTypes.ViewModels;
@@ -12,7 +10,6 @@ using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Composition.Objects;
 using MediaDeck.Core.Utils;
 using MediaDeck.Database.Tables;
-using MediaDeck.Database.Tables.Metadata;
 using Microsoft.Extensions.DependencyInjection;
 using R3;
 using Shouldly;

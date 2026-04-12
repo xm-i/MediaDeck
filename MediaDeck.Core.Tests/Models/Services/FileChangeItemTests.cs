@@ -1,6 +1,4 @@
-using System;
 using MediaDeck.Core.Models.Services;
-using Xunit;
 
 namespace MediaDeck.Core.Tests.Models.Services;
 

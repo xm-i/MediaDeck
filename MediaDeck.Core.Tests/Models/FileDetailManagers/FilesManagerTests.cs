@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Composition.Objects;
 using MediaDeck.Core.Models.FileDetailManagers;
@@ -13,7 +9,6 @@ using Microsoft.EntityFrameworkCore;
 using Moq;
 using R3;
 using Shouldly;
-using Xunit;
 
 namespace MediaDeck.Core.Tests.Models.FileDetailManagers;
 

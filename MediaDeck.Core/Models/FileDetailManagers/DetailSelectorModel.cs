@@ -1,4 +1,3 @@
-using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Core.Models.FileDetailManagers.Objects;

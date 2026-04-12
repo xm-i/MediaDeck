@@ -1,15 +1,10 @@
-using System;
-using System.IO;
 using System.Runtime.CompilerServices;
-using MediaDeck.Composition.Constants;
 using MediaDeck.Composition.Stores.State.Model;
-using MediaDeck.Core.Stores.State;
 using MediaDeck.Store.State;
 
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Shouldly;
-using Xunit;
 
 namespace MediaDeck.Core.Tests.Stores.State;
 

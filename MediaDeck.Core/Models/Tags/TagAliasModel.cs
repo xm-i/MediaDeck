@@ -1,7 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using MediaDeck.Common.Utilities;
 using MediaDeck.Composition.Interfaces.Tags;
-using MediaDeck.Core.Models.Tags;
 using MediaDeck.Database.Tables;
 using R3.JsonConfig.Attributes;
 

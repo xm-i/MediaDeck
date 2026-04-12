@@ -7,7 +7,6 @@ using MediaDeck.Store.State;
 
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using ObservableCollections;
 
 namespace MediaDeck.Core.Tests.Models.Files.Sort;
 

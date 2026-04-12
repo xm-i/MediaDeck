@@ -1,7 +1,5 @@
-using System;
 using System.Drawing;
 using Shouldly;
-using Xunit;
 using Rectangle = MediaDeck.Core.Models.Maps.Rectangle;
 
 namespace MediaDeck.Core.Tests.Models.Maps;

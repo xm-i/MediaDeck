@@ -1,5 +1,3 @@
-using MediaDeck.Composition.Interfaces.Tags;
-using R3;
 using R3.JsonConfig.Attributes;
 
 namespace MediaDeck.Composition.Interfaces.Tags;
