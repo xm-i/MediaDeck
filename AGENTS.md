@@ -33,11 +33,7 @@
 - **R3/ObservableCollectionsのバインディング (非常に重要)**: `ObservableList<T>` や `ObservableDictionary<K, V>` はそのままでは WinUI 3 の UI にバインドできません。ViewModel では `.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current)` を使用して、UI スレッドへの同期を伴う `INotifyCollectionChangedSynchronizedViewList<T>` 等に変換して公開してください。
 - **コーディングスタイル**: プロジェクトルートの `.editorconfig` に定義されているルールを遵守すること。コードを記述・修正する際は必ずこれらのルールに従うこと。
 - **x:Bind を優先すること**: XAML のデータバインディングでは `{Binding}` ではなく `{x:Bind}` を使用すること。型安全性とパフォーマンスの観点から `{x:Bind}` を優先し、`{Binding}` への安易な変更は禁止する。
+- **作業完了前の検証 (重要)**: 作業を終了する前に、必ず `dotnet build`、`dotnet test`、および `dotnet format` を実行し、ビルドエラー、テスト失敗、フォーマット違反がすべて解消されていることを確認すること。
 
 ## 4. 拡張自動化ワークフローについて
 もし「定型的なビルド手順」「特定のテストの実行手順」「新規機能追加時の雛形作成手順」などをAIに自動で行わせたい場合は、プロジェクトルートに `.agents/workflows/` というディレクトリを作成し、その中に手順を書いたマークダウンファイル（例：`build_step.md`）を配置することができます。
-
----
-
-> 💡 **ユーザーさまへ**
-> このファイルはAIの振る舞いを決定づける重要なファイルです。「ここでは必ずこのクラスを継承する」「こういう書き方はNG」など、プロジェクト固有のルールが増えた場合は、このファイルにどんどん追記してください。追記するほどAIの提案精度が向上します。
