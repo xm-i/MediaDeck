@@ -48,7 +48,7 @@ public class DetailSelectorViewModel : ViewModelBase {
 			.Subscribe(_ => this._model.Refresh(this.TargetFileModels))
 			.AddTo(this.CompositeDisposable);
 
-		this.Rate.SubscribeAwait(async (x, ct) => {
+		this.UpdateRateCommand.SubscribeAwait(async (x, ct) => {
 			if (!double.IsInteger(x) || this.TargetFiles.Value is null) {
 				return;
 			}
@@ -165,6 +165,10 @@ public class DetailSelectorViewModel : ViewModelBase {
 	} = new();
 
 	public ReactiveCommand AddTagCommand {
+		get;
+	} = new();
+
+	public ReactiveCommand<double> UpdateRateCommand{
 		get;
 	} = new();
 

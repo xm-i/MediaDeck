@@ -13,9 +13,10 @@
 			<TextBlock Text="Rating"
 				Style="{ThemeResource CaptionTextBlockStyle}"
 				Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-			<RatingControl Value="{x:Bind ViewModel.Rate.Value, Mode=TwoWay}"
+			<RatingControl Value="{x:Bind ViewModel.Rate.Value, Mode=OneWay}"
 				IsClearEnabled="True"
-				Caption="{x:Bind ViewModel.Rate.Value, Mode=OneWay}" />
+				Caption="{x:Bind ViewModel.Rate.Value, Mode=OneWay}"
+				ValueChanged="RatingControl_ValueChanged"/>
 		</StackPanel>
 
 		<!-- Properties Section -->
