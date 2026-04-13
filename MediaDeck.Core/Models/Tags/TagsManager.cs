@@ -33,6 +33,7 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 			TagName = tagName,
 			Detail = detail,
 			TagAliases = [],
+			MediaFileTags = [],
 			TagCategory = null
 		};
 		await db.AddAsync(tag);
@@ -108,73 +109,95 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 		}
 	}
 
-	public async Task UpdateTagAsync(int tagId, int? tagCategoryId, string tagName, string detail, IEnumerable<ITagAliasModel> aliases) {
+	public async Task SaveAsync() {
 		await using var db = await this._dbFactory.CreateDbContextAsync();
 		using var transaction = await db.Database.BeginTransactionAsync();
-		var tag = await db.Tags.FirstAsync(x => x.TagId == tagId);
-		tag.TagCategoryId = tagCategoryId;
-		tag.TagName = tagName;
-		tag.Detail = detail;
-		db.Tags.Update(tag);
+		try {
+			foreach (var category in this.TagCategories) {
+				int? dbCategoryId = category.TagCategoryId;
 
-		db.TagAliases.RemoveRange(db.TagAliases.Where(x => x.TagId == tagId));
-		await db.TagAliases.AddRangeAsync(aliases.Select((x, i) => new TagAlias { TagId = tagId, TagAliasId = i, Alias = x.Alias, Ruby = x.Ruby }));
+				if (dbCategoryId == null && category.TagCategoryName != "未設定") {
+					// 新規カテゴリーの作成
+					var entity = new TagCategory {
+						TagCategoryName = category.TagCategoryName,
+						Detail = category.Detail,
+						Tags = []
+					};
+					await db.TagCategories.AddAsync(entity);
+					await db.SaveChangesAsync();
+					category.TagCategoryId = entity.TagCategoryId;
+					dbCategoryId = entity.TagCategoryId;
+				} else if (dbCategoryId != null && category.IsDirty) {
+					// 既存カテゴリーの更新
+					var entity = await db.TagCategories.FirstOrDefaultAsync(x => x.TagCategoryId == dbCategoryId);
+					if (entity != null) {
+						entity.TagCategoryName = category.TagCategoryName;
+						entity.Detail = category.Detail;
+						db.TagCategories.Update(entity);
+					}
+				}
 
-		await db.SaveChangesAsync();
-		await transaction.CommitAsync();
+				// カテゴリーに属するタグの保存
+				foreach (var tag in category.Tags) {
+					if (!tag.IsDirty) {
+						continue;
+					}
 
-		var cachedTag = this.Tags.FirstOrDefault(x => x.TagId == tagId);
-		if (cachedTag != null) {
-			var oldCategoryId = cachedTag.TagCategoryId;
-			cachedTag.TagCategoryId = tagCategoryId;
-			cachedTag.TagName = tagName;
-			cachedTag.Detail = detail;
-			cachedTag.Romaji = tagName.KatakanaToHiragana().HiraganaToRomaji();
-			cachedTag.TagAliases = [.. aliases];
+					Tag? tagEntity = null;
+					try {
+						var tagId = tag.TagId;
+						tagEntity = await db.Tags.Include(x => x.TagAliases).FirstOrDefaultAsync(x => x.TagId == tagId);
+					} catch (InvalidOperationException) {
+						// ID が未初期化の場合は新規作成とみなす
+					}
 
-			if (oldCategoryId != tagCategoryId) {
-				var oldCategory = this.TagCategories.FirstOrDefault(x => x.TagCategoryId == oldCategoryId);
-				oldCategory?.Tags.Remove(cachedTag);
+					if (tagEntity == null) {
+						// 新規タグの作成
+						tagEntity = new Tag {
+							TagCategoryId = dbCategoryId,
+							TagName = tag.TagName,
+							Detail = tag.Detail,
+							TagAliases = []
+						};
+						await db.Tags.AddAsync(tagEntity);
+						await db.SaveChangesAsync();
+						tag.TagId = tagEntity.TagId;
+					} else {
+						// 既存タグの更新
+						tagEntity.TagCategoryId = dbCategoryId;
+						tagEntity.TagName = tag.TagName;
+						tagEntity.Detail = tag.Detail;
+						db.Tags.Update(tagEntity);
+					}
 
-				var newCategory = this.TagCategories.FirstOrDefault(x => x.TagCategoryId == tagCategoryId) ?? this.TagCategories.First(x => x.TagCategoryId == null);
-				newCategory.Tags.Add(cachedTag);
-				cachedTag.TagCategory = newCategory;
+					// 別名の更新 (一括削除して再追加)
+					db.TagAliases.RemoveRange(tagEntity.TagAliases);
+					foreach (var (alias, index) in tag.TagAliases.Select((x, i) => (x, i))) {
+						await db.TagAliases.AddAsync(new TagAlias {
+							TagId = tagEntity.TagId,
+							TagAliasId = index,
+							Alias = alias.Alias,
+							Ruby = string.IsNullOrEmpty(alias.Ruby) ? null : alias.Ruby
+						});
+					}
+				}
 			}
-		}
-	}
 
-	public async Task<ITagCategoryModel> CreateTagCategoryAsync(string tagCategoryName, string detail) {
-		await using var db = await this._dbFactory.CreateDbContextAsync();
-		using var transaction = await db.Database.BeginTransactionAsync();
+			await db.SaveChangesAsync();
+			await transaction.CommitAsync();
 
-		var tagCategoryEntity = new TagCategory() { TagCategoryName = tagCategoryName, Detail = detail, Tags = [] };
-		await db.TagCategories.AddAsync(tagCategoryEntity);
+			// フラグのリセット
+			foreach (var category in this.TagCategories) {
+				category.IsDirty = false;
+				foreach (var tag in category.Tags) {
+					tag.IsDirty = false;
+				}
+			}
 
-		await db.SaveChangesAsync();
-		await transaction.CommitAsync();
-
-		var newCategory = this._tagModelFactory.CreateCategory(tagCategoryEntity);
-		this.TagCategories.Add(newCategory);
-		return newCategory;
-	}
-
-	public async Task UpdateTagCategoryAsync(int tagCategoryId, string tagCategoryName, string detail) {
-		await using var db = await this._dbFactory.CreateDbContextAsync();
-		using var transaction = await db.Database.BeginTransactionAsync();
-
-		var tagCategoryEntity = await db.TagCategories.FirstOrDefaultAsync(x => x.TagCategoryId == tagCategoryId) ?? throw new InvalidOperationException($"TagCategory with ID {tagCategoryId} not found.");
-
-		tagCategoryEntity.TagCategoryName = tagCategoryName;
-		tagCategoryEntity.Detail = detail;
-		db.TagCategories.Update(tagCategoryEntity);
-
-		await db.SaveChangesAsync();
-		await transaction.CommitAsync();
-
-		var cachedCategory = this.TagCategories.FirstOrDefault(x => x.TagCategoryId == tagCategoryId);
-		if (cachedCategory != null) {
-			cachedCategory.TagCategoryName = tagCategoryName;
-			cachedCategory.Detail = detail;
+			// TODO: 全タグリスト (this.Tags) との整合性も必要に応じて整える
+		} catch {
+			await transaction.RollbackAsync();
+			throw;
 		}
 	}
 

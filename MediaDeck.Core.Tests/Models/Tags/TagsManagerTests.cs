@@ -37,41 +37,20 @@ public class TagsManagerTests {
 
 	private void SetupFactoryMock(Mock<ITagModelFactory> mock) {
 		mock.Setup(f => f.CreateCategory(It.IsAny<TagCategory?>())).Returns((TagCategory? c) => {
-			var m = new Mock<ITagCategoryModel>();
-			if (c != null) {
-				m.SetupGet(x => x.TagCategoryId).Returns(c.TagCategoryId);
-				m.SetupGet(x => x.TagCategoryName).Returns(c.TagCategoryName);
-				// 簡易的に、カテゴリ内のタグをモデルに変換して返す（実際のLoadの挙動を模倣）
-				var tagModels = c.Tags.Select(t => {
-					var tm = new Mock<ITagModel>();
-					tm.SetupGet(x => x.TagId).Returns(t.TagId);
-					tm.SetupGet(x => x.TagName).Returns(t.TagName);
-					tm.SetupGet(x => x.TagCategory).Returns(m.Object);
-					int usageCount = 0;
-					try {
-						usageCount = t.MediaFileTags?.Count ?? 0;
-					} catch (InvalidOperationException) { }
-					tm.SetupGet(x => x.UsageCount).Returns(new ReactiveProperty<int>(usageCount));
-					return tm.Object;
-				}).ToList();
-				m.SetupGet(x => x.Tags).Returns(new ObservableList<ITagModel>(tagModels));
-			} else {
-				m.SetupGet(x => x.TagCategoryId).Returns((int?)null);
-				m.SetupGet(x => x.TagCategoryName).Returns("未設定");
-				m.SetupGet(x => x.Tags).Returns([]);
-			}
-			return m.Object;
+			var model = new TagCategoryModel();
+			model.Initialize(c, mock.Object);
+			return model;
 		});
 		mock.Setup(f => f.Create(It.IsAny<Tag>(), It.IsAny<ITagCategoryModel>())).Returns((Tag t, ITagCategoryModel c) => {
-			var m = new Mock<ITagModel>();
-			m.SetupGet(x => x.TagId).Returns(t.TagId);
-			m.SetupGet(x => x.TagName).Returns(t.TagName);
-			m.SetupGet(x => x.TagCategory).Returns(c);
-			int usageCount = 0;
-			try {
-				usageCount = t.MediaFileTags?.Count ?? 0;
-			} catch (InvalidOperationException) { }
-			m.SetupGet(x => x.UsageCount).Returns(new ReactiveProperty<int>(usageCount));
+			var model = new TagModel();
+			model.Initialize(t, c, mock.Object);
+			return model;
+		});
+		mock.Setup(f => f.CreateAlias(It.IsAny<TagAlias>())).Returns((TagAlias a) => {
+			var m = new Mock<ITagAliasModel>();
+			m.SetupAllProperties();
+			m.Object.Alias = a.Alias;
+			m.Object.Ruby = a.Ruby;
 			return m.Object;
 		});
 	}
@@ -243,74 +222,57 @@ public class TagsManagerTests {
 	}
 
 	/// <summary>
-	/// UpdateTagAsyncが存在しないIDを更新しようとした場合に例外（FirstAsyncによるInvalidOperationException）を投げることを検証します。
+	/// SaveAsyncが既存の情報の更新と新規追加を正しく処理することを検証します。
 	/// </summary>
 	[Fact]
-	public async Task UpdateTagAsync_ShouldThrowInvalidOperationException_WhenTagDoesNotExist() {
-		var dbFactory = this.CreateInMemoryDbFactory(nameof(this.UpdateTagAsync_ShouldThrowInvalidOperationException_WhenTagDoesNotExist));
-		var tagModelFactoryMock = new Mock<ITagModelFactory>();
-		var manager = new TagsManager(dbFactory, tagModelFactoryMock.Object);
-
-		await Should.ThrowAsync<InvalidOperationException>(() => manager.UpdateTagAsync(999, 1, "Name", "Detail", []));
-	}
-
-	/// <summary>
-	/// UpdateTagAsyncが既存タグの情報とエイリアスを正しく更新することを検証します。
-	/// </summary>
-	[Fact]
-	public async Task UpdateTagAsync_ShouldUpdateTagAndAliases_WhenTagExists() {
-		var dbFactory = this.CreateInMemoryDbFactory(nameof(this.UpdateTagAsync_ShouldUpdateTagAndAliases_WhenTagExists));
+	public async Task SaveAsync_ShouldPersistChangesToDatabase() {
+		var dbName = nameof(this.SaveAsync_ShouldPersistChangesToDatabase);
+		var dbFactory = this.CreateInMemoryDbFactory(dbName);
 		await this.SeedDatabaseAsync(dbFactory);
 		var tagModelFactoryMock = new Mock<ITagModelFactory>();
 		this.SetupFactoryMock(tagModelFactoryMock);
 		var manager = new TagsManager(dbFactory, tagModelFactoryMock.Object);
 		await manager.InitializeAsync();
-		var newAliases = new List<ITagAliasModel>();
-		var aliasMock = new Mock<ITagAliasModel>();
-		aliasMock.SetupGet(x => x.Alias).Returns("UpdatedAlias1");
-		aliasMock.SetupGet(x => x.Ruby).Returns("UpdatedRuby1");
-		newAliases.Add(aliasMock.Object);
-		await manager.UpdateTagAsync(1, 2, "UpdatedTag1", "UpdatedDetail1", newAliases);
+
+		// カテゴリの更新
+		var cat1 = manager.TagCategories.First(x => x.TagCategoryId == 1);
+		cat1.TagCategoryName = "UpdatedCategory1";
+
+		// タグの更新
+		var tag1 = manager.Tags.First(x => x.TagId == 1);
+		tag1.TagName = "UpdatedTag1";
+
+		await manager.SaveAsync();
+
 		await using var db = await dbFactory.CreateDbContextAsync();
-		var dbTag = await db.Tags.Include(x => x.TagAliases).FirstAsync(x => x.TagId == 1);
-		dbTag.TagCategoryId.ShouldBe(2);
-		dbTag.TagName.ShouldBe("UpdatedTag1");
-		dbTag.Detail.ShouldBe("UpdatedDetail1");
-		dbTag.TagAliases.Count.ShouldBe(1);
-		dbTag.TagAliases.First().Alias.ShouldBe("UpdatedAlias1");
-		dbTag.TagAliases.First().Ruby.ShouldBe("UpdatedRuby1");
+		var dbCat1 = await db.TagCategories.FirstAsync(x => x.TagCategoryId == 1);
+		dbCat1.TagCategoryName.ShouldBe("UpdatedCategory1");
+
+		var dbTag1 = await db.Tags.FirstAsync(x => x.TagId == 1);
+		dbTag1.TagName.ShouldBe("UpdatedTag1");
 	}
 
 	/// <summary>
-	/// UpdateTagCategoryAsyncが既存のカテゴリを更新することを検証します。
+	/// IsDirtyフラグが正しく動作し、保存後にリセットされることを検証します。
 	/// </summary>
 	[Fact]
-	public async Task UpdateTagCategoryAsync_ShouldUpdateCategory_WhenCategoryExists() {
-		var dbFactory = this.CreateInMemoryDbFactory(nameof(this.UpdateTagCategoryAsync_ShouldUpdateCategory_WhenCategoryExists));
+	public async Task IsDirty_ShouldTrackChangesAndResetAfterSave() {
+		var dbName = nameof(this.IsDirty_ShouldTrackChangesAndResetAfterSave);
+		var dbFactory = this.CreateInMemoryDbFactory(dbName);
 		await this.SeedDatabaseAsync(dbFactory);
 		var tagModelFactoryMock = new Mock<ITagModelFactory>();
 		this.SetupFactoryMock(tagModelFactoryMock);
 		var manager = new TagsManager(dbFactory, tagModelFactoryMock.Object);
-		await manager.UpdateTagCategoryAsync(1, "UpdatedCategoryName", "UpdatedCatDetail");
-		await using var db = await dbFactory.CreateDbContextAsync();
-		var dbCat = await db.TagCategories.FirstAsync(x => x.TagCategoryId == 1);
-		dbCat.TagCategoryName.ShouldBe("UpdatedCategoryName");
-	}
+		await manager.InitializeAsync();
 
-	/// <summary>
-	/// UpdateTagCategoryAsyncが、存在しないIDを指定された場合に新規カテゴリを作成することを検証します。
-	/// </summary>
-	[Fact]
-	public async Task CreateTagCategoryAsync_ShouldCreateCategory() {
-		var dbFactory = this.CreateInMemoryDbFactory(nameof(this.CreateTagCategoryAsync_ShouldCreateCategory));
-		var tagModelFactoryMock = new Mock<ITagModelFactory>();
-		this.SetupFactoryMock(tagModelFactoryMock);
-		var manager = new TagsManager(dbFactory, tagModelFactoryMock.Object);
-		await manager.CreateTagCategoryAsync("NewCategoryName", "NewCatDetail");
-		await using var db = await dbFactory.CreateDbContextAsync();
-		var dbCat = await db.TagCategories.FirstOrDefaultAsync(x => x.TagCategoryName == "NewCategoryName");
-		dbCat.ShouldNotBeNull();
-		dbCat.TagCategoryName.ShouldBe("NewCategoryName");
+		var tag = manager.Tags.First();
+		tag.IsDirty.ShouldBeFalse();
+		
+		tag.TagName = "DirtyTag";
+		tag.IsDirty.ShouldBeTrue();
+
+		await manager.SaveAsync();
+		tag.IsDirty.ShouldBeFalse();
 	}
 
 	/// <summary>

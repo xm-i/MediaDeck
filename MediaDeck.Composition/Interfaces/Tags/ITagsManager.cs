@@ -53,33 +53,12 @@ public interface ITagsManager {
 	/// <returns>タスク</returns>
 	public Task RemoveTagAsync(IFileModel[] fileModels, int tagId);
 
-	/// <summary>
-	/// タグの情報を更新する
-	/// </summary>
-	/// <param name="tagId">タグID</param>
-	/// <param name="tagCategoryId">カテゴリーID</param>
-	/// <param name="tagName">タグ名</param>
-	/// <param name="detail">詳細</param>
-	/// <param name="aliases">別名リスト</param>
-	/// <returns>タスク</returns>
-	public Task UpdateTagAsync(int tagId, int? tagCategoryId, string tagName, string detail, IEnumerable<ITagAliasModel> aliases);
 
 	/// <summary>
-	/// タグカテゴリーを新規作成する
+	/// 変更を全て保存する
 	/// </summary>
-	/// <param name="tagCategoryName">カテゴリー名</param>
-	/// <param name="detail">詳細</param>
-	/// <returns>作成されたタグカテゴリーモデル</returns>
-	public Task<ITagCategoryModel> CreateTagCategoryAsync(string tagCategoryName, string detail);
-
-	/// <summary>
-	/// タグカテゴリーを更新する
-	/// </summary>
-	/// <param name="tagCategoryId">カテゴリーID</param>
-	/// <param name="tagCategoryName">カテゴリー名</param>
-	/// <param name="detail">詳細</param>
 	/// <returns>タスク</returns>
-	public Task UpdateTagCategoryAsync(int tagCategoryId, string tagCategoryName, string detail);
+	public Task SaveAsync();
 
 	/// <summary>
 	/// データを初期化（ロード）する

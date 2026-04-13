@@ -9,6 +9,13 @@ namespace MediaDeck.Composition.Interfaces.Tags;
 [GenerateR3JsonConfigDto]
 public interface ITagCategoryModel {
 	/// <summary>
+	/// 変更フラグ
+	/// </summary>
+	public bool IsDirty {
+		get;
+		set;
+	}
+	/// <summary>
 	/// タグカテゴリーID
 	/// </summary>
 	public int? TagCategoryId {

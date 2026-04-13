@@ -17,6 +17,7 @@ public class TagCategoryModel : ITagCategoryModel {
 	private string? _tagCategoryName;
 	private string? _detail;
 	private ObservableList<ITagModel>? _tags;
+	private bool _isDirty;
 	private bool _isInitialized;
 
 	public TagCategoryModel() {
@@ -43,6 +44,15 @@ public class TagCategoryModel : ITagCategoryModel {
 			this.Tags.Clear();
 		}
 		this._isInitialized = true;
+		this._isDirty = false;
+	}
+
+	/// <summary>
+	/// 変更フラグ
+	/// </summary>
+	public bool IsDirty {
+		get => this._isDirty;
+		set => this._isDirty = value;
 	}
 
 	/// <summary>
@@ -57,6 +67,9 @@ public class TagCategoryModel : ITagCategoryModel {
 		}
 
 		set {
+			if (this._tagCategoryId != value) {
+				this._isDirty = true;
+			}
 			this._tagCategoryId = value;
 			this._isInitialized = true;
 		}
@@ -72,6 +85,9 @@ public class TagCategoryModel : ITagCategoryModel {
 
 		[MemberNotNull(nameof(_tagCategoryName))]
 		set {
+			if (this._tagCategoryName != value) {
+				this._isDirty = true;
+			}
 			this._tagCategoryName = value;
 			this._isInitialized = true;
 		}
@@ -87,6 +103,9 @@ public class TagCategoryModel : ITagCategoryModel {
 
 		[MemberNotNull(nameof(_detail))]
 		set {
+			if (this._detail != value) {
+				this._isDirty = true;
+			}
 			this._detail = value;
 			this._isInitialized = true;
 		}

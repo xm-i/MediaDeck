@@ -8,11 +8,12 @@ public class TagManagerViewModel : ViewModelBase {
 	public TagManagerViewModel(ITagsManager tagsManager, ITagModelFactory tagModelFactory) {
 		this._tagCategories = tagsManager.TagCategories.CreateView(x => new TagCategoryViewModel(x, tagsManager, tagModelFactory));
 		this.TagCategories = this._tagCategories.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
-		this.SaveCommand.Subscribe(async _ => {
-			foreach (var tagCategory in this.TagCategories) {
-				tagCategory.UpdateTagCategoryCommand.Execute(Unit.Default);
+		this.SaveCommand.SubscribeAwait(async (_, ct) => {
+			foreach (var category in this.TagCategories) {
+				category.SyncToModel();
 			}
-		});
+			await tagsManager.SaveAsync();
+		}, AwaitOperation.Drop);
 		this.AddTagCategoryCommand.Subscribe(_ => {
 			var model = tagModelFactory.CreateCategory();
 			model.TagCategoryName = "";

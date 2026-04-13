@@ -12,24 +12,7 @@ public class TagCategoryViewModel {
 		this.Tags = tagCategory.Tags.CreateView(x => new TagViewModel(this, x, tagsManager, tagModelFactory));
 		this.FilteredTags = this.Tags.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
 
-		this.UpdateTagCategoryCommand = this.TagCategoryName.CombineLatest(this.Detail, (x, y) => !string.IsNullOrWhiteSpace(x) && !string.IsNullOrWhiteSpace(y)).ToReactiveCommand();
-		this.UpdateTagCategoryCommand.Subscribe(async _ => {
-			if (this.TagCategoryId.HasValue) {
-				await tagsManager.UpdateTagCategoryAsync(this.TagCategoryId.Value,
-					this.TagCategoryName.Value,
-					this.Detail.Value);
-			} else {
-				await tagsManager.CreateTagCategoryAsync(this.TagCategoryName.Value,
-					this.Detail.Value);
-				// プレースホルダー（自分自身に関連付けられた空モデル）を削除
-				// これにより SynchronizedView 経由で自分が破棄され、新しいモデル用の ViewModel が生成される
-				tagsManager.TagCategories.Remove(this.Model);
-			}
-
-			foreach (var tag in this.Tags) {
-				tag.UpdateTagCommand.Execute(Unit.Default);
-			}
-		});
+		this.FilteredTags = this.Tags.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
 
 		this.FilterText.ThrottleLast(TimeSpan.FromMilliseconds(300))
 			.Subscribe(_ => {
@@ -69,9 +52,13 @@ public class TagCategoryViewModel {
 		get;
 	} = new();
 
-	public ReactiveCommand UpdateTagCategoryCommand {
-		get;
-	} = new();
+	public void SyncToModel() {
+		this.Model.TagCategoryName = this.TagCategoryName.Value;
+		this.Model.Detail = this.Detail.Value;
+		foreach (var tag in this.Tags) {
+			tag.SyncToModel();
+		}
+	}
 
 	private void RefreshTagCandidateFilter() {
 		this.Tags.AttachFilter(tag => {

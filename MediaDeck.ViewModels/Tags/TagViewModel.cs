@@ -15,23 +15,7 @@ public class TagViewModel : ViewModelBase {
 		this._tagAliases.AddRange(tag.TagAliases.Select(x => new TagAliasViewModel(x, this)));
 		this.TagAliases = this._tagAliases.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
 		this.TagCategory.Value = parent;
-		this.UpdateTagCommand = this.TagName.CombineLatest(this.Detail, (x, y) => !string.IsNullOrWhiteSpace(x) && !string.IsNullOrWhiteSpace(y)).ToReactiveCommand();
-		this.UpdateTagCommand.Subscribe(async _ => {
-			if (!this._editedFlag) {
-				return;
-			}
-			await tagsManager.UpdateTagAsync(tag.TagId,
-				this.TagCategory.Value.TagCategoryId,
-				this.TagName.Value,
-				this.Detail.Value,
-				this.TagAliases.Select(x => {
-					var alias = x.Model;
-					alias.Alias = x.Alias.Value;
-					alias.Ruby = string.IsNullOrEmpty(x.Ruby.Value) ? null : x.Ruby.Value;
-					return alias;
-				}));
-			this._editedFlag = false;
-		});
+
 		this.RemoveTagAliasCommand.Subscribe(x => {
 			this._tagAliases.Remove(x);
 		});
@@ -73,9 +57,21 @@ public class TagViewModel : ViewModelBase {
 		get;
 	}
 
-	public ReactiveCommand UpdateTagCommand {
-		get;
-	} = new();
+	public void SyncToModel() {
+		if (!this._editedFlag) {
+			return;
+		}
+		this.Model.TagName = this.TagName.Value;
+		this.Model.Detail = this.Detail.Value;
+		this.Model.TagCategoryId = this.TagCategory.Value.TagCategoryId;
+		this.Model.TagAliases = this.TagAliases.Select(x => {
+			var alias = x.Model;
+			alias.Alias = x.Alias.Value;
+			alias.Ruby = string.IsNullOrEmpty(x.Ruby.Value) ? null : x.Ruby.Value;
+			return alias;
+		}).ToList();
+		this._editedFlag = false;
+	}
 
 	public ReactiveCommand AddTagAliasCommand {
 		get;
