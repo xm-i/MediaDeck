@@ -54,8 +54,8 @@ internal abstract class BaseFileType<TFileOperator, TFileModel, TFileViewModel, 
 		if (mediaFile.Latitude is { } lat && mediaFile.Longitude is { } lon) {
 			fileModel.Location = new GpsLocation(lat, lon, mediaFile.Altitude);
 		}
-		var tagModelFactory = Ioc.Default.GetRequiredService<ITagModelFactory>();
-		fileModel.Tags = [.. mediaFile.MediaFileTags.Select(mft => tagModelFactory.Create(mft.Tag))];
+		var tagsManager = Ioc.Default.GetRequiredService<ITagsManager>();
+		fileModel.Tags = [.. mediaFile.MediaFileTags.Select(mft => tagsManager.Tags.FirstOrDefault(t => t.TagId == mft.TagId)).OfType<ITagModel>()];
 	}
 
 	IFileOperator IFileType.CreateFileOperator() {

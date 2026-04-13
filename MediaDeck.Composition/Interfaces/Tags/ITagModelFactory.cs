@@ -9,7 +9,7 @@ public interface ITagModelFactory {
 	/// <summary>
 	/// タグモデルを作成します。
 	/// </summary>
-	public ITagModel Create(Tag tag, ITagCategoryModel? category = null);
+	public ITagModel Create(Tag tag, ITagCategoryModel category);
 
 	/// <summary>
 	/// タグカテゴリーモデルを作成します。

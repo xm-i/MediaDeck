@@ -65,7 +65,15 @@ public interface ITagsManager {
 	public Task UpdateTagAsync(int tagId, int? tagCategoryId, string tagName, string detail, IEnumerable<ITagAliasModel> aliases);
 
 	/// <summary>
-	/// タグカテゴリーを更新または作成する
+	/// タグカテゴリーを新規作成する
+	/// </summary>
+	/// <param name="tagCategoryName">カテゴリー名</param>
+	/// <param name="detail">詳細</param>
+	/// <returns>作成されたタグカテゴリーモデル</returns>
+	public Task<ITagCategoryModel> CreateTagCategoryAsync(string tagCategoryName, string detail);
+
+	/// <summary>
+	/// タグカテゴリーを更新する
 	/// </summary>
 	/// <param name="tagCategoryId">カテゴリーID</param>
 	/// <param name="tagCategoryName">カテゴリー名</param>

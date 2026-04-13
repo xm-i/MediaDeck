@@ -4,21 +4,28 @@ using MediaDeck.Composition.Interfaces.Tags;
 namespace MediaDeck.ViewModels.Tags;
 
 public class TagCategoryViewModel {
-	public TagCategoryViewModel(ITagCategoryModel? tagCategory, ITagsManager tagsManager, ITagModelFactory tagModelFactory) {
+	public TagCategoryViewModel(ITagCategoryModel tagCategory, ITagsManager tagsManager, ITagModelFactory tagModelFactory) {
 		this.Model = tagCategory;
-		this.TagCategoryId = tagCategory?.TagCategoryId;
-		this.TagCategoryName.Value = tagCategory?.TagCategoryName ?? "未設定";
-		this.Detail.Value = tagCategory?.Detail ?? "カテゴリーが設定されていないタグ";
-		this.Tags = tagCategory!.Tags.CreateView(x => new TagViewModel(this, x, tagsManager, tagModelFactory));
+		this.TagCategoryId = tagCategory.TagCategoryId;
+		this.TagCategoryName.Value = tagCategory.TagCategoryName;
+		this.Detail.Value = tagCategory.Detail;
+		this.Tags = tagCategory.Tags.CreateView(x => new TagViewModel(this, x, tagsManager, tagModelFactory));
 		this.FilteredTags = this.Tags.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
 
 		this.UpdateTagCategoryCommand = this.TagCategoryName.CombineLatest(this.Detail, (x, y) => !string.IsNullOrWhiteSpace(x) && !string.IsNullOrWhiteSpace(y)).ToReactiveCommand();
 		this.UpdateTagCategoryCommand.Subscribe(async _ => {
-			if (tagCategory?.TagCategoryId.HasValue ?? false) {
-				await tagsManager.UpdateTagCategoryAsync(tagCategory.TagCategoryId.Value,
+			if (this.TagCategoryId.HasValue) {
+				await tagsManager.UpdateTagCategoryAsync(this.TagCategoryId.Value,
 					this.TagCategoryName.Value,
 					this.Detail.Value);
+			} else {
+				await tagsManager.CreateTagCategoryAsync(this.TagCategoryName.Value,
+					this.Detail.Value);
+				// プレースホルダー（自分自身に関連付けられた空モデル）を削除
+				// これにより SynchronizedView 経由で自分が破棄され、新しいモデル用の ViewModel が生成される
+				tagsManager.TagCategories.Remove(this.Model);
 			}
+
 			foreach (var tag in this.Tags) {
 				tag.UpdateTagCommand.Execute(Unit.Default);
 			}
@@ -30,7 +37,7 @@ public class TagCategoryViewModel {
 			});
 	}
 
-	public ITagCategoryModel? Model {
+	public ITagCategoryModel Model {
 		get;
 	}
 

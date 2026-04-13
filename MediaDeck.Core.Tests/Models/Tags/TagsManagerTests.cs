@@ -46,6 +46,7 @@ public class TagsManagerTests {
 					var tm = new Mock<ITagModel>();
 					tm.SetupGet(x => x.TagId).Returns(t.TagId);
 					tm.SetupGet(x => x.TagName).Returns(t.TagName);
+					tm.SetupGet(x => x.TagCategory).Returns(m.Object);
 					int usageCount = 0;
 					try {
 						usageCount = t.MediaFileTags?.Count ?? 0;
@@ -61,21 +62,11 @@ public class TagsManagerTests {
 			}
 			return m.Object;
 		});
-		mock.Setup(f => f.Create(It.IsAny<Tag>(), It.IsAny<ITagCategoryModel>())).Returns((Tag t, ITagCategoryModel? c) => {
-			var m = new Mock<ITagModel>();
-			m.SetupGet(x => x.TagId).Returns(t.TagId);
-			m.SetupGet(x => x.TagName).Returns(t.TagName);
-			int usageCount = 0;
-			try {
-				usageCount = t.MediaFileTags?.Count ?? 0;
-			} catch (InvalidOperationException) { }
-			m.SetupGet(x => x.UsageCount).Returns(new ReactiveProperty<int>(usageCount));
-			return m.Object;
-		});
 		mock.Setup(f => f.Create(It.IsAny<Tag>(), It.IsAny<ITagCategoryModel>())).Returns((Tag t, ITagCategoryModel c) => {
 			var m = new Mock<ITagModel>();
 			m.SetupGet(x => x.TagId).Returns(t.TagId);
 			m.SetupGet(x => x.TagName).Returns(t.TagName);
+			m.SetupGet(x => x.TagCategory).Returns(c);
 			int usageCount = 0;
 			try {
 				usageCount = t.MediaFileTags?.Count ?? 0;
@@ -95,6 +86,7 @@ public class TagsManagerTests {
 		var manager = new TagsManager(dbFactory, tagModelFactoryMock.Object);
 		var tagMock = new Mock<ITagModel>();
 		tagMock.SetupGet(x => x.TagName).Returns("ExistingTag");
+		tagMock.SetupGet(x => x.TagCategory).Returns(new Mock<ITagCategoryModel>().Object);
 		tagMock.SetupGet(x => x.UsageCount).Returns(new ReactiveProperty<int>(0));
 		manager.Tags.Add(tagMock.Object);
 		var result = await manager.FindTagByNameAsync("ExistingTag");
@@ -124,6 +116,7 @@ public class TagsManagerTests {
 		var tagModelFactoryMock = new Mock<ITagModelFactory>();
 		this.SetupFactoryMock(tagModelFactoryMock);
 		var manager = new TagsManager(dbFactory, tagModelFactoryMock.Object);
+		await manager.InitializeAsync();
 		var aliases = new List<ITagAliasModel>();
 		var aliasMock = new Mock<ITagAliasModel>();
 		aliasMock.SetupGet(x => x.Alias).Returns("NewAlias1");
@@ -155,6 +148,7 @@ public class TagsManagerTests {
 		var manager = new TagsManager(dbFactory, tagModelFactoryMock.Object);
 		var tagMock = new Mock<ITagModel>();
 		tagMock.SetupGet(x => x.TagId).Returns(99);
+		tagMock.SetupGet(x => x.TagCategory).Returns(new Mock<ITagCategoryModel>().Object);
 		tagMock.SetupGet(x => x.UsageCount).Returns(new ReactiveProperty<int>(0));
 		var fileTags = new List<ITagModel>();
 		var fileModelMock = new Mock<IFileModel>();
@@ -196,6 +190,7 @@ public class TagsManagerTests {
 		var manager = new TagsManager(dbFactory, tagModelFactoryMock.Object);
 		var tagMock = new Mock<ITagModel>();
 		tagMock.SetupGet(x => x.TagId).Returns(99);
+		tagMock.SetupGet(x => x.TagCategory).Returns(new Mock<ITagCategoryModel>().Object);
 		tagMock.SetupGet(x => x.UsageCount).Returns(new ReactiveProperty<int>(0));
 		var fileTags = new List<ITagModel> { tagMock.Object };
 		var fileModelMock = new Mock<IFileModel>();
@@ -217,6 +212,7 @@ public class TagsManagerTests {
 		var manager = new TagsManager(dbFactory, tagModelFactoryMock.Object);
 		var tagMock = new Mock<ITagModel>();
 		tagMock.SetupGet(x => x.TagId).Returns(99);
+		tagMock.SetupGet(x => x.TagCategory).Returns(new Mock<ITagCategoryModel>().Object);
 		tagMock.SetupGet(x => x.UsageCount).Returns(new ReactiveProperty<int>(1));
 		var fileTags = new List<ITagModel> { tagMock.Object };
 		var fileModelMock = new Mock<IFileModel>();
@@ -268,6 +264,7 @@ public class TagsManagerTests {
 		var tagModelFactoryMock = new Mock<ITagModelFactory>();
 		this.SetupFactoryMock(tagModelFactoryMock);
 		var manager = new TagsManager(dbFactory, tagModelFactoryMock.Object);
+		await manager.InitializeAsync();
 		var newAliases = new List<ITagAliasModel>();
 		var aliasMock = new Mock<ITagAliasModel>();
 		aliasMock.SetupGet(x => x.Alias).Returns("UpdatedAlias1");
@@ -304,14 +301,14 @@ public class TagsManagerTests {
 	/// UpdateTagCategoryAsyncが、存在しないIDを指定された場合に新規カテゴリを作成することを検証します。
 	/// </summary>
 	[Fact]
-	public async Task UpdateTagCategoryAsync_ShouldCreateCategory_WhenCategoryDoesNotExist() {
-		var dbFactory = this.CreateInMemoryDbFactory(nameof(this.UpdateTagCategoryAsync_ShouldCreateCategory_WhenCategoryDoesNotExist));
+	public async Task CreateTagCategoryAsync_ShouldCreateCategory() {
+		var dbFactory = this.CreateInMemoryDbFactory(nameof(this.CreateTagCategoryAsync_ShouldCreateCategory));
 		var tagModelFactoryMock = new Mock<ITagModelFactory>();
 		this.SetupFactoryMock(tagModelFactoryMock);
 		var manager = new TagsManager(dbFactory, tagModelFactoryMock.Object);
-		await manager.UpdateTagCategoryAsync(3, "NewCategoryName", "NewCatDetail");
+		await manager.CreateTagCategoryAsync("NewCategoryName", "NewCatDetail");
 		await using var db = await dbFactory.CreateDbContextAsync();
-		var dbCat = await db.TagCategories.FirstOrDefaultAsync(x => x.TagCategoryId == 3);
+		var dbCat = await db.TagCategories.FirstOrDefaultAsync(x => x.TagCategoryName == "NewCategoryName");
 		dbCat.ShouldNotBeNull();
 		dbCat.TagCategoryName.ShouldBe("NewCategoryName");
 	}

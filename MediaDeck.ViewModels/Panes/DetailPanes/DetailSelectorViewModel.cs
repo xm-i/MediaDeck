@@ -184,10 +184,10 @@ public class DetailSelectorViewModel : ViewModelBase {
 		});
 	}
 
-	private TagCategoryViewModel GetCategoryViewModel(ITagCategoryModel? category, ITagsManager tagsManager, ITagModelFactory factory) {
-		// ConcurrentDictionaryのキーはnotnull制約があるため、IDがnull(未設定)の場合は-1をキーとして使用します。
+	private TagCategoryViewModel GetCategoryViewModel(ITagCategoryModel category, ITagsManager tagsManager, ITagModelFactory factory) {
+		// ConcurrentDictionaryのキーはnotnull制約があるため、IDがnull(未設定)の場合はint.MinValueをキーとして使用します。
 		// このマジックナンバーはキャッシュ管理のためだけに内部で使用され、外部（モデルやUI）には影響しません。
-		var key = category?.TagCategoryId ?? int.MinValue;
+		var key = category.TagCategoryId ?? int.MinValue;
 		return this._categoryViewModels.GetOrAdd(key, _ => new TagCategoryViewModel(category, tagsManager, factory));
 	}
 }

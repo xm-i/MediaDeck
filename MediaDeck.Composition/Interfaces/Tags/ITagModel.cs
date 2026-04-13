@@ -26,7 +26,7 @@ public interface ITagModel {
 	/// <summary>
 	/// タグカテゴリー
 	/// </summary>
-	public ITagCategoryModel? TagCategory {
+	public ITagCategoryModel TagCategory {
 		get;
 		set;
 	}
@@ -77,5 +77,5 @@ public interface ITagModel {
 		set;
 	}
 
-	public void Initialize(MediaDeck.Database.Tables.Tag tag, ITagCategoryModel? category, ITagModelFactory factory);
+	public void Initialize(MediaDeck.Database.Tables.Tag tag, ITagCategoryModel category, ITagModelFactory factory);
 }

@@ -26,11 +26,11 @@ public class TagModel : ITagModel {
 	public TagModel() {
 	}
 
-	[MemberNotNull(nameof(_tagId), nameof(_tagName), nameof(_detail), nameof(_romaji), nameof(_tagAliases))]
-	public void Initialize(Tag tag, ITagCategoryModel? category, ITagModelFactory factory) {
+	[MemberNotNull(nameof(_tagId), nameof(_tagName), nameof(_detail), nameof(_romaji), nameof(_tagAliases), nameof(_tagCategory))]
+	public void Initialize(Tag tag, ITagCategoryModel category, ITagModelFactory factory) {
 		this._tagId = tag.TagId;
 		this._tagCategoryId = tag.TagCategoryId;
-		this._tagCategory = category ?? factory.CreateCategory(tag.TagCategory);
+		this._tagCategory = category;
 		this._tagName = tag.TagName;
 		this._detail = tag.Detail;
 		this._romaji = tag.TagName.KatakanaToHiragana().HiraganaToRomaji();
@@ -74,14 +74,12 @@ public class TagModel : ITagModel {
 	/// <summary>
 	/// タグカテゴリー
 	/// </summary>
-	public ITagCategoryModel? TagCategory {
+	public ITagCategoryModel TagCategory {
 		get {
-			if (!this._isInitialized) {
-				throw new InvalidOperationException($"{nameof(this.TagCategory)} is not initialized.");
-			}
-			return this._tagCategory;
+			return this._tagCategory ?? throw new InvalidOperationException($"{nameof(this.TagCategory)} is not initialized.");
 		}
 
+		[MemberNotNull(nameof(_tagCategory))]
 		set {
 			this._tagCategory = value;
 			this._isInitialized = true;

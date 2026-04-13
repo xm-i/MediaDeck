@@ -35,6 +35,7 @@ public class DetailSelectorModelTests {
 		tagModelFactoryMock.Setup(x => x.CreateCategory(It.IsAny<TagCategory?>())).Returns((TagCategory? c) => {
 			var m = new Mock<ITagCategoryModel>();
 			m.SetupGet(x => x.TagCategoryId).Returns(c?.TagCategoryId);
+			m.SetupGet(x => x.TagCategoryName).Returns(c?.TagCategoryName ?? "未設定");
 			m.SetupGet(x => x.Tags).Returns([]);
 			return m.Object;
 		});
@@ -156,9 +157,11 @@ public class DetailSelectorModelTests {
 
 		var tag1 = new Mock<ITagModel>();
 		tag1.SetupGet(x => x.TagId).Returns(1);
+		tag1.SetupGet(x => x.TagCategory).Returns(new Mock<ITagCategoryModel>().Object);
 		tag1.SetupGet(x => x.UsageCount).Returns(new ReactiveProperty<int>(0));
 		var tag2 = new Mock<ITagModel>();
 		tag2.SetupGet(x => x.TagId).Returns(2);
+		tag2.SetupGet(x => x.TagCategory).Returns(new Mock<ITagCategoryModel>().Object);
 		tag2.SetupGet(x => x.UsageCount).Returns(new ReactiveProperty<int>(0));
 
 		var fileMock1 = new Mock<IFileModel>();
@@ -189,6 +192,7 @@ public class DetailSelectorModelTests {
 
 		var tagMock = new Mock<ITagModel>();
 		tagMock.SetupGet(x => x.TagName).Returns("TestTag");
+		tagMock.SetupGet(x => x.TagCategory).Returns(new Mock<ITagCategoryModel>().Object);
 		tagMock.SetupGet(x => x.UsageCount).Returns(new ReactiveProperty<int>(0));
 		tagsManager.Tags.Add(tagMock.Object);
 
@@ -249,6 +253,7 @@ public class DetailSelectorModelTests {
 
 		var tagMock = new Mock<ITagModel>();
 		tagMock.SetupGet(x => x.TagId).Returns(1);
+		tagMock.SetupGet(x => x.TagCategory).Returns(new Mock<ITagCategoryModel>().Object);
 		tagMock.SetupGet(x => x.UsageCount).Returns(new ReactiveProperty<int>(0));
 
 		// By setting Id to 0 (or simply not verifying DB integrity strongly) we might still get FK issues.
@@ -301,6 +306,7 @@ public class DetailSelectorModelTests {
 		// Arrange
 		var tagMock = new Mock<ITagModel>();
 		tagMock.SetupGet(x => x.TagName).Returns(tagName);
+		tagMock.SetupGet(x => x.TagCategory).Returns(new Mock<ITagCategoryModel>().Object);
 		tagMock.SetupGet(x => x.UsageCount).Returns(new ReactiveProperty<int>(0));
 
 		var aliasList = new List<ITagAliasModel>();
