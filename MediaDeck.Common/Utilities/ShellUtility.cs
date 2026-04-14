@@ -70,17 +70,13 @@ public static class ShellUtility {
 		if (string.IsNullOrEmpty(filePath))
 			return;
 
-		// セキュリティ対策:
-		// PATH上の任意の実行ファイル（cmd.exe等）やURLプロトコルの意図しない起動を防ぐため絶対パス化する
-		var fullPath = Path.GetFullPath(filePath);
-
 		var hwnd = GetForegroundWindow();
 
 		var info = new SHELLEXECUTEINFOW {
 			cbSize = Marshal.SizeOf<SHELLEXECUTEINFOW>(),
 			hwnd = hwnd,
 			lpVerb = "open",
-			lpFile = fullPath,
+			lpFile = filePath,
 			lpParameters = arguments,
 			nShow = SW_SHOWNORMAL
 		};
@@ -88,7 +84,7 @@ public static class ShellUtility {
 		if (!ShellExecuteExW(ref info)) {
 			// フォールバック: セキュアなProcess.Startを使用
 			var psi = new ProcessStartInfo {
-				FileName = fullPath,
+				FileName = filePath,
 				UseShellExecute = false
 			};
 
