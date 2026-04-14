@@ -21,7 +21,6 @@ public class TagModel : ITagModel {
 	private string? _detail;
 	private string? _romaji;
 	private List<ITagAliasModel>? _tagAliases;
-	private bool _isDirty;
 	private bool _isInitialized;
 
 	public TagModel() {
@@ -38,15 +37,15 @@ public class TagModel : ITagModel {
 		this.UsageCount.Value = tag.MediaFileTags.Count;
 		this._tagAliases = [.. tag.TagAliases.Select(factory.CreateAlias)];
 		this._isInitialized = true;
-		this._isDirty = false;
+		this.IsDirty = false;
 	}
 
 	/// <summary>
 	/// 変更フラグ
 	/// </summary>
 	public bool IsDirty {
-		get => this._isDirty;
-		set => this._isDirty = value;
+		get;
+		set;
 	}
 
 	/// <summary>
@@ -60,7 +59,7 @@ public class TagModel : ITagModel {
 		[MemberNotNull(nameof(_tagId))]
 		set {
 			if (this._tagId != value) {
-				this._isDirty = true;
+				this.IsDirty = true;
 			}
 			this._tagId = value;
 			this._isInitialized = true;
@@ -80,7 +79,7 @@ public class TagModel : ITagModel {
 
 		set {
 			if (this._tagCategoryId != value) {
-				this._isDirty = true;
+				this.IsDirty = true;
 			}
 			this._tagCategoryId = value;
 			this._isInitialized = true;
@@ -113,7 +112,7 @@ public class TagModel : ITagModel {
 		[MemberNotNull(nameof(_tagName))]
 		set {
 			if (this._tagName != value) {
-				this._isDirty = true;
+				this.IsDirty = true;
 			}
 			this._tagName = value;
 			this._isInitialized = true;
@@ -131,7 +130,7 @@ public class TagModel : ITagModel {
 		[MemberNotNull(nameof(_detail))]
 		set {
 			if (this._detail != value) {
-				this._isDirty = true;
+				this.IsDirty = true;
 			}
 			this._detail = value;
 			this._isInitialized = true;
@@ -163,7 +162,7 @@ public class TagModel : ITagModel {
 
 		[MemberNotNull(nameof(_tagAliases))]
 		set {
-			this._isDirty = true; // エイリアスのリストがセットされたら変更ありとみなす
+			this.IsDirty = true; // エイリアスのリストがセットされたら変更ありとみなす
 			this._tagAliases = value;
 			this._isInitialized = true;
 		}

@@ -78,6 +78,16 @@
 				<TextBox
 					Text="{x:Bind ViewModel.SelectedTagCategory.Value.Detail.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
 					PlaceholderText="詳細を入力" />
+				<Button Click="DeleteTagCategoryButton_Click"
+					Margin="0,8,0,0"
+					HorizontalAlignment="Right"
+					IsEnabled="{x:Bind ViewModel.SelectedTagCategory.Value.IsDeletable, Mode=OneWay}"
+					ToolTipService.ToolTip="このタグカテゴリを削除します" >
+					<StackPanel Orientation="Horizontal" Spacing="6">
+						<FontIcon Glyph="&#xE74D;" FontSize="12" Foreground="{ThemeResource SystemFillColorCriticalBrush}" />
+						<TextBlock Text="カテゴリを削除" Foreground="{ThemeResource SystemFillColorCriticalBrush}" />
+					</StackPanel>
+				</Button>
 			</StackPanel>
 		</Grid>
 
@@ -225,17 +235,36 @@
 					</Border>
 				</Grid>
 
-				<!-- エイリアス追加ボタン -->
-				<Button Grid.Row="6"
-					Command="{x:Bind ViewModel.SelectedTagCategory.Value.SelectedTag.Value.AddTagAliasCommand, Mode=OneWay}"
-					ToolTipService.ToolTip="新しいエイリアスを追加" >
-					<StackPanel Orientation="Horizontal"
-						Spacing="6" >
-						<FontIcon Glyph="&#xF8AA;"
-							FontSize="12" />
-						<TextBlock Text="エイリアスを追加" />
-					</StackPanel>
-				</Button>
+				<!-- ボタンエリア -->
+				<Grid Grid.Row="6">
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="Auto" />
+						<ColumnDefinition Width="*" />
+						<ColumnDefinition Width="Auto" />
+					</Grid.ColumnDefinitions>
+					
+					<!-- エイリアス追加ボタン -->
+					<Button Grid.Column="0"
+						Command="{x:Bind ViewModel.SelectedTagCategory.Value.SelectedTag.Value.AddTagAliasCommand, Mode=OneWay}"
+						ToolTipService.ToolTip="新しいエイリアスを追加" >
+						<StackPanel Orientation="Horizontal"
+							Spacing="6" >
+							<FontIcon Glyph="&#xF8AA;"
+								FontSize="12" />
+							<TextBlock Text="エイリアスを追加" />
+						</StackPanel>
+					</Button>
+
+					<!-- タグ削除ボタン -->
+					<Button Grid.Column="2" 
+						Click="DeleteTagButton_Click"
+						ToolTipService.ToolTip="このタグを削除します" >
+						<StackPanel Orientation="Horizontal" Spacing="6">
+							<FontIcon Glyph="&#xE74D;" FontSize="12" Foreground="{ThemeResource SystemFillColorCriticalBrush}" />
+							<TextBlock Text="タグを削除" Foreground="{ThemeResource SystemFillColorCriticalBrush}" />
+						</StackPanel>
+					</Button>
+				</Grid>
 			</Grid>
 		</Border>
 	</Grid>

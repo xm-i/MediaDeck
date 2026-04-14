@@ -32,6 +32,15 @@ public class TagCategoryViewModel {
 		get;
 	}
 
+	/// <summary>
+	/// このカテゴリが削除可能かどうか（システム定義の未分類カテゴリ以外は削除可能）
+	/// </summary>
+	public bool IsDeletable {
+		get {
+			return this.TagCategoryId != null;
+		}
+	}
+
 	public INotifyCollectionChangedSynchronizedViewList<TagViewModel> FilteredTags {
 		get;
 	}

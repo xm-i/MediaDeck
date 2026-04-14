@@ -53,6 +53,19 @@ public interface ITagsManager {
 	/// <returns>タスク</returns>
 	public Task RemoveTagAsync(IFileModel[] fileModels, int tagId);
 
+	/// <summary>
+	/// タグカテゴリをシステムから完全に削除する
+	/// </summary>
+	/// <param name="tagCategoryId">削除するタグカテゴリのID</param>
+	/// <returns>タスク</returns>
+	public Task DeleteTagCategoryAsync(int tagCategoryId);
+
+	/// <summary>
+	/// タグをシステムから完全に削除する
+	/// </summary>
+	/// <param name="tagId">削除するタグのID</param>
+	/// <returns>タスク</returns>
+	public Task DeleteTagAsync(int tagId);
 
 	/// <summary>
 	/// 変更を全て保存する

@@ -1,4 +1,3 @@
-using MediaDeck.Common.Utilities;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Database;
@@ -106,6 +105,57 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 			var tag = this.Tags.FirstOrDefault(x => x.TagId == tagId);
 			tag?.UsageCount.Value -= rel.Length;
 			await transaction.CommitAsync();
+		}
+	}
+
+	public async Task DeleteTagCategoryAsync(int tagCategoryId) {
+		await using var db = await this._dbFactory.CreateDbContextAsync();
+		using var transaction = await db.Database.BeginTransactionAsync();
+
+		var categoryEntity = await db.TagCategories.FirstOrDefaultAsync(x => x.TagCategoryId == tagCategoryId);
+		if (categoryEntity != null) {
+			db.TagCategories.Remove(categoryEntity);
+			await db.SaveChangesAsync();
+			await transaction.CommitAsync();
+
+			var categoryModel = this.TagCategories.FirstOrDefault(x => x.TagCategoryId == tagCategoryId);
+			if (categoryModel != null) {
+				this.TagCategories.Remove(categoryModel);
+
+				// UI上のタグを未設定カテゴリへ移動
+				var targetTags = categoryModel.Tags.ToArray();
+				if (targetTags.Any()) {
+					var nullCategoryModel = this.TagCategories.FirstOrDefault(x => x.TagCategoryId == null);
+					if (nullCategoryModel != null) {
+						foreach (var targetTag in targetTags) {
+							targetTag.TagCategoryId = null;
+							targetTag.TagCategory = nullCategoryModel;
+							nullCategoryModel.Tags.Add(targetTag);
+						}
+					}
+				}
+				categoryModel.Tags.Clear();
+			}
+		}
+	}
+
+	public async Task DeleteTagAsync(int tagId) {
+		await using var db = await this._dbFactory.CreateDbContextAsync();
+		using var transaction = await db.Database.BeginTransactionAsync();
+
+		var tagEntity = await db.Tags.FirstOrDefaultAsync(x => x.TagId == tagId);
+		if (tagEntity != null) {
+			db.Tags.Remove(tagEntity);
+			await db.SaveChangesAsync();
+			await transaction.CommitAsync();
+
+			var tagModel = this.Tags.FirstOrDefault(x => x.TagId == tagId);
+			if (tagModel != null) {
+				this.Tags.Remove(tagModel);
+				// remove from category
+				var categoryModel = this.TagCategories.FirstOrDefault(x => x.TagCategoryId == tagModel.TagCategoryId);
+				categoryModel?.Tags.Remove(tagModel);
+			}
 		}
 	}
 

@@ -5,7 +5,6 @@ using MediaDeck.Database;
 using MediaDeck.Database.Tables;
 using Microsoft.EntityFrameworkCore;
 using Moq;
-using ObservableCollections;
 using R3;
 using Shouldly;
 
@@ -267,7 +266,7 @@ public class TagsManagerTests {
 
 		var tag = manager.Tags.First();
 		tag.IsDirty.ShouldBeFalse();
-		
+
 		tag.TagName = "DirtyTag";
 		tag.IsDirty.ShouldBeTrue();
 
