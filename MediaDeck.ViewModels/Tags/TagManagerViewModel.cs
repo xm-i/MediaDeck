@@ -6,8 +6,8 @@ namespace MediaDeck.ViewModels.Tags;
 [Inject(InjectServiceLifetime.Transient)]
 public class TagManagerViewModel : ViewModelBase {
 	public TagManagerViewModel(ITagsManager tagsManager, ITagModelFactory tagModelFactory) {
-		this._tagCategories = tagsManager.TagCategories.CreateView(x => new TagCategoryViewModel(x, tagsManager, tagModelFactory));
-		this.TagCategories = this._tagCategories.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
+		var tagCategoriesView = tagsManager.TagCategories.CreateView(x => new TagCategoryViewModel(x, tagsManager, tagModelFactory));
+		this.TagCategories = tagCategoriesView.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
 		this.SaveCommand.SubscribeAwait(async (_, ct) => {
 			foreach (var category in this.TagCategories) {
 				category.SyncToModel();
@@ -22,16 +22,13 @@ public class TagManagerViewModel : ViewModelBase {
 		});
 		this.DeleteTagCategoryCommand.SubscribeAwait(async (_, ct) => {
 			var category = this.SelectedTagCategory.Value;
-			if (category != null) {
-				if (category.TagCategoryId != null) {
-					// DBに存在するカテゴリの削除
-					await tagsManager.DeleteTagCategoryAsync(category.TagCategoryId.Value);
-				} else if (category.IsDeletable == false) {
-					// システムカテゴリ（ID=null かつ IsDeletable=false）なら何もしない
-					return;
-				} else {
+			if (category != null && category.IsDeletable) {
+				if (category.TagCategoryId is null) {
 					// 追加したばかりの未保存カテゴリの削除（キャンセル）
 					tagsManager.TagCategories.Remove(category.Model);
+				} else {
+					// DBに存在するカテゴリの削除
+					await tagsManager.DeleteTagCategoryAsync(category.Model);
 				}
 				this.SelectedTagCategory.Value = null;
 			}
@@ -41,7 +38,7 @@ public class TagManagerViewModel : ViewModelBase {
 			var tag = category?.SelectedTag.Value;
 			if (tag != null) {
 				if (tag.Model.TagId > 0) {
-					await tagsManager.DeleteTagAsync(tag.Model.TagId);
+					await tagsManager.DeleteTagAsync(tag.Model);
 				} else {
 					tagsManager.Tags.Remove(tag.Model);
 					category!.Model.Tags.Remove(tag.Model);
@@ -51,14 +48,14 @@ public class TagManagerViewModel : ViewModelBase {
 		}, AwaitOperation.Drop);
 	}
 
-
-	private readonly ISynchronizedView<ITagCategoryModel, TagCategoryViewModel> _tagCategories;
-
 	public INotifyCollectionChangedSynchronizedViewList<TagCategoryViewModel> TagCategories {
 		get;
 	}
 
-	public BindableReactiveProperty<TagCategoryViewModel> SelectedTagCategory {
+	/// <summary>
+	/// 選択されているタグカテゴリー
+	/// </summary>
+	public BindableReactiveProperty<TagCategoryViewModel?> SelectedTagCategory {
 		get;
 	} = new();
 

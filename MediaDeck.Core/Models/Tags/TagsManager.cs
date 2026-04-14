@@ -19,6 +19,11 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 		get;
 	} = [];
 
+	public ITagCategoryModel NoCategory {
+		get;
+		private set;
+	} = null!;
+
 	public async Task<ITagModel?> FindTagByNameAsync(string tagName) {
 		var tag = this.Tags.FirstOrDefault(x => x.TagName == tagName);
 		return tag;
@@ -108,54 +113,45 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 		}
 	}
 
-	public async Task DeleteTagCategoryAsync(int tagCategoryId) {
+	public async Task DeleteTagCategoryAsync(ITagCategoryModel categoryModel) {
 		await using var db = await this._dbFactory.CreateDbContextAsync();
 		using var transaction = await db.Database.BeginTransactionAsync();
 
-		var categoryEntity = await db.TagCategories.FirstOrDefaultAsync(x => x.TagCategoryId == tagCategoryId);
+		var categoryEntity = await db.TagCategories.FirstOrDefaultAsync(x => x.TagCategoryId == categoryModel.TagCategoryId);
 		if (categoryEntity != null) {
 			db.TagCategories.Remove(categoryEntity);
 			await db.SaveChangesAsync();
 			await transaction.CommitAsync();
 
-			var categoryModel = this.TagCategories.FirstOrDefault(x => x.TagCategoryId == tagCategoryId);
-			if (categoryModel != null) {
-				this.TagCategories.Remove(categoryModel);
+			this.TagCategories.Remove(categoryModel);
 
-				// UI上のタグを未設定カテゴリへ移動
-				var targetTags = categoryModel.Tags.ToArray();
-				if (targetTags.Any()) {
-					var nullCategoryModel = this.TagCategories.FirstOrDefault(x => x.TagCategoryId == null);
-					if (nullCategoryModel != null) {
-						foreach (var targetTag in targetTags) {
-							targetTag.TagCategoryId = null;
-							targetTag.TagCategory = nullCategoryModel;
-							nullCategoryModel.Tags.Add(targetTag);
-						}
-					}
+			// UI上のタグを未設定カテゴリへ移動
+			var targetTags = categoryModel.Tags.ToArray();
+			if (targetTags.Any()) {
+				foreach (var targetTag in targetTags) {
+					targetTag.TagCategoryId = null;
+					targetTag.TagCategory = this.NoCategory;
+					this.NoCategory.Tags.Add(targetTag);
 				}
-				categoryModel.Tags.Clear();
 			}
+			categoryModel.Tags.Clear();
 		}
 	}
 
-	public async Task DeleteTagAsync(int tagId) {
+	public async Task DeleteTagAsync(ITagModel tagModel) {
 		await using var db = await this._dbFactory.CreateDbContextAsync();
 		using var transaction = await db.Database.BeginTransactionAsync();
 
-		var tagEntity = await db.Tags.FirstOrDefaultAsync(x => x.TagId == tagId);
+		var tagEntity = await db.Tags.FirstOrDefaultAsync(x => x.TagId == tagModel.TagId);
 		if (tagEntity != null) {
 			db.Tags.Remove(tagEntity);
 			await db.SaveChangesAsync();
 			await transaction.CommitAsync();
 
-			var tagModel = this.Tags.FirstOrDefault(x => x.TagId == tagId);
-			if (tagModel != null) {
-				this.Tags.Remove(tagModel);
-				// remove from category
-				var categoryModel = this.TagCategories.FirstOrDefault(x => x.TagCategoryId == tagModel.TagCategoryId);
-				categoryModel?.Tags.Remove(tagModel);
-			}
+			this.Tags.Remove(tagModel);
+			// remove from category
+			var categoryModel = this.TagCategories.FirstOrDefault(x => x.TagCategoryId == tagModel.TagCategoryId);
+			categoryModel?.Tags.Remove(tagModel);
 		}
 	}
 
@@ -164,29 +160,35 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 		using var transaction = await db.Database.BeginTransactionAsync();
 		try {
 			foreach (var category in this.TagCategories) {
-				int? dbCategoryId = category.TagCategoryId;
-
-				if (dbCategoryId == null && category.TagCategoryName != "未設定") {
-					// 新規カテゴリーの作成
-					var entity = new TagCategory {
-						TagCategoryName = category.TagCategoryName,
-						Detail = category.Detail,
-						Tags = []
-					};
-					await db.TagCategories.AddAsync(entity);
-					await db.SaveChangesAsync();
-					category.TagCategoryId = entity.TagCategoryId;
-					dbCategoryId = entity.TagCategoryId;
-				} else if (dbCategoryId != null && category.IsDirty) {
-					// 既存カテゴリーの更新
-					var entity = await db.TagCategories.FirstOrDefaultAsync(x => x.TagCategoryId == dbCategoryId);
-					if (entity != null) {
-						entity.TagCategoryName = category.TagCategoryName;
-						entity.Detail = category.Detail;
-						db.TagCategories.Update(entity);
+				if (category == this.NoCategory) {
+					// システムカテゴリ自体の保存（エンティティ作成）は不要だが、
+					// 属するタグの保存処理へ進むため、ここでは continue せずにフラグ等で制御するか、
+					// カテゴリ保存処理をスキップする。
+				} else {
+					int? dbCategoryId = category.TagCategoryId;
+					if (dbCategoryId == null) {
+						// 新規カテゴリーの作成
+						var entity = new TagCategory {
+							TagCategoryName = category.TagCategoryName,
+							Detail = category.Detail,
+							Tags = []
+						};
+						await db.TagCategories.AddAsync(entity);
+						await db.SaveChangesAsync();
+						category.TagCategoryId = entity.TagCategoryId;
+						dbCategoryId = entity.TagCategoryId;
+					} else if (category.IsDirty) {
+						// 既存カテゴリーの更新
+						var entity = await db.TagCategories.FirstOrDefaultAsync(x => x.TagCategoryId == dbCategoryId);
+						if (entity != null) {
+							entity.TagCategoryName = category.TagCategoryName;
+							entity.Detail = category.Detail;
+							db.TagCategories.Update(entity);
+						}
 					}
 				}
 
+				var currentCategoryId = category.TagCategoryId;
 				// カテゴリーに属するタグの保存
 				foreach (var tag in category.Tags) {
 					if (!tag.IsDirty) {
@@ -204,7 +206,7 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 					if (tagEntity == null) {
 						// 新規タグの作成
 						tagEntity = new Tag {
-							TagCategoryId = dbCategoryId,
+							TagCategoryId = currentCategoryId,
 							TagName = tag.TagName,
 							Detail = tag.Detail,
 							TagAliases = []
@@ -214,7 +216,7 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 						tag.TagId = tagEntity.TagId;
 					} else {
 						// 既存タグの更新
-						tagEntity.TagCategoryId = dbCategoryId;
+						tagEntity.TagCategoryId = currentCategoryId;
 						tagEntity.TagName = tag.TagName;
 						tagEntity.Detail = tag.Detail;
 						db.Tags.Update(tagEntity);
@@ -285,6 +287,7 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 		var tags = new List<ITagModel>();
 
 		var noCategoryModel = this._tagModelFactory.CreateCategory(null);
+		this.NoCategory = noCategoryModel;
 		noCategoryModel.Tags.AddRange(noCategoryTags.Select(t => this._tagModelFactory.Create(t, noCategoryModel)).OrderByDescending(x => x.UsageCount.Value));
 		this.TagCategories.Add(noCategoryModel);
 		tags.AddRange(noCategoryModel.Tags);

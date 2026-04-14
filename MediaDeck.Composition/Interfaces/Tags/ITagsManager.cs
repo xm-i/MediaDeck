@@ -14,6 +14,13 @@ public interface ITagsManager {
 	}
 
 	/// <summary>
+	/// 未分類のタグカテゴリー（システム定義）
+	/// </summary>
+	public ITagCategoryModel NoCategory {
+		get;
+	}
+
+	/// <summary>
 	/// 全タグのリスト
 	/// </summary>
 	public ObservableList<ITagModel> Tags {
@@ -56,16 +63,16 @@ public interface ITagsManager {
 	/// <summary>
 	/// タグカテゴリをシステムから完全に削除する
 	/// </summary>
-	/// <param name="tagCategoryId">削除するタグカテゴリのID</param>
+	/// <param name="categoryModel">削除するタグカテゴリのモデル</param>
 	/// <returns>タスク</returns>
-	public Task DeleteTagCategoryAsync(int tagCategoryId);
+	public Task DeleteTagCategoryAsync(ITagCategoryModel categoryModel);
 
 	/// <summary>
 	/// タグをシステムから完全に削除する
 	/// </summary>
-	/// <param name="tagId">削除するタグのID</param>
+	/// <param name="tagModel">削除するタグのモデル</param>
 	/// <returns>タスク</returns>
-	public Task DeleteTagAsync(int tagId);
+	public Task DeleteTagAsync(ITagModel tagModel);
 
 	/// <summary>
 	/// 変更を全て保存する

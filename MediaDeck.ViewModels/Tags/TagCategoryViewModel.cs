@@ -4,7 +4,10 @@ using MediaDeck.Composition.Interfaces.Tags;
 namespace MediaDeck.ViewModels.Tags;
 
 public class TagCategoryViewModel {
+	private readonly ITagsManager _tagsManager;
+
 	public TagCategoryViewModel(ITagCategoryModel tagCategory, ITagsManager tagsManager, ITagModelFactory tagModelFactory) {
+		this._tagsManager = tagsManager;
 		this.Model = tagCategory;
 		this.TagCategoryId = tagCategory.TagCategoryId;
 		this.TagCategoryName.Value = tagCategory.TagCategoryName;
@@ -37,7 +40,7 @@ public class TagCategoryViewModel {
 	/// </summary>
 	public bool IsDeletable {
 		get {
-			return this.TagCategoryId != null;
+			return this.Model != this._tagsManager.NoCategory;
 		}
 	}
 
@@ -45,7 +48,10 @@ public class TagCategoryViewModel {
 		get;
 	}
 
-	public BindableReactiveProperty<TagViewModel> SelectedTag {
+	/// <summary>
+	/// 選択されているタグ
+	/// </summary>
+	public BindableReactiveProperty<TagViewModel?> SelectedTag {
 		get;
 	} = new();
 
