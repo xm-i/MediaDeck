@@ -216,7 +216,7 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 						tag.TagId = tagEntity.TagId;
 					} else {
 						// 既存タグの更新
-						tagEntity.TagCategoryId = currentCategoryId;
+						tagEntity.TagCategoryId = tag.TagCategoryId;
 						tagEntity.TagName = tag.TagName;
 						tagEntity.Detail = tag.Detail;
 						db.Tags.Update(tagEntity);
