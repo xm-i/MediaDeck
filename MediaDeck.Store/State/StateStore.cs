@@ -47,6 +47,7 @@ public class StateStore : IStateStore {
 	public JsonSerializerOptions JsonSerializerOptions {
 		get {
 			return field ??= new JsonSerializerOptions() {
+				WriteIndented = true,
 				TypeInfoResolver = StateJsonSerializerContext.Default.WithAddedModifier(global::R3.JsonConfig.ForJsonConverterRegistry.ApplyPolymorphism)
 			};
 		}
