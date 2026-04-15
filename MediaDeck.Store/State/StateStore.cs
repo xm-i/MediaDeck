@@ -63,6 +63,7 @@ public class StateStore : IStateStore {
 			if (File.Exists(this.StateFilePath)) {
 				try {
 					var json = File.ReadAllText(this.StateFilePath);
+					this._logger.LogInformation(json);
 					var loaded = JsonSerializer.Deserialize<StateModelForJson>(json, this.JsonSerializerOptions);
 					if (loaded != null) {
 						this.State = StateModelForJson.CreateModel(loaded, scope.ServiceProvider);
@@ -106,6 +107,7 @@ public class StateStore : IStateStore {
 
 			var jsonDto = StateModelForJson.CreateJson(this.State);
 			var json = JsonSerializer.Serialize(jsonDto, this.JsonSerializerOptions);
+			this._logger.LogInformation(json);
 			File.WriteAllText(this.StateFilePath, json);
 			this._logger.LogInformation("状態設定を保存しました: {FilePath}", this.StateFilePath);
 		} catch (IOException ie) {

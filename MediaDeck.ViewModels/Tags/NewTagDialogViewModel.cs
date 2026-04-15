@@ -10,7 +10,7 @@ public class NewTagDialogViewModel : ViewModelBase {
 		this.SelectedCategory.Value = this.TagCategories.FirstOrDefault();
 		this.ConfirmCommand.Subscribe(async _ => {
 			// タグを作成
-			this.CreatedTag.Value = await tagsManager.CreateTagAsync(this.SelectedCategory.Value?.TagCategoryId ?? 0,
+			this.CreatedTag.Value = await tagsManager.CreateTagImmediatelyAsync(this.SelectedCategory.Value?.TagCategoryId ?? 0,
 				this.TagName.Value,
 				this.Detail.Value,
 				[]);

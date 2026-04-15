@@ -23,13 +23,7 @@ public class TagManagerViewModel : ViewModelBase {
 		this.DeleteTagCategoryCommand.SubscribeAwait(async (_, ct) => {
 			var category = this.SelectedTagCategory.Value;
 			if (category != null && category.IsDeletable) {
-				if (category.TagCategoryId is null) {
-					// 追加したばかりの未保存カテゴリの削除（キャンセル）
-					tagsManager.TagCategories.Remove(category.Model);
-				} else {
-					// DBに存在するカテゴリの削除
-					await tagsManager.DeleteTagCategoryAsync(category.Model);
-				}
+				await tagsManager.DeleteTagCategoryAsync(category.Model);
 				this.SelectedTagCategory.Value = null;
 			}
 		}, AwaitOperation.Drop);
@@ -37,14 +31,15 @@ public class TagManagerViewModel : ViewModelBase {
 			var category = this.SelectedTagCategory.Value;
 			var tag = category?.SelectedTag.Value;
 			if (tag != null) {
-				if (tag.Model.TagId > 0) {
-					await tagsManager.DeleteTagAsync(tag.Model);
-				} else {
-					tagsManager.Tags.Remove(tag.Model);
-					category!.Model.Tags.Remove(tag.Model);
-				}
+				await tagsManager.DeleteTagAsync(tag.Model);
 				category!.SelectedTag.Value = null;
 			}
+		}, AwaitOperation.Drop);
+		this.CancelCommand.SubscribeAwait(async (_, ct) => {
+			await tagsManager.ReloadAsync();
+		}, AwaitOperation.Drop);
+		this.LoadCommand.SubscribeAwait(async (_, ct) => {
+			await tagsManager.InitializeAsync();
 		}, AwaitOperation.Drop);
 	}
 
@@ -64,6 +59,10 @@ public class TagManagerViewModel : ViewModelBase {
 	} = new();
 
 	public ReactiveCommand SaveCommand {
+		get;
+	} = new();
+
+	public ReactiveCommand CancelCommand {
 		get;
 	} = new();
 

@@ -85,11 +85,11 @@ public class TagsManagerTests {
 	}
 
 	/// <summary>
-	/// CreateTagAsyncが新しいタグとエイリアスを正常に作成し、データベースに保存することを検証します。
+	/// CreateTagImmediatelyAsyncが新しいタグとエイリアスを正常に作成し、データベースに保存することを検証します。
 	/// </summary>
 	[Fact]
-	public async Task CreateTagAsync_ShouldCreateTagAndAliases_WhenValidArgumentsProvided() {
-		var dbFactory = this.CreateInMemoryDbFactory(nameof(this.CreateTagAsync_ShouldCreateTagAndAliases_WhenValidArgumentsProvided));
+	public async Task CreateTagImmediatelyAsync_ShouldCreateTagAndAliases_WhenValidArgumentsProvided() {
+		var dbFactory = this.CreateInMemoryDbFactory(nameof(this.CreateTagImmediatelyAsync_ShouldCreateTagAndAliases_WhenValidArgumentsProvided));
 		await this.SeedDatabaseAsync(dbFactory);
 		var tagModelFactoryMock = new Mock<ITagModelFactory>();
 		this.SetupFactoryMock(tagModelFactoryMock);
@@ -100,20 +100,20 @@ public class TagsManagerTests {
 		aliasMock.SetupGet(x => x.Alias).Returns("NewAlias1");
 		aliases.Add(aliasMock.Object);
 
-		var result = await manager.CreateTagAsync(1, "NewTag", "NewDetail", aliases);
+		var result = await manager.CreateTagImmediatelyAsync(1, "NewTag", "NewDetail", aliases);
 		result.ShouldNotBeNull();
 		result.TagName.ShouldBe("NewTag");
 	}
 
 	/// <summary>
-	/// CreateTagAsyncが、エイリアスリストにnullが渡された場合に例外を投げることを検証します。
+	/// CreateTagImmediatelyAsyncが、エイリアスリストにnullが渡された場合に例外を投げることを検証します。
 	/// </summary>
 	[Fact]
-	public async Task CreateTagAsync_ShouldThrowException_WhenAliasesIsNull() {
-		var dbFactory = this.CreateInMemoryDbFactory(nameof(this.CreateTagAsync_ShouldThrowException_WhenAliasesIsNull));
+	public async Task CreateTagImmediatelyAsync_ShouldThrowException_WhenAliasesIsNull() {
+		var dbFactory = this.CreateInMemoryDbFactory(nameof(this.CreateTagImmediatelyAsync_ShouldThrowException_WhenAliasesIsNull));
 		var tagModelFactoryMock = new Mock<ITagModelFactory>();
 		var manager = new TagsManager(dbFactory, tagModelFactoryMock.Object);
-		await Should.ThrowAsync<Exception>(() => manager.CreateTagAsync(1, "NewTag", "NewDetail", null!));
+		await Should.ThrowAsync<Exception>(() => manager.CreateTagImmediatelyAsync(1, "NewTag", "NewDetail", null!));
 	}
 
 	/// <summary>
@@ -287,5 +287,109 @@ public class TagsManagerTests {
 		await manager.InitializeAsync();
 		manager.TagCategories.Count.ShouldBe(3); // +1 Virtual Category for No Category tags
 		manager.Tags.Count.ShouldBe(2);
+	}
+
+	/// <summary>
+	/// DeleteTagAsyncが即座にDBを更新せず、SaveAsync時に削除が反映されることを検証します。
+	/// </summary>
+	[Fact]
+	public async Task DeleteTagAsync_ShouldDeferDeletion() {
+		var dbName = nameof(this.DeleteTagAsync_ShouldDeferDeletion);
+		var dbFactory = this.CreateInMemoryDbFactory(dbName);
+		await this.SeedDatabaseAsync(dbFactory);
+		var tagModelFactoryMock = new Mock<ITagModelFactory>();
+		this.SetupFactoryMock(tagModelFactoryMock);
+		var manager = new TagsManager(dbFactory, tagModelFactoryMock.Object);
+		await manager.InitializeAsync();
+
+		var tag = manager.Tags.First(x => x.TagId == 1);
+		await manager.DeleteTagAsync(tag);
+
+		// メモリ上からは消えている
+		manager.Tags.ShouldNotContain(tag);
+
+		// DBにはまだ残っている
+		await using (var db = await dbFactory.CreateDbContextAsync()) {
+			var dbTag = await db.Tags.FirstOrDefaultAsync(x => x.TagId == 1);
+			dbTag.ShouldNotBeNull();
+		}
+
+		// 保存実行
+		await manager.SaveAsync();
+
+		// DBからも消える
+		await using (var db = await dbFactory.CreateDbContextAsync()) {
+			var dbTag = await db.Tags.FirstOrDefaultAsync(x => x.TagId == 1);
+			dbTag.ShouldBeNull();
+		}
+	}
+
+	/// <summary>
+	/// DeleteTagCategoryAsyncが即座にDBを更新せず、SaveAsync時に削除が反映されることを検証します。
+	/// </summary>
+	[Fact]
+	public async Task DeleteTagCategoryAsync_ShouldDeferDeletion() {
+		var dbName = nameof(this.DeleteTagCategoryAsync_ShouldDeferDeletion);
+		var dbFactory = this.CreateInMemoryDbFactory(dbName);
+		await this.SeedDatabaseAsync(dbFactory);
+		var tagModelFactoryMock = new Mock<ITagModelFactory>();
+		this.SetupFactoryMock(tagModelFactoryMock);
+		var manager = new TagsManager(dbFactory, tagModelFactoryMock.Object);
+		await manager.InitializeAsync();
+
+		var category = manager.TagCategories.First(x => x.TagCategoryId == 2);
+		await manager.DeleteTagCategoryAsync(category);
+
+		// メモリ上からは消えている
+		manager.TagCategories.ShouldNotContain(category);
+
+		// DBにはまだ残っている
+		await using (var db = await dbFactory.CreateDbContextAsync()) {
+			var dbCategory = await db.TagCategories.FirstOrDefaultAsync(x => x.TagCategoryId == 2);
+			dbCategory.ShouldNotBeNull();
+		}
+
+		// 保存実行
+		await manager.SaveAsync();
+
+		// DBからも消える
+		await using (var db = await dbFactory.CreateDbContextAsync()) {
+			var dbCategory = await db.TagCategories.FirstOrDefaultAsync(x => x.TagCategoryId == 2);
+			dbCategory.ShouldBeNull();
+		}
+	}
+
+	/// <summary>
+	/// ReloadAsyncがメモリ上の変更（追加・更新・削除待ち）を破棄し、DBの状態にリセットすることを検証します。
+	/// </summary>
+	[Fact]
+	public async Task ReloadAsync_ShouldResetStateToDatabase() {
+		var dbName = nameof(this.ReloadAsync_ShouldResetStateToDatabase);
+		var dbFactory = this.CreateInMemoryDbFactory(dbName);
+		await this.SeedDatabaseAsync(dbFactory);
+		var tagModelFactoryMock = new Mock<ITagModelFactory>();
+		this.SetupFactoryMock(tagModelFactoryMock);
+		var manager = new TagsManager(dbFactory, tagModelFactoryMock.Object);
+		await manager.InitializeAsync();
+
+		// 1. 変更を加える
+		var tag = manager.Tags.First(x => x.TagId == 1);
+		tag.TagName = "ModifiedTagName";
+		
+		// 2. 削除を加える
+		var category = manager.TagCategories.First(x => x.TagCategoryId == 2);
+		await manager.DeleteTagCategoryAsync(category);
+
+		// 状態確認
+		manager.Tags.Any(x => x.TagName == "ModifiedTagName").ShouldBeTrue();
+		manager.TagCategories.Any(x => x.TagCategoryId == 2).ShouldBeFalse();
+
+		// 3. リセット実行
+		await manager.ReloadAsync();
+
+		// 4. DBの状態に戻っていることを確認
+		manager.Tags.Any(x => x.TagName == "ModifiedTagName").ShouldBeFalse();
+		manager.TagCategories.Any(x => x.TagCategoryId == 2).ShouldBeTrue();
+		manager.Tags.First(x => x.TagId == 1).TagName.ShouldBe("Tag1");
 	}
 }

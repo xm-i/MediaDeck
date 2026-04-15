@@ -35,14 +35,14 @@ public interface ITagsManager {
 	public Task<ITagModel?> FindTagByNameAsync(string tagName);
 
 	/// <summary>
-	/// タグを作成する
+	/// タグを即座に作成し、データベースに保存する
 	/// </summary>
 	/// <param name="tagCategoryId">カテゴリーID</param>
 	/// <param name="tagName">タグ名</param>
 	/// <param name="detail">詳細</param>
 	/// <param name="aliases">別名リスト</param>
 	/// <returns>作成されたタグ</returns>
-	public Task<ITagModel?> CreateTagAsync(int? tagCategoryId, string tagName, string detail, IEnumerable<ITagAliasModel> aliases);
+	public Task<ITagModel?> CreateTagImmediatelyAsync(int? tagCategoryId, string tagName, string detail, IEnumerable<ITagAliasModel> aliases);
 
 	/// <summary>
 	/// ファイルにタグを追加する
@@ -79,6 +79,12 @@ public interface ITagsManager {
 	/// </summary>
 	/// <returns>タスク</returns>
 	public Task SaveAsync();
+
+	/// <summary>
+	/// データを再読み込みし、全ての変更（未保存の追加、更新、削除）を破棄します。
+	/// </summary>
+	/// <returns>タスク</returns>
+	public Task ReloadAsync();
 
 	/// <summary>
 	/// データを初期化（ロード）する

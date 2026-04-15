@@ -11,6 +11,9 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 	private readonly ITagModelFactory _tagModelFactory = tagModelFactory;
 	private bool _isInitialized;
 
+	private readonly List<ITagCategoryModel> _pendingDeleteCategories = [];
+	private readonly List<ITagModel> _pendingDeleteTags = [];
+
 	public ObservableList<ITagCategoryModel> TagCategories {
 		get;
 	} = [];
@@ -29,7 +32,7 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 		return tag;
 	}
 
-	public async Task<ITagModel?> CreateTagAsync(int? tagCategoryId, string tagName, string detail, IEnumerable<ITagAliasModel> aliases) {
+	public async Task<ITagModel?> CreateTagImmediatelyAsync(int? tagCategoryId, string tagName, string detail, IEnumerable<ITagAliasModel> aliases) {
 		await using var db = await this._dbFactory.CreateDbContextAsync();
 		using var transaction = await db.Database.BeginTransactionAsync();
 		var tag = new Tag {
@@ -114,51 +117,63 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 	}
 
 	public async Task DeleteTagCategoryAsync(ITagCategoryModel categoryModel) {
-		await using var db = await this._dbFactory.CreateDbContextAsync();
-		using var transaction = await db.Database.BeginTransactionAsync();
+		this.TagCategories.Remove(categoryModel);
 
-		var categoryEntity = await db.TagCategories.FirstOrDefaultAsync(x => x.TagCategoryId == categoryModel.TagCategoryId);
-		if (categoryEntity != null) {
-			db.TagCategories.Remove(categoryEntity);
-			await db.SaveChangesAsync();
-			await transaction.CommitAsync();
-
-			this.TagCategories.Remove(categoryModel);
-
-			// UI上のタグを未設定カテゴリへ移動
-			var targetTags = categoryModel.Tags.ToArray();
-			if (targetTags.Any()) {
-				foreach (var targetTag in targetTags) {
-					targetTag.TagCategoryId = null;
-					targetTag.TagCategory = this.NoCategory;
-					this.NoCategory.Tags.Add(targetTag);
-				}
-			}
-			categoryModel.Tags.Clear();
+		// UI上のタグを未設定カテゴリへ移動
+		var targetTags = categoryModel.Tags.ToArray();
+		foreach (var targetTag in targetTags) {
+			targetTag.TagCategoryId = null;
+			targetTag.TagCategory = this.NoCategory;
+			this.NoCategory.Tags.Add(targetTag);
 		}
+		categoryModel.Tags.Clear();
+
+		// DBに存在する（IDがある）場合は、保存時に削除するためリストに保持
+		if (categoryModel.TagCategoryId != null) {
+			this._pendingDeleteCategories.Add(categoryModel);
+		}
+
+		await Task.CompletedTask;
 	}
 
 	public async Task DeleteTagAsync(ITagModel tagModel) {
-		await using var db = await this._dbFactory.CreateDbContextAsync();
-		using var transaction = await db.Database.BeginTransactionAsync();
+		this.Tags.Remove(tagModel);
+		// remove from category
+		var categoryModel = this.TagCategories.FirstOrDefault(x => x.TagCategoryId == tagModel.TagCategoryId);
+		categoryModel?.Tags.Remove(tagModel);
 
-		var tagEntity = await db.Tags.FirstOrDefaultAsync(x => x.TagId == tagModel.TagId);
-		if (tagEntity != null) {
-			db.Tags.Remove(tagEntity);
-			await db.SaveChangesAsync();
-			await transaction.CommitAsync();
-
-			this.Tags.Remove(tagModel);
-			// remove from category
-			var categoryModel = this.TagCategories.FirstOrDefault(x => x.TagCategoryId == tagModel.TagCategoryId);
-			categoryModel?.Tags.Remove(tagModel);
+		// DBに存在する（IDが初期化されている）場合は、保存時に削除するためリストに保持
+		try {
+			if (tagModel.TagId > 0) {
+				this._pendingDeleteTags.Add(tagModel);
+			}
+		} catch (InvalidOperationException) {
+			// ID未初期化（新規追加かつ未保存）の場合は無視
 		}
+
+		await Task.CompletedTask;
 	}
 
 	public async Task SaveAsync() {
 		await using var db = await this._dbFactory.CreateDbContextAsync();
 		using var transaction = await db.Database.BeginTransactionAsync();
 		try {
+			// 1. 削除待ちのタグを削除
+			if (this._pendingDeleteTags.Any()) {
+				var tagIds = this._pendingDeleteTags.Select(x => x.TagId).ToArray();
+				var entities = await db.Tags.Where(x => tagIds.Contains(x.TagId)).ToArrayAsync();
+				db.Tags.RemoveRange(entities);
+				await db.SaveChangesAsync();
+			}
+
+			// 2. 削除待ちのカテゴリを削除
+			if (this._pendingDeleteCategories.Any()) {
+				var categoryIds = this._pendingDeleteCategories.Select(x => x.TagCategoryId).ToArray();
+				var entities = await db.TagCategories.Where(x => categoryIds.Contains(x.TagCategoryId)).ToArrayAsync();
+				db.TagCategories.RemoveRange(entities);
+				await db.SaveChangesAsync();
+			}
+
 			foreach (var category in this.TagCategories) {
 				if (category == this.NoCategory) {
 					// システムカテゴリ自体の保存（エンティティ作成）は不要だが、
@@ -246,6 +261,10 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 				}
 			}
 
+			// 完了後にリストをクリア
+			this._pendingDeleteTags.Clear();
+			this._pendingDeleteCategories.Clear();
+
 			// TODO: 全タグリスト (this.Tags) との整合性も必要に応じて整える
 		} catch {
 			await transaction.RollbackAsync();
@@ -253,11 +272,18 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 		}
 	}
 
+	public async Task ReloadAsync() {
+		this._isInitialized = false;
+		await this.InitializeAsync();
+	}
+
 	public async Task InitializeAsync() {
 		if (this._isInitialized) {
 			return;
 		}
 		this._isInitialized = true;
+		this._pendingDeleteTags.Clear();
+		this._pendingDeleteCategories.Clear();
 
 		await using var db = await this._dbFactory.CreateDbContextAsync();
 		var tagCategories =
