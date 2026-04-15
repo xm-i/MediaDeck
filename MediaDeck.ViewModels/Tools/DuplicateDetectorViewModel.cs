@@ -1,9 +1,9 @@
 using MediaDeck.Common.Base;
 using MediaDeck.Common.Utilities;
+using MediaDeck.Composition.Interfaces.FileTypes;
 using MediaDeck.Composition.Interfaces.FileTypes.ViewModels;
 using MediaDeck.Core.Models.Tools;
 using MediaDeck.Core.Primitives;
-using MediaDeck.Core.Utils;
 
 namespace MediaDeck.ViewModels.Tools;
 
@@ -13,6 +13,7 @@ namespace MediaDeck.ViewModels.Tools;
 [Inject(InjectServiceLifetime.Transient)]
 public class DuplicateDetectorViewModel : ViewModelBase {
 	private readonly DuplicateFileDetector _detector;
+	private readonly IFileTypeService _fileTypeService;
 
 	/// <summary>
 	/// 重複ファイルグループリスト
@@ -94,8 +95,9 @@ public class DuplicateDetectorViewModel : ViewModelBase {
 		get;
 	} = new();
 
-	public DuplicateDetectorViewModel(DuplicateFileDetector detector) {
+	public DuplicateDetectorViewModel(DuplicateFileDetector detector, IFileTypeService fileTypeService) {
 		this._detector = detector;
+		this._fileTypeService = fileTypeService;
 
 		this.DuplicateGroups = this._detector.DuplicateGroups.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
 
@@ -109,10 +111,11 @@ public class DuplicateDetectorViewModel : ViewModelBase {
 		this.SelectedGroup
 			.Subscribe(g => {
 				this.SelectedGroupFiles.Value = g?.Files
-					.Select(f => FileTypeUtility.CreateFileViewModel(FileTypeUtility.CreateFileModelFromRecord(f)))
+					.Select(f => this._fileTypeService.CreateFileViewModel(this._fileTypeService.CreateFileModelFromRecord(f)))
 					.ToArray();
 			})
 			.AddTo(this.CompositeDisposable);
+
 
 		this.DetectCommand
 			.Subscribe(async _ => {

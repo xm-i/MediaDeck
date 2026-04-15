@@ -1,12 +1,4 @@
-using CommunityToolkit.Mvvm.DependencyInjection;
-
-using MediaDeck.Views;
-
-using Microsoft.UI;
-using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
-
-using WinRT.Interop;
 
 namespace MediaDeck.Utils.Tools;
 
@@ -20,34 +12,4 @@ public static class WinUIUtility {
 
 		return ((object)parent as Window)!;
 	}
-
-	public static void ActivateCenteredOnMainWindow(this Window childWindow) {
-		CenterWindowOnMainWindow(childWindow);
-		childWindow.Activate();
-	}
-
-	private static void CenterWindowOnMainWindow(Window childWindow) {
-		var mainWindow = Ioc.Default.GetRequiredService<MainWindow>();
-		var mainAppWindow = GetAppWindow(mainWindow);
-		var childAppWindow = GetAppWindow(childWindow);
-
-		if (mainAppWindow is null || childAppWindow is null) {
-			return;
-		}
-
-		var mainPos = mainAppWindow.Position;
-		var mainSize = mainAppWindow.Size;
-		var childSize = childAppWindow.Size;
-
-		var x = mainPos.X + ((mainSize.Width - childSize.Width) / 2);
-		var y = mainPos.Y + ((mainSize.Height - childSize.Height) / 2);
-
-		childAppWindow.Move(new(x, y));
-	}
-
-	private static AppWindow? GetAppWindow(Window window) {
-		var hWnd = WindowNative.GetWindowHandle(window);
-		var windowId = Win32Interop.GetWindowIdFromWindow(hWnd);
-		return AppWindow.GetFromWindowId(windowId);
-	}
-}
+}

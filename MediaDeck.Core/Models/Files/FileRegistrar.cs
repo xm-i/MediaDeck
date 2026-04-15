@@ -1,10 +1,10 @@
 using System.Collections.Concurrent;
 
+using MediaDeck.Composition.Interfaces.FileTypes;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Composition.Stores.State.Model.Objects;
 using MediaDeck.Core.Models.NotificationDispatcher;
-using MediaDeck.Core.Utils;
 
 using Microsoft.Extensions.Logging;
 
@@ -12,7 +12,7 @@ namespace MediaDeck.Core.Models.Files;
 
 [Inject(InjectServiceLifetime.Singleton)]
 public class FileRegistrar {
-	private static readonly IFileOperator[] _fileOperators;
+	private readonly IFileOperator[] _fileOperators;
 	private readonly ConcurrentDictionary<string, FolderModel> _fileToFolderMap = new();
 	private readonly ILogger<FileRegistrar> _logger;
 	private readonly IFilePathService _filePathService;
@@ -25,14 +25,11 @@ public class FileRegistrar {
 		get;
 	}
 
-	static FileRegistrar() {
-		_fileOperators = FileTypeUtility.CreateFileOperators();
-	}
-
-	public FileRegistrar(ConfigModel config, ILogger<FileRegistrar> logger, IFilePathService filePathService) {
+	public FileRegistrar(ConfigModel config, ILogger<FileRegistrar> logger, IFilePathService filePathService, IFileTypeService fileTypeService) {
 		this.Config = config;
 		this._logger = logger;
 		this._filePathService = filePathService;
+		this._fileOperators = fileTypeService.CreateFileOperators();
 		this.RegistrationQueue
 			.ObserveAdd()
 			.ThrottleFirst(TimeSpan.FromSeconds(0.1))
@@ -42,6 +39,7 @@ public class FileRegistrar {
 				AwaitOperation.Sequential,
 				false);
 	}
+
 
 	public async Task ScanFolderAsync(FolderModel folder) {
 		folder.IsScanning.Value = true;

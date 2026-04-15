@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.DependencyInjection;
 
+using MediaDeck.Composition.Interfaces.Services;
 using MediaDeck.ViewModels.Panes.FilterPanes;
 using MediaDeck.Views.Filters;
 
@@ -14,8 +15,9 @@ public sealed partial class FilterSelector {
 
 	private void OpenFilterSettingsWindowButton_Click(object sender, RoutedEventArgs e) {
 		var window = Ioc.Default.GetRequiredService<FilterManagerWindow>();
-		window.ActivateCenteredOnMainWindow();
+		Ioc.Default.GetRequiredService<IWindowService>().ActivateCenteredOnMainWindow(window);
 	}
 }
+
 
 public abstract class FilterSelectorUserControl : UserControlBase<FilterSelectorViewModel>;

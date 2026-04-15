@@ -1,17 +1,18 @@
 using MediaDeck.Common.Base;
 using MediaDeck.Composition.Interfaces.Files;
+using MediaDeck.Composition.Interfaces.FileTypes;
 using MediaDeck.Composition.Interfaces.FileTypes.ViewModels;
 using MediaDeck.Core.Models.Files;
 using MediaDeck.Core.Models.NotificationDispatcher;
-using MediaDeck.Core.Utils;
 
 namespace MediaDeck.ViewModels.Panes.ViewerPanes;
 
 [Inject(InjectServiceLifetime.Singleton)]
 public class MediaContentLibraryViewModel : ViewModelBase {
-	public MediaContentLibraryViewModel(MediaContentLibrary mediaContentLibrary, SearchConditionNotificationDispatcher searchConditionNotificationDispatcher) {
+	public MediaContentLibraryViewModel(MediaContentLibrary mediaContentLibrary, SearchConditionNotificationDispatcher searchConditionNotificationDispatcher, IFileTypeService fileTypeService) {
 		this._mediaContentLibrary = mediaContentLibrary;
-		this.Files = mediaContentLibrary.Files.CreateView(FileTypeUtility.CreateFileViewModel).ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
+		this.Files = mediaContentLibrary.Files.CreateView(fileTypeService.CreateFileViewModel).ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
+
 		this.SearchConditions =
 			mediaContentLibrary
 				.SearchConditions

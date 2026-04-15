@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.DependencyInjection;
 
+using MediaDeck.Composition.Interfaces.Services;
 using MediaDeck.ViewModels;
 using MediaDeck.Views.FolderManager;
 using MediaDeck.Views.Preferences;
@@ -12,8 +13,11 @@ using Microsoft.UI.Xaml.Controls;
 namespace MediaDeck.Views;
 
 public sealed partial class NavigationMenu {
+	private readonly IWindowService _windowService;
+
 	public NavigationMenu() {
 		this.InitializeComponent();
+		this._windowService = Ioc.Default.GetRequiredService<IWindowService>();
 		this.Loaded += this.NavigationMenu_Loaded;
 	}
 
@@ -45,13 +49,17 @@ public sealed partial class NavigationMenu {
 			"BackgroundTasks" => Ioc.Default.GetRequiredService<BackgroundTasksWindow>(),
 			_ => null
 		};
-		window?.ActivateCenteredOnMainWindow();
+
+		if (window != null) {
+			this._windowService.ActivateCenteredOnMainWindow(window);
+		}
 	}
 
 	private void SyncNotificationButton_Click(object sender, RoutedEventArgs e) {
 		var window = Ioc.Default.GetRequiredService<FileChangeSyncWindow>();
-		window.ActivateCenteredOnMainWindow();
+		this._windowService.ActivateCenteredOnMainWindow(window);
 	}
 }
+
 
 public abstract class NavigationMenuUserControl : UserControlBase<NavigationMenuViewModel>;

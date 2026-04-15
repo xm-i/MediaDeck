@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.DependencyInjection;
 
+using MediaDeck.Composition.Interfaces.Services;
 using MediaDeck.ViewModels.Panes.ViewerPanes;
 using MediaDeck.Views.Sort;
 
@@ -14,8 +15,9 @@ public sealed partial class ViewerSelector {
 
 	private void Button_Click(object sender, RoutedEventArgs e) {
 		var window = Ioc.Default.GetRequiredService<SortManagerWindow>();
-		window.ActivateCenteredOnMainWindow();
+		Ioc.Default.GetRequiredService<IWindowService>().ActivateCenteredOnMainWindow(window);
 	}
 }
+
 
 public abstract class ViewerSelectorUserControl : UserControlBase<ViewerSelectorViewModel>;

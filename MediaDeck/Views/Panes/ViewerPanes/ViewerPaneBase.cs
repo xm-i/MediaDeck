@@ -4,6 +4,7 @@ using CommunityToolkit.WinUI.Controls;
 using MediaDeck.Common.Utilities;
 using MediaDeck.Composition.Interfaces.FileTypes.ViewModels;
 using MediaDeck.Core.Models.Files.SearchConditions;
+using MediaDeck.Composition.Interfaces.Services;
 using MediaDeck.ViewModels.Panes.ViewerPanes;
 using MediaDeck.Views.Thumbnails;
 using Microsoft.UI.Input;
@@ -16,6 +17,12 @@ using Windows.UI.Core;
 namespace MediaDeck.Views.Panes.ViewerPanes;
 
 public class ViewerPaneBase : UserControlBase<ViewerSelectorViewModel> {
+	private readonly IWindowService _windowService;
+
+	public ViewerPaneBase() {
+		this._windowService = Ioc.Default.GetRequiredService<IWindowService>();
+	}
+
 	protected virtual void List_SelectionChanged(object sender, SelectionChangedEventArgs e) {
 		if (this.ViewModel is not { } vm) {
 			return;
@@ -73,7 +80,7 @@ public class ViewerPaneBase : UserControlBase<ViewerSelectorViewModel> {
 			case "RecreateThumbnail":
 				var window = Ioc.Default.GetRequiredService<ThumbnailPickerWindow>();
 				window.ViewModel.FileViewModel.Value = fvm;
-				window.ActivateCenteredOnMainWindow();
+				this._windowService.ActivateCenteredOnMainWindow(window);
 				break;
 			case "RemoveFile":
 				var selectedFiles = this.ViewModel.MediaContentLibraryViewModel.SelectedFiles.Value;
@@ -139,4 +146,4 @@ public class ViewerPaneBase : UserControlBase<ViewerSelectorViewModel> {
 		}
 		e.Handled = true;
 	}
-}
+}
