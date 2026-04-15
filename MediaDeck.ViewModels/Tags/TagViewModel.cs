@@ -18,10 +18,10 @@ public class TagViewModel : ViewModelBase {
 
 		this.RemoveTagAliasCommand.Subscribe(x => {
 			this._tagAliases.Remove(x);
-		});
+		}).AddTo(this.CompositeDisposable);
 		this.AddTagAliasCommand.Subscribe(_ => {
 			this._tagAliases.Add(new(tagModelFactory.CreateAlias(), this));
-		});
+		}).AddTo(this.CompositeDisposable);
 
 		this.TagName
 			.ToUnit()
@@ -30,7 +30,7 @@ public class TagViewModel : ViewModelBase {
 			.Merge(this.TagCategory.ToUnit())
 			.Subscribe(_ => {
 				this._editedFlag = true;
-			});
+			}).AddTo(this.CompositeDisposable);
 		this._editedFlag = false;
 	}
 

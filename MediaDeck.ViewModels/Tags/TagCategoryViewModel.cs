@@ -1,9 +1,10 @@
+using MediaDeck.Common.Base;
 using MediaDeck.Common.Utilities;
 using MediaDeck.Composition.Interfaces.Tags;
 
 namespace MediaDeck.ViewModels.Tags;
 
-public class TagCategoryViewModel {
+public class TagCategoryViewModel : ViewModelBase {
 	private readonly ITagsManager _tagsManager;
 
 	public TagCategoryViewModel(ITagCategoryModel tagCategory, ITagsManager tagsManager, ITagModelFactory tagModelFactory) {
@@ -15,12 +16,10 @@ public class TagCategoryViewModel {
 		this.Tags = tagCategory.Tags.CreateView(x => new TagViewModel(this, x, tagsManager, tagModelFactory));
 		this.FilteredTags = this.Tags.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
 
-		this.FilteredTags = this.Tags.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
-
 		this.FilterText.ThrottleLast(TimeSpan.FromMilliseconds(300))
 			.Subscribe(_ => {
 				this.RefreshTagCandidateFilter();
-			});
+			}).AddTo(this.CompositeDisposable);
 	}
 
 	public ITagCategoryModel Model {

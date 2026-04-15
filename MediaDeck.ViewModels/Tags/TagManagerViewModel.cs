@@ -13,17 +13,17 @@ public class TagManagerViewModel : ViewModelBase {
 				category.SyncToModel();
 			}
 			await tagsManager.SaveAsync();
-		}, AwaitOperation.Drop);
+		}, AwaitOperation.Drop).AddTo(this.CompositeDisposable);
 		this.AddTagCategoryCommand.Subscribe(_ => {
 			tagsManager.AddTagCategory();
-		});
+		}).AddTo(this.CompositeDisposable);
 		this.DeleteTagCategoryCommand.SubscribeAwait(async (_, ct) => {
 			var category = this.SelectedTagCategory.Value;
 			if (category != null && category.IsDeletable) {
 				await tagsManager.DeleteTagCategoryAsync(category.Model);
 				this.SelectedTagCategory.Value = null;
 			}
-		}, AwaitOperation.Drop);
+		}, AwaitOperation.Drop).AddTo(this.CompositeDisposable);
 		this.DeleteTagCommand.SubscribeAwait(async (_, ct) => {
 			var category = this.SelectedTagCategory.Value;
 			var tag = category?.SelectedTag.Value;
@@ -31,13 +31,13 @@ public class TagManagerViewModel : ViewModelBase {
 				await tagsManager.DeleteTagAsync(tag.Model);
 				category!.SelectedTag.Value = null;
 			}
-		}, AwaitOperation.Drop);
+		}, AwaitOperation.Drop).AddTo(this.CompositeDisposable);
 		this.CancelCommand.SubscribeAwait(async (_, ct) => {
 			await tagsManager.ReloadAsync();
-		}, AwaitOperation.Drop);
+		}, AwaitOperation.Drop).AddTo(this.CompositeDisposable);
 		this.LoadCommand.SubscribeAwait(async (_, ct) => {
 			await tagsManager.InitializeAsync();
-		}, AwaitOperation.Drop);
+		}, AwaitOperation.Drop).AddTo(this.CompositeDisposable);
 	}
 
 	public INotifyCollectionChangedSynchronizedViewList<TagCategoryViewModel> TagCategories {
