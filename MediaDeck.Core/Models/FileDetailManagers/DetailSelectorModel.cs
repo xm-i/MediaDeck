@@ -42,7 +42,7 @@ public class DetailSelectorModel : IDisposable {
 	/// <summary>
 	/// タグカテゴリ
 	/// </summary>
-	public ObservableList<ITagCategoryModel> TagCategories {
+	public IReadOnlyObservableList<ITagCategoryModel> TagCategories {
 		get {
 			return this._tagsManager.TagCategories;
 		}
@@ -51,7 +51,7 @@ public class DetailSelectorModel : IDisposable {
 	/// <summary>
 	/// タグ候補
 	/// </summary>
-	public ObservableList<ITagModel> TagModels {
+	public IReadOnlyObservableList<ITagModel> TagModels {
 		get {
 			return this._tagsManager.Tags;
 		}

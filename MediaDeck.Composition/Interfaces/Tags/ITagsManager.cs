@@ -9,7 +9,10 @@ public interface ITagsManager {
 	/// <summary>
 	/// タグカテゴリーのリスト
 	/// </summary>
-	public ObservableList<ITagCategoryModel> TagCategories {
+	/// <summary>
+	/// タグカテゴリーのリスト
+	/// </summary>
+	public IReadOnlyObservableList<ITagCategoryModel> TagCategories {
 		get;
 	}
 
@@ -23,9 +26,18 @@ public interface ITagsManager {
 	/// <summary>
 	/// 全タグのリスト
 	/// </summary>
-	public ObservableList<ITagModel> Tags {
+	/// <summary>
+	/// 全タグのリスト
+	/// </summary>
+	public IReadOnlyObservableList<ITagModel> Tags {
 		get;
 	}
+
+	/// <summary>
+	/// 新規タグカテゴリーを追加する
+	/// </summary>
+	/// <returns>作成されたタグカテゴリー</returns>
+	public ITagCategoryModel AddTagCategory();
 
 	/// <summary>
 	/// 名前でタグを検索する

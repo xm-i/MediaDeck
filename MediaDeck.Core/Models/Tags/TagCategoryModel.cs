@@ -16,16 +16,36 @@ public class TagCategoryModel : ITagCategoryModel {
 	private int? _tagCategoryId;
 	private string? _tagCategoryName;
 	private string? _detail;
-	private ObservableList<ITagModel>? _tags;
+	private readonly ObservableList<ITagModel> _tags = [];
 	private bool _isInitialized;
 
 	public TagCategoryModel() {
 	}
 
-	public ObservableList<ITagModel> Tags {
+	public IReadOnlyObservableList<ITagModel> Tags {
 		get {
-			return this._tags ??= [];
+			return this._tags;
 		}
+	}
+
+	/// <inheritdoc />
+	public void AddTag(ITagModel tag) {
+		this._tags.Add(tag);
+	}
+
+	/// <inheritdoc />
+	public void RemoveTag(ITagModel tag) {
+		this._tags.Remove(tag);
+	}
+
+	/// <inheritdoc />
+	public void AddTagRange(IEnumerable<ITagModel> tags) {
+		this._tags.AddRange(tags);
+	}
+
+	/// <inheritdoc />
+	public void ClearTags() {
+		this._tags.Clear();
 	}
 
 	[MemberNotNull(nameof(_tagCategoryName), nameof(_detail))]
@@ -34,13 +54,13 @@ public class TagCategoryModel : ITagCategoryModel {
 			this._tagCategoryId = tagCategory.TagCategoryId;
 			this._tagCategoryName = tagCategory.TagCategoryName;
 			this._detail = tagCategory.Detail;
-			this.Tags.Clear();
-			this.Tags.AddRange(tagCategory.Tags.OrderByDescending(x => x.MediaFileTags.Count).Select(t => factory.Create(t, this)));
+			this._tags.Clear();
+			this._tags.AddRange(tagCategory.Tags.OrderByDescending(x => x.MediaFileTags.Count).Select(t => factory.Create(t, this)));
 		} else {
 			this._tagCategoryId = null;
 			this._tagCategoryName = "未設定";
 			this._detail = "カテゴリーが設定されていないタグ";
-			this.Tags.Clear();
+			this._tags.Clear();
 		}
 		this._isInitialized = true;
 		this.IsDirty = false;

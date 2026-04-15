@@ -15,10 +15,7 @@ public class TagManagerViewModel : ViewModelBase {
 			await tagsManager.SaveAsync();
 		}, AwaitOperation.Drop);
 		this.AddTagCategoryCommand.Subscribe(_ => {
-			var model = tagModelFactory.CreateCategory();
-			model.TagCategoryName = "";
-			model.Detail = "";
-			tagsManager.TagCategories.Add(model);
+			tagsManager.AddTagCategory();
 		});
 		this.DeleteTagCategoryCommand.SubscribeAwait(async (_, ct) => {
 			var category = this.SelectedTagCategory.Value;

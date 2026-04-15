@@ -42,9 +42,32 @@ public interface ITagCategoryModel {
 	/// <summary>
 	/// カテゴリーに属するタグのリスト
 	/// </summary>
-	public ObservableList<ITagModel> Tags {
+	public IReadOnlyObservableList<ITagModel> Tags {
 		get;
 	}
+
+	/// <summary>
+	/// タグを追加する
+	/// </summary>
+	/// <param name="tag">タグ</param>
+	public void AddTag(ITagModel tag);
+
+	/// <summary>
+	/// タグを削除する
+	/// </summary>
+	/// <param name="tag">タグ</param>
+	public void RemoveTag(ITagModel tag);
+
+	/// <summary>
+	/// タグを一括追加する
+	/// </summary>
+	/// <param name="tags">タグのリスト</param>
+	public void AddTagRange(IEnumerable<ITagModel> tags);
+
+	/// <summary>
+	/// 全てのタグをクリアする
+	/// </summary>
+	public void ClearTags();
 
 	public void Initialize(TagCategory? tagCategory, ITagModelFactory factory);
 }

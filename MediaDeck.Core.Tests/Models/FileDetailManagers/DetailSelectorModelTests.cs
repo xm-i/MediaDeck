@@ -6,6 +6,7 @@ using MediaDeck.Database;
 using MediaDeck.Database.Tables;
 using Microsoft.EntityFrameworkCore;
 using Moq;
+using ObservableCollections;
 using R3;
 using Shouldly;
 
@@ -36,7 +37,7 @@ public class DetailSelectorModelTests {
 			var m = new Mock<ITagCategoryModel>();
 			m.SetupGet(x => x.TagCategoryId).Returns(c?.TagCategoryId);
 			m.SetupGet(x => x.TagCategoryName).Returns(c?.TagCategoryName ?? "未設定");
-			m.SetupGet(x => x.Tags).Returns([]);
+			m.SetupGet(x => x.Tags).Returns(new ObservableList<ITagModel>());
 			return m.Object;
 		});
 
@@ -187,20 +188,19 @@ public class DetailSelectorModelTests {
 	[Fact]
 	public async Task FindTagByNameAsync_ShouldDelegateToTagsManager() {
 		// Arrange
-		var tagsManager = this.CreateTagsManager(out _, out _);
-		using var model = new DetailSelectorModel(tagsManager);
-
+		var tagsManagerMock = new Mock<ITagsManager>();
 		var tagMock = new Mock<ITagModel>();
 		tagMock.SetupGet(x => x.TagName).Returns("TestTag");
-		tagMock.SetupGet(x => x.TagCategory).Returns(new Mock<ITagCategoryModel>().Object);
-		tagMock.SetupGet(x => x.UsageCount).Returns(new ReactiveProperty<int>(0));
-		tagsManager.Tags.Add(tagMock.Object);
+		tagsManagerMock.Setup(x => x.FindTagByNameAsync("TestTag")).ReturnsAsync(tagMock.Object);
+
+		using var model = new DetailSelectorModel(tagsManagerMock.Object);
 
 		// Act
 		var result = await model.FindTagByNameAsync("TestTag");
 
 		// Assert
 		result.ShouldBe(tagMock.Object);
+		tagsManagerMock.Verify(x => x.FindTagByNameAsync("TestTag"), Times.Once);
 	}
 
 	/// <summary>

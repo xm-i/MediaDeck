@@ -59,14 +59,16 @@ public class TagsManagerTests {
 	/// </summary>
 	[Fact]
 	public async Task FindTagByNameAsync_ShouldReturnTag_WhenTagExists() {
-		var dbFactory = this.CreateInMemoryDbFactory(nameof(this.FindTagByNameAsync_ShouldReturnTag_WhenTagExists));
+		var dbName = nameof(this.FindTagByNameAsync_ShouldReturnTag_WhenTagExists);
+		var dbFactory = this.CreateInMemoryDbFactory(dbName);
+		await using (var db = await dbFactory.CreateDbContextAsync()) {
+			db.Tags.Add(new Tag { TagId = 1, TagName = "ExistingTag", Detail = "", TagCategory = null!, MediaFileTags = [], TagAliases = [] });
+			await db.SaveChangesAsync();
+		}
 		var tagModelFactoryMock = new Mock<ITagModelFactory>();
+		this.SetupFactoryMock(tagModelFactoryMock);
 		var manager = new TagsManager(dbFactory, tagModelFactoryMock.Object);
-		var tagMock = new Mock<ITagModel>();
-		tagMock.SetupGet(x => x.TagName).Returns("ExistingTag");
-		tagMock.SetupGet(x => x.TagCategory).Returns(new Mock<ITagCategoryModel>().Object);
-		tagMock.SetupGet(x => x.UsageCount).Returns(new ReactiveProperty<int>(0));
-		manager.Tags.Add(tagMock.Object);
+		await manager.InitializeAsync();
 		var result = await manager.FindTagByNameAsync("ExistingTag");
 		result.ShouldNotBeNull();
 		result.TagName.ShouldBe("ExistingTag");
@@ -375,7 +377,7 @@ public class TagsManagerTests {
 		// 1. 変更を加える
 		var tag = manager.Tags.First(x => x.TagId == 1);
 		tag.TagName = "ModifiedTagName";
-		
+
 		// 2. 削除を加える
 		var category = manager.TagCategories.First(x => x.TagCategoryId == 2);
 		await manager.DeleteTagCategoryAsync(category);
