@@ -12,4 +12,4 @@ public static class WinUIUtility {
 
 		return ((object)parent as Window)!;
 	}
-}
+}

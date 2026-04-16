@@ -3,8 +3,8 @@ using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.WinUI.Controls;
 using MediaDeck.Common.Utilities;
 using MediaDeck.Composition.Interfaces.FileTypes.ViewModels;
-using MediaDeck.Core.Models.Files.SearchConditions;
 using MediaDeck.Composition.Interfaces.Services;
+using MediaDeck.Core.Models.Files.SearchConditions;
 using MediaDeck.ViewModels.Panes.ViewerPanes;
 using MediaDeck.Views.Thumbnails;
 using Microsoft.UI.Input;
@@ -146,4 +146,4 @@ public class ViewerPaneBase : UserControlBase<ViewerSelectorViewModel> {
 		}
 		e.Handled = true;
 	}
-}
+}

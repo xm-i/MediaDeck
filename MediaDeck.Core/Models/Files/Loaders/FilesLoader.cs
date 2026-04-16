@@ -43,4 +43,4 @@ public class FilesLoader(IDbContextFactory<MediaDeckDbContext> dbFactory, SortSe
 
 		return this.SortSelector.SetSortConditions(files);
 	}
-}
+}

@@ -68,7 +68,7 @@ public class FileRegistrar {
 		while (this.RegistrationQueue.TryDequeue(out var filePath)) {
 			try {
 				var type = this._filePathService.GetMediaType(filePath);
-				var fileOperator = _fileOperators.First(x => x.TargetMediaType == type);
+				var fileOperator = this._fileOperators.First(x => x.TargetMediaType == type);
 				var mf = await fileOperator.RegisterFileAsync(filePath).ConfigureAwait(false);
 				if (mf is { } mf2) {
 					FileNotifications.FileRegistered.OnNext(mf2);
