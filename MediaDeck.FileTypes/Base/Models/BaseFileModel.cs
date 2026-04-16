@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using CommunityToolkit.Mvvm.DependencyInjection;
 using MediaDeck.Common.Base;
 using MediaDeck.Common.Utilities;
 using MediaDeck.Composition.Enum;
@@ -13,11 +12,7 @@ using MediaDeck.Composition.Stores.Config.Model;
 namespace MediaDeck.FileTypes.Base.Models;
 
 internal abstract class BaseFileModel : ModelBase, IFileModel {
-	private static readonly ExecutionConfigModel executionConfig;
-
-	static BaseFileModel() {
-		executionConfig = Ioc.Default.GetRequiredService<ExecutionConfigModel>();
-	}
+	private readonly ConfigModel _config;
 
 	protected IFileOperator FileOperator {
 		get;
@@ -31,7 +26,8 @@ internal abstract class BaseFileModel : ModelBase, IFileModel {
 		}
 	}
 
-	internal BaseFileModel(long id, string filePath, IFileOperator fileOperator, MediaType mediaType) : base() {
+	internal BaseFileModel(long id, string filePath, IFileOperator fileOperator, MediaType mediaType, ConfigModel config) : base() {
+		this._config = config;
 		this.FileOperator = fileOperator;
 		this.Id = id;
 		this.FilePath = filePath;
@@ -185,7 +181,7 @@ internal abstract class BaseFileModel : ModelBase, IFileModel {
 	}
 
 	public async Task ExecuteFileAsync() {
-		var epo = executionConfig.ExecutionPrograms.FirstOrDefault(x => x.MediaType.Value == this.MediaType);
+		var epo = this._config.ExecutionConfig.ExecutionPrograms.FirstOrDefault(x => x.MediaType.Value == this.MediaType);
 		if (epo is null) {
 			ShellUtility.ShellExecute(this.FilePath);
 		} else {

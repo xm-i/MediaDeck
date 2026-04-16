@@ -32,7 +32,7 @@ internal class ImageFileType : BaseFileType<ImageFileOperator, ImageFileModel, I
 	}
 
 	public override ImageFileModel CreateFileModelFromRecord(MediaFile mediaFile) {
-		var ifm = new ImageFileModel(mediaFile.MediaFileId, mediaFile.FilePath, this._imageFileOperator);
+		var ifm = new ImageFileModel(mediaFile.MediaFileId, mediaFile.FilePath, this._imageFileOperator, this._config);
 		this.SetModelProperties(ifm, mediaFile);
 		return ifm;
 	}

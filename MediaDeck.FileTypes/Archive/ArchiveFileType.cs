@@ -32,7 +32,7 @@ internal class ArchiveFileType : BaseFileType<ArchiveFileOperator, ArchiveFileMo
 	}
 
 	public override ArchiveFileModel CreateFileModelFromRecord(MediaFile mediaFile) {
-		var ifm = new ArchiveFileModel(mediaFile.MediaFileId, mediaFile.FilePath, this._archiveFileOperator);
+		var ifm = new ArchiveFileModel(mediaFile.MediaFileId, mediaFile.FilePath, this._archiveFileOperator, this._config);
 		this.SetModelProperties(ifm, mediaFile);
 		return ifm;
 	}

@@ -32,7 +32,7 @@ internal class UnknownFileType : BaseFileType<UnknownFileOperator, UnknownFileMo
 	}
 
 	public override UnknownFileModel CreateFileModelFromRecord(MediaFile mediaFile) {
-		var ifm = new UnknownFileModel(mediaFile.MediaFileId, mediaFile.FilePath, this.CreateFileOperator());
+		var ifm = new UnknownFileModel(mediaFile.MediaFileId, mediaFile.FilePath, this.CreateFileOperator(), this._config);
 		this.SetModelProperties(ifm, mediaFile);
 		return ifm;
 	}

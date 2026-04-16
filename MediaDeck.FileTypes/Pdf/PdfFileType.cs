@@ -32,7 +32,7 @@ internal class PdfFileType : BaseFileType<PdfFileOperator, PdfFileModel, PdfFile
 	}
 
 	public override PdfFileModel CreateFileModelFromRecord(MediaFile mediaFile) {
-		var ifm = new PdfFileModel(mediaFile.MediaFileId, mediaFile.FilePath, this._pdfFileOperator);
+		var ifm = new PdfFileModel(mediaFile.MediaFileId, mediaFile.FilePath, this._pdfFileOperator, this._config);
 		this.SetModelProperties(ifm, mediaFile);
 		return ifm;
 	}

@@ -32,7 +32,7 @@ internal class VideoFileType : BaseFileType<VideoFileOperator, VideoFileModel, V
 	}
 
 	public override VideoFileModel CreateFileModelFromRecord(MediaFile mediaFile) {
-		var ifm = new VideoFileModel(mediaFile.MediaFileId, mediaFile.FilePath, this._videoFileOperator);
+		var ifm = new VideoFileModel(mediaFile.MediaFileId, mediaFile.FilePath, this._videoFileOperator, this._config);
 		this.SetModelProperties(ifm, mediaFile);
 		return ifm;
 	}
