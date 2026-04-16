@@ -1,6 +1,6 @@
 using System.IO;
 
-using CommunityToolkit.Mvvm.DependencyInjection;
+
 
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.FileTypes;
@@ -21,7 +21,12 @@ internal abstract class BaseFileType<TFileOperator, TFileModel, TFileViewModel, 
 	where TDetailViewerPreviewControlView : IDetailViewerPreviewControlView
 	where TThumbnailPickerViewModel : IThumbnailPickerViewModel
 	where TThumbnailPickerView : IThumbnailPickerView {
-	internal BaseFileType(MediaType mediaType) {
+	protected readonly ConfigModel _config;
+	protected readonly ITagsManager _tagsManager;
+
+	internal BaseFileType(ConfigModel config, ITagsManager tagsManager, MediaType mediaType) {
+		this._config = config;
+		this._tagsManager = tagsManager;
 		this.MediaType = mediaType;
 	}
 
@@ -39,7 +44,7 @@ internal abstract class BaseFileType<TFileOperator, TFileModel, TFileViewModel, 
 
 	protected void SetModelProperties(TFileModel fileModel, MediaFile mediaFile) {
 		if (mediaFile.ThumbnailFileName != null) {
-			fileModel.ThumbnailFilePath = Path.Combine(Ioc.Default.GetRequiredService<ConfigModel>().PathConfig.ThumbnailFolderPath.Value, mediaFile.ThumbnailFileName);
+			fileModel.ThumbnailFilePath = Path.Combine(this._config.PathConfig.ThumbnailFolderPath.Value, mediaFile.ThumbnailFileName);
 		}
 		fileModel.Rate = mediaFile.Rate;
 		fileModel.Description = mediaFile.Description;
@@ -54,8 +59,7 @@ internal abstract class BaseFileType<TFileOperator, TFileModel, TFileViewModel, 
 		if (mediaFile.Latitude is { } lat && mediaFile.Longitude is { } lon) {
 			fileModel.Location = new GpsLocation(lat, lon, mediaFile.Altitude);
 		}
-		var tagsManager = Ioc.Default.GetRequiredService<ITagsManager>();
-		fileModel.Tags = [.. mediaFile.MediaFileTags.Select(mft => tagsManager.Tags.FirstOrDefault(t => t.TagId == mft.TagId)).OfType<ITagModel>()];
+		fileModel.Tags = [.. mediaFile.MediaFileTags.Select(mft => this._tagsManager.Tags.FirstOrDefault(t => t.TagId == mft.TagId)).OfType<ITagModel>()];
 	}
 
 	IFileOperator IFileType.CreateFileOperator() {

@@ -1,12 +1,13 @@
-using CommunityToolkit.Mvvm.DependencyInjection;
-
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.FileTypes;
+using MediaDeck.Composition.Interfaces.Tags;
+using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Database.Tables;
 using MediaDeck.FileTypes.Base;
 using MediaDeck.FileTypes.Pdf.Models;
 using MediaDeck.FileTypes.Pdf.ViewModels;
 using MediaDeck.FileTypes.Pdf.Views;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace MediaDeck.FileTypes.Pdf;
 
@@ -14,9 +15,16 @@ namespace MediaDeck.FileTypes.Pdf;
 internal class PdfFileType : BaseFileType<PdfFileOperator, PdfFileModel, PdfFileViewModel, PdfDetailViewerPreviewControlView, PdfThumbnailPickerViewModel, PdfThumbnailPickerView> {
 	private PdfDetailViewerPreviewControlView? _pdfDetailViewerPreviewControlView;
 	private readonly PdfFileOperator _pdfFileOperator;
+	private readonly IServiceProvider _serviceProvider;
 
-	public PdfFileType(PdfFileOperator pdfFileOperator) : base(MediaType.Pdf) {
+	public PdfFileType(
+		PdfFileOperator pdfFileOperator,
+		ConfigModel config,
+		ITagsManager tagsManager,
+		IServiceProvider serviceProvider)
+		: base(config, tagsManager, MediaType.Pdf) {
 		this._pdfFileOperator = pdfFileOperator;
+		this._serviceProvider = serviceProvider;
 	}
 
 	public override PdfFileOperator CreateFileOperator() {
@@ -38,7 +46,7 @@ internal class PdfFileType : BaseFileType<PdfFileOperator, PdfFileModel, PdfFile
 	}
 
 	public override PdfThumbnailPickerViewModel CreateThumbnailPickerViewModel() {
-		return Ioc.Default.GetRequiredService<PdfThumbnailPickerViewModel>();
+		return this._serviceProvider.GetRequiredService<PdfThumbnailPickerViewModel>();
 	}
 
 	public override PdfThumbnailPickerView CreateThumbnailPickerView() {

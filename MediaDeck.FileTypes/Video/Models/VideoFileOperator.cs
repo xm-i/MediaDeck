@@ -2,11 +2,11 @@ using System.Drawing;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using CommunityToolkit.Mvvm.DependencyInjection;
 using FFMpegCore;
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Composition.Stores.Config.Model;
+using MediaDeck.Database;
 using MediaDeck.Database.Tables;
 using MediaDeck.Database.Tables.Metadata;
 using MediaDeck.FileTypes.Base.Models;
@@ -25,8 +25,14 @@ internal partial class VideoFileOperator : BaseFileOperator {
 		"TAG:com.apple.quicktime.location.ISO6709"
 	];
 
-	public VideoFileOperator(IFilePathService filePathService, ILogger<VideoFileOperator> logger) : base(MediaType.Video) {
-		this._config = Ioc.Default.GetRequiredService<ConfigModel>();
+	public VideoFileOperator(
+		IFilePathService filePathService,
+		ILogger<VideoFileOperator> logger,
+		ConfigModel config,
+		IDbContextFactory<MediaDeckDbContext> dbFactory,
+		IUpdateFileHashBackgroundService updateFileHashBackgroundService)
+		: base(dbFactory, updateFileHashBackgroundService, MediaType.Video) {
+		this._config = config;
 		this._filePathService = filePathService;
 		this._logger = logger;
 	}

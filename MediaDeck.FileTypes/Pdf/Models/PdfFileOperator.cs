@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 
 using MediaDeck.Composition.Enum;
+using MediaDeck.Database;
 using MediaDeck.Database.Tables;
 using MediaDeck.FileTypes.Base.Models;
 
@@ -18,7 +19,12 @@ internal partial class PdfFileOperator : BaseFileOperator {
 	private readonly IFilePathService _filePathService;
 	private readonly ILogger<PdfFileOperator> _logger;
 
-	public PdfFileOperator(IFilePathService filePathService, ILogger<PdfFileOperator> logger) : base(MediaType.Pdf) {
+	public PdfFileOperator(
+		IFilePathService filePathService,
+		ILogger<PdfFileOperator> logger,
+		IDbContextFactory<MediaDeckDbContext> dbFactory,
+		IUpdateFileHashBackgroundService updateFileHashBackgroundService)
+		: base(dbFactory, updateFileHashBackgroundService, MediaType.Pdf) {
 		this._filePathService = filePathService;
 		this._logger = logger;
 	}

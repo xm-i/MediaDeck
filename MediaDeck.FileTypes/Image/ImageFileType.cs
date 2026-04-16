@@ -1,12 +1,13 @@
-using CommunityToolkit.Mvvm.DependencyInjection;
-
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.FileTypes;
+using MediaDeck.Composition.Interfaces.Tags;
+using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Database.Tables;
 using MediaDeck.FileTypes.Base;
 using MediaDeck.FileTypes.Image.Models;
 using MediaDeck.FileTypes.Image.ViewModels;
 using MediaDeck.FileTypes.Image.Views;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace MediaDeck.FileTypes.Image;
 
@@ -14,9 +15,16 @@ namespace MediaDeck.FileTypes.Image;
 internal class ImageFileType : BaseFileType<ImageFileOperator, ImageFileModel, ImageFileViewModel, ImageDetailViewerPreviewControlView, ImageThumbnailPickerViewModel, ImageThumbnailPickerView> {
 	private ImageDetailViewerPreviewControlView? _imageDetailViewerPreviewControlView;
 	private readonly ImageFileOperator _imageFileOperator;
+	private readonly IServiceProvider _serviceProvider;
 
-	public ImageFileType(ImageFileOperator imageFileOperator) : base(MediaType.Image) {
+	public ImageFileType(
+		ImageFileOperator imageFileOperator,
+		ConfigModel config,
+		ITagsManager tagsManager,
+		IServiceProvider serviceProvider)
+		: base(config, tagsManager, MediaType.Image) {
 		this._imageFileOperator = imageFileOperator;
+		this._serviceProvider = serviceProvider;
 	}
 
 	public override ImageFileOperator CreateFileOperator() {
@@ -38,7 +46,7 @@ internal class ImageFileType : BaseFileType<ImageFileOperator, ImageFileModel, I
 	}
 
 	public override ImageThumbnailPickerViewModel CreateThumbnailPickerViewModel() {
-		return Ioc.Default.GetRequiredService<ImageThumbnailPickerViewModel>();
+		return this._serviceProvider.GetRequiredService<ImageThumbnailPickerViewModel>();
 	}
 
 	public override ImageThumbnailPickerView CreateThumbnailPickerView() {

@@ -1,12 +1,13 @@
-using CommunityToolkit.Mvvm.DependencyInjection;
-
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.FileTypes;
+using MediaDeck.Composition.Interfaces.Tags;
+using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Database.Tables;
 using MediaDeck.FileTypes.Archive.Models;
 using MediaDeck.FileTypes.Archive.ViewModels;
 using MediaDeck.FileTypes.Archive.Views;
 using MediaDeck.FileTypes.Base;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace MediaDeck.FileTypes.Archive;
 
@@ -14,9 +15,16 @@ namespace MediaDeck.FileTypes.Archive;
 internal class ArchiveFileType : BaseFileType<ArchiveFileOperator, ArchiveFileModel, ArchiveFileViewModel, ArchiveDetailViewerPreviewControlView, ArchiveThumbnailPickerViewModel, ArchiveThumbnailPickerView> {
 	private ArchiveDetailViewerPreviewControlView? _archiveDetailViewerPreviewControlView;
 	private readonly ArchiveFileOperator _archiveFileOperator;
+	private readonly IServiceProvider _serviceProvider;
 
-	public ArchiveFileType(ArchiveFileOperator archiveFileOperator) : base(MediaType.Archive) {
+	public ArchiveFileType(
+		ArchiveFileOperator archiveFileOperator,
+		ConfigModel config,
+		ITagsManager tagsManager,
+		IServiceProvider serviceProvider)
+		: base(config, tagsManager, MediaType.Archive) {
 		this._archiveFileOperator = archiveFileOperator;
+		this._serviceProvider = serviceProvider;
 	}
 
 	public override ArchiveFileOperator CreateFileOperator() {
@@ -38,7 +46,7 @@ internal class ArchiveFileType : BaseFileType<ArchiveFileOperator, ArchiveFileMo
 	}
 
 	public override ArchiveThumbnailPickerViewModel CreateThumbnailPickerViewModel() {
-		return Ioc.Default.GetRequiredService<ArchiveThumbnailPickerViewModel>();
+		return this._serviceProvider.GetRequiredService<ArchiveThumbnailPickerViewModel>();
 	}
 
 	public override ArchiveThumbnailPickerView CreateThumbnailPickerView() {

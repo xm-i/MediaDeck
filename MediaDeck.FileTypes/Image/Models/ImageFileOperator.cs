@@ -5,6 +5,7 @@ using ImageMagick;
 
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
+using MediaDeck.Database;
 using MediaDeck.Database.Tables;
 using MediaDeck.FileTypes.Base.Models;
 using MediaDeck.FileTypes.Image.Utils;
@@ -16,7 +17,11 @@ namespace MediaDeck.FileTypes.Image.Models;
 internal class ImageFileOperator : BaseFileOperator {
 	private readonly IFilePathService _filePathService;
 
-	public ImageFileOperator(IFilePathService filePathService) : base(MediaType.Image) {
+	public ImageFileOperator(
+		IFilePathService filePathService,
+		IDbContextFactory<MediaDeckDbContext> dbFactory,
+		IUpdateFileHashBackgroundService updateFileHashBackgroundService)
+		: base(dbFactory, updateFileHashBackgroundService, MediaType.Image) {
 		this._filePathService = filePathService;
 	}
 

@@ -1,12 +1,13 @@
-using CommunityToolkit.Mvvm.DependencyInjection;
-
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.FileTypes;
+using MediaDeck.Composition.Interfaces.Tags;
+using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Database.Tables;
 using MediaDeck.FileTypes.Base;
 using MediaDeck.FileTypes.Video.Models;
 using MediaDeck.FileTypes.Video.ViewModels;
 using MediaDeck.FileTypes.Video.Views;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace MediaDeck.FileTypes.Video;
 
@@ -14,9 +15,16 @@ namespace MediaDeck.FileTypes.Video;
 internal class VideoFileType : BaseFileType<VideoFileOperator, VideoFileModel, VideoFileViewModel, VideoDetailViewerPreviewControlView, VideoThumbnailPickerViewModel, VideoThumbnailPickerView> {
 	private VideoDetailViewerPreviewControlView? _videoDetailViewerPreviewControlView;
 	private readonly VideoFileOperator _videoFileOperator;
+	private readonly IServiceProvider _serviceProvider;
 
-	public VideoFileType(VideoFileOperator videoFileOperator) : base(MediaType.Video) {
+	public VideoFileType(
+		VideoFileOperator videoFileOperator,
+		ConfigModel config,
+		ITagsManager tagsManager,
+		IServiceProvider serviceProvider)
+		: base(config, tagsManager, MediaType.Video) {
 		this._videoFileOperator = videoFileOperator;
+		this._serviceProvider = serviceProvider;
 	}
 
 	public override VideoFileOperator CreateFileOperator() {
@@ -38,7 +46,7 @@ internal class VideoFileType : BaseFileType<VideoFileOperator, VideoFileModel, V
 	}
 
 	public override VideoThumbnailPickerViewModel CreateThumbnailPickerViewModel() {
-		return Ioc.Default.GetRequiredService<VideoThumbnailPickerViewModel>();
+		return this._serviceProvider.GetRequiredService<VideoThumbnailPickerViewModel>();
 	}
 
 	public override VideoThumbnailPickerView CreateThumbnailPickerView() {

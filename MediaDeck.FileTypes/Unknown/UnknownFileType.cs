@@ -1,23 +1,34 @@
-using CommunityToolkit.Mvvm.DependencyInjection;
-
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.FileTypes;
+using MediaDeck.Composition.Interfaces.Tags;
+using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Database.Tables;
 using MediaDeck.FileTypes.Base;
 using MediaDeck.FileTypes.Unknown.Models;
 using MediaDeck.FileTypes.Unknown.ViewModels;
 using MediaDeck.FileTypes.Unknown.Views;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace MediaDeck.FileTypes.Unknown;
 
 [Inject(InjectServiceLifetime.Transient, typeof(IFileType))]
 internal class UnknownFileType : BaseFileType<UnknownFileOperator, UnknownFileModel, UnknownFileViewModel, UnknownDetailViewerPreviewControlView, UnknownThumbnailPickerViewModel, UnknownThumbnailPickerView> {
 	private UnknownDetailViewerPreviewControlView? _unknownDetailViewerPreviewControlView;
+	private readonly UnknownFileOperator _unknownFileOperator;
+	private readonly IServiceProvider _serviceProvider;
 
-	public UnknownFileType() : base(MediaType.Unknown) { }
+	public UnknownFileType(
+		UnknownFileOperator unknownFileOperator,
+		ConfigModel config,
+		ITagsManager tagsManager,
+		IServiceProvider serviceProvider)
+		: base(config, tagsManager, MediaType.Unknown) {
+		this._unknownFileOperator = unknownFileOperator;
+		this._serviceProvider = serviceProvider;
+	}
 
 	public override UnknownFileOperator CreateFileOperator() {
-		return new UnknownFileOperator();
+		return this._unknownFileOperator;
 	}
 
 	public override UnknownFileModel CreateFileModelFromRecord(MediaFile mediaFile) {
@@ -35,7 +46,7 @@ internal class UnknownFileType : BaseFileType<UnknownFileOperator, UnknownFileMo
 	}
 
 	public override UnknownThumbnailPickerViewModel CreateThumbnailPickerViewModel() {
-		return Ioc.Default.GetRequiredService<UnknownThumbnailPickerViewModel>();
+		return this._serviceProvider.GetRequiredService<UnknownThumbnailPickerViewModel>();
 	}
 
 	public override UnknownThumbnailPickerView CreateThumbnailPickerView() {

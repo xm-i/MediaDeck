@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using ImageMagick;
 
 using MediaDeck.Composition.Enum;
+using MediaDeck.Database;
 using MediaDeck.Database.Tables;
 using MediaDeck.FileTypes.Base.Models;
 using MediaDeck.FileTypes.Image.Utils;
@@ -18,7 +19,12 @@ internal partial class ArchiveFileOperator : BaseFileOperator {
 	private readonly IFilePathService _filePathService;
 	private readonly ILogger<ArchiveFileOperator> _logger;
 
-	public ArchiveFileOperator(IFilePathService filePathService, ILogger<ArchiveFileOperator> logger) : base(MediaType.Archive) {
+	public ArchiveFileOperator(
+		IFilePathService filePathService,
+		ILogger<ArchiveFileOperator> logger,
+		IDbContextFactory<MediaDeckDbContext> dbFactory,
+		IUpdateFileHashBackgroundService updateFileHashBackgroundService)
+		: base(dbFactory, updateFileHashBackgroundService, MediaType.Archive) {
 		this._filePathService = filePathService;
 		this._logger = logger;
 	}

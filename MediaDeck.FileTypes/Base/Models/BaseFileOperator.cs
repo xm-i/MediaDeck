@@ -1,7 +1,5 @@
 using System.Threading.Tasks;
 
-using CommunityToolkit.Mvvm.DependencyInjection;
-
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Database;
@@ -13,9 +11,12 @@ internal abstract class BaseFileOperator : IFileOperator {
 	protected readonly IDbContextFactory<MediaDeckDbContext> _dbFactory;
 	protected readonly IUpdateFileHashBackgroundService _updateFileHashBackgroundService;
 
-	protected BaseFileOperator(MediaType targetMediaType) {
-		this._dbFactory = Ioc.Default.GetRequiredService<IDbContextFactory<MediaDeckDbContext>>();
-		this._updateFileHashBackgroundService = Ioc.Default.GetRequiredService<IUpdateFileHashBackgroundService>();
+	protected BaseFileOperator(
+		IDbContextFactory<MediaDeckDbContext> dbFactory,
+		IUpdateFileHashBackgroundService updateFileHashBackgroundService,
+		MediaType targetMediaType) {
+		this._dbFactory = dbFactory;
+		this._updateFileHashBackgroundService = updateFileHashBackgroundService;
 		this.TargetMediaType = targetMediaType;
 	}
 
