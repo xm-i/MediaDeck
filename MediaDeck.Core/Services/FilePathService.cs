@@ -1,7 +1,7 @@
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Stores.Config.Model;
 
-namespace MediaDeck.Core.Models.Services;
+namespace MediaDeck.Core.Services;
 
 [Inject(InjectServiceLifetime.Singleton, typeof(IFilePathService))]
 public class FilePathService : IFilePathService {

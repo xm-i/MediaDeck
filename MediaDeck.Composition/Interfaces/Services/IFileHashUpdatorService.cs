@@ -1,6 +1,6 @@
 namespace MediaDeck.Composition.Interfaces.Services;
 
-public interface IUpdateFileHashBackgroundService : IServiceBase {
+public interface IFileHashUpdatorService : IServiceBase {
 	public ReactiveProperty<long> CompletedCount {
 		get;
 	}

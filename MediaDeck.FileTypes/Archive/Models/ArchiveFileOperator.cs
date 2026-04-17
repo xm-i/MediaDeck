@@ -23,7 +23,7 @@ internal partial class ArchiveFileOperator : BaseFileOperator {
 		IFilePathService filePathService,
 		ILogger<ArchiveFileOperator> logger,
 		IDbContextFactory<MediaDeckDbContext> dbFactory,
-		IUpdateFileHashBackgroundService updateFileHashBackgroundService)
+		IFileHashUpdatorService updateFileHashBackgroundService)
 		: base(dbFactory, updateFileHashBackgroundService, MediaType.Archive) {
 		this._filePathService = filePathService;
 		this._logger = logger;

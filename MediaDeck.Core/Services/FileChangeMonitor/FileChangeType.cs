@@ -1,4 +1,4 @@
-namespace MediaDeck.Core.Models.Services;
+namespace MediaDeck.Core.Services.FileChangeMonitor;
 
 /// <summary>
 /// ファイルの変更種類を定義します。

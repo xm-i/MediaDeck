@@ -1,11 +1,11 @@
 using MediaDeck.Common.Base;
-using MediaDeck.Core.Models.Tools;
+using MediaDeck.Core.Services.FileStatusUpdator;
 
 namespace MediaDeck.ViewModels.Tools;
 
 [Inject(InjectServiceLifetime.Singleton)]
 public class BackgroundTasksViewModel : ViewModelBase {
-	public BackgroundTasksViewModel(FileStatusUpdater fileStatusUpdater, IUpdateFileHashBackgroundService updateFileHashBackgroundService) {
+	public BackgroundTasksViewModel(FileStatusUpdatorService fileStatusUpdater, IFileHashUpdatorService updateFileHashBackgroundService) {
 		this._fileStatusUpdater = fileStatusUpdater;
 		this._updateFileHashBackgroundService = updateFileHashBackgroundService;
 		this.FileStatusUpdaterTargetCount = this._fileStatusUpdater.TargetCount.ThrottleLast(TimeSpan.FromMilliseconds(100)).ObserveOnCurrentSynchronizationContext().ToBindableReactiveProperty();
@@ -17,8 +17,8 @@ public class BackgroundTasksViewModel : ViewModelBase {
 		this.Actions.Synchronize().ObserveOnThreadPool().Subscribe(action => action());
 	}
 
-	private readonly FileStatusUpdater _fileStatusUpdater;
-	private readonly IUpdateFileHashBackgroundService _updateFileHashBackgroundService;
+	private readonly FileStatusUpdatorService _fileStatusUpdater;
+	private readonly IFileHashUpdatorService _updateFileHashBackgroundService;
 
 	public BindableReactiveProperty<long> FileStatusUpdaterTargetCount {
 		get;

@@ -30,7 +30,7 @@ internal partial class VideoFileOperator : BaseFileOperator {
 		ILogger<VideoFileOperator> logger,
 		ConfigModel config,
 		IDbContextFactory<MediaDeckDbContext> dbFactory,
-		IUpdateFileHashBackgroundService updateFileHashBackgroundService)
+		IFileHashUpdatorService updateFileHashBackgroundService)
 		: base(dbFactory, updateFileHashBackgroundService, MediaType.Video) {
 		this._config = config;
 		this._filePathService = filePathService;

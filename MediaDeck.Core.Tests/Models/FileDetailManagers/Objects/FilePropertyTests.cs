@@ -1,4 +1,3 @@
-using MediaDeck.Core.Models.FileDetailManagers.Objects;
 using MediaDeck.Core.Primitives;
 
 namespace MediaDeck.Core.Tests.Models.FileDetailManagers.Objects;

@@ -1,6 +1,4 @@
-using MediaDeck.Core.Primitives;
-
-namespace MediaDeck.Core.Models.FileDetailManagers.Objects;
+namespace MediaDeck.Core.Primitives;
 
 /// <param name="title">タイトル</param>
 /// <param name="values">値と件数リスト</param>

@@ -1,4 +1,4 @@
-using MediaDeck.Core.Models.Services;
+using MediaDeck.Core.Services.FileChangeMonitor;
 
 namespace MediaDeck.Core.Tests.Models.Services;
 

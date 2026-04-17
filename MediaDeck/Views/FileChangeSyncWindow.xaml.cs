@@ -1,4 +1,4 @@
-using MediaDeck.Core.Models.Services;
+using MediaDeck.Core.Services.FileChangeMonitor;
 using MediaDeck.ViewModels;
 
 using Microsoft.UI.Xaml;

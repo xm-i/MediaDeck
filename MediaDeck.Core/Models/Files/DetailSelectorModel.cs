@@ -1,9 +1,8 @@
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Composition.Interfaces.Tags;
-using MediaDeck.Core.Models.FileDetailManagers.Objects;
 using MediaDeck.Core.Primitives;
 
-namespace MediaDeck.Core.Models.FileDetailManagers;
+namespace MediaDeck.Core.Models.Files;
 
 /// <summary>
 /// 詳細セレクタのビジネスロジックを管理するモデル

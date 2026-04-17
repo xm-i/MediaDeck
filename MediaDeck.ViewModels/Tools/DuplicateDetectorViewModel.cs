@@ -2,8 +2,8 @@ using MediaDeck.Common.Base;
 using MediaDeck.Common.Utilities;
 using MediaDeck.Composition.Interfaces.FileTypes;
 using MediaDeck.Composition.Interfaces.FileTypes.ViewModels;
-using MediaDeck.Core.Models.Tools;
 using MediaDeck.Core.Primitives;
+using MediaDeck.Core.Services.DuplicateFileDetector;
 
 namespace MediaDeck.ViewModels.Tools;
 
@@ -12,7 +12,7 @@ namespace MediaDeck.ViewModels.Tools;
 /// </summary>
 [Inject(InjectServiceLifetime.Transient)]
 public class DuplicateDetectorViewModel : ViewModelBase {
-	private readonly DuplicateFileDetector _detector;
+	private readonly DuplicateFileDetectorService _detector;
 	private readonly IFileTypeService _fileTypeService;
 
 	/// <summary>
@@ -95,7 +95,7 @@ public class DuplicateDetectorViewModel : ViewModelBase {
 		get;
 	} = new();
 
-	public DuplicateDetectorViewModel(DuplicateFileDetector detector, IFileTypeService fileTypeService) {
+	public DuplicateDetectorViewModel(DuplicateFileDetectorService detector, IFileTypeService fileTypeService) {
 		this._detector = detector;
 		this._fileTypeService = fileTypeService;
 

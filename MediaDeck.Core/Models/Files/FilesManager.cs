@@ -3,7 +3,7 @@ using MediaDeck.Composition.Objects;
 using MediaDeck.Core.Models.NotificationDispatcher;
 using MediaDeck.Database;
 
-namespace MediaDeck.Core.Models.FileDetailManagers;
+namespace MediaDeck.Core.Models.Files;
 
 /// <summary>
 /// ファイルの管理を行うクラス

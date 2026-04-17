@@ -1,8 +1,10 @@
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Composition.Stores.Config.Model.Objects;
-using MediaDeck.Core.Models.Services;
+using MediaDeck.Core.Services;
+
 using Microsoft.Extensions.DependencyInjection;
+
 using Shouldly;
 
 namespace MediaDeck.Core.Tests.Models.Services;

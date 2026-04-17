@@ -1,13 +1,18 @@
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Composition.Interfaces.Tags;
-using MediaDeck.Core.Models.FileDetailManagers;
+using MediaDeck.Core.Models.Files;
 using MediaDeck.Core.Models.Tags;
 using MediaDeck.Database;
 using MediaDeck.Database.Tables;
+
 using Microsoft.EntityFrameworkCore;
+
 using Moq;
+
 using ObservableCollections;
+
 using R3;
+
 using Shouldly;
 
 namespace MediaDeck.Core.Tests.Models.FileDetailManagers;

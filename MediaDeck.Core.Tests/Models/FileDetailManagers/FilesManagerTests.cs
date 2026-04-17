@@ -1,13 +1,17 @@
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Composition.Objects;
-using MediaDeck.Core.Models.FileDetailManagers;
+using MediaDeck.Core.Models.Files;
 using MediaDeck.Core.Models.NotificationDispatcher;
 using MediaDeck.Database;
 using MediaDeck.Database.Tables;
+
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+
 using Moq;
+
 using R3;
+
 using Shouldly;
 
 namespace MediaDeck.Core.Tests.Models.FileDetailManagers;

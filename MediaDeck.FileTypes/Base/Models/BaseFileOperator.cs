@@ -9,11 +9,11 @@ namespace MediaDeck.FileTypes.Base.Models;
 
 internal abstract class BaseFileOperator : IFileOperator {
 	protected readonly IDbContextFactory<MediaDeckDbContext> _dbFactory;
-	protected readonly IUpdateFileHashBackgroundService _updateFileHashBackgroundService;
+	protected readonly IFileHashUpdatorService _updateFileHashBackgroundService;
 
 	protected BaseFileOperator(
 		IDbContextFactory<MediaDeckDbContext> dbFactory,
-		IUpdateFileHashBackgroundService updateFileHashBackgroundService,
+		IFileHashUpdatorService updateFileHashBackgroundService,
 		MediaType targetMediaType) {
 		this._dbFactory = dbFactory;
 		this._updateFileHashBackgroundService = updateFileHashBackgroundService;

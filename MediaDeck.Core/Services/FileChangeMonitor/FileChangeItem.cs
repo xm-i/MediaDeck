@@ -1,4 +1,4 @@
-namespace MediaDeck.Core.Models.Services;
+namespace MediaDeck.Core.Services.FileChangeMonitor;
 
 /// <summary>
 /// 未処理のファイル変更を保持するアイテムクラスです。

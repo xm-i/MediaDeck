@@ -11,7 +11,7 @@ namespace MediaDeck.FileTypes.Unknown.Models;
 internal partial class UnknownFileOperator : BaseFileOperator {
 	public UnknownFileOperator(
 		IDbContextFactory<MediaDeckDbContext> dbFactory,
-		IUpdateFileHashBackgroundService updateFileHashBackgroundService)
+		IFileHashUpdatorService updateFileHashBackgroundService)
 		: base(dbFactory, updateFileHashBackgroundService, MediaType.Unknown) { }
 
 	public override Task<MediaFile?> RegisterFileAsync(string filePath) {

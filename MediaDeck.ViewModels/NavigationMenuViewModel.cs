@@ -1,5 +1,5 @@
 using MediaDeck.Common.Base;
-using MediaDeck.Core.Models.Services;
+using MediaDeck.Core.Services.FileChangeMonitor;
 
 namespace MediaDeck.ViewModels;
 

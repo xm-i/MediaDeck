@@ -1,44 +1,13 @@
 using MediaDeck.Common.Base;
 using MediaDeck.Database;
-using MediaDeck.Database.Tables;
 
-namespace MediaDeck.Core.Models.Tools;
-
-/// <summary>
-/// 重複ファイルグループ
-/// </summary>
-public class DuplicateFileGroup {
-	/// <summary>
-	/// ハッシュ値
-	/// </summary>
-	public required string Hash {
-		get;
-		init;
-	}
-
-	/// <summary>
-	/// 重複ファイルリスト
-	/// </summary>
-	public required List<MediaFile> Files {
-		get;
-		init;
-	}
-
-	/// <summary>
-	/// 代表ファイル名（表示用）
-	/// </summary>
-	public string RepresentativeFileName {
-		get {
-			return this.Files.FirstOrDefault()?.FilePath ?? this.Hash;
-		}
-	}
-}
+namespace MediaDeck.Core.Services.DuplicateFileDetector;
 
 /// <summary>
 /// 重複ファイル検出モデル
 /// </summary>
 [Inject(InjectServiceLifetime.Transient)]
-public class DuplicateFileDetector : ModelBase {
+public class DuplicateFileDetectorService : ModelBase {
 	private readonly IDbContextFactory<MediaDeckDbContext> _dbFactory;
 
 	/// <summary>
@@ -76,7 +45,7 @@ public class DuplicateFileDetector : ModelBase {
 		get;
 	} = new(0);
 
-	public DuplicateFileDetector(IDbContextFactory<MediaDeckDbContext> dbFactory) {
+	public DuplicateFileDetectorService(IDbContextFactory<MediaDeckDbContext> dbFactory) {
 		this._dbFactory = dbFactory;
 	}
 

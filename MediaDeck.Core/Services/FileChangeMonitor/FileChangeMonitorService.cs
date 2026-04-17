@@ -7,7 +7,7 @@ using MediaDeck.Database;
 
 using Microsoft.Extensions.Logging;
 
-namespace MediaDeck.Core.Models.Services;
+namespace MediaDeck.Core.Services.FileChangeMonitor;
 
 /// <summary>
 /// ファイルシステムの変更を監視し、DBとの同期を管理するサービスです。

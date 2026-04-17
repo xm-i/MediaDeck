@@ -20,7 +20,7 @@ internal class ImageFileOperator : BaseFileOperator {
 	public ImageFileOperator(
 		IFilePathService filePathService,
 		IDbContextFactory<MediaDeckDbContext> dbFactory,
-		IUpdateFileHashBackgroundService updateFileHashBackgroundService)
+		IFileHashUpdatorService updateFileHashBackgroundService)
 		: base(dbFactory, updateFileHashBackgroundService, MediaType.Image) {
 		this._filePathService = filePathService;
 	}

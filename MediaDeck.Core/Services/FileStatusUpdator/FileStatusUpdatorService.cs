@@ -1,17 +1,17 @@
 using MediaDeck.Database;
 using MediaDeck.Database.Tables;
 
-namespace MediaDeck.Core.Models.Tools;
+namespace MediaDeck.Core.Services.FileStatusUpdator;
 
 [Inject(InjectServiceLifetime.Transient)]
-public class FileStatusUpdater {
-	public FileStatusUpdater(IDbContextFactory<MediaDeckDbContext> dbFactory, IUpdateFileHashBackgroundService updateFileHashBackgroundService) {
+public class FileStatusUpdatorService {
+	public FileStatusUpdatorService(IDbContextFactory<MediaDeckDbContext> dbFactory, IFileHashUpdatorService fileHashUpdatorService) {
 		this._dbFactory = dbFactory;
-		this._updateFileHashBackgroundService = updateFileHashBackgroundService;
+		this._fileHashUpdatorService = fileHashUpdatorService;
 	}
 
 	private readonly IDbContextFactory<MediaDeckDbContext> _dbFactory;
-	private readonly IUpdateFileHashBackgroundService _updateFileHashBackgroundService;
+	private readonly IFileHashUpdatorService _fileHashUpdatorService;
 
 	public ReactiveProperty<long> TargetCount {
 		get;
@@ -56,7 +56,7 @@ public class FileStatusUpdater {
 
 			if (file.IsExists) {
 				if (needsHashUpdate) {
-					this._updateFileHashBackgroundService.EnqueueHashUpdate(file.MediaFileId);
+					this._fileHashUpdatorService.EnqueueHashUpdate(file.MediaFileId);
 				}
 				file.FileSize = fileInfo.Length;
 				file.CreationTime = fileInfo.CreationTime;
@@ -74,6 +74,6 @@ public class FileStatusUpdater {
 		}
 
 		// PreHash更新がなかった場合もFullHashのチェックを行う
-		await this._updateFileHashBackgroundService.CheckAndEnqueueFullHashUpdatesAsync();
+		await this._fileHashUpdatorService.CheckAndEnqueueFullHashUpdatesAsync();
 	}
 }

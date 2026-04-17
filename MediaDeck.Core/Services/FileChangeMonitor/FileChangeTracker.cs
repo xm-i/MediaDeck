@@ -4,7 +4,7 @@ using MediaDeck.Database;
 
 using Microsoft.Extensions.Logging;
 
-namespace MediaDeck.Core.Models.Services;
+namespace MediaDeck.Core.Services.FileChangeMonitor;
 
 /// <summary>
 /// 未処理のファイル変更リストの管理・マッチング・統合ロジックを担うクラスです。

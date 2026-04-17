@@ -23,7 +23,7 @@ internal partial class PdfFileOperator : BaseFileOperator {
 		IFilePathService filePathService,
 		ILogger<PdfFileOperator> logger,
 		IDbContextFactory<MediaDeckDbContext> dbFactory,
-		IUpdateFileHashBackgroundService updateFileHashBackgroundService)
+		IFileHashUpdatorService updateFileHashBackgroundService)
 		: base(dbFactory, updateFileHashBackgroundService, MediaType.Pdf) {
 		this._filePathService = filePathService;
 		this._logger = logger;

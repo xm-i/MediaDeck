@@ -2,7 +2,7 @@ using System.Collections.Concurrent;
 
 using Microsoft.Extensions.Logging;
 
-namespace MediaDeck.Core.Models.Services;
+namespace MediaDeck.Core.Services.FileChangeMonitor;
 
 /// <summary>
 /// FileSystemWatcherの生成・破棄・イベント登録を一元管理するクラスです。

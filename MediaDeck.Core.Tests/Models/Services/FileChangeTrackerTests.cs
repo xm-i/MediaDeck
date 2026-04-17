@@ -1,9 +1,12 @@
 using System.Diagnostics;
-using MediaDeck.Core.Models.Services;
+
+using MediaDeck.Core.Services.FileChangeMonitor;
 using MediaDeck.Database;
 using MediaDeck.Database.Tables;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
+
 using Xunit.Abstractions;
 
 namespace MediaDeck.Core.Tests.Models.Services;
