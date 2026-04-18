@@ -12,6 +12,9 @@ internal abstract class UserControlBase<T> : UserControl where T : class {
 		this.DataContextChanged += (s, e) => {
 			var old = this.ViewModel;
 			this.ViewModel = this.DataContext as T;
+			if (old == this.ViewModel) {
+				return;
+			}
 			this.OnViewModelChanged(old, this.ViewModel);
 		};
 	}

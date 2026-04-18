@@ -8,6 +8,8 @@
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.WinUI.Controls.Primitives" />
     <PackageReference Include="FFMpegCore" />
+    <PackageReference Include="Flyleaf.FFmpeg.Bindings" />
+    <PackageReference Include="FlyleafLib.Controls.WinUI" />
     <PackageReference Include="Magick.NET-Q16-AnyCPU" />
     <PackageReference Include="MetadataExtractor" />
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" />

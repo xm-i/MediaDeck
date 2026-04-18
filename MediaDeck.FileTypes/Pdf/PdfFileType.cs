@@ -11,7 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace MediaDeck.FileTypes.Pdf;
 
-[Inject(InjectServiceLifetime.Transient, typeof(IFileType))]
+[Inject(InjectServiceLifetime.Singleton, typeof(IFileType))]
 internal class PdfFileType : BaseFileType<PdfFileOperator, PdfFileModel, PdfFileViewModel, PdfDetailViewerPreviewControlView, PdfThumbnailPickerViewModel, PdfThumbnailPickerView> {
 	private PdfDetailViewerPreviewControlView? _pdfDetailViewerPreviewControlView;
 	private readonly PdfFileOperator _pdfFileOperator;

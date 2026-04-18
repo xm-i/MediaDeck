@@ -7,11 +7,12 @@ using MediaDeck.FileTypes.Base;
 using MediaDeck.FileTypes.Video.Models;
 using MediaDeck.FileTypes.Video.ViewModels;
 using MediaDeck.FileTypes.Video.Views;
+
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MediaDeck.FileTypes.Video;
 
-[Inject(InjectServiceLifetime.Transient, typeof(IFileType))]
+[Inject(InjectServiceLifetime.Singleton, typeof(IFileType))]
 internal class VideoFileType : BaseFileType<VideoFileOperator, VideoFileModel, VideoFileViewModel, VideoDetailViewerPreviewControlView, VideoThumbnailPickerViewModel, VideoThumbnailPickerView> {
 	private VideoDetailViewerPreviewControlView? _videoDetailViewerPreviewControlView;
 	private readonly VideoFileOperator _videoFileOperator;
@@ -25,6 +26,16 @@ internal class VideoFileType : BaseFileType<VideoFileOperator, VideoFileModel, V
 		: base(config, tagsManager, MediaType.Video) {
 		this._videoFileOperator = videoFileOperator;
 		this._serviceProvider = serviceProvider;
+
+		FlyleafLib.Engine.Start(new FlyleafLib.EngineConfig() {
+#if DEBUG
+			LogOutput = ":debug",
+			LogLevel = FlyleafLib.LogLevel.Debug,
+			FFmpegLogLevel = Flyleaf.FFmpeg.LogLevel.Warn,
+#endif
+			UIRefresh = false,
+			FFmpegPath = config.PathConfig.FFMpegFolderPath.Value,
+		});
 	}
 
 	public override VideoFileOperator CreateFileOperator() {

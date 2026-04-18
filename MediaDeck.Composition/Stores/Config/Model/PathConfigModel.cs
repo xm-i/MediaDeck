@@ -29,5 +29,5 @@ public class PathConfigModel {
 
 	public ReactiveProperty<string> FFMpegFolderPath {
 		get;
-	} = new(Path.Combine(AppDomain.CurrentDomain.BaseDirectory!, "Assets"));
+	} = new(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets"));
 }

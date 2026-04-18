@@ -16,6 +16,7 @@ public class DetailViewerViewModel : ViewerPaneViewModelBase, IDetailViewerViewM
 			}
 			this.DetailViewerPreviewControlView.Value = fileTypeService.CreateDetailViewerPreviewControlView(vm);
 			this.DetailViewerPreviewControlView.Value.DataContext = this;
+			this.SelectedFile.Value = vm;
 			this.SelectedFilePath.Value = vm.FilePath;
 			this.SelectedFileThumbnailFilePath.Value = vm.ThumbnailFilePath.Value;
 		});
@@ -26,14 +27,24 @@ public class DetailViewerViewModel : ViewerPaneViewModelBase, IDetailViewerViewM
 		get;
 	}
 
+	/// <summary>
+	/// 各ファイルタイプのDetailViewerView。
+	/// </summary>
 	public BindableReactiveProperty<IDetailViewerPreviewControlView?> DetailViewerPreviewControlView {
 		get;
 	} = new();
 
+	/// <inheritdoc/>
+	public BindableReactiveProperty<IFileViewModel?> SelectedFile {
+		get;
+	} = new(null);
+
+	/// <inheritdoc/>
 	public BindableReactiveProperty<string?> SelectedFilePath {
 		get;
 	} = new(null);
 
+	/// <inheritdoc/>
 	public BindableReactiveProperty<string?> SelectedFileThumbnailFilePath {
 		get;
 	} = new(null);

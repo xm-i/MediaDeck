@@ -11,7 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace MediaDeck.FileTypes.Image;
 
-[Inject(InjectServiceLifetime.Transient, typeof(IFileType))]
+[Inject(InjectServiceLifetime.Singleton, typeof(IFileType))]
 internal class ImageFileType : BaseFileType<ImageFileOperator, ImageFileModel, ImageFileViewModel, ImageDetailViewerPreviewControlView, ImageThumbnailPickerViewModel, ImageThumbnailPickerView> {
 	private ImageDetailViewerPreviewControlView? _imageDetailViewerPreviewControlView;
 	private readonly ImageFileOperator _imageFileOperator;

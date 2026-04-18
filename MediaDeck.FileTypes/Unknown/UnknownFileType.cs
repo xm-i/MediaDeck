@@ -11,7 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace MediaDeck.FileTypes.Unknown;
 
-[Inject(InjectServiceLifetime.Transient, typeof(IFileType))]
+[Inject(InjectServiceLifetime.Singleton, typeof(IFileType))]
 internal class UnknownFileType : BaseFileType<UnknownFileOperator, UnknownFileModel, UnknownFileViewModel, UnknownDetailViewerPreviewControlView, UnknownThumbnailPickerViewModel, UnknownThumbnailPickerView> {
 	private UnknownDetailViewerPreviewControlView? _unknownDetailViewerPreviewControlView;
 	private readonly UnknownFileOperator _unknownFileOperator;

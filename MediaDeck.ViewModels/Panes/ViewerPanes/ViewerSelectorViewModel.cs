@@ -30,6 +30,13 @@ public class ViewerSelectorViewModel : ViewModelBase {
 
 		this.ItemSize = stateStore.State.ViewerState.ItemSize.ToTwoWayBindableReactiveProperty(stateStore.State.ViewerState.ItemSize.Value).AddTo(this.CompositeDisposable);
 
+		this.SelectedViewerPane.Pairwise()
+			.Subscribe(x => {
+				x.Previous?.IsSelected.Value = false;
+				x.Current?.IsSelected.Value = true;
+			})
+			.AddTo(this.CompositeDisposable);
+
 		this.RefreshCommand.SubscribeAwait(async (_, ct) =>
 					await this.MediaContentLibraryViewModel.ReloadAsync().ConfigureAwait(false),
 				AwaitOperation.Drop)

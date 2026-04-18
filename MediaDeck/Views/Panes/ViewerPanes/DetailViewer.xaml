@@ -33,9 +33,14 @@
 				</DataTemplate>
 			</controls:TokenizingTextBox.SuggestedItemTemplate>
 		</controls:TokenizingTextBox>
-		<Viewbox Grid.Row="1" >
-			<ContentControl Content="{x:Bind ViewModel.DetailViewerViewModel.DetailViewerPreviewControlView.Value, Mode=OneWay}" />
-		</Viewbox>
+		<Grid Grid.Row="1" >
+			<ContentControl
+				HorizontalAlignment="Stretch"
+				VerticalAlignment="Stretch"
+				HorizontalContentAlignment="Stretch"
+				VerticalContentAlignment="Stretch"
+				Content="{x:Bind ViewModel.DetailViewerViewModel.DetailViewerPreviewControlView.Value, Mode=OneWay}" />
+		</Grid>
 		<ListView x:Name="List"
 			Margin="10"
 			Grid.Row="2"

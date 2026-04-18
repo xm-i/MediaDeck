@@ -11,7 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace MediaDeck.FileTypes.Archive;
 
-[Inject(InjectServiceLifetime.Transient, typeof(IFileType))]
+[Inject(InjectServiceLifetime.Singleton, typeof(IFileType))]
 internal class ArchiveFileType : BaseFileType<ArchiveFileOperator, ArchiveFileModel, ArchiveFileViewModel, ArchiveDetailViewerPreviewControlView, ArchiveThumbnailPickerViewModel, ArchiveThumbnailPickerView> {
 	private ArchiveDetailViewerPreviewControlView? _archiveDetailViewerPreviewControlView;
 	private readonly ArchiveFileOperator _archiveFileOperator;

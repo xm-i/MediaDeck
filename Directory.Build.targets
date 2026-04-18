@@ -9,6 +9,8 @@
     <PackageReference Update="CommunityToolkit.WinUI.Controls.TokenizingTextBox" Version="8.2.251219" />
     <PackageReference Update="CommunityToolkit.WinUI.Converters" Version="8.2.251219" />
     <PackageReference Update="FFMpegCore" Version="5.4.0" />
+    <PackageReference Update="Flyleaf.FFmpeg.Bindings" Version="8.0.0" />
+    <PackageReference Update="FlyleafLib.Controls.WinUI" Version="1.3.1" />
     <PackageReference Update="Magick.NET-Q16-AnyCPU" Version="14.12.0" />
     <PackageReference Update="MetadataExtractor" Version="2.9.3" />
     <PackageReference Update="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.6" />
