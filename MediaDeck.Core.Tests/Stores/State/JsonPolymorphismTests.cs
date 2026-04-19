@@ -8,6 +8,8 @@ using MediaDeck.Core.Models.Files.SearchConditions;
 using MediaDeck.Core.Models.Tags;
 using MediaDeck.Stores.SerializerContext;
 using Microsoft.Extensions.DependencyInjection;
+using Moq;
+using ObservableCollections;
 using Shouldly;
 
 namespace MediaDeck.Core.Tests.Stores.State;
@@ -18,6 +20,8 @@ public class JsonPolymorphismTests {
 	private readonly JsonSerializerOptions DefaultOptions = new JsonSerializerOptions() {
 		TypeInfoResolver = StateJsonSerializerContext.Default.WithAddedModifier(global::R3.JsonConfig.ForJsonConverterRegistry.ApplyPolymorphism)
 	};
+
+	private readonly Mock<ITagsManager> _tagsManagerMock = new();
 
 	public JsonPolymorphismTests() {
 		var services = new ServiceCollection();
@@ -33,6 +37,7 @@ public class JsonPolymorphismTests {
 		services.AddTransient<ITagCategoryModel, TagCategoryModel>();
 		services.AddTransient<TagAliasModel>();
 		services.AddTransient<ITagAliasModel, TagAliasModel>();
+		services.AddSingleton(this._tagsManagerMock.Object);
 		this._serviceProvider = services.BuildServiceProvider();
 	}
 
@@ -50,16 +55,19 @@ public class JsonPolymorphismTests {
 	[Fact]
 	public void TagSearchCondition_RoundTrip_Works() {
 		// Arrange
-		var condition = new TagSearchCondition {
-			TargetTag = new TagModel {
-				TagId = 1,
-				TagCategoryId = 1,
-				TagCategory = new TagCategoryModel { TagCategoryId = 1, TagCategoryName = "Cat", Detail = "" },
-				TagName = "TestTag",
-				Detail = "",
-				Romaji = "testtag",
-				TagAliases = []
-			}
+		var tag = new TagModel {
+			TagId = 1,
+			TagCategoryId = 1,
+			TagCategory = new TagCategoryModel { TagCategoryId = 1, TagCategoryName = "Cat", Detail = "" },
+			TagName = "TestTag",
+			Detail = "",
+			Romaji = "testtag",
+			TagAliases = []
+		};
+		this._tagsManagerMock.Setup(x => x.Tags).Returns(new ObservableList<ITagModel> { tag });
+
+		var condition = new TagSearchCondition(this._tagsManagerMock.Object) {
+			TagId = tag.TagId
 		};
 
 		// Act & Assert

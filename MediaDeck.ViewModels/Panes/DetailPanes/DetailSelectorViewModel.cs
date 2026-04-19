@@ -83,8 +83,8 @@ public class DetailSelectorViewModel : ViewModelBase {
 		this.SearchTaggedFilesCommand.Subscribe(x => {
 			searchConditionNotificationDispatcher.UpdateRequest.OnNext(conditions => {
 				conditions.Clear();
-				var condition = new TagSearchCondition {
-					TargetTag = x.Value.Model
+				var condition = new TagSearchCondition(this._model.TagsManager) {
+					TagId = x.Value.Model.TagId
 				};
 				conditions.Add(condition);
 			});

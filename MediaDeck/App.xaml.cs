@@ -1,10 +1,12 @@
 using System.IO;
+using System.Threading.Tasks;
 
 using CommunityToolkit.Mvvm.DependencyInjection;
 
 using FFMpegCore;
 
 using MediaDeck.Composition.Constants;
+using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Core.Stores.Config;
 using MediaDeck.Core.Stores.State;
 using MediaDeck.Database;
@@ -16,7 +18,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.UI.Xaml;
 
 using Serilog;
-using Serilog.Events;
 
 namespace MediaDeck;
 
@@ -40,19 +41,8 @@ public partial class App {
 			Directory.CreateDirectory(FilePathConstants.BaseDirectory);
 		}
 		BuildConfigureServices();
-
-		var dbFactory = Ioc.Default.GetRequiredService<IDbContextFactory<MediaDeckDbContext>>();
-		using (var db = dbFactory.CreateDbContext()) {
-			db.Database.EnsureCreated();
-		}
-
 		this._configStore = Ioc.Default.GetRequiredService<IConfigStore>();
 		this._stateStore = Ioc.Default.GetRequiredService<IStateStore>();
-		Directory.CreateDirectory(this._configStore.Config.PathConfig.TemporaryFolderPath.Value);
-
-		GlobalFFOptions.Configure(options => {
-			options.BinaryFolder = Path.Combine(this._configStore.Config.PathConfig.FFMpegFolderPath.Value);
-		});
 		this.InitializeComponent();
 	}
 
@@ -60,7 +50,8 @@ public partial class App {
 	/// Invoked when the application is launched.
 	/// </summary>
 	/// <param name="args">Details about the launch request and process.</param>
-	protected override void OnLaunched(LaunchActivatedEventArgs args) {
+	protected override async void OnLaunched(LaunchActivatedEventArgs args) {
+		await this.InitializeAsync();
 		this._window = Ioc.Default.GetRequiredService<MainWindow>();
 
 		this._window.Closed += (_, _) => {
@@ -120,5 +111,22 @@ public partial class App {
 			ServiceLifetime.Transient);
 
 		Ioc.Default.ConfigureServices(serviceCollection.BuildServiceProvider());
+	}
+
+	private async Task InitializeAsync() {
+
+		var dbFactory = Ioc.Default.GetRequiredService<IDbContextFactory<MediaDeckDbContext>>();
+		using (var db = dbFactory.CreateDbContext()) {
+			db.Database.EnsureCreated();
+		}
+
+		Directory.CreateDirectory(this._configStore.Config.PathConfig.TemporaryFolderPath.Value);
+
+		GlobalFFOptions.Configure(options => {
+			options.BinaryFolder = Path.Combine(this._configStore.Config.PathConfig.FFMpegFolderPath.Value);
+		});
+
+		var tagsManager = Ioc.Default.GetRequiredService<ITagsManager>();
+		await tagsManager.InitializeAsync();
 	}
 }

@@ -12,15 +12,20 @@ namespace MediaDeck.Core.Models.Files.SearchConditions;
 [JsonConfigDerivedType("tag")]
 [Inject(InjectServiceLifetime.Transient)]
 public class TagSearchCondition : ISearchCondition {
-	public TagSearchCondition() {
+	private readonly ITagsManager _tagsManager;
+
+	public TagSearchCondition(ITagsManager tagsManager) {
+		this._tagsManager = tagsManager;
 	}
 
-	public ITagModel TargetTag {
+	public int TagId {
+		get;
+		set;
+	}
+
+	private ITagModel TargetTag {
 		get {
-			return field ?? throw new InvalidOperationException($"{nameof(this.TargetTag)} is not initialized.");
-		}
-		set {
-			field = value;
+			return field ??= this._tagsManager.Tags.FirstOrDefault(t => t.TagId == this.TagId) ?? throw new InvalidOperationException($"Tag with Id {this.TagId} not found.");
 		}
 	}
 
@@ -33,7 +38,7 @@ public class TagSearchCondition : ISearchCondition {
 	public Expression<Func<MediaFile, bool>>? WherePredicate {
 		get {
 			Expression<Func<MediaFile, bool>> exp1 =
-				mediaFile => mediaFile.MediaFileTags.Select(x => x.TagId).Contains(this.TargetTag.TagId);
+				mediaFile => mediaFile.MediaFileTags.Select(x => x.TagId).Contains(this.TagId);
 			var exp = exp1.Body;
 			var visitor = new ParameterVisitor(exp1.Parameters);
 

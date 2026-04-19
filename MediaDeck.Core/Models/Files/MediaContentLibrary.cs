@@ -9,7 +9,6 @@ using MediaDeck.Core.Models.Files.Loaders;
 using MediaDeck.Core.Models.Files.SearchConditions;
 using MediaDeck.Core.Models.NotificationDispatcher;
 using MediaDeck.Core.Models.Repositories;
-using MediaDeck.Core.Models.Tags;
 
 namespace MediaDeck.Core.Models.Files;
 
@@ -18,8 +17,7 @@ public class MediaContentLibrary : ModelBase {
 	public MediaContentLibrary(FilesLoader filesLoader, SearchConditionNotificationDispatcher searchConditionNotificationDispatcher, ITagsManager tagsManager, FolderRepository folderRepository, StateModel states) {
 		this._filesLoader = filesLoader;
 		this.SearchConditions.ObserveChanged().ThrottleLast(TimeSpan.FromMilliseconds(100)).Subscribe(async _ => await this.SearchAsync());
-		tagsManager.InitializeAsync().Wait();
-		this.SearchConditionCandidates.AddRange(tagsManager.Tags.Select(x => new TagSearchCondition { TargetTag = (TagModel)x } as ISearchCondition));
+		this.SearchConditionCandidates.AddRange(tagsManager.Tags.Select(x => new TagSearchCondition(tagsManager) { TagId = x.TagId } as ISearchCondition));
 		this.SearchConditionCandidates.AddRange(folderRepository.GetAllFolders().Select(x => new FolderSearchCondition { FolderPath = x.FolderPath } as ISearchCondition));
 		searchConditionNotificationDispatcher.AddRequest.Subscribe(this.SearchConditions.Add);
 		searchConditionNotificationDispatcher.RemoveRequest.Subscribe(x => this.SearchConditions.Remove(x));
