@@ -169,14 +169,6 @@ public class TagModel : ITagModel {
 	}
 
 	/// <summary>
-	/// 代表テキスト
-	/// </summary>
-	public ReactiveProperty<string?> RepresentativeText {
-		get;
-		set;
-	} = new();
-
-	/// <summary>
 	/// 使用回数
 	/// </summary>
 	public ReactiveProperty<int> UsageCount {

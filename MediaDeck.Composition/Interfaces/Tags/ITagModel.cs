@@ -63,13 +63,6 @@ public interface ITagModel {
 	}
 
 	/// <summary>
-	/// 代表テキスト
-	/// </summary>
-	public ReactiveProperty<string?> RepresentativeText {
-		get;
-	}
-
-	/// <summary>
 	/// 使用回数
 	/// </summary>
 	public ReactiveProperty<int> UsageCount {

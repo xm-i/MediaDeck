@@ -23,6 +23,11 @@ public class TagSearchCondition : ISearchCondition {
 		set;
 	}
 
+	public string? RepresentativeText {
+		get;
+		set;
+	}
+
 	private ITagModel TargetTag {
 		get {
 			return field ??= this._tagsManager.Tags.FirstOrDefault(t => t.TagId == this.TagId) ?? throw new InvalidOperationException($"Tag with Id {this.TagId} not found.");
@@ -31,7 +36,7 @@ public class TagSearchCondition : ISearchCondition {
 
 	public string DisplayText {
 		get {
-			return $"TagName={this.TargetTag.TagName}";
+			return $"TagName={this.TargetTag.TagName}({this.RepresentativeText})";
 		}
 	}
 
@@ -54,7 +59,7 @@ public class TagSearchCondition : ISearchCondition {
 	public bool IsMatchForSuggest(string searchWord) {
 		if (this.TargetTag.TagName.Contains(searchWord) ||
 			(this.TargetTag.TagName.KatakanaToHiragana().HiraganaToRomaji()?.Contains(searchWord, StringComparison.CurrentCultureIgnoreCase) ?? false)) {
-			this.TargetTag.RepresentativeText.Value = null;
+			this.RepresentativeText = null;
 			return true;
 		}
 		var result = this.TargetTag.TagAliases
@@ -62,7 +67,7 @@ public class TagSearchCondition : ISearchCondition {
 				x.Alias.Contains(searchWord, StringComparison.CurrentCultureIgnoreCase) ||
 				(x.Ruby?.Contains(searchWord) ?? false) ||
 				((x.Ruby ?? x.Alias.KatakanaToHiragana()).HiraganaToRomaji()?.Contains(searchWord, StringComparison.CurrentCultureIgnoreCase) ?? false));
-		this.TargetTag.RepresentativeText.Value = result?.Alias;
+		this.RepresentativeText = result?.Alias;
 		return result != null;
 	}
 }

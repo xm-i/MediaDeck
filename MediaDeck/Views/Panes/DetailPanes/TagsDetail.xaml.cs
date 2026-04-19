@@ -60,6 +60,13 @@ public sealed partial class TagsDetail {
 		}
 	}
 
+	private void AutoSuggestBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args) {
+		if (args.ChosenSuggestion is TagViewModel tagViewModel) {
+			this.ViewModel?.AddSpecificTagCommand.Execute(tagViewModel);
+		}
+	}
+
+
 	private void TagGrid_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e) {
 		if (this.TagListBox.SelectedItem is not ValueCountPair<TagViewModel> tag) {
 			return;

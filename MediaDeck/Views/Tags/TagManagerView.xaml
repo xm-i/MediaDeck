@@ -126,8 +126,8 @@
 									<Run Text=")" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
 								</TextBlock>
 								<TextBlock
-									Visibility="{x:Bind RepresentativeTextForSearch.Value, Mode=OneWay, Converter={StaticResource NullToCollapseConverter}}"
-									Text="{x:Bind RepresentativeTextForSearch.Value, Mode=OneWay}"
+									Visibility="{x:Bind RepresentativeText.Value, Mode=OneWay, Converter={StaticResource NullToCollapseConverter}}"
+									Text="{x:Bind RepresentativeText.Value, Mode=OneWay}"
 									FontSize="10"
 									Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
 							</StackPanel>

@@ -36,6 +36,7 @@ public class DetailSelectorViewModel : ViewModelBase {
 			return new TagViewModel(categoryViewModel, x, model.TagsManager, tagModelFactory);
 		});
 		this.FilteredTagCandidates = this.TagCandidates.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current).AddTo(this.CompositeDisposable);
+
 		this.Tags = model.Tags.CreateView(x => {
 			var categoryViewModel = this.GetCategoryViewModel(x.Value.TagCategory, model.TagsManager, tagModelFactory);
 			return new ValueCountPair<TagViewModel>(new TagViewModel(categoryViewModel, x.Value, model.TagsManager, tagModelFactory), x.Count);
@@ -80,6 +81,11 @@ public class DetailSelectorViewModel : ViewModelBase {
 			this.Text.Value = string.Empty;
 		}, AwaitOperation.Drop).AddTo(this.CompositeDisposable);
 
+		this.AddSpecificTagCommand.SubscribeAwait(async (tagViewModel, ct) => {
+			await model.AddTagAsync(this.TargetFileModels, tagViewModel.Model);
+			this.Text.Value = string.Empty;
+		}, AwaitOperation.Drop).AddTo(this.CompositeDisposable);
+
 		this.SearchTaggedFilesCommand.Subscribe(x => {
 			searchConditionNotificationDispatcher.UpdateRequest.OnNext(conditions => {
 				conditions.Clear();
@@ -89,9 +95,6 @@ public class DetailSelectorViewModel : ViewModelBase {
 				conditions.Add(condition);
 			});
 		}).AddTo(this.CompositeDisposable);
-
-		this.Text.Subscribe(_ => this.RefreshTagCandidateFilter())
-			.AddTo(this.CompositeDisposable);
 	}
 
 	public BindableReactiveProperty<string> RepresentativeFilePath {
@@ -164,6 +167,10 @@ public class DetailSelectorViewModel : ViewModelBase {
 		get;
 	} = new();
 
+	public ReactiveCommand<TagViewModel> AddSpecificTagCommand {
+		get;
+	} = new();
+
 	public ReactiveCommand<double> UpdateRateCommand {
 		get;
 	} = new();
@@ -178,8 +185,10 @@ public class DetailSelectorViewModel : ViewModelBase {
 	}
 
 	private void RefreshTagCandidateFilter() {
-		this.TagCandidates.AttachFilter(x => {
-			return DetailSelectorModel.MatchesTagFilter(x, this.Text.Value, out _);
+		this.TagCandidates.AttachFilter((m, vm) => {
+			var result = DetailSelectorModel.MatchesTagFilter(m, this.Text.Value, out var representativeText);
+			vm.RepresentativeText.Value = representativeText ?? string.Empty;
+			return result;
 		});
 	}
 

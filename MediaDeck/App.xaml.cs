@@ -18,6 +18,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.UI.Xaml;
 
 using Serilog;
+using Serilog.Events;
 
 namespace MediaDeck;
 

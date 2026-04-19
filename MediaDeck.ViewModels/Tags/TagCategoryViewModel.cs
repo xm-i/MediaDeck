@@ -17,6 +17,7 @@ public class TagCategoryViewModel : ViewModelBase {
 		this.FilteredTags = this.Tags.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
 
 		this.FilterText.ThrottleLast(TimeSpan.FromMilliseconds(300))
+			.ObserveOnCurrentSynchronizationContext()
 			.Subscribe(_ => {
 				this.RefreshTagCandidateFilter();
 			}).AddTo(this.CompositeDisposable);
@@ -75,14 +76,14 @@ public class TagCategoryViewModel : ViewModelBase {
 	}
 
 	private void RefreshTagCandidateFilter() {
-		this.Tags.AttachFilter(tag => {
+		this.Tags.AttachFilter((tag, tagVm) => {
 			var text = this.FilterText.Value ?? "";
 			if (text.Length == 0) {
 				return true;
 			}
 			if (tag.TagName.Contains(text) ||
 				(tag.TagName.KatakanaToHiragana().HiraganaToRomaji()?.Contains(text, StringComparison.CurrentCultureIgnoreCase) ?? false)) {
-				tag.RepresentativeText.Value = null;
+				tagVm.RepresentativeText.Value = null;
 				return true;
 			}
 			var result =
@@ -92,7 +93,7 @@ public class TagCategoryViewModel : ViewModelBase {
 						x.Alias.Contains(text, StringComparison.CurrentCultureIgnoreCase) ||
 						(x.Ruby?.Contains(text) ?? false) ||
 						((x.Ruby ?? x.Alias.KatakanaToHiragana()).HiraganaToRomaji()?.Contains(text, StringComparison.CurrentCultureIgnoreCase) ?? false));
-			tag.RepresentativeText.Value = result?.Alias;
+			tagVm.RepresentativeText.Value = result?.Alias;
 			return result != null;
 		});
 	}
