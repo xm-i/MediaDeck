@@ -3,7 +3,7 @@ using System.Text.Json;
 
 using AutoDiAttributes;
 
-using MediaDeck.Composition.Constants;
+using MediaDeck.Composition.Interfaces.Services;
 using MediaDeck.Composition.Objects;
 using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Core.Models.NotificationDispatcher;
@@ -19,6 +19,7 @@ namespace MediaDeck.Store.Config;
 public class ConfigStore : IConfigStore {
 	private readonly ILogger<ConfigStore> _logger;
 	private readonly AppNotificationDispatcher _notificationDispatcher;
+	private readonly IAppPathProvider _pathProvider;
 	public IServiceProvider ScopedService {
 		get;
 	}
@@ -28,15 +29,15 @@ public class ConfigStore : IConfigStore {
 		private set;
 	}
 
-	// Protected property to allow overriding the file path during testing.
 	protected virtual string ConfigFilePath {
 		get {
-			return FilePathConstants.ConfigFilePath;
+			return this._pathProvider.ConfigFilePath;
 		}
 	}
 
-	public ConfigStore(IServiceProvider service) {
+	public ConfigStore(IServiceProvider service, IAppPathProvider pathProvider) {
 		this.ScopedService = service;
+		this._pathProvider = pathProvider;
 		this._logger = service.GetRequiredService<ILogger<ConfigStore>>();
 		this._notificationDispatcher = service.GetRequiredService<AppNotificationDispatcher>();
 		this.Load();

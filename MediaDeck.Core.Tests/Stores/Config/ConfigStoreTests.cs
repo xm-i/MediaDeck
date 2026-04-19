@@ -1,8 +1,10 @@
 using System.Runtime.CompilerServices;
+using MediaDeck.Composition.Interfaces.Services;
 using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Core.Models.NotificationDispatcher;
 using MediaDeck.Store.Config;
 using Microsoft.Extensions.DependencyInjection;
+using Moq;
 using Shouldly;
 
 namespace MediaDeck.Core.Tests.Stores.Config;
@@ -23,7 +25,7 @@ public class ConfigStoreTests : IDisposable {
 			}
 		}
 
-		public TestableConfigStore(IServiceProvider service) : base(service) {
+		public TestableConfigStore(IServiceProvider service, IAppPathProvider pathProvider) : base(service, pathProvider) {
 		}
 	}
 
@@ -54,10 +56,14 @@ public class ConfigStoreTests : IDisposable {
 		services.AddSingleton(mockConfig);
 		services.AddLogging();
 		services.AddSingleton<AppNotificationDispatcher>();
+		var mockPathProvider = new Mock<IAppPathProvider>();
+		mockPathProvider.Setup(x => x.ConfigFilePath).Returns(() => TestableConfigStore.TestPath);
+		services.AddSingleton(mockPathProvider.Object);
+
 		var serviceProvider = services.BuildServiceProvider();
 
 		// Act
-		var store = new TestableConfigStore(serviceProvider); // Load is called in constructor
+		var store = new TestableConfigStore(serviceProvider, mockPathProvider.Object); // Load is called in constructor
 
 		// Assert
 		store.Config.ShouldNotBeNull();
@@ -76,9 +82,13 @@ public class ConfigStoreTests : IDisposable {
 		services.AddSingleton(mockConfig);
 		services.AddLogging();
 		services.AddSingleton<AppNotificationDispatcher>();
+		var mockPathProvider = new Mock<IAppPathProvider>();
+		mockPathProvider.Setup(x => x.ConfigFilePath).Returns(() => TestableConfigStore.TestPath);
+		services.AddSingleton(mockPathProvider.Object);
+
 		var serviceProvider = services.BuildServiceProvider();
 
-		var store = new TestableConfigStore(serviceProvider);
+		var store = new TestableConfigStore(serviceProvider, mockPathProvider.Object);
 
 		// Act & Assert
 		// Should not throw
@@ -95,9 +105,13 @@ public class ConfigStoreTests : IDisposable {
 		services.AddSingleton(mockConfig);
 		services.AddLogging();
 		services.AddSingleton<AppNotificationDispatcher>();
+		var mockPathProvider = new Mock<IAppPathProvider>();
+		mockPathProvider.Setup(x => x.ConfigFilePath).Returns(() => TestableConfigStore.TestPath);
+		services.AddSingleton(mockPathProvider.Object);
+
 		var serviceProvider = services.BuildServiceProvider();
 
-		var store = new TestableConfigStore(serviceProvider);
+		var store = new TestableConfigStore(serviceProvider, mockPathProvider.Object);
 
 		// Act & Assert
 		// Calling Save with an empty file path will cause an exception in Path.GetDirectoryName or File.WriteAllText
@@ -118,9 +132,13 @@ public class ConfigStoreTests : IDisposable {
 			services.AddSingleton(mockConfig);
 			services.AddLogging();
 			services.AddSingleton<AppNotificationDispatcher>();
+			var mockPathProvider = new Mock<IAppPathProvider>();
+			mockPathProvider.Setup(x => x.ConfigFilePath).Returns(() => TestableConfigStore.TestPath);
+			services.AddSingleton(mockPathProvider.Object);
+
 			var serviceProvider = services.BuildServiceProvider();
 
-			var store = new TestableConfigStore(serviceProvider);
+			var store = new TestableConfigStore(serviceProvider, mockPathProvider.Object);
 
 			// Act & Assert
 			Should.NotThrow(() => store.Save());

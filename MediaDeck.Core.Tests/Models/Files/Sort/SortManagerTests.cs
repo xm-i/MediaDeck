@@ -1,4 +1,5 @@
 using MediaDeck.Composition.Enum;
+using MediaDeck.Composition.Interfaces.Services;
 using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Composition.Stores.State.Model.Objects;
 using MediaDeck.Core.Models.Files.Sort;
@@ -42,7 +43,10 @@ public class SortManagerTests {
 		this._mockServiceProvider.Setup(x => x.GetService(typeof(ILogger<StateStore>))).Returns(realServiceProvider.GetRequiredService<ILogger<StateStore>>());
 		this._mockServiceProvider.Setup(x => x.GetService(typeof(AppNotificationDispatcher))).Returns(realServiceProvider.GetRequiredService<AppNotificationDispatcher>());
 
-		this._stateStore = new StateStore(this._mockServiceProvider.Object);
+		var pathProvider = new StubAppPathProvider();
+		this._mockServiceProvider.Setup(x => x.GetService(typeof(IAppPathProvider))).Returns(pathProvider);
+
+		this._stateStore = new StateStore(this._mockServiceProvider.Object, pathProvider);
 	}
 
 	/// <summary>

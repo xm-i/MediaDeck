@@ -4,7 +4,7 @@ using System.Text.Json.Serialization.Metadata;
 
 using AutoDiAttributes;
 
-using MediaDeck.Composition.Constants;
+using MediaDeck.Composition.Interfaces.Services;
 using MediaDeck.Composition.Objects;
 using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Core.Models.NotificationDispatcher;
@@ -20,6 +20,7 @@ namespace MediaDeck.Store.State;
 public class StateStore : IStateStore {
 	private readonly ILogger<StateStore> _logger;
 	private readonly AppNotificationDispatcher _notificationDispatcher;
+	private readonly IAppPathProvider _pathProvider;
 	public IServiceProvider ScopedService {
 		get;
 	}
@@ -29,16 +30,15 @@ public class StateStore : IStateStore {
 		private set;
 	}
 
-
-	// Protected property to allow overriding the file path during testing.
 	protected virtual string StateFilePath {
 		get {
-			return FilePathConstants.StateFilePath;
+			return this._pathProvider.StateFilePath;
 		}
 	}
 
-	public StateStore(IServiceProvider service) {
+	public StateStore(IServiceProvider service, IAppPathProvider pathProvider) {
 		this.ScopedService = service;
+		this._pathProvider = pathProvider;
 		this._logger = service.GetRequiredService<ILogger<StateStore>>();
 		this._notificationDispatcher = service.GetRequiredService<AppNotificationDispatcher>();
 		this.Load();

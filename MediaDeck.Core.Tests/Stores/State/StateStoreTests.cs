@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using MediaDeck.Composition.Interfaces.Services;
 using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Core.Models.NotificationDispatcher;
 using MediaDeck.Store.State;
@@ -30,7 +31,7 @@ public class StateStoreTests : IDisposable {
 			}
 		}
 
-		public TestableStateStore(IServiceProvider service) : base(service) {
+		public TestableStateStore(IServiceProvider service, IAppPathProvider pathProvider) : base(service, pathProvider) {
 		}
 	}
 
@@ -61,6 +62,11 @@ public class StateStoreTests : IDisposable {
 		Directory.CreateDirectory(this._tempDirectory);
 		this._testStateFilePath = Path.Combine(this._tempDirectory, "MediaDeck.states");
 
+		var mockPathProvider = new Mock<IAppPathProvider>();
+		mockPathProvider.Setup(x => x.StateFilePath).Returns(() => TestableStateStore.TestPath);
+
+		this._serviceProviderMock.Setup(x => x.GetService(typeof(IAppPathProvider))).Returns(mockPathProvider.Object);
+
 		TestableStateStore.TestPath = this._testStateFilePath;
 	}
 
@@ -75,7 +81,7 @@ public class StateStoreTests : IDisposable {
 		File.WriteAllText(this._testStateFilePath, "{ invalid json }");
 
 		// The constructor invokes Load automatically
-		var store = new TestableStateStore(this._serviceProviderMock.Object);
+		var store = new TestableStateStore(this._serviceProviderMock.Object, this._serviceProviderMock.Object.GetRequiredService<IAppPathProvider>());
 
 		store.State.ShouldNotBeNull();
 		this._serviceProviderMock.Verify(x => x.GetService(typeof(StateModel)), Times.Once);
@@ -87,7 +93,7 @@ public class StateStoreTests : IDisposable {
 		using var stream = new FileStream(this._testStateFilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
 
 		// This invokes Load, which sees an empty/locked file or fails to read, hitting the fallback
-		var store = new TestableStateStore(this._serviceProviderMock.Object);
+		var store = new TestableStateStore(this._serviceProviderMock.Object, this._serviceProviderMock.Object.GetRequiredService<IAppPathProvider>());
 
 		// Save tries to write, hitting the lock
 		var act = () => store.Save();
@@ -100,7 +106,7 @@ public class StateStoreTests : IDisposable {
 			File.Delete(this._testStateFilePath);
 		}
 
-		var store = new TestableStateStore(this._serviceProviderMock.Object);
+		var store = new TestableStateStore(this._serviceProviderMock.Object, this._serviceProviderMock.Object.GetRequiredService<IAppPathProvider>());
 
 		store.State.ShouldNotBeNull();
 		this._serviceProviderMock.Verify(x => x.GetService(typeof(StateModel)), Times.Once);
@@ -110,7 +116,7 @@ public class StateStoreTests : IDisposable {
 	public void Save_WithInvalidFilePath_DoesNotThrow() {
 		TestableStateStore.TestPath = string.Empty;
 
-		var store = new TestableStateStore(this._serviceProviderMock.Object);
+		var store = new TestableStateStore(this._serviceProviderMock.Object, this._serviceProviderMock.Object.GetRequiredService<IAppPathProvider>());
 
 		var act = () => store.Save();
 		Should.NotThrow(act);
