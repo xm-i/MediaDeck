@@ -5,6 +5,7 @@ using MediaDeck.Composition.Interfaces.FileTypes.ViewModels;
 using MediaDeck.Composition.Interfaces.FileTypes.Views;
 using MediaDeck.FileTypes.Base.Views;
 
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
 namespace MediaDeck.FileTypes.Video.Views;
@@ -15,6 +16,11 @@ internal sealed partial class VideoDetailViewerPreviewControlView : VideoDetailV
 	public Player Player {
 		get; set;
 	}
+
+	/// <summary>
+	/// サムネイルの表示状態。
+	/// </summary>
+	public BindableReactiveProperty<Visibility> ThumbnailVisibility { get; } = new(Visibility.Collapsed);
 
 	internal VideoDetailViewerPreviewControlView() {
 		this.Player = new();
@@ -31,6 +37,8 @@ internal sealed partial class VideoDetailViewerPreviewControlView : VideoDetailV
 			.Subscribe(tuple => {
 				var (file, isSelected) = tuple;
 				if (file != null && file.MediaType == MediaType.Video && isSelected) {
+					this.ThumbnailVisibility.Value = Visibility.Visible;
+
 					this.Player.Open(file.FilePath);
 					this.Player.Pause();
 				} else {
@@ -43,6 +51,10 @@ internal sealed partial class VideoDetailViewerPreviewControlView : VideoDetailV
 		switch (e.PropertyName) {
 			case nameof(this.Player.Status):
 				this.btnPlayback.Content = this.Player.Status == Status.Paused ? this._iconPlay : this._iconPause;
+
+				if (this.Player.Status == Status.Playing) {
+					this.ThumbnailVisibility.Value = Visibility.Collapsed;
+				}
 
 				break;
 		}

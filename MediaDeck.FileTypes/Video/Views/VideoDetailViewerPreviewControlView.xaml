@@ -23,6 +23,10 @@
 			</Grid.RowDefinitions>
 
 			<flyleaf:FlyleafHost x:Name="flyleafHost" Player="{x:Bind Player}"/>
+			<Image x:Name="imgThumbnail"
+				Source="{x:Bind ViewModel.SelectedFileThumbnailFilePath.Value, Mode=OneWay}"
+				Stretch="Uniform"
+				Visibility="{x:Bind ThumbnailVisibility.Value, Mode=OneWay}"/>
 			<Grid Grid.Row="1" VerticalAlignment="Bottom" Background="#1000" Margin="0 0 0 0">
 				<Grid.RowDefinitions>
 					<RowDefinition/>
