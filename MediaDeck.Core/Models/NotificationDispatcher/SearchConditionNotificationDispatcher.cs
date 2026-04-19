@@ -2,7 +2,7 @@ using MediaDeck.Composition.Interfaces.Files;
 
 namespace MediaDeck.Core.Models.NotificationDispatcher;
 
-[Inject(InjectServiceLifetime.Singleton)]
+[Inject(InjectServiceLifetime.Scoped)]
 public class SearchConditionNotificationDispatcher {
 	public Subject<ISearchCondition> AddRequest {
 		get;

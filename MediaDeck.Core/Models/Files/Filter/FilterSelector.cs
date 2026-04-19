@@ -8,15 +8,15 @@ namespace MediaDeck.Core.Models.Files.Filter;
 /// <summary>
 /// フィルターマネージャー
 /// </summary>
-[Inject(InjectServiceLifetime.Singleton)]
+[Inject(InjectServiceLifetime.Scoped)]
 public class FilterSelector : ModelBase {
 	/// <summary>
 	/// コンストラクタ
 	/// </summary>
-	public FilterSelector(StateModel state) {
-		this.FilteringConditions.AddRange(state.SearchState.FilteringConditions.Select(x => new FilteringCondition(x)));
+	public FilterSelector(TabStateModel tabState, SearchDefinitionsStateModel searchDefinitions) {
+		this.FilteringConditions.AddRange(searchDefinitions.FilteringConditions.Select(x => new FilteringCondition(x)));
 
-		this.CurrentFilteringCondition.Value = this.FilteringConditions.FirstOrDefault(x => x.FilterObject.Id == state.SearchState.CurrentFilteringCondition.Value);
+		this.CurrentFilteringCondition.Value = this.FilteringConditions.FirstOrDefault(x => x.FilterObject.Id == tabState.SearchState.CurrentFilteringCondition.Value);
 
 		IDisposable? beforeCurrent = null;
 		this.CurrentFilteringCondition
@@ -26,14 +26,14 @@ public class FilterSelector : ModelBase {
 				beforeCurrent = x?.OnUpdateFilteringConditions
 					.Subscribe(_ =>
 						this._onUpdateFilteringChanged.OnNext(Unit.Default));
-				state.SearchState.CurrentFilteringCondition.Value = x?.FilterObject.Id;
+				tabState.SearchState.CurrentFilteringCondition.Value = x?.FilterObject.Id;
 			})
 			.AddTo(this.CompositeDisposable);
 
-		state.SearchState.FilteringConditions.ObserveChanged()
+		searchDefinitions.FilteringConditions.ObserveChanged()
 			.Subscribe(x => {
 				this.FilteringConditions.Clear();
-				this.FilteringConditions.AddRange(state.SearchState.FilteringConditions.Select(x => new FilteringCondition(x)));
+				this.FilteringConditions.AddRange(searchDefinitions.FilteringConditions.Select(x => new FilteringCondition(x)));
 				this.CurrentFilteringCondition.Value = this.FilteringConditions.FirstOrDefault(x => x.DisplayName == this.CurrentFilteringCondition.Value?.DisplayName);
 			});
 	}

@@ -12,7 +12,10 @@ namespace MediaDeck.Stores.SerializerContext;
 	WriteIndented = true,
 	Converters = [typeof(GuidJsonConverter)]
 )]
-[JsonSerializable(typeof(StateModelForJson))]
+[JsonSerializable(typeof(RootStateModelForJson))]
+[JsonSerializable(typeof(AppStateModelForJson))]
+[JsonSerializable(typeof(TabStateModelForJson))]
+[JsonSerializable(typeof(SearchDefinitionsStateModelForJson))]
 [JsonSerializable(typeof(ISearchConditionForJson))]
 [JsonSerializable(typeof(AddressSearchConditionForJson))]
 [JsonSerializable(typeof(FolderSearchConditionForJson))]

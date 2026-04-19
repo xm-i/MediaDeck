@@ -7,7 +7,7 @@ namespace MediaDeck.Core.Models.Files;
 /// <summary>
 /// 詳細セレクタのビジネスロジックを管理するモデル
 /// </summary>
-[Inject(InjectServiceLifetime.Transient)]
+[Inject(InjectServiceLifetime.Scoped)]
 public class DetailSelectorModel : IDisposable {
 	private readonly SerialDisposable _propertyChangedSubscription = new();
 	private readonly ITagsManager _tagsManager;

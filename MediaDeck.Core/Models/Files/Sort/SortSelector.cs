@@ -8,16 +8,16 @@ using MediaDeck.Composition.Stores.State.Model.Objects;
 
 namespace MediaDeck.Core.Models.Files.Sort;
 
-[Inject(InjectServiceLifetime.Singleton)]
+[Inject(InjectServiceLifetime.Scoped)]
 public class SortSelector : ModelBase {
 	/// <summary>
 	/// コンストラクタ
 	/// </summary>
-	public SortSelector(StateModel state) {
+	public SortSelector(TabStateModel tabState, SearchDefinitionsStateModel searchDefinitions) {
 		// 設定値初回値読み込み
-		this.SortConditions = state.SearchState.SortConditions;
-		this.CurrentSortCondition = state.SearchState.CurrentSortCondition.ToTwoWayReactiveProperty(x => this.SortConditions.FirstOrDefault(sc => sc.Id == x), x => x?.Id, null);
-		this.Direction = state.SearchState.SortDirection;
+		this.SortConditions = searchDefinitions.SortConditions;
+		this.CurrentSortCondition = tabState.SearchState.CurrentSortCondition.ToTwoWayReactiveProperty(x => this.SortConditions.FirstOrDefault(sc => sc.Id == x), x => x?.Id, null);
+		this.Direction = tabState.SearchState.SortDirection;
 
 		// 更新
 		this.CurrentSortCondition.Select(_ => Unit.Default)

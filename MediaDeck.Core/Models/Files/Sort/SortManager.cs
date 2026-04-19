@@ -1,4 +1,5 @@
 using MediaDeck.Common.Base;
+using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Composition.Stores.State.Model.Objects;
 using MediaDeck.Core.Stores.State;
 
@@ -10,10 +11,12 @@ namespace MediaDeck.Core.Models.Files.Sort;
 [Inject(InjectServiceLifetime.Singleton)]
 public class SortManager : ModelBase {
 	private readonly IStateStore _stateStore;
+	private readonly SearchDefinitionsStateModel _searchDefinitions;
 
-	public SortManager(IStateStore stateStore) {
+	public SortManager(IStateStore stateStore, SearchDefinitionsStateModel searchDefinitions) {
 		this._stateStore = stateStore;
-		this.SortConditions = this._stateStore.State.SearchState.SortConditions;
+		this._searchDefinitions = searchDefinitions;
+		this.SortConditions = searchDefinitions.SortConditions;
 	}
 
 	/// <summary>
@@ -34,7 +37,7 @@ public class SortManager : ModelBase {
 	/// ソート条件追加
 	/// </summary>
 	public void AddCondition() {
-		var so = this._stateStore.State.SearchState.AddSortCondition();
+		var so = this._searchDefinitions.AddSortCondition();
 	}
 
 	/// <summary>
@@ -42,6 +45,6 @@ public class SortManager : ModelBase {
 	/// </summary>
 	/// <param name="sortObject">削除するソート条件</param>
 	public void RemoveCondition(SortObject sortObject) {
-		this._stateStore.State.SearchState.RemoveSortCondition(sortObject);
+		this._searchDefinitions.RemoveSortCondition(sortObject);
 	}
 }

@@ -12,9 +12,9 @@ using MediaDeck.Core.Models.Repositories;
 
 namespace MediaDeck.Core.Models.Files;
 
-[Inject(InjectServiceLifetime.Singleton)]
+[Inject(InjectServiceLifetime.Scoped)]
 public class MediaContentLibrary : ModelBase {
-	public MediaContentLibrary(FilesLoader filesLoader, SearchConditionNotificationDispatcher searchConditionNotificationDispatcher, ITagsManager tagsManager, FolderRepository folderRepository, StateModel states) {
+	public MediaContentLibrary(FilesLoader filesLoader, SearchConditionNotificationDispatcher searchConditionNotificationDispatcher, ITagsManager tagsManager, FolderRepository folderRepository, TabStateModel tabState) {
 		this._filesLoader = filesLoader;
 		this.SearchConditions.ObserveChanged().ThrottleLast(TimeSpan.FromMilliseconds(100)).Subscribe(async _ => await this.SearchAsync());
 		this.SearchConditionCandidates.AddRange(tagsManager.Tags.Select(x => new TagSearchCondition(tagsManager) { TagId = x.TagId } as ISearchCondition));
@@ -23,11 +23,11 @@ public class MediaContentLibrary : ModelBase {
 		searchConditionNotificationDispatcher.RemoveRequest.Subscribe(x => this.SearchConditions.Remove(x));
 		searchConditionNotificationDispatcher.UpdateRequest.Subscribe(x => x(this.SearchConditions));
 
-		this.SearchConditions.AddRange(states.SearchState.SearchCondition.ToArray());
+		this.SearchConditions.AddRange(tabState.SearchState.SearchCondition.ToArray());
 		this.SearchConditions.ObserveChanged()
 			.Subscribe(_ => {
-				states.SearchState.SearchCondition.Clear();
-				states.SearchState.SearchCondition.AddRange(this.SearchConditions.ToArray());
+				tabState.SearchState.SearchCondition.Clear();
+				tabState.SearchState.SearchCondition.AddRange(this.SearchConditions.ToArray());
 			});
 	}
 

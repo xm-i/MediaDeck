@@ -1,4 +1,5 @@
 using MediaDeck.Common.Base;
+using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Core.Stores.State;
 
 namespace MediaDeck.Core.Models.Files.Filter;
@@ -12,10 +13,12 @@ namespace MediaDeck.Core.Models.Files.Filter;
 [Inject(InjectServiceLifetime.Singleton)]
 public class FilterManager : ModelBase {
 	private readonly IStateStore _stateStore;
+	private readonly SearchDefinitionsStateModel _searchDefinitions;
 
-	public FilterManager(IStateStore stateStore) {
+	public FilterManager(IStateStore stateStore, SearchDefinitionsStateModel searchDefinitions) {
 		this._stateStore = stateStore;
-		this.FilteringConditions = [.. stateStore.State.SearchState.FilteringConditions.Select(x => new FilteringConditionEditor(x))];
+		this._searchDefinitions = searchDefinitions;
+		this.FilteringConditions = [.. searchDefinitions.FilteringConditions.Select(x => new FilteringConditionEditor(x))];
 	}
 
 	/// <summary>
@@ -36,7 +39,7 @@ public class FilterManager : ModelBase {
 	/// フィルタリング条件追加
 	/// </summary>
 	public void AddCondition() {
-		var fo = this._stateStore.State.SearchState.AddFilteringCondition();
+		var fo = this._searchDefinitions.AddFilteringCondition();
 		this.FilteringConditions.Add(new FilteringConditionEditor(fo));
 	}
 
@@ -45,7 +48,7 @@ public class FilterManager : ModelBase {
 	/// </summary>
 	/// <param name="filteringCondition">削除するフィルタリング条件</param>
 	public void RemoveCondition(FilteringConditionEditor filteringCondition) {
-		this._stateStore.State.SearchState.RemoveFilteringCondition(filteringCondition.FilterObject);
+		this._searchDefinitions.RemoveFilteringCondition(filteringCondition.FilterObject);
 		this.FilteringConditions.Remove(filteringCondition);
 	}
 }

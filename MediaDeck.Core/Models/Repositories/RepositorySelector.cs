@@ -1,6 +1,6 @@
 namespace MediaDeck.Core.Models.Repositories;
 
-[Inject(InjectServiceLifetime.Singleton)]
+[Inject(InjectServiceLifetime.Scoped)]
 public class RepositorySelector {
 	public RepositorySelector(FolderRepository folderRepository) {
 		this.Repositories = [

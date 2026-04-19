@@ -11,7 +11,7 @@ namespace MediaDeck.ViewModels.Panes.DetailPanes;
 
 public record NewTagRequestedContext(string TagName, ITagCategoryModel? SelectedCategory);
 
-[Inject(InjectServiceLifetime.Transient)]
+[Inject(InjectServiceLifetime.Scoped)]
 public class DetailSelectorViewModel : ViewModelBase {
 	public Subject<NewTagRequestedContext> NewTagRequested {
 		get;

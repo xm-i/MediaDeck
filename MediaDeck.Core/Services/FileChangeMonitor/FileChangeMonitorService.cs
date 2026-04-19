@@ -55,19 +55,19 @@ public class FileChangeMonitorService : ModelBase {
 			onError: this.HandleWatcherError);
 
 		// 初期フォルダーの監視を開始
-		foreach (var folder in stateStore.State.FolderManagerState.Folders) {
+		foreach (var folder in stateStore.AppState.FolderManagerState.Folders) {
 			this._watcherManager.AddWatcher(folder.FolderPath);
 		}
 
 		// フォルダー追加の購読
-		stateStore.State.FolderManagerState.Folders.ObserveAdd()
+		stateStore.AppState.FolderManagerState.Folders.ObserveAdd()
 			.Subscribe(ev => {
 				this._watcherManager.AddWatcher(ev.Value.FolderPath);
 			})
 			.AddTo(this.CompositeDisposable);
 
 		// フォルダー削除の購読
-		stateStore.State.FolderManagerState.Folders.ObserveRemove()
+		stateStore.AppState.FolderManagerState.Folders.ObserveRemove()
 			.Subscribe(ev => {
 				this._watcherManager.RemoveWatcher(ev.Value.FolderPath);
 			})

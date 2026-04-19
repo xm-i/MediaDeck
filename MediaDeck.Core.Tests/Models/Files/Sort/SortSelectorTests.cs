@@ -12,7 +12,8 @@ namespace MediaDeck.Core.Tests.Models.Files.Sort;
 /// </summary>
 public class SortSelectorTests {
 	private readonly IServiceProvider _serviceProvider;
-	private readonly StateModel _stateModel;
+	private readonly TabStateModel _tabState;
+	private readonly SearchDefinitionsStateModel _searchDefinitions;
 
 	public SortSelectorTests() {
 		var services = new ServiceCollection();
@@ -21,10 +22,12 @@ public class SortSelectorTests {
 		services.AddSingleton<SearchStateModel>();
 		services.AddSingleton<FolderManagerStateModel>();
 		services.AddSingleton<ViewerStateModel>();
-		services.AddSingleton<StateModel>();
+		services.AddSingleton<TabStateModel>();
+		services.AddSingleton<SearchDefinitionsStateModel>();
 
 		this._serviceProvider = services.BuildServiceProvider();
-		this._stateModel = this._serviceProvider.GetRequiredService<StateModel>();
+		this._tabState = this._serviceProvider.GetRequiredService<TabStateModel>();
+		this._searchDefinitions = this._serviceProvider.GetRequiredService<SearchDefinitionsStateModel>();
 	}
 
 	/// <summary>
@@ -33,7 +36,7 @@ public class SortSelectorTests {
 	[Fact]
 	public void SetSortConditions_ReturnsOriginalArray_WhenCurrentSortConditionIsNull() {
 		// Arrange
-		var selector = new SortSelector(this._stateModel);
+		var selector = new SortSelector(this._tabState, this._searchDefinitions);
 		var files = new[] { new TestFileModel { Id = 1 }, new TestFileModel { Id = 2 } };
 
 		// Act
@@ -49,10 +52,10 @@ public class SortSelectorTests {
 	[Fact]
 	public void SetSortConditions_ThrowsInvalidOperationException_WhenSortItemObjectsIsEmpty() {
 		// Arrange
-		var sortObject = this._stateModel.SearchState.AddSortCondition();
-		this._stateModel.SearchState.CurrentSortCondition.Value = sortObject.Id;
+		var sortObject = this._searchDefinitions.AddSortCondition();
+		this._tabState.SearchState.CurrentSortCondition.Value = sortObject.Id;
 
-		var selector = new SortSelector(this._stateModel);
+		var selector = new SortSelector(this._tabState, this._searchDefinitions);
 		var files = new[] { new TestFileModel { Id = 1 } };
 
 		// Act & Assert
@@ -65,15 +68,15 @@ public class SortSelectorTests {
 	[Fact]
 	public void SetSortConditions_SortsBySingleProperty_Ascending() {
 		// Arrange
-		var sortObject = this._stateModel.SearchState.AddSortCondition();
+		var sortObject = this._searchDefinitions.AddSortCondition();
 		var item = sortObject.AddSortItemObject();
 		item.SortItemKey = SortItemKey.FilePath;
 		item.Direction = ListSortDirection.Ascending;
 
-		this._stateModel.SearchState.CurrentSortCondition.Value = sortObject.Id;
-		this._stateModel.SearchState.SortDirection.Value = ListSortDirection.Ascending;
+		this._tabState.SearchState.CurrentSortCondition.Value = sortObject.Id;
+		this._tabState.SearchState.SortDirection.Value = ListSortDirection.Ascending;
 
-		var selector = new SortSelector(this._stateModel);
+		var selector = new SortSelector(this._tabState, this._searchDefinitions);
 		var files = new[]
 		{
 			new TestFileModel { FilePath = "B" },
@@ -96,15 +99,15 @@ public class SortSelectorTests {
 	[Fact]
 	public void SetSortConditions_SortsBySingleProperty_Descending() {
 		// Arrange
-		var sortObject = this._stateModel.SearchState.AddSortCondition();
+		var sortObject = this._searchDefinitions.AddSortCondition();
 		var item = sortObject.AddSortItemObject();
 		item.SortItemKey = SortItemKey.FilePath;
 		item.Direction = ListSortDirection.Ascending; // Item's base direction is Asc
 
-		this._stateModel.SearchState.CurrentSortCondition.Value = sortObject.Id;
-		this._stateModel.SearchState.SortDirection.Value = ListSortDirection.Descending; // Overall reverse is Desc
+		this._tabState.SearchState.CurrentSortCondition.Value = sortObject.Id;
+		this._tabState.SearchState.SortDirection.Value = ListSortDirection.Descending; // Overall reverse is Desc
 
-		var selector = new SortSelector(this._stateModel);
+		var selector = new SortSelector(this._tabState, this._searchDefinitions);
 		var files = new[]
 		{
 			new TestFileModel { FilePath = "B" },
@@ -127,7 +130,7 @@ public class SortSelectorTests {
 	[Fact]
 	public void SetSortConditions_SortsByMultipleProperties() {
 		// Arrange
-		var sortObject = this._stateModel.SearchState.AddSortCondition();
+		var sortObject = this._searchDefinitions.AddSortCondition();
 
 		var item1 = sortObject.AddSortItemObject();
 		item1.SortItemKey = SortItemKey.Rate;
@@ -137,10 +140,10 @@ public class SortSelectorTests {
 		item2.SortItemKey = SortItemKey.FilePath;
 		item2.Direction = ListSortDirection.Ascending;
 
-		this._stateModel.SearchState.CurrentSortCondition.Value = sortObject.Id;
-		this._stateModel.SearchState.SortDirection.Value = ListSortDirection.Ascending;
+		this._tabState.SearchState.CurrentSortCondition.Value = sortObject.Id;
+		this._tabState.SearchState.SortDirection.Value = ListSortDirection.Ascending;
 
-		var selector = new SortSelector(this._stateModel);
+		var selector = new SortSelector(this._tabState, this._searchDefinitions);
 		var files = new[]
 		{
 			new TestFileModel { Rate = 5, FilePath = "B" },

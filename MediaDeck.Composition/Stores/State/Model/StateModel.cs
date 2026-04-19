@@ -3,23 +3,18 @@ using R3.JsonConfig.Attributes;
 namespace MediaDeck.Composition.Stores.State.Model;
 
 /// <summary>
-/// 検索状態
+/// アプリケーション全体で共有される状態（Singleton）
 /// </summary>
 [Inject(InjectServiceLifetime.Singleton)]
 [GenerateR3JsonConfigDto]
-public class StateModel(SearchStateModel searchState, FolderManagerStateModel folderManagerState, ViewerStateModel viewerState) {
-	public SearchStateModel SearchState {
-		get;
-		set;
-	} = searchState;
-
+public class AppStateModel(FolderManagerStateModel folderManagerState, SearchDefinitionsStateModel searchDefinitions) {
 	public FolderManagerStateModel FolderManagerState {
 		get;
 		set;
 	} = folderManagerState;
 
-	public ViewerStateModel ViewerState {
+	public SearchDefinitionsStateModel SearchDefinitions {
 		get;
 		set;
-	} = viewerState;
+	} = searchDefinitions;
 }

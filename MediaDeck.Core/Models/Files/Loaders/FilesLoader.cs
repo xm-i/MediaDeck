@@ -10,7 +10,7 @@ using MediaDeck.Database.Tables;
 
 namespace MediaDeck.Core.Models.Files.Loaders;
 
-[Inject(InjectServiceLifetime.Transient)]
+[Inject(InjectServiceLifetime.Scoped)]
 public class FilesLoader(IDbContextFactory<MediaDeckDbContext> dbFactory, SortSelector sortSelector, FilterSelector filterSetter, IFileTypeService fileTypeService) {
 	protected FilterSelector FilterSetter = filterSetter;
 	protected SortSelector SortSelector = sortSelector;

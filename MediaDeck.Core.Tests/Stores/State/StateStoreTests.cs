@@ -49,8 +49,8 @@ public class StateStoreTests : IDisposable {
 		this._serviceScopeMock.Setup(x => x.ServiceProvider)
 			.Returns(this._serviceProviderMock.Object);
 
-		this._serviceProviderMock.Setup(x => x.GetService(typeof(StateModel)))
-			.Returns((StateModel)RuntimeHelpers.GetUninitializedObject(typeof(StateModel)));
+		this._serviceProviderMock.Setup(x => x.GetService(typeof(AppStateModel)))
+			.Returns((AppStateModel)RuntimeHelpers.GetUninitializedObject(typeof(AppStateModel)));
 
 		this._serviceProviderMock.Setup(x => x.GetService(typeof(ILogger<StateStore>)))
 			.Returns(NullLogger<StateStore>.Instance);
@@ -77,14 +77,14 @@ public class StateStoreTests : IDisposable {
 	}
 
 	[Fact]
-	public void Load_WhenExceptionOccurs_UsesFallbackStateModel() {
+	public void Load_WhenExceptionOccurs_UsesFallbackAppStateModel() {
 		File.WriteAllText(this._testStateFilePath, "{ invalid json }");
 
 		// The constructor invokes Load automatically
 		var store = new TestableStateStore(this._serviceProviderMock.Object, this._serviceProviderMock.Object.GetRequiredService<IAppPathProvider>());
 
-		store.State.ShouldNotBeNull();
-		this._serviceProviderMock.Verify(x => x.GetService(typeof(StateModel)), Times.Once);
+		store.AppState.ShouldNotBeNull();
+		this._serviceProviderMock.Verify(x => x.GetService(typeof(AppStateModel)), Times.Once);
 	}
 
 	[Fact]
@@ -101,15 +101,15 @@ public class StateStoreTests : IDisposable {
 	}
 
 	[Fact]
-	public void Load_WhenFileNotExists_UsesFallbackStateModel() {
+	public void Load_WhenFileNotExists_UsesFallbackAppStateModel() {
 		if (File.Exists(this._testStateFilePath)) {
 			File.Delete(this._testStateFilePath);
 		}
 
 		var store = new TestableStateStore(this._serviceProviderMock.Object, this._serviceProviderMock.Object.GetRequiredService<IAppPathProvider>());
 
-		store.State.ShouldNotBeNull();
-		this._serviceProviderMock.Verify(x => x.GetService(typeof(StateModel)), Times.Once);
+		store.AppState.ShouldNotBeNull();
+		this._serviceProviderMock.Verify(x => x.GetService(typeof(AppStateModel)), Times.Once);
 	}
 
 	[Fact]

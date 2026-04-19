@@ -3,7 +3,7 @@ using MediaDeck.Core.Models.Repositories;
 
 namespace MediaDeck.ViewModels.Panes.RepositoryPanes;
 
-[Inject(InjectServiceLifetime.Transient)]
+[Inject(InjectServiceLifetime.Scoped)]
 public class RepositorySelectorViewModel : ViewModelBase {
 	public RepositorySelectorViewModel(
 		RepositorySelector repositorySelector) {

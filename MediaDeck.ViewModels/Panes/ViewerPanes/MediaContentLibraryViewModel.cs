@@ -7,7 +7,7 @@ using MediaDeck.Core.Models.NotificationDispatcher;
 
 namespace MediaDeck.ViewModels.Panes.ViewerPanes;
 
-[Inject(InjectServiceLifetime.Singleton)]
+[Inject(InjectServiceLifetime.Scoped)]
 public class MediaContentLibraryViewModel : ViewModelBase {
 	public MediaContentLibraryViewModel(MediaContentLibrary mediaContentLibrary, SearchConditionNotificationDispatcher searchConditionNotificationDispatcher, IFileTypeService fileTypeService) {
 		this._mediaContentLibrary = mediaContentLibrary;

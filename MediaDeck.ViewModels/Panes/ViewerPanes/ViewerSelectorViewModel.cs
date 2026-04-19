@@ -1,13 +1,13 @@
 using MediaDeck.Common.Base;
 using MediaDeck.Common.Extensions;
-using MediaDeck.Core.Stores.State;
+using MediaDeck.Composition.Stores.State.Model;
 
 namespace MediaDeck.ViewModels.Panes.ViewerPanes;
 
-[Inject(InjectServiceLifetime.Transient)]
+[Inject(InjectServiceLifetime.Scoped)]
 public class ViewerSelectorViewModel : ViewModelBase {
 	public ViewerSelectorViewModel(
-		IStateStore stateStore,
+		TabStateModel tabState,
 		MediaContentLibraryViewModel mediaContentLibraryViewModel,
 		WrapViewerViewModel wrapViewerViewModel,
 		ListViewerViewModel listViewerViewModel,
@@ -28,7 +28,7 @@ public class ViewerSelectorViewModel : ViewModelBase {
 		this.MapViewerViewModel = mapViewerViewModel;
 		this.SortSelectorViewModel = sortSelectorViewModel;
 
-		this.ItemSize = stateStore.State.ViewerState.ItemSize.ToTwoWayBindableReactiveProperty(stateStore.State.ViewerState.ItemSize.Value).AddTo(this.CompositeDisposable);
+		this.ItemSize = tabState.ViewerState.ItemSize.ToTwoWayBindableReactiveProperty(tabState.ViewerState.ItemSize.Value).AddTo(this.CompositeDisposable);
 
 		this.SelectedViewerPane.Pairwise()
 			.Subscribe(x => {

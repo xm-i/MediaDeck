@@ -17,42 +17,51 @@
 			<RowDefinition Height="auto" />
 			<RowDefinition Height="*" />
 		</Grid.RowDefinitions>
-		<local:NavigationMenu Grid.Row="0"
-			DataContext="{x:Bind _viewModel.NavigationMenuViewModel}" />
-		<Grid Grid.Row="1" >
-			<Grid.ColumnDefinitions>
-				<ColumnDefinition Width="250" />
-				<ColumnDefinition Width="*" />
-				<ColumnDefinition Width="250" />
-			</Grid.ColumnDefinitions>
-			<Grid.RowDefinitions>
-				<RowDefinition Height="*" />
-				<RowDefinition Height="*" />
-			</Grid.RowDefinitions>
-			<repositoryPanes:RepositorySelector Grid.Column="0"
-				Grid.Row="0"
-				DataContext="{x:Bind _viewModel.RepositorySelectorViewModel}" />
-			<filterPanes:FilterSelector Grid.Column="0"
-				Grid.Row="1"
-				DataContext="{x:Bind _viewModel.FilterSelectorViewModel}" />
-			<viewerPanes:ViewerSelector Grid.Column="1"
-				Grid.Row="0"
-				Grid.RowSpan="2"
-				DataContext="{x:Bind _viewModel.ViewerSelectorViewModel}" />
-			<detailPanes:DetailSelector Grid.Column="2"
-				Grid.Row="0"
-				Grid.RowSpan="2"
-				DataContext="{x:Bind _viewModel.DetailSelectorViewModel}" />
 
-			<!-- GlobalInfoBarをオーバーレイとして配置 -->
-			<localControls:GlobalInfoBar Grid.Column="0"
-				Grid.ColumnSpan="3"
-				Grid.Row="0"
-				Grid.RowSpan="2"
-				VerticalAlignment="Top"
-				HorizontalAlignment="Center"
-				Margin="0,10,0,0"
-				Canvas.ZIndex="1000" />
-		</Grid>
+		<!-- ナビゲーションメニュー（全タブ共通） -->
+		<local:NavigationMenu Grid.Row="0"
+			x:Name="NavigationMenuControl" />
+
+		<!-- TabView -->
+		<TabView Grid.Row="1"
+			x:Name="MainTabView"
+			VerticalAlignment="Stretch"
+			IsAddTabButtonVisible="True"
+			AddTabButtonCommand="{x:Bind _viewModel.AddTabCommand}"
+			TabCloseRequested="MainTabView_TabCloseRequested"
+			SelectionChanged="MainTabView_SelectionChanged"
+			TabWidthMode="SizeToContent" >
+			<TabView.TabItemTemplate>
+				<DataTemplate>
+					<TabViewItem Header="{Binding DisplayName.Value}" >
+						<Grid>
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="250" />
+								<ColumnDefinition Width="*" />
+								<ColumnDefinition Width="250" />
+							</Grid.ColumnDefinitions>
+							<Grid.RowDefinitions>
+								<RowDefinition Height="*" />
+								<RowDefinition Height="*" />
+							</Grid.RowDefinitions>
+							<repositoryPanes:RepositorySelector Grid.Column="0" Grid.Row="0"
+								DataContext="{Binding RepositorySelectorViewModel}" />
+							<filterPanes:FilterSelector Grid.Column="0" Grid.Row="1"
+								DataContext="{Binding FilterSelectorViewModel}" />
+							<viewerPanes:ViewerSelector Grid.Column="1" Grid.Row="0" Grid.RowSpan="2"
+								DataContext="{Binding ViewerSelectorViewModel}" />
+							<detailPanes:DetailSelector Grid.Column="2" Grid.Row="0" Grid.RowSpan="2"
+								DataContext="{Binding DetailSelectorViewModel}" />
+						</Grid>
+					</TabViewItem>
+				</DataTemplate>
+			</TabView.TabItemTemplate>
+			<TabView.TabStripFooter>
+				<localControls:GlobalInfoBar
+					VerticalAlignment="Center"
+					HorizontalAlignment="Right"
+					Margin="0,0,8,0" />
+			</TabView.TabStripFooter>
+		</TabView>
 	</Grid>
 </Window>

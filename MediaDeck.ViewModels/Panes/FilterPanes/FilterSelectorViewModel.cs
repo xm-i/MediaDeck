@@ -8,7 +8,7 @@ namespace MediaDeck.ViewModels.Panes.FilterPanes;
 /// <summary>
 /// フィルターセレクターViewModel
 /// </summary>
-[Inject(InjectServiceLifetime.Singleton)]
+[Inject(InjectServiceLifetime.Scoped)]
 public class FilterSelectorViewModel : ViewModelBase {
 	/// <summary>
 	/// コンストラクタ

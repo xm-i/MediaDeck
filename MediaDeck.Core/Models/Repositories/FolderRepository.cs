@@ -8,14 +8,14 @@ using MediaDeck.Database;
 
 namespace MediaDeck.Core.Models.Repositories;
 
-[Inject(InjectServiceLifetime.Transient)]
+[Inject(InjectServiceLifetime.Scoped)]
 public class FolderRepository : RepositoryBase {
-	private readonly StateModel _state;
+	private readonly TabStateModel _tabState;
 
-	public FolderRepository(IDbContextFactory<MediaDeckDbContext> dbFactory, SearchConditionNotificationDispatcher searchConditionNotificationDispatcher, StateModel state) {
+	public FolderRepository(IDbContextFactory<MediaDeckDbContext> dbFactory, SearchConditionNotificationDispatcher searchConditionNotificationDispatcher, TabStateModel tabState) {
 		this._dbFactory = dbFactory;
 		this._searchConditionNotificationDispatcher = searchConditionNotificationDispatcher;
-		this._state = state;
+		this._tabState = tabState;
 		FileNotifications
 			.FileRegistered
 			.ThrottleLast(TimeSpan.FromSeconds(10))
@@ -90,7 +90,7 @@ public class FolderRepository : RepositoryBase {
 	}
 
 	private void Restore() {
-		var condition = this._state.SearchState.SearchCondition.FirstOrDefault(x => x is FolderSearchCondition) as FolderSearchCondition;
+		var condition = this._tabState.SearchState.SearchCondition.FirstOrDefault(x => x is FolderSearchCondition) as FolderSearchCondition;
 		if (condition == null) {
 			return;
 		}

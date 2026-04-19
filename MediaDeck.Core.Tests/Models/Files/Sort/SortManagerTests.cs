@@ -18,6 +18,8 @@ namespace MediaDeck.Core.Tests.Models.Files.Sort;
 public class SortManagerTests {
 	private readonly IStateStore _stateStore;
 	private readonly Mock<IServiceProvider> _mockServiceProvider;
+	private readonly SearchDefinitionsStateModel _searchDefinitions;
+	private readonly TabStateModel _tabState;
 
 	public SortManagerTests() {
 		var services = new ServiceCollection();
@@ -26,11 +28,15 @@ public class SortManagerTests {
 		services.AddSingleton<SearchStateModel>();
 		services.AddSingleton<FolderManagerStateModel>();
 		services.AddSingleton<ViewerStateModel>();
-		services.AddSingleton<StateModel>();
+		services.AddSingleton<AppStateModel>();
+		services.AddSingleton<TabStateModel>();
+		services.AddSingleton<SearchDefinitionsStateModel>();
 		services.AddLogging();
 		services.AddSingleton<AppNotificationDispatcher>();
 
 		var realServiceProvider = services.BuildServiceProvider();
+		this._searchDefinitions = realServiceProvider.GetRequiredService<SearchDefinitionsStateModel>();
+		this._tabState = realServiceProvider.GetRequiredService<TabStateModel>();
 
 		this._mockServiceProvider = new Mock<IServiceProvider>();
 		var mockScope = new Mock<IServiceScope>();
@@ -42,6 +48,9 @@ public class SortManagerTests {
 
 		this._mockServiceProvider.Setup(x => x.GetService(typeof(ILogger<StateStore>))).Returns(realServiceProvider.GetRequiredService<ILogger<StateStore>>());
 		this._mockServiceProvider.Setup(x => x.GetService(typeof(AppNotificationDispatcher))).Returns(realServiceProvider.GetRequiredService<AppNotificationDispatcher>());
+
+		// Required for StateStore correctly resolving RootStateModel when loaded via DI if Load uses sp
+		this._mockServiceProvider.Setup(x => x.GetService(typeof(AppStateModel))).Returns(realServiceProvider.GetRequiredService<AppStateModel>());
 
 		var pathProvider = new StubAppPathProvider();
 		this._mockServiceProvider.Setup(x => x.GetService(typeof(IAppPathProvider))).Returns(pathProvider);
@@ -55,7 +64,7 @@ public class SortManagerTests {
 	[Fact]
 	public void SortLogic_OrdersUnsortedListCorrectly() {
 		// Arrange
-		var sortManager = new SortManager(this._stateStore);
+		var sortManager = new SortManager(this._stateStore, this._searchDefinitions);
 		sortManager.AddCondition();
 		var sortObject = sortManager.SortConditions.Last();
 
@@ -63,10 +72,10 @@ public class SortManagerTests {
 		item.SortItemKey = SortItemKey.FilePath;
 		item.Direction = System.ComponentModel.ListSortDirection.Ascending;
 
-		this._stateStore.State.SearchState.CurrentSortCondition.Value = sortObject.Id;
-		this._stateStore.State.SearchState.SortDirection.Value = System.ComponentModel.ListSortDirection.Ascending;
+		this._tabState.SearchState.CurrentSortCondition.Value = sortObject.Id;
+		this._tabState.SearchState.SortDirection.Value = System.ComponentModel.ListSortDirection.Ascending;
 
-		var selector = new SortSelector(this._stateStore.State);
+		var selector = new SortSelector(this._tabState, this._searchDefinitions);
 		var unsortedList = new[]
 		{
 			new TestFileModel { FilePath = "FileC.txt" },
@@ -89,10 +98,10 @@ public class SortManagerTests {
 	[Fact]
 	public void Constructor_SetsSortConditionsFromStateStore() {
 		// Act
-		var sortManager = new SortManager(this._stateStore);
+		var sortManager = new SortManager(this._stateStore, this._searchDefinitions);
 
 		// Assert
-		Assert.Same(this._stateStore.State.SearchState.SortConditions, sortManager.SortConditions);
+		Assert.Same(this._searchDefinitions.SortConditions, sortManager.SortConditions);
 	}
 
 	/// <summary>
@@ -101,7 +110,7 @@ public class SortManagerTests {
 	[Fact]
 	public void AddCondition_AddsNewSortCondition() {
 		// Arrange
-		var sortManager = new SortManager(this._stateStore);
+		var sortManager = new SortManager(this._stateStore, this._searchDefinitions);
 		var initialCount = sortManager.SortConditions.Count;
 
 		// Act
@@ -117,7 +126,7 @@ public class SortManagerTests {
 	[Fact]
 	public void RemoveCondition_RemovesTargetSortCondition() {
 		// Arrange
-		var sortManager = new SortManager(this._stateStore);
+		var sortManager = new SortManager(this._stateStore, this._searchDefinitions);
 		sortManager.AddCondition();
 		var conditionToRemove = sortManager.SortConditions.Last();
 		var initialCount = sortManager.SortConditions.Count;
@@ -136,7 +145,7 @@ public class SortManagerTests {
 	[Fact]
 	public void Save_ExecutesWithoutException() {
 		// Arrange
-		var sortManager = new SortManager(this._stateStore);
+		var sortManager = new SortManager(this._stateStore, this._searchDefinitions);
 
 		// Act
 		var exception = Record.Exception(() => sortManager.Save());

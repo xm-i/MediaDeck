@@ -3,7 +3,7 @@ using MediaDeck.Core.Services.FileChangeMonitor;
 
 namespace MediaDeck.ViewModels;
 
-[Inject(InjectServiceLifetime.Transient)]
+[Inject(InjectServiceLifetime.Scoped)]
 public class NavigationMenuViewModel : ViewModelBase {
 	public BindableReactiveProperty<bool> HasUnprocessedChanges {
 		get;
