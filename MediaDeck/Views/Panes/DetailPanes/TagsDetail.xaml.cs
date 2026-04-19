@@ -36,10 +36,10 @@ public sealed partial class TagsDetail {
 		}
 
 		var tagsManager = this.ViewModel.GetTagsManager();
-		var newTagDialogViewModel = new NewTagDialogViewModel(tagsManager);
+		var newTagDialogViewModel = new NewTagDialogViewModel(tagsManager, this.ViewModel.TagModelFactory);
 		var dialog = new NewTagDialog(newTagDialogViewModel) { XamlRoot = this.XamlRoot };
 		dialog.ViewModel.TagName.Value = context.TagName;
-		dialog.ViewModel.SelectedCategory.Value = context.TagCategories.FirstOrDefault();
+		dialog.ViewModel.SelectedCategory.Value = dialog.ViewModel.TagCategories.FirstOrDefault(x => x.Model == context.SelectedCategory);
 
 		var result = await dialog.ShowAsync();
 		if (result == ContentDialogResult.Primary && dialog.ViewModel.CreatedTag.Value is { }) {

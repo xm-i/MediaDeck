@@ -5,12 +5,12 @@ namespace MediaDeck.ViewModels.Tags;
 
 [Inject(InjectServiceLifetime.Transient)]
 public class NewTagDialogViewModel : ViewModelBase {
-	public NewTagDialogViewModel(ITagsManager tagsManager) {
-		this.TagCategories = tagsManager.TagCategories.ToArray();
+	public NewTagDialogViewModel(ITagsManager tagsManager, ITagModelFactory tagModelFactory) {
+		this.TagCategories = tagsManager.TagCategories.Select(x => new TagCategoryViewModel(x, tagsManager, tagModelFactory)).ToArray();
 		this.SelectedCategory.Value = this.TagCategories.FirstOrDefault();
 		this.ConfirmCommand.Subscribe(async _ => {
 			// タグを作成
-			this.CreatedTag.Value = await tagsManager.CreateTagImmediatelyAsync(this.SelectedCategory.Value?.TagCategoryId ?? 0,
+			this.CreatedTag.Value = await tagsManager.CreateTagImmediatelyAsync(this.SelectedCategory.Value?.Model.TagCategoryId,
 				this.TagName.Value,
 				this.Detail.Value,
 				[]);
@@ -29,7 +29,7 @@ public class NewTagDialogViewModel : ViewModelBase {
 		get;
 	} = new("");
 
-	public BindableReactiveProperty<ITagCategoryModel?> SelectedCategory {
+	public BindableReactiveProperty<TagCategoryViewModel?> SelectedCategory {
 		get;
 	} = new();
 
@@ -41,7 +41,7 @@ public class NewTagDialogViewModel : ViewModelBase {
 		get;
 	} = new();
 
-	public ITagCategoryModel[] TagCategories {
+	public TagCategoryViewModel[] TagCategories {
 		get;
 		private set;
 	} = [];

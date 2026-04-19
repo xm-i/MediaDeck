@@ -9,7 +9,7 @@ using MediaDeck.ViewModels.Tags;
 
 namespace MediaDeck.ViewModels.Panes.DetailPanes;
 
-public record NewTagRequestedContext(string TagName, IEnumerable<ITagCategoryModel> TagCategories);
+public record NewTagRequestedContext(string TagName, ITagCategoryModel? SelectedCategory);
 
 [Inject(InjectServiceLifetime.Transient)]
 public class DetailSelectorViewModel : ViewModelBase {
@@ -20,10 +20,15 @@ public class DetailSelectorViewModel : ViewModelBase {
 	private readonly DetailSelectorModel _model;
 	private readonly System.Collections.Concurrent.ConcurrentDictionary<int, TagCategoryViewModel> _categoryViewModels = new();
 
+	public ITagModelFactory TagModelFactory {
+		get;
+	}
+
 	public DetailSelectorViewModel(DetailSelectorModel model,
 		SearchConditionNotificationDispatcher searchConditionNotificationDispatcher,
 		ITagModelFactory tagModelFactory) {
 		this._model = model;
+		this.TagModelFactory = tagModelFactory;
 		this.RepresentativeFilePath = model.RepresentativeFilePath.ToBindableReactiveProperty(string.Empty).AddTo(this.CompositeDisposable);
 		this.Properties = model.Properties.ToBindableReactiveProperty([]).AddTo(this.CompositeDisposable);
 		this.Rate = model.Rate.ToBindableReactiveProperty().AddTo(this.CompositeDisposable);
@@ -73,7 +78,7 @@ public class DetailSelectorViewModel : ViewModelBase {
 
 			var tag = await model.FindTagByNameAsync(this.Text.Value);
 			if (tag is null) {
-				this.NewTagRequested.OnNext(new NewTagRequestedContext(this.Text.Value, model.TagCategories));
+				this.NewTagRequested.OnNext(new NewTagRequestedContext(this.Text.Value, model.TagCategories.FirstOrDefault()));
 				return;
 			}
 
