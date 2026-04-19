@@ -2,23 +2,21 @@ using System.Diagnostics.CodeAnalysis;
 using MediaDeck.Common.Utilities;
 using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Database.Tables;
-using R3.JsonConfig.Attributes;
 
 namespace MediaDeck.Core.Models.Tags;
 
 /// <summary>
 /// タグのモデルクラス
 /// </summary>
-[GenerateR3JsonConfigDto]
-[JsonConfigDerivedType("tag")]
+
 [Inject(InjectServiceLifetime.Transient, typeof(ITagModel))]
-[Inject(InjectServiceLifetime.Transient)] // TagModel 自身としても登録
 public class TagModel : ITagModel {
 	private int? _tagId;
 	private int? _tagCategoryId;
 	private ITagCategoryModel? _tagCategory;
 	private string? _tagName;
 	private string? _detail;
+	private string? _ruby;
 	private string? _romaji;
 	private List<ITagAliasModel>? _tagAliases;
 	private bool _isInitialized;
@@ -28,12 +26,13 @@ public class TagModel : ITagModel {
 
 	[MemberNotNull(nameof(_tagId), nameof(_tagName), nameof(_detail), nameof(_romaji), nameof(_tagAliases), nameof(_tagCategory))]
 	public void Initialize(Tag tag, ITagCategoryModel category, ITagModelFactory factory) {
+		this._ruby = tag.Ruby;
 		this._tagId = tag.TagId;
 		this._tagCategoryId = tag.TagCategoryId;
 		this._tagCategory = category;
 		this._tagName = tag.TagName;
 		this._detail = tag.Detail;
-		this._romaji = tag.TagName.KatakanaToHiragana().HiraganaToRomaji();
+		this._romaji = (tag.Ruby ?? tag.TagName.KatakanaToHiragana()).HiraganaToRomaji();
 		this.UsageCount.Value = tag.MediaFileTags.Count;
 		this._tagAliases = [.. tag.TagAliases.Select(factory.CreateAlias)];
 		this._isInitialized = true;
@@ -115,6 +114,26 @@ public class TagModel : ITagModel {
 				this.IsDirty = true;
 			}
 			this._tagName = value;
+			this._romaji = (this._ruby ?? this._tagName).KatakanaToHiragana().HiraganaToRomaji();
+			this._isInitialized = true;
+		}
+	}
+
+	/// <summary>
+	/// 読み仮名 (Ruby)
+	/// </summary>
+	public string? Ruby {
+		get {
+			return this._ruby;
+		}
+		set {
+			if (this._ruby != value) {
+				this.IsDirty = true;
+			}
+			this._ruby = value;
+			if (this._tagName != null) {
+				this._romaji = (this._ruby ?? this._tagName).KatakanaToHiragana().HiraganaToRomaji();
+			}
 			this._isInitialized = true;
 		}
 	}

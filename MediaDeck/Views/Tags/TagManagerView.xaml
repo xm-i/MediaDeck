@@ -164,6 +164,13 @@
 					<TextBox
 						Text="{x:Bind ViewModel.SelectedTagCategory.Value.SelectedTag.Value.TagName.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
 						PlaceholderText="タグ名を入力" />
+					
+					<TextBlock Text="読み"
+						FontWeight="SemiBold"
+						Margin="0,8,0,0" />
+					<TextBox
+						Text="{x:Bind ViewModel.SelectedTagCategory.Value.SelectedTag.Value.Ruby.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+						PlaceholderText="読みを入力" />
 				</StackPanel>
 
 				<!-- カテゴリ選択 -->

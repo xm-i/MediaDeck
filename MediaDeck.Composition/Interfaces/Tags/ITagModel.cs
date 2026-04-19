@@ -1,11 +1,9 @@
-using R3.JsonConfig.Attributes;
-
 namespace MediaDeck.Composition.Interfaces.Tags;
 
 /// <summary>
 /// タグのモデルクラスのインターフェース
 /// </summary>
-[GenerateR3JsonConfigDto]
+
 public interface ITagModel {
 	/// <summary>
 	/// 変更フラグ
@@ -65,6 +63,10 @@ public interface ITagModel {
 	/// <summary>
 	/// 使用回数
 	/// </summary>
+	public string? Ruby {
+		get; set;
+	}
+
 	public ReactiveProperty<int> UsageCount {
 		get;
 	}

@@ -102,7 +102,7 @@ public class TagsManagerTests {
 		aliasMock.SetupGet(x => x.Alias).Returns("NewAlias1");
 		aliases.Add(aliasMock.Object);
 
-		var result = await manager.CreateTagImmediatelyAsync(1, "NewTag", "NewDetail", aliases);
+		var result = await manager.CreateTagImmediatelyAsync(1, "NewTag", null, "NewDetail", aliases);
 		result.ShouldNotBeNull();
 		result.TagName.ShouldBe("NewTag");
 	}
@@ -115,7 +115,7 @@ public class TagsManagerTests {
 		var dbFactory = this.CreateInMemoryDbFactory(nameof(this.CreateTagImmediatelyAsync_ShouldThrowException_WhenAliasesIsNull));
 		var tagModelFactoryMock = new Mock<ITagModelFactory>();
 		var manager = new TagsManager(dbFactory, tagModelFactoryMock.Object);
-		await Should.ThrowAsync<Exception>(() => manager.CreateTagImmediatelyAsync(1, "NewTag", "NewDetail", null!));
+		await Should.ThrowAsync<Exception>(() => manager.CreateTagImmediatelyAsync(1, "NewTag", null, "NewDetail", null!));
 	}
 
 	/// <summary>

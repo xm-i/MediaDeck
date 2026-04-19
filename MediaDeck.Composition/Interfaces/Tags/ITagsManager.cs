@@ -51,10 +51,11 @@ public interface ITagsManager {
 	/// </summary>
 	/// <param name="tagCategoryId">カテゴリーID</param>
 	/// <param name="tagName">タグ名</param>
+	/// <param name="ruby">読み</param>
 	/// <param name="detail">詳細</param>
 	/// <param name="aliases">別名リスト</param>
 	/// <returns>作成されたタグ</returns>
-	public Task<ITagModel?> CreateTagImmediatelyAsync(int? tagCategoryId, string tagName, string detail, IEnumerable<ITagAliasModel> aliases);
+	public Task<ITagModel?> CreateTagImmediatelyAsync(int? tagCategoryId, string tagName, string? ruby, string detail, IEnumerable<ITagAliasModel> aliases);
 
 	/// <summary>
 	/// ファイルにタグを追加する

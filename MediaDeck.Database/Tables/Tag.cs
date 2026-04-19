@@ -29,6 +29,14 @@ public class Tag {
 	}
 
 	/// <summary>
+	/// 読み仮名 (Ruby)
+	/// </summary>
+	public string? Ruby {
+		get;
+		set;
+	}
+
+	/// <summary>
 	/// タグ説明
 	/// </summary>
 	public required string Detail {

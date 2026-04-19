@@ -9,6 +9,7 @@ public class TagViewModel : ViewModelBase {
 	public TagViewModel(TagCategoryViewModel parent, ITagModel tag, ITagsManager tagsManager, ITagModelFactory tagModelFactory) {
 		this.Model = tag;
 		this.TagName.Value = tag.TagName;
+		this.Ruby.Value = tag.Ruby ?? string.Empty;
 		this.Detail.Value = tag.Detail;
 		this.UsageCount = tag.UsageCount.ToBindableReactiveProperty().AddTo(this.CompositeDisposable);
 		this._tagAliases.AddRange(tag.TagAliases.Select(x => new TagAliasViewModel(x, this)));
@@ -24,6 +25,7 @@ public class TagViewModel : ViewModelBase {
 
 		this.TagName
 			.ToUnit()
+			.Merge(this.Ruby.ToUnit())
 			.Merge(this.Detail.ToUnit())
 			.Merge(this.TagAliases.ToObservable().ToUnit())
 			.Merge(this.TagCategory.ToUnit())
@@ -44,6 +46,10 @@ public class TagViewModel : ViewModelBase {
 		get;
 	} = new();
 
+	public BindableReactiveProperty<string> Ruby {
+		get;
+	} = new();
+
 	public BindableReactiveProperty<string> Detail {
 		get;
 	} = new();
@@ -61,6 +67,7 @@ public class TagViewModel : ViewModelBase {
 			return;
 		}
 		this.Model.TagName = this.TagName.Value;
+		this.Model.Ruby = string.IsNullOrEmpty(this.Ruby.Value) ? null : this.Ruby.Value;
 		this.Model.Detail = this.Detail.Value;
 		this.Model.TagCategoryId = this.TagCategory.Value.TagCategoryId;
 		this.Model.TagAliases = this.TagAliases.Select(x => {

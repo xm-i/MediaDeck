@@ -34,7 +34,9 @@ public class TagModelFactory(IServiceProvider serviceProvider)
 	/// 新しいタグカテゴリーモデルを作成します。
 	/// </summary>
 	public ITagCategoryModel CreateCategory() {
-		return this._serviceProvider.GetRequiredService<ITagCategoryModel>();
+		var model = this._serviceProvider.GetRequiredService<ITagCategoryModel>();
+		model.Initialize(null, this);
+		return model;
 	}
 
 	/// <summary>
@@ -50,6 +52,8 @@ public class TagModelFactory(IServiceProvider serviceProvider)
 	/// 新しいタグ別名モデルを作成します。
 	/// </summary>
 	public ITagAliasModel CreateAlias() {
-		return this._serviceProvider.GetRequiredService<ITagAliasModel>();
+		var model = this._serviceProvider.GetRequiredService<ITagAliasModel>();
+		model.Initialize(new TagAlias { Alias = string.Empty, Ruby = string.Empty });
+		return model;
 	}
 }

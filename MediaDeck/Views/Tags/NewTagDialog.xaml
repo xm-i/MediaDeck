@@ -21,6 +21,12 @@
 				PlaceholderText="Enter tag name" />
 		</StackPanel>
 		<StackPanel Spacing="6" >
+			<TextBlock Text="読み"
+				FontWeight="SemiBold" />
+			<TextBox Text="{x:Bind ViewModel.Ruby.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+				PlaceholderText="読みを入力" />
+		</StackPanel>
+		<StackPanel Spacing="6" >
 			<TextBlock Text="Category"
 				FontWeight="SemiBold" />
 			<ComboBox HorizontalAlignment="Stretch"

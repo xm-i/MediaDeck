@@ -1,5 +1,4 @@
 using MediaDeck.Common.Base;
-using MediaDeck.Common.Utilities;
 using MediaDeck.Composition.Interfaces.Tags;
 
 namespace MediaDeck.ViewModels.Tags;
@@ -82,7 +81,8 @@ public class TagCategoryViewModel : ViewModelBase {
 				return true;
 			}
 			if (tag.TagName.Contains(text) ||
-				(tag.TagName.KatakanaToHiragana().HiraganaToRomaji()?.Contains(text, StringComparison.CurrentCultureIgnoreCase) ?? false)) {
+				(tag.Ruby?.Contains(text) ?? false) ||
+				(tag.Romaji?.Contains(text, StringComparison.CurrentCultureIgnoreCase) ?? false)) {
 				tagVm.RepresentativeText.Value = null;
 				return true;
 			}
@@ -92,7 +92,7 @@ public class TagCategoryViewModel : ViewModelBase {
 					.FirstOrDefault(x =>
 						x.Alias.Contains(text, StringComparison.CurrentCultureIgnoreCase) ||
 						(x.Ruby?.Contains(text) ?? false) ||
-						((x.Ruby ?? x.Alias.KatakanaToHiragana()).HiraganaToRomaji()?.Contains(text, StringComparison.CurrentCultureIgnoreCase) ?? false));
+						(x.Romaji?.Contains(text, StringComparison.CurrentCultureIgnoreCase) ?? false));
 			tagVm.RepresentativeText.Value = result?.Alias;
 			return result != null;
 		});

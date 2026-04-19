@@ -48,12 +48,13 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 		return model;
 	}
 
-	public async Task<ITagModel?> CreateTagImmediatelyAsync(int? tagCategoryId, string tagName, string detail, IEnumerable<ITagAliasModel> aliases) {
+	public async Task<ITagModel?> CreateTagImmediatelyAsync(int? tagCategoryId, string tagName, string? ruby, string detail, IEnumerable<ITagAliasModel> aliases) {
 		await using var db = await this._dbFactory.CreateDbContextAsync();
 		using var transaction = await db.Database.BeginTransactionAsync();
 		var tag = new Tag {
 			TagCategoryId = tagCategoryId,
 			TagName = tagName,
+			Ruby = string.IsNullOrEmpty(ruby) ? null : ruby,
 			Detail = detail,
 			TagAliases = [],
 			MediaFileTags = [],
@@ -239,6 +240,7 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 						tagEntity = new Tag {
 							TagCategoryId = currentCategoryId,
 							TagName = tag.TagName,
+							Ruby = tag.Ruby,
 							Detail = tag.Detail,
 							TagAliases = []
 						};
@@ -249,6 +251,7 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 						// 既存タグの更新
 						tagEntity.TagCategoryId = tag.TagCategoryId;
 						tagEntity.TagName = tag.TagName;
+						tagEntity.Ruby = tag.Ruby;
 						tagEntity.Detail = tag.Detail;
 						db.Tags.Update(tagEntity);
 					}

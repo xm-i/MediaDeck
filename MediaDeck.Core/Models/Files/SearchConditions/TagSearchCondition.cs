@@ -58,7 +58,8 @@ public class TagSearchCondition : ISearchCondition {
 
 	public bool IsMatchForSuggest(string searchWord) {
 		if (this.TargetTag.TagName.Contains(searchWord) ||
-			(this.TargetTag.TagName.KatakanaToHiragana().HiraganaToRomaji()?.Contains(searchWord, StringComparison.CurrentCultureIgnoreCase) ?? false)) {
+			(this.TargetTag.Ruby?.Contains(searchWord) ?? false) ||
+			(this.TargetTag.Romaji?.Contains(searchWord, StringComparison.CurrentCultureIgnoreCase) ?? false)) {
 			this.RepresentativeText = null;
 			return true;
 		}
@@ -66,7 +67,7 @@ public class TagSearchCondition : ISearchCondition {
 			.FirstOrDefault(x =>
 				x.Alias.Contains(searchWord, StringComparison.CurrentCultureIgnoreCase) ||
 				(x.Ruby?.Contains(searchWord) ?? false) ||
-				((x.Ruby ?? x.Alias.KatakanaToHiragana()).HiraganaToRomaji()?.Contains(searchWord, StringComparison.CurrentCultureIgnoreCase) ?? false));
+				(x.Romaji?.Contains(searchWord, StringComparison.CurrentCultureIgnoreCase) ?? false));
 		this.RepresentativeText = result?.Alias;
 		return result != null;
 	}

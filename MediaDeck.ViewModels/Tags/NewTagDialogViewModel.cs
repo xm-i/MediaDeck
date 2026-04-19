@@ -12,6 +12,7 @@ public class NewTagDialogViewModel : ViewModelBase {
 			// タグを作成
 			this.CreatedTag.Value = await tagsManager.CreateTagImmediatelyAsync(this.SelectedCategory.Value?.Model.TagCategoryId,
 				this.TagName.Value,
+				this.Ruby.Value,
 				this.Detail.Value,
 				[]);
 			this.Result.Value = DialogResult.Confirmed;
@@ -22,6 +23,10 @@ public class NewTagDialogViewModel : ViewModelBase {
 	}
 
 	public BindableReactiveProperty<string> TagName {
+		get;
+	} = new("");
+
+	public BindableReactiveProperty<string> Ruby {
 		get;
 	} = new("");
 

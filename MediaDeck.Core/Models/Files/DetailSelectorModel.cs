@@ -201,6 +201,7 @@ public class DetailSelectorModel : IDisposable {
 			return false;
 		}
 		if (tag.TagName.Contains(text) ||
+			(tag.Ruby?.Contains(text) ?? false) ||
 			(tag.Romaji?.Contains(text, StringComparison.CurrentCultureIgnoreCase) ?? false)) {
 			return true;
 		}
