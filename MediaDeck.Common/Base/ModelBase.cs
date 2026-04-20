@@ -1,61 +1,18 @@
 using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
 
-using CommunityToolkit.Mvvm.ComponentModel;
-
-using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces;
-using MediaDeck.Composition.Objects;
 
 namespace MediaDeck.Common.Base;
 
-public class ModelBase : ObservableObject, IModelBase {
-	/// <summary>
-	/// Dispose用Lockオブジェクト
-	/// 処理を行っている途中でDisposeされるとマズイ場合、このオブジェクトでロックしておく。
-	/// </summary>
-	protected readonly DisposableLock DisposeLock = new(LockRecursionPolicy.SupportsRecursion);
-
-	/// <summary>
-	/// まとめてDispose
-	/// </summary>
-	private CompositeDisposable? _compositeDisposable;
-
-	/// <summary>
-	/// Dispose通知用Subject
-	/// </summary>
-	private readonly Subject<Unit> _onDisposed = new();
-
+/// <summary>
+/// Model基底クラス
+/// </summary>
+public class ModelBase : DisposableBase, IModelBase {
 	/// <summary>
 	/// バッキングフィールド
 	/// </summary>
 	private readonly ConcurrentDictionary<string, object?> _backingFields = new();
-
-	/// <summary>
-	/// Dispose済みか
-	/// </summary>
-	public DisposeState DisposeState {
-		get;
-		private set;
-	}
-
-	/// <summary>
-	/// Dispose通知
-	/// </summary>
-	public Observable<Unit> OnDisposed {
-		get {
-			return this._onDisposed.AsObservable();
-		}
-	}
-
-	/// <summary>
-	/// まとめてDispose
-	/// </summary>
-	public CompositeDisposable CompositeDisposable {
-		get {
-			return this._compositeDisposable ??= [];
-		}
-	}
 
 	/// <summary>
 	/// バッキングフィールドから値を取得(Boxingが発生するのでパフォーマンスが重要な場面では使わない)
@@ -93,39 +50,5 @@ public class ModelBase : ObservableObject, IModelBase {
 		}
 		this._backingFields[member] = value;
 		this.OnPropertyChanged(member);
-	}
-
-	/// <summary>
-	/// Dispose
-	/// </summary>
-	public void Dispose() {
-		this.Dispose(true);
-		GC.SuppressFinalize(this);
-	}
-
-	/// <summary>
-	/// Dispose
-	/// </summary>
-	/// <param name="disposing">マネージドリソースの破棄を行うかどうか</param>
-	protected virtual void Dispose(bool disposing) {
-		lock (this.DisposeLock) {
-			if (this.DisposeState != DisposeState.NotDisposed) {
-				return;
-			}
-			using (this.DisposeLock.DisposableEnterWriteLock()) {
-				if (this.DisposeState != DisposeState.NotDisposed) {
-					return;
-				}
-				this.DisposeState = DisposeState.Disposing;
-			}
-			if (disposing) {
-				this._onDisposed.OnNext(Unit.Default);
-				this._compositeDisposable?.Dispose();
-			}
-			using (this.DisposeLock.DisposableEnterWriteLock()) {
-				this.DisposeState = DisposeState.Disposed;
-			}
-			this.DisposeLock.Dispose();
-		}
 	}
 }

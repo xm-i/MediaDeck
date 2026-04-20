@@ -1,4 +1,7 @@
 namespace MediaDeck.Composition.Interfaces;
 
-public interface IViewModelBase {
+/// <summary>
+/// ViewModel基底インターフェース
+/// </summary>
+public interface IViewModelBase : IDisposableBase {
 }
