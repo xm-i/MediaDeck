@@ -19,7 +19,8 @@ public class FolderRepository : RepositoryBase {
 		FileNotifications
 			.FileRegistered
 			.ThrottleLast(TimeSpan.FromSeconds(10))
-			.Subscribe(async _ => await this.Load());
+			.Subscribe(async _ => await this.Load())
+			.AddTo(this.CompositeDisposable);
 	}
 
 	private readonly IDbContextFactory<MediaDeckDbContext> _dbFactory;

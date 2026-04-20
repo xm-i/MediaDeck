@@ -1,3 +1,4 @@
+using MediaDeck.Common.Base;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Composition.Interfaces.Primitives;
 
@@ -9,7 +10,7 @@ namespace MediaDeck.Core.Models.Maps;
 /// <remarks>
 /// このグループを一つのピンとして表示する
 /// </remarks>
-public class MapPin {
+public class MapPin : ModelBase {
 	/// <summary>
 	/// 代表メディア
 	/// </summary>
@@ -65,7 +66,7 @@ public class MapPin {
 		this.CoreRectangle = rectangle;
 		this.Location = this.Core.Value.Location;
 		this.Count = this.Items.Count;
-		this.Items.ObserveCountChanged().Subscribe(x => this.Count = x);
+		this.Items.ObserveCountChanged().Subscribe(x => this.Count = x).AddTo(this.CompositeDisposable);
 	}
 
 	public override string ToString() {

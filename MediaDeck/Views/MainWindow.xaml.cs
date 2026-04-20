@@ -9,6 +9,8 @@ namespace MediaDeck.Views;
 public sealed partial class MainWindow {
 	private readonly MainWindowViewModel _viewModel;
 
+	private readonly System.Reactive.Disposables.CompositeDisposable _disposable = new();
+
 	public MainWindow(MainWindowViewModel viewModel) {
 		this._viewModel = viewModel;
 		this.InitializeComponent();
@@ -17,7 +19,9 @@ public sealed partial class MainWindow {
 			if (tab != null && this.MainTabView.SelectedItem != tab) {
 				this.MainTabView.SelectedItem = tab;
 			}
-		});
+		}).AddTo(this._disposable);
+
+		this.Closed += (s, e) => this._disposable.Dispose();
 	}
 
 	private void MainTabView_TabCloseRequested(TabView sender, TabViewTabCloseRequestedEventArgs args) {

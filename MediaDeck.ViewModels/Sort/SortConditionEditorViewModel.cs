@@ -12,7 +12,7 @@ public class SortConditionEditorViewModel : ViewModelBase {
 		this.DisplayName = this.Model.DisplayName.ToBindableReactiveProperty(null!);
 		this.DisplayName.Subscribe(x => {
 			this.Model.DisplayName.Value = x;
-		});
+		}).AddTo(this.CompositeDisposable);
 
 		this.SortItemObjects = this.Model.SortItemObjects.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
 

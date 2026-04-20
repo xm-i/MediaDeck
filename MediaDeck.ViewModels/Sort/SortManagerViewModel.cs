@@ -10,9 +10,9 @@ public class SortManagerViewModel : ViewModelBase {
 
 		this.AddSortConditionCommand.Subscribe(_ => {
 			this.Add();
-		});
+		}).AddTo(this.CompositeDisposable);
 
-		this.RemoveSortConditionCommand.Where(x => x != null).Subscribe(this.Remove);
+		this.RemoveSortConditionCommand.Where(x => x != null).Subscribe(this.Remove).AddTo(this.CompositeDisposable);
 
 		this.SaveCommand.Subscribe(_ => {
 			this.Save();

@@ -36,7 +36,7 @@ public class MainWindowViewModel : ViewModelBase {
 				var idx = Math.Clamp(stateStore.RootState.ActiveTabIndex, 0, this._tabsView.Count - 1);
 				this.SelectedTab.Value = this.Tabs.ElementAt(idx);
 			}
-		});
+		}).AddTo(this.CompositeDisposable);
 
 		this.AddTabCommand.Subscribe(x => {
 			this.AddTab();

@@ -89,7 +89,8 @@ public sealed partial class MapViewer {
 			if (cores.Count == 0) {
 				list.Add(new MapPin(item.FileModel, rect));
 			} else {
-				cores.OrderBy(x => rect.DistanceTo(x.CoreRectangle)).First().Items.Add(item.FileModel);
+				var mapPin = cores.OrderBy(x => rect.DistanceTo(x.CoreRectangle)).First();
+				mapPin.Items.Add(item.FileModel);
 			}
 		}
 

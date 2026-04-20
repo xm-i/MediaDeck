@@ -8,17 +8,15 @@ using Microsoft.Extensions.Logging;
 namespace MediaDeck.FileTypes.Video.ViewModels;
 
 [Inject(InjectServiceLifetime.Transient)]
-internal class VideoThumbnailPickerViewModel : BaseThumbnailPickerViewModel, IDisposable {
+internal class VideoThumbnailPickerViewModel : BaseThumbnailPickerViewModel {
 	public VideoThumbnailPickerViewModel(
 		BaseThumbnailPickerModel thumbnailPickerModel,
 		VideoFileOperator videoFileOperator,
 		ILogger<VideoThumbnailPickerViewModel> logger) : base(thumbnailPickerModel) {
 		this._videoFileOperator = videoFileOperator;
 		this._logger = logger;
-		this._updateTimeSubject.ObserveOnCurrentSynchronizationContext().Subscribe(x => this.Time.Value = x).AddTo(this._disposables);
+		this._updateTimeSubject.ObserveOnCurrentSynchronizationContext().Subscribe(x => this.Time.Value = x).AddTo(this.CompositeDisposable);
 	}
-
-	private readonly CompositeDisposable _disposables = new();
 
 	private readonly VideoFileOperator _videoFileOperator;
 
@@ -53,9 +51,5 @@ internal class VideoThumbnailPickerViewModel : BaseThumbnailPickerViewModel, IDi
 
 	internal void UpdateTime(TimeSpan time) {
 		this._updateTimeSubject.OnNext(time);
-	}
-
-	public void Dispose() {
-		this._disposables.Dispose();
 	}
 }

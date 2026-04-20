@@ -1,15 +1,17 @@
 using System.Threading.Tasks;
 
+using MediaDeck.Common.Base;
 using MediaDeck.Composition.Interfaces.FileTypes.ViewModels;
 using MediaDeck.FileTypes.Base.Models;
 
 namespace MediaDeck.FileTypes.Base.ViewModels;
 
-internal abstract class BaseThumbnailPickerViewModel : IThumbnailPickerViewModel {
+internal abstract class BaseThumbnailPickerViewModel : ViewModelBase, IThumbnailPickerViewModel {
 	internal BaseThumbnailPickerViewModel(BaseThumbnailPickerModel thumbnailPickerModel) {
-		this.RecreateThumbnailCommand.Subscribe(_ => this.RecreateThumbnail());
-		this.SaveCommand.Subscribe(async _ => await this.SaveAsync());
+		this.RecreateThumbnailCommand.Subscribe(_ => this.RecreateThumbnail()).AddTo(this.CompositeDisposable);
+		this.SaveCommand.Subscribe(async _ => await this.SaveAsync()).AddTo(this.CompositeDisposable);
 		this.thumbnailPickerModel = thumbnailPickerModel;
+
 	}
 
 	protected IFileViewModel? targetFileViewModel;

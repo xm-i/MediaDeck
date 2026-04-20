@@ -16,10 +16,10 @@ public class NewTagDialogViewModel : ViewModelBase {
 				this.Detail.Value,
 				[]);
 			this.Result.Value = DialogResult.Confirmed;
-		});
+		}).AddTo(this.CompositeDisposable);
 		this.CancelCommand.Subscribe(_ => {
 			this.Result.Value = DialogResult.Canceled;
-		});
+		}).AddTo(this.CompositeDisposable);
 	}
 
 	public BindableReactiveProperty<string> TagName {

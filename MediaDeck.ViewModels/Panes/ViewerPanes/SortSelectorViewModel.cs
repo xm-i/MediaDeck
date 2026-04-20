@@ -22,12 +22,12 @@ public class SortSelectorViewModel : ViewModelBase {
 		this.CurrentCondition.Subscribe(async x => {
 			model.CurrentSortCondition.Value = x?.Model;
 			await mediaContentLibrary.SearchAsync();
-		});
+		}).AddTo(this.CompositeDisposable);
 		this.Direction.Value = model.Direction.Value;
 		this.Direction.Subscribe(async x => {
 			model.Direction.Value = x;
 			await mediaContentLibrary.SearchAsync();
-		});
+		}).AddTo(this.CompositeDisposable);
 	}
 
 	private readonly IStateStore _stateStore;

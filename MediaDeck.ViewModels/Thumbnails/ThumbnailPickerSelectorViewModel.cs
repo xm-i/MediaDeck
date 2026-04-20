@@ -18,7 +18,7 @@ public class ThumbnailPickerSelectorViewModel : ViewModelBase {
 			this.ThumbnailPickerView.Value = fileTypeService.CreateThumbnailPickerView(x);
 			this.ThumbnailPickerView.Value.DataContext = this.ThumbnailPickerViewModel.Value;
 			await this.ThumbnailPickerViewModel.Value.LoadAsync(x);
-		});
+		}).AddTo(this.CompositeDisposable);
 	}
 
 

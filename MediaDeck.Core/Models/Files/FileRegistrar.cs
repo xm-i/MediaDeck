@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 
+using MediaDeck.Common.Base;
 using MediaDeck.Composition.Interfaces.FileTypes;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Composition.Stores.Config.Model;
@@ -11,7 +12,7 @@ using Microsoft.Extensions.Logging;
 namespace MediaDeck.Core.Models.Files;
 
 [Inject(InjectServiceLifetime.Singleton)]
-public class FileRegistrar {
+public class FileRegistrar : ServiceBase {
 	private readonly IFileOperator[] _fileOperators;
 	private readonly ConcurrentDictionary<string, FolderModel> _fileToFolderMap = new();
 	private readonly ILogger<FileRegistrar> _logger;
@@ -37,7 +38,8 @@ public class FileRegistrar {
 			.SubscribeAwait(async (x, ct) =>
 					await this.RegisterFilesAsync().ConfigureAwait(false),
 				AwaitOperation.Sequential,
-				false);
+				false)
+			.AddTo(this.CompositeDisposable);
 	}
 
 

@@ -35,7 +35,8 @@ public class FilterSelector : ModelBase {
 				this.FilteringConditions.Clear();
 				this.FilteringConditions.AddRange(searchDefinitions.FilteringConditions.Select(x => new FilteringCondition(x)));
 				this.CurrentFilteringCondition.Value = this.FilteringConditions.FirstOrDefault(x => x.DisplayName == this.CurrentFilteringCondition.Value?.DisplayName);
-			});
+			})
+			.AddTo(this.CompositeDisposable);
 	}
 
 	/// <summary>

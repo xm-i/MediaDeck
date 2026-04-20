@@ -104,6 +104,6 @@ public class ResolutionFilterCreatorViewModel : ViewModelBase, IFilterCreatorVie
 					};
 				}
 				target.Value?.AddFilter(filterItemObject);
-			});
+			}).AddTo(this.CompositeDisposable);
 	}
 }

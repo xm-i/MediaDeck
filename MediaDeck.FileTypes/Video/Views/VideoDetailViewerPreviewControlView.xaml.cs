@@ -11,6 +11,7 @@ using Microsoft.UI.Xaml.Controls;
 namespace MediaDeck.FileTypes.Video.Views;
 
 internal sealed partial class VideoDetailViewerPreviewControlView : VideoDetailViewerPreviewControlViewUserControl, IDetailViewerPreviewControlView {
+	private readonly CompositeDisposable _disposables = [];
 	private readonly SymbolIcon _iconPlay = new(Symbol.Play);
 	private readonly SymbolIcon _iconPause = new(Symbol.Pause);
 	public Player Player {
@@ -29,6 +30,11 @@ internal sealed partial class VideoDetailViewerPreviewControlView : VideoDetailV
 		this.btnPlayback.Content = this.Player.Status == Status.Paused ? this._iconPlay : this._iconPause;
 		this.Player.PropertyChanged += this.Player_PropertyChanged;
 		this.rootGrid.DataContext = this;
+
+		this.Unloaded += (s, e) => {
+			this.Player.Dispose();
+			this._disposables.Dispose();
+		};
 	}
 
 	protected override void OnViewModelChanged(IDetailViewerViewModel? oldViewModel, IDetailViewerViewModel? newViewModel) {
@@ -44,7 +50,7 @@ internal sealed partial class VideoDetailViewerPreviewControlView : VideoDetailV
 				} else {
 					this.Player.Stop();
 				}
-			});
+			}).AddTo(this._disposables);
 		base.OnViewModelChanged(oldViewModel, newViewModel);
 	}
 	private void Player_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e) {

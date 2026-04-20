@@ -65,9 +65,9 @@ public class FilterManagerViewModel : ViewModelBase {
 
 		this.AddFilteringConditionCommand.Subscribe(_ => {
 			this.Add();
-		});
+		}).AddTo(this.CompositeDisposable);
 
-		this.RemoveFilteringConditionCommand.Where(x => x != null).Subscribe(this.Remove);
+		this.RemoveFilteringConditionCommand.Where(x => x != null).Subscribe(this.Remove).AddTo(this.CompositeDisposable);
 
 		this.SaveCommand.Subscribe(_ => {
 			this.Save();

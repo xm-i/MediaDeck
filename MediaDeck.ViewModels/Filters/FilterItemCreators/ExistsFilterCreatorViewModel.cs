@@ -48,6 +48,6 @@ public class ExistsFilterCreatorViewModel : ViewModelBase, IFilterCreatorViewMod
 				Exists = this.Exists.Value.Value
 			};
 			target.Value?.AddFilter(filter);
-		});
+		}).AddTo(this.CompositeDisposable);
 	}
 }

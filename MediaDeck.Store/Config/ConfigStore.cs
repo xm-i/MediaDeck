@@ -2,7 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 
 using AutoDiAttributes;
-
+using MediaDeck.Common.Base;
 using MediaDeck.Composition.Interfaces.Services;
 using MediaDeck.Composition.Objects;
 using MediaDeck.Composition.Stores.Config.Model;
@@ -13,10 +13,12 @@ using MediaDeck.Stores.SerializerContext;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
+using R3;
+
 namespace MediaDeck.Store.Config;
 
 [Inject(InjectServiceLifetime.Singleton, typeof(IConfigStore))]
-public class ConfigStore : IConfigStore {
+public class ConfigStore : DisposableBase, IConfigStore {
 	private readonly ILogger<ConfigStore> _logger;
 	private readonly AppNotificationDispatcher _notificationDispatcher;
 	private readonly IAppPathProvider _pathProvider;
@@ -48,7 +50,7 @@ public class ConfigStore : IConfigStore {
 	/// </summary>
 	[MemberNotNull(nameof(Config))]
 	public void Load() {
-		var scope = this.ScopedService.CreateScope();
+		var scope = this.ScopedService.CreateScope().AddTo(this.CompositeDisposable);
 		try {
 			if (File.Exists(this.ConfigFilePath)) {
 				try {

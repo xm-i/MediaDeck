@@ -25,7 +25,7 @@ internal class ArchiveThumbnailPickerViewModel : BaseThumbnailPickerViewModel {
 				this.FileName.Value = x;
 				this.RecreateThumbnail();
 			}
-		});
+		}).AddTo(this.CompositeDisposable);
 	}
 
 	internal BindableReactiveProperty<string?> FileName {

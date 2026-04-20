@@ -39,7 +39,7 @@ public class FilteringConditionEditorViewModel : ViewModelBase {
 		this.DisplayName = this.Model.DisplayName.ToBindableReactiveProperty(null!);
 		this.DisplayName.Subscribe(x => {
 			this.Model.DisplayName.Value = x;
-		});
+		}).AddTo(this.CompositeDisposable);
 
 		this.FilterItems = this.Model.FilterItemObjects.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
 

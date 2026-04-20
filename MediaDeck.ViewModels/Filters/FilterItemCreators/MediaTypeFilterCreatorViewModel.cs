@@ -48,6 +48,6 @@ public class MediaTypeFilterCreatorViewModel : ViewModelBase, IFilterCreatorView
 				IsVideo = this.MediaType.Value.Value
 			};
 			target.Value?.AddFilter(filter);
-		});
+		}).AddTo(this.CompositeDisposable);
 	}
 }

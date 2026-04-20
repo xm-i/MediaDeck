@@ -18,7 +18,7 @@ public class RepositorySelectorViewModel : ViewModelBase {
 			foreach (var repository in repositorySelector.Repositories) {
 				await repository.Load();
 			}
-		});
+		}).AddTo(this.CompositeDisposable);
 	}
 
 	public ReactiveCommand LoadCommand {

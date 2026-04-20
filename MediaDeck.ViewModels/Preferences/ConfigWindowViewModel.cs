@@ -16,11 +16,11 @@ public class ConfigWindowViewModel : ViewModelBase {
 		this.SelectedPageViewModel.Value = this.ScanConfigPageViewModel;
 		this.SaveCommand.Subscribe(_ => {
 			configStore.Save();
-		});
+		}).AddTo(this.CompositeDisposable);
 
 		this.LoadCommand.Subscribe(_ => {
 			configStore.Load();
-		});
+		}).AddTo(this.CompositeDisposable);
 	}
 
 	public IConfigPageViewModel[] ConfigPageViewModels {

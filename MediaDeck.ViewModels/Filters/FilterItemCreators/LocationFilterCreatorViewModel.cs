@@ -48,6 +48,6 @@ public class LocationFilterCreatorViewModel : ViewModelBase, IFilterCreatorViewM
 				Contains = this.HasLocation.Value.Value
 			};
 			target.Value?.AddFilter(filter);
-		});
+		}).AddTo(this.CompositeDisposable);
 	}
 }

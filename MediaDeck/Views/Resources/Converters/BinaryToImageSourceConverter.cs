@@ -19,7 +19,7 @@ public class BinaryToImageSourceConverter : IValueConverter {
 			await writer.FlushAsync();
 		})
 			.Wait();
-		writer.DetachStream();
+		using var detachedStream = writer.DetachStream();
 		stream.Seek(0);
 
 		bi.SetSource(stream);

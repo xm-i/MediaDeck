@@ -22,6 +22,8 @@ public sealed partial class GlobalInfoBar {
 	private CancellationTokenSource? _autoCloseCts;
 	private bool _isShowingNotification;
 
+	private readonly CompositeDisposable _disposable = new();
+
 	/// <summary>
 	/// GlobalInfoBarクラスの新しいインスタンスを初期化
 	/// </summary>
@@ -34,7 +36,13 @@ public sealed partial class GlobalInfoBar {
 			.Subscribe(appNotification => {
 				var infoBarNotification = InfoBarNotification.FromAppNotification(appNotification);
 				this.EnqueueNotification(infoBarNotification);
-			});
+			}).AddTo(this._disposable);
+
+		this.Unloaded += (s, e) => {
+			this._disposable.Dispose();
+			this._autoCloseCts?.Cancel();
+			this._autoCloseCts?.Dispose();
+		};
 	}
 
 	/// <summary>

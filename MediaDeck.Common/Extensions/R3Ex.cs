@@ -7,22 +7,29 @@ public static class R3Ex {
 		return observable.Select(_ => Unit.Default);
 	}
 
-	public static BindableReactiveProperty<T> ToTwoWayBindableReactiveProperty<T>(this ReactiveProperty<T> source, T initialValue = default!) {
+	public static BindableReactiveProperty<T> ToTwoWayBindableReactiveProperty<T>(this ReactiveProperty<T> source, T initialValue = default!, CompositeDisposable? disposables = null) {
 		var bindable = source.ToBindableReactiveProperty(initialValue);
-		bindable.Subscribe(x => {
+		var d1 = bindable.Subscribe(x => {
 			source.Value = x;
 		});
+		if (disposables != null) {
+			d1.AddTo(disposables);
+		}
 		return bindable;
 	}
 
-	public static ReactiveProperty<TResult> ToTwoWayReactiveProperty<TProperty, TResult>(this ReactiveProperty<TProperty> source, Func<TProperty, TResult> convert, Func<TResult, TProperty> convertBack, TResult initialValue = default!) {
+	public static ReactiveProperty<TResult> ToTwoWayReactiveProperty<TProperty, TResult>(this ReactiveProperty<TProperty> source, Func<TProperty, TResult> convert, Func<TResult, TProperty> convertBack, TResult initialValue = default!, CompositeDisposable? disposables = null) {
 		var resultRp = new ReactiveProperty<TResult>(initialValue);
-		source.Subscribe(x => {
+		var d1 = source.Subscribe(x => {
 			resultRp.Value = convert(x);
 		});
-		resultRp.Subscribe(x => {
+		var d2 = resultRp.Subscribe(x => {
 			source.Value = convertBack(x);
 		});
+		if (disposables != null) {
+			d1.AddTo(disposables);
+			d2.AddTo(disposables);
+		}
 		return resultRp;
 	}
 

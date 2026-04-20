@@ -14,7 +14,7 @@ public class BackgroundTasksViewModel : ViewModelBase {
 		this.UpdateFileHashBackgroundServiceCompletedCount = this._updateFileHashBackgroundService.CompletedCount.ThrottleLast(TimeSpan.FromMilliseconds(100)).ObserveOnCurrentSynchronizationContext().ToBindableReactiveProperty();
 		this.FullHashUpdaterTargetCount = this._updateFileHashBackgroundService.FullHashTargetCount.ThrottleLast(TimeSpan.FromMilliseconds(100)).ObserveOnCurrentSynchronizationContext().ToBindableReactiveProperty();
 		this.FullHashUpdaterCompletedCount = this._updateFileHashBackgroundService.FullHashCompletedCount.ThrottleLast(TimeSpan.FromMilliseconds(100)).ObserveOnCurrentSynchronizationContext().ToBindableReactiveProperty();
-		this.Actions.Synchronize().ObserveOnThreadPool().Subscribe(action => action());
+		this.Actions.Synchronize().ObserveOnThreadPool().Subscribe(action => action()).AddTo(this.CompositeDisposable);
 	}
 
 	private readonly FileStatusUpdatorService _fileStatusUpdater;

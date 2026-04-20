@@ -16,7 +16,7 @@ public class SortSelector : ModelBase {
 	public SortSelector(TabStateModel tabState, SearchDefinitionsStateModel searchDefinitions) {
 		// 設定値初回値読み込み
 		this.SortConditions = searchDefinitions.SortConditions;
-		this.CurrentSortCondition = tabState.SearchState.CurrentSortCondition.ToTwoWayReactiveProperty(x => this.SortConditions.FirstOrDefault(sc => sc.Id == x), x => x?.Id, null);
+		this.CurrentSortCondition = tabState.SearchState.CurrentSortCondition.ToTwoWayReactiveProperty(x => this.SortConditions.FirstOrDefault(sc => sc.Id == x), x => x?.Id, null, this.CompositeDisposable);
 		this.Direction = tabState.SearchState.SortDirection;
 
 		// 更新
@@ -31,7 +31,7 @@ public class SortSelector : ModelBase {
 		this.CurrentSortCondition.Subscribe(x => {
 			before?.Dispose();
 			before = x?.SortItemObjects.ObserveChanged().Subscribe(_ => this._onUpdateSortConditionChanged.OnNext(Unit.Default));
-		});
+		}).AddTo(this.CompositeDisposable);
 	}
 
 	/// <summary>

@@ -3,7 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 
 using AutoDiAttributes;
-
+using MediaDeck.Common.Base;
 using MediaDeck.Composition.Interfaces.Services;
 using MediaDeck.Composition.Objects;
 using MediaDeck.Composition.Stores.State.Model;
@@ -13,11 +13,12 @@ using MediaDeck.Stores.SerializerContext;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using R3;
 
 namespace MediaDeck.Store.State;
 
 [Inject(InjectServiceLifetime.Singleton, typeof(IStateStore))]
-public class StateStore : IStateStore {
+public class StateStore : DisposableBase, IStateStore {
 	private readonly ILogger<StateStore> _logger;
 	private readonly AppNotificationDispatcher _notificationDispatcher;
 	private readonly IAppPathProvider _pathProvider;
@@ -74,7 +75,7 @@ public class StateStore : IStateStore {
 	[MemberNotNull(nameof(AppState))]
 	[MemberNotNull(nameof(RootState))]
 	public void Load() {
-		var scope = this.ScopedService.CreateScope();
+		var scope = this.ScopedService.CreateScope().AddTo(this.CompositeDisposable);
 		try {
 			if (File.Exists(this.StateFilePath)) {
 				try {

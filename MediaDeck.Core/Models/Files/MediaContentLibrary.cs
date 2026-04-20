@@ -16,19 +16,20 @@ namespace MediaDeck.Core.Models.Files;
 public class MediaContentLibrary : ModelBase {
 	public MediaContentLibrary(FilesLoader filesLoader, SearchConditionNotificationDispatcher searchConditionNotificationDispatcher, ITagsManager tagsManager, FolderRepository folderRepository, TabStateModel tabState) {
 		this._filesLoader = filesLoader;
-		this.SearchConditions.ObserveChanged().ThrottleLast(TimeSpan.FromMilliseconds(100)).Subscribe(async _ => await this.SearchAsync());
+		this.SearchConditions.ObserveChanged().ThrottleLast(TimeSpan.FromMilliseconds(100)).Subscribe(async _ => await this.SearchAsync()).AddTo(this.CompositeDisposable);
 		this.SearchConditionCandidates.AddRange(tagsManager.Tags.Select(x => new TagSearchCondition(tagsManager) { TagId = x.TagId } as ISearchCondition));
 		this.SearchConditionCandidates.AddRange(folderRepository.GetAllFolders().Select(x => new FolderSearchCondition { FolderPath = x.FolderPath } as ISearchCondition));
-		searchConditionNotificationDispatcher.AddRequest.Subscribe(this.SearchConditions.Add);
-		searchConditionNotificationDispatcher.RemoveRequest.Subscribe(x => this.SearchConditions.Remove(x));
-		searchConditionNotificationDispatcher.UpdateRequest.Subscribe(x => x(this.SearchConditions));
+		searchConditionNotificationDispatcher.AddRequest.Subscribe(this.SearchConditions.Add).AddTo(this.CompositeDisposable);
+		searchConditionNotificationDispatcher.RemoveRequest.Subscribe(x => this.SearchConditions.Remove(x)).AddTo(this.CompositeDisposable);
+		searchConditionNotificationDispatcher.UpdateRequest.Subscribe(x => x(this.SearchConditions)).AddTo(this.CompositeDisposable);
 
 		this.SearchConditions.AddRange(tabState.SearchState.SearchCondition.ToArray());
 		this.SearchConditions.ObserveChanged()
 			.Subscribe(_ => {
 				tabState.SearchState.SearchCondition.Clear();
 				tabState.SearchState.SearchCondition.AddRange(this.SearchConditions.ToArray());
-			});
+			})
+			.AddTo(this.CompositeDisposable);
 	}
 
 	private readonly FilesLoader _filesLoader;

@@ -10,6 +10,8 @@ public sealed partial class ConfigWindow {
 		get;
 	}
 
+	private readonly System.Reactive.Disposables.CompositeDisposable _disposable = new();
+
 	public ConfigWindow(ConfigWindowViewModel configWindowViewModel) {
 		this.InitializeComponent();
 		this.ViewModel = configWindowViewModel;
@@ -29,6 +31,7 @@ public sealed partial class ConfigWindow {
 			}
 
 			this.ContentFrame.Navigate(view, vm);
-		});
+		}).AddTo(this._disposable);
+		this.Closed += (s, e) => this._disposable.Dispose();
 	}
 }

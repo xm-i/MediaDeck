@@ -73,6 +73,6 @@ public class RateFilterCreatorViewModel : ViewModelBase, IFilterCreatorViewModel
 					};
 					target.Value?.AddFilter(filter);
 				}
-			});
+			}).AddTo(this.CompositeDisposable);
 	}
 }

@@ -20,7 +20,7 @@ public class FilterSelectorViewModel : ViewModelBase {
 		this.ChangeFilteringConditionSelectionCommand.Subscribe(async x => {
 			model.CurrentFilteringCondition.Value = x?.Model;
 			await mediaContentLibrary.SearchAsync();
-		});
+		}).AddTo(this.CompositeDisposable);
 	}
 
 	private readonly IStateStore _stateStore;

@@ -47,9 +47,9 @@ public class ExecutionProgramConfigViewModel : ViewModelBase {
 	} = new();
 
 	public ExecutionProgramConfigViewModel(ExecutionProgramObjectModel executionProgramConfigModel, ExecutionConfigModel executionConfig) {
-		this.Path = executionProgramConfigModel.Path.ToTwoWayBindableReactiveProperty(string.Empty).AddTo(this.CompositeDisposable);
-		this.Args = executionProgramConfigModel.Args.ToTwoWayBindableReactiveProperty(string.Empty).AddTo(this.CompositeDisposable);
-		this.MediaType = executionProgramConfigModel.MediaType.ToTwoWayBindableReactiveProperty(Composition.Enum.MediaType.Image).AddTo(this.CompositeDisposable);
+		this.Path = executionProgramConfigModel.Path.ToTwoWayBindableReactiveProperty(string.Empty, this.CompositeDisposable).AddTo(this.CompositeDisposable);
+		this.Args = executionProgramConfigModel.Args.ToTwoWayBindableReactiveProperty(string.Empty, this.CompositeDisposable).AddTo(this.CompositeDisposable);
+		this.MediaType = executionProgramConfigModel.MediaType.ToTwoWayBindableReactiveProperty(Composition.Enum.MediaType.Image, this.CompositeDisposable).AddTo(this.CompositeDisposable);
 
 		this.RemoveCommand.Subscribe(_ => {
 			executionConfig.RemoveExecutionProgram(executionProgramConfigModel);

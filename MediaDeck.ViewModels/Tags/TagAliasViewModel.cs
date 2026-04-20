@@ -1,8 +1,9 @@
+using MediaDeck.Common.Base;
 using MediaDeck.Composition.Interfaces.Tags;
 
 namespace MediaDeck.ViewModels.Tags;
 
-public class TagAliasViewModel {
+public class TagAliasViewModel : ViewModelBase {
 	public TagAliasViewModel(ITagAliasModel tagAlias, TagViewModel parent) {
 		this.Model = tagAlias;
 		this.Alias.Value = tagAlias.Alias;
@@ -12,11 +13,11 @@ public class TagAliasViewModel {
 		this.Alias.Subscribe(x => {
 			tagAlias.Alias = x;
 			parent.MarkAsEdited();
-		});
+		}).AddTo(this.CompositeDisposable);
 		this.Ruby.Subscribe(x => {
 			tagAlias.Ruby = string.IsNullOrEmpty(x) ? null : x;
 			parent.MarkAsEdited();
-		});
+		}).AddTo(this.CompositeDisposable);
 	}
 
 	public ITagAliasModel Model {

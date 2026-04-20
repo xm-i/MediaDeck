@@ -14,7 +14,7 @@ public class FolderRepositoryViewModel : RepositoryViewModelBase {
 					return;
 				}
 				folderRepository.SetRepositoryCandidate(folder, this.IncludeSubDirectories.Value);
-			});
+			}).AddTo(this.CompositeDisposable);
 	}
 
 	public BindableReactiveProperty<FolderObject> RootFolder {

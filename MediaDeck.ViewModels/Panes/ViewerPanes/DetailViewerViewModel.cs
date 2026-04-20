@@ -19,7 +19,7 @@ public class DetailViewerViewModel : ViewerPaneViewModelBase, IDetailViewerViewM
 			this.SelectedFile.Value = vm;
 			this.SelectedFilePath.Value = vm.FilePath;
 			this.SelectedFileThumbnailFilePath.Value = vm.ThumbnailFilePath.Value;
-		});
+		}).AddTo(this.CompositeDisposable);
 	}
 
 

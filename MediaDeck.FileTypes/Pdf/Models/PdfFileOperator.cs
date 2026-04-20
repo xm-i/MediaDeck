@@ -94,7 +94,8 @@ internal partial class PdfFileOperator : BaseFileOperator {
 		page.Render(pdfBitmap, 0, 0, width, height, PageRotate.Normal, RenderFlags.FPDF_NONE);
 		using var ms = new MemoryStream();
 
-		pdfBitmap.GetImage().Save(ms, ImageFormat.Jpeg);
+		using var image = pdfBitmap.GetImage();
+		image.Save(ms, ImageFormat.Jpeg);
 		return ms.ToArray();
 	}
 }

@@ -28,7 +28,7 @@ public class ViewerSelectorViewModel : ViewModelBase {
 		this.MapViewerViewModel = mapViewerViewModel;
 		this.SortSelectorViewModel = sortSelectorViewModel;
 
-		this.ItemSize = tabState.ViewerState.ItemSize.ToTwoWayBindableReactiveProperty(tabState.ViewerState.ItemSize.Value).AddTo(this.CompositeDisposable);
+		this.ItemSize = tabState.ViewerState.ItemSize.ToTwoWayBindableReactiveProperty(tabState.ViewerState.ItemSize.Value, this.CompositeDisposable).AddTo(this.CompositeDisposable);
 
 		this.SelectedViewerPane.Pairwise()
 			.Subscribe(x => {
