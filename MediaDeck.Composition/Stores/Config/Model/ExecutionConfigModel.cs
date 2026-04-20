@@ -26,8 +26,7 @@ public class ExecutionConfigModel {
 	} = [];
 
 	public void AddExecutionProgram() {
-		var scope = this.ScopedServiceProvider.CreateScope();
-		var programConfig = scope.ServiceProvider.GetRequiredService<ExecutionProgramObjectModel>();
+		var programConfig = this.ScopedServiceProvider.GetRequiredService<ExecutionProgramObjectModel>();
 		this.ExecutionPrograms.Add(programConfig);
 	}
 

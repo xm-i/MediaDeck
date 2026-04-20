@@ -48,7 +48,7 @@ public class ScanConfigModel {
 		];
 		this.TargetExtensions = [
 			.. extensions.Select(x => {
-				var model = this.ScopedServiceProvider.CreateScope().ServiceProvider.GetRequiredService<ExtensionObjectModel>();
+				var model = this.ScopedServiceProvider.GetRequiredService<ExtensionObjectModel>();
 				model.Extension.Value = x.Item1;
 				model.MediaType.Value = x.Item2;
 				return model;
@@ -57,8 +57,7 @@ public class ScanConfigModel {
 	}
 
 	public void AddTargetExtension() {
-		var scope = this.ScopedServiceProvider.CreateScope();
-		var config = scope.ServiceProvider.GetRequiredService<ExtensionObjectModel>();
+		var config = this.ScopedServiceProvider.GetRequiredService<ExtensionObjectModel>();
 		this.TargetExtensions.Add(config);
 	}
 

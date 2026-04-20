@@ -40,7 +40,7 @@ public class SearchDefinitionsStateModel {
 		];
 		this.SortConditions = [
 			.. sc.Select(x => {
-				var model = serviceProvider.CreateScope().ServiceProvider.GetRequiredService<SortObject>();
+				var model = serviceProvider.GetRequiredService<SortObject>();
 				model.DisplayName.Value = x.Item1;
 				model.SortItemObjects.AddRange(x.Item2.Select(sik => new SortItemObject() { SortItemKey = sik }));
 				return model;
@@ -49,7 +49,7 @@ public class SearchDefinitionsStateModel {
 	}
 
 	public SortObject AddSortCondition() {
-		var so = this._serviceProvider.CreateScope().ServiceProvider.GetRequiredService<SortObject>();
+		var so = this._serviceProvider.GetRequiredService<SortObject>();
 		this.SortConditions.Add(so);
 		return so;
 	}
@@ -59,7 +59,7 @@ public class SearchDefinitionsStateModel {
 	}
 
 	public FilterObject AddFilteringCondition() {
-		var fo = this._serviceProvider.CreateScope().ServiceProvider.GetRequiredService<FilterObject>();
+		var fo = this._serviceProvider.GetRequiredService<FilterObject>();
 		this.FilteringConditions.Add(fo);
 		return fo;
 	}

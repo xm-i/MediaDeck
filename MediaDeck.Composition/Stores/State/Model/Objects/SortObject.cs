@@ -7,7 +7,7 @@ namespace MediaDeck.Composition.Stores.State.Model.Objects;
 /// <summary>
 /// ソート設定復元用オブジェクト
 /// </summary>
-[Inject(InjectServiceLifetime.Scoped)]
+[Inject(InjectServiceLifetime.Transient)]
 [GenerateR3JsonConfigDto]
 public class SortObject(IServiceProvider serviceProvider) {
 	/// <summary>
@@ -33,7 +33,7 @@ public class SortObject(IServiceProvider serviceProvider) {
 	} = [];
 
 	public SortItemObject AddSortItemObject() {
-		var sio = serviceProvider.CreateScope().ServiceProvider.GetRequiredService<SortItemObject>();
+		var sio = serviceProvider.GetRequiredService<SortItemObject>();
 		this.SortItemObjects.Add(sio);
 		return sio;
 	}

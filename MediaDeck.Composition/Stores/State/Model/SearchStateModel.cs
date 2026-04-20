@@ -9,7 +9,7 @@ namespace MediaDeck.Composition.Stores.State.Model;
 /// <summary>
 /// タブ固有の検索選択状態
 /// </summary>
-[Inject(InjectServiceLifetime.Scoped)]
+[Inject(InjectServiceLifetime.Transient)]
 [GenerateR3JsonConfigDto]
 public class SearchStateModel {
 	/// <summary>

@@ -19,6 +19,7 @@ public class RootStateModel {
 	/// <summary>
 	/// タブごとの状態リスト
 	/// </summary>
+	[JsonConfigCreateScope]
 	public ObservableList<TabStateModel> Tabs {
 		get;
 	} = [];

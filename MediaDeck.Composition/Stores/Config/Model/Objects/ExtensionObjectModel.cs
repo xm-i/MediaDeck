@@ -4,7 +4,7 @@ using R3.JsonConfig.Attributes;
 
 namespace MediaDeck.Composition.Stores.Config.Model.Objects;
 
-[Inject(InjectServiceLifetime.Scoped)]
+[Inject(InjectServiceLifetime.Transient)]
 [GenerateR3JsonConfigDto]
 public class ExtensionObjectModel {
 	public IServiceProvider ScopedServiceProvider {
