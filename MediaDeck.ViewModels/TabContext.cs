@@ -46,10 +46,6 @@ public class TabContext : ViewModelBase {
 		get;
 	}
 
-	public NavigationMenuViewModel NavigationMenuViewModel {
-		get;
-	}
-
 	public TabContext(TabStateModel tabState) {
 		this.TabState = tabState;
 		var sp = tabState.ServiceProvider;
@@ -61,7 +57,7 @@ public class TabContext : ViewModelBase {
 		this.FilterSelectorViewModel = sp.GetRequiredService<FilterSelectorViewModel>();
 		this.DetailSelectorViewModel = sp.GetRequiredService<DetailSelectorViewModel>();
 		this.RepositorySelectorViewModel = sp.GetRequiredService<RepositorySelectorViewModel>();
-		this.NavigationMenuViewModel = sp.GetRequiredService<NavigationMenuViewModel>();
+
 
 		this.ViewerSelectorViewModel.MediaContentLibraryViewModel.SelectedFiles.Subscribe(x => {
 			this.DetailSelectorViewModel.TargetFiles.Value = x.Select(v => v.FileModel).ToArray();

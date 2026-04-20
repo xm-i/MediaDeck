@@ -13,12 +13,7 @@ public sealed partial class MainWindow {
 		this._viewModel = viewModel;
 		this.InitializeComponent();
 
-		// TabItemsSource にVMのタブリストをバインド
-		this.MainTabView.TabItemsSource = this._viewModel.Tabs;
-
-		// SelectedTab の変更を追跡
 		this._viewModel.SelectedTab.Subscribe(tab => {
-			this.NavigationMenuControl.DataContext = tab?.NavigationMenuViewModel;
 			if (tab != null && this.MainTabView.SelectedItem != tab) {
 				this.MainTabView.SelectedItem = tab;
 			}

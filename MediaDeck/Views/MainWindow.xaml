@@ -20,7 +20,8 @@
 
 		<!-- ナビゲーションメニュー（全タブ共通） -->
 		<local:NavigationMenu Grid.Row="0"
-			x:Name="NavigationMenuControl" />
+			x:Name="NavigationMenuControl"
+			DataContext="{x:Bind _viewModel.NavigationMenuViewModel}"/>
 
 		<!-- TabView -->
 		<TabView Grid.Row="1"
@@ -30,7 +31,8 @@
 			AddTabButtonCommand="{x:Bind _viewModel.AddTabCommand}"
 			TabCloseRequested="MainTabView_TabCloseRequested"
 			SelectionChanged="MainTabView_SelectionChanged"
-			TabWidthMode="SizeToContent" >
+			TabWidthMode="SizeToContent"
+			TabItemsSource="{x:Bind _viewModel.Tabs}">
 			<TabView.TabItemTemplate>
 				<DataTemplate>
 					<TabViewItem Header="{Binding DisplayName.Value}" >

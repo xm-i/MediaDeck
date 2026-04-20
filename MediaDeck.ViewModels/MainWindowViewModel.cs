@@ -16,9 +16,11 @@ public class MainWindowViewModel : ViewModelBase {
 	public MainWindowViewModel(
 		IServiceProvider serviceProvider,
 		IStateStore stateStore,
-		BackgroundTasksViewModel backgroundTasksViewModel) {
+		BackgroundTasksViewModel backgroundTasksViewModel,
+		NavigationMenuViewModel navigationMenuViewModel) {
 		this._rootServiceProvider = serviceProvider;
 		this._stateStore = stateStore;
+		this.NavigationMenuViewModel = navigationMenuViewModel;
 
 		this._tabsView = stateStore.RootState.Tabs.CreateView(tabState => new TabContext(tabState));
 		this._tabsView.ObserveRemove().Subscribe(e => e.Value.View.Dispose()).AddTo(this.CompositeDisposable);
@@ -56,6 +58,10 @@ public class MainWindowViewModel : ViewModelBase {
 	public BindableReactiveProperty<TabContext?> SelectedTab {
 		get;
 	} = new();
+
+	public NavigationMenuViewModel NavigationMenuViewModel {
+		get;
+	}
 
 	public ReactiveCommand WindowActivatedCommand {
 		get;
