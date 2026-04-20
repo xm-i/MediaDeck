@@ -84,7 +84,7 @@ public class SortManagerTests {
 		};
 
 		// Act
-		var result = selector.SetSortConditions(unsortedList).Cast<TestFileModel>().ToList();
+		var result = selector.SetSortConditions(unsortedList.AsQueryable()).Cast<TestFileModel>().ToList();
 
 		// Assert
 		Assert.Equal("FileA.txt", result[0].FilePath);

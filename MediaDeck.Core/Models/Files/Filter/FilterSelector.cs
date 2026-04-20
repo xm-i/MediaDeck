@@ -1,5 +1,4 @@
 using MediaDeck.Common.Base;
-using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Database.Tables;
 
@@ -72,16 +71,8 @@ public class FilterSelector : ModelBase {
 	/// </summary>
 	/// <param name="query">絞り込みクエリを適用するクエリ</param>
 	/// <returns>フィルター適用後クエリ</returns>
-	public IEnumerable<MediaFile> SetFilterConditions(IQueryable<MediaFile> query) {
+	public IQueryable<MediaFile> SetFilterConditions(IQueryable<MediaFile> query) {
 		return this.CurrentFilteringCondition.Value?.SetFilterConditions(query) ?? query;
 	}
 
-	/// <summary>
-	/// フィルターマネージャーで選択したフィルターを引数に渡されたシーケンスに適用して返却する。
-	/// </summary>
-	/// <param name="query">絞り込みを適用するシーケンス</param>
-	/// <returns>フィルター適用後シーケンス</returns>
-	public IEnumerable<IFileModel> SetFilterConditions(IEnumerable<IFileModel> files) {
-		return this.CurrentFilteringCondition.Value?.SetFilterConditions(files) ?? files;
-	}
 }

@@ -1,7 +1,6 @@
 using System.Linq.Expressions;
 
 using MediaDeck.Composition.Interfaces.Files;
-using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Database.Tables;
 
 using R3.JsonConfig.Attributes;
@@ -46,10 +45,6 @@ public class FolderSearchCondition : ISearchCondition {
 			}
 		}
 	}
-
-	public Func<IFileModel, bool>? Filter {
-		get;
-	} = null;
 
 	public bool IsMatchForSuggest(string searchWord) {
 		return this.FolderPath.Contains(searchWord, StringComparison.CurrentCultureIgnoreCase);

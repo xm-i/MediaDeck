@@ -1,4 +1,3 @@
-using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Database.Tables;
 
 namespace MediaDeck.Core.Models.Files.Filter;
@@ -10,17 +9,7 @@ public static class FilterExtensions {
 	/// <param name="query">絞り込みクエリを適用するクエリ</param>
 	/// <param name="filter">適用するフィルター</param>
 	/// <returns>フィルター適用後クエリ</returns>
-	public static IEnumerable<MediaFile> Where(this IQueryable<MediaFile> query, FilterSelector filter) {
+	public static IQueryable<MediaFile> Where(this IQueryable<MediaFile> query, FilterSelector filter) {
 		return filter.SetFilterConditions(query);
-	}
-
-	/// <summary>
-	/// フィルターマネージャーで選択したフィルターを引数に渡されたシーケンスに適用して返却する。
-	/// </summary>
-	/// <param name="files">絞り込みを適用するシーケンス</param>
-	/// <param name="filter">適用するフィルター</param>
-	/// <returns>フィルター適用後シーケンス</returns>
-	public static IEnumerable<IFileModel> Where(this IEnumerable<IFileModel> files, FilterSelector filter) {
-		return filter.SetFilterConditions(files);
 	}
 }

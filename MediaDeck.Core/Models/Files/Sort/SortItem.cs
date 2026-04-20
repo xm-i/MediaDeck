@@ -1,15 +1,16 @@
 using System.ComponentModel;
+using System.Linq.Expressions;
 
 using MediaDeck.Common.Base;
 using MediaDeck.Composition.Enum;
-using MediaDeck.Composition.Interfaces.FileTypes.Models;
+using MediaDeck.Database.Tables;
 
 namespace MediaDeck.Core.Models.Files.Sort;
 
 /// <summary>
 /// ソート条件
 /// </summary>
-public class SortItem<TKey> : ModelBase, ISortItem {
+public class SortItem : ModelBase, ISortItem {
 	/// <summary>
 	/// 保存時のキー値
 	/// </summary>
@@ -35,53 +36,43 @@ public class SortItem<TKey> : ModelBase, ISortItem {
 	}
 
 	/// <summary>
-	/// ソートキー
+	/// ソートキー（Expression Tree）
 	/// </summary>
-	public Func<IFileModel, TKey> KeySelector {
-		get {
-			return this.GetValue<Func<IFileModel, TKey>>()!;
-		}
-		set {
-			this.SetValue(value);
-		}
+	public Expression<Func<MediaFile, object?>> KeySelector {
+		get;
 	}
 
 	/// <summary>
 	/// コンストラクタ
 	/// </summary>
 	/// <param name="key">保存時のキー</param>
+	/// <param name="dbKeySelector">DB用ソートキー</param>
 	/// <param name="direction">ソート方向</param>
-	public SortItem(SortItemKey key, Func<IFileModel, TKey> keySelector, ListSortDirection direction = ListSortDirection.Ascending) {
+	public SortItem(SortItemKey key, Expression<Func<MediaFile, object?>> dbKeySelector, ListSortDirection direction = ListSortDirection.Ascending) {
 		this.Key = key;
-		this.KeySelector = keySelector;
+		this.KeySelector = dbKeySelector;
 		this.Direction = direction;
 	}
 
 	/// <summary>
-	/// ソート適用
+	/// IQueryable用ソート適用
 	/// </summary>
-	/// <param name="items">ソートを適用するアイテムリスト</param>
-	/// <param name="reverse">ソート方向の反転を行うか否か true:反転する false:反転しない</param>
-	/// <returns>整列されたアイテムリスト</returns>
-	public IOrderedEnumerable<IFileModel> ApplySort(IEnumerable<IFileModel> items, bool reverse) {
+	public IOrderedQueryable<MediaFile> ApplySort(IQueryable<MediaFile> query, bool reverse) {
 		if (this.Direction == ListSortDirection.Ascending ^ reverse) {
-			return items.OrderBy(this.KeySelector);
+			return query.OrderBy(this.KeySelector);
 		} else {
-			return items.OrderByDescending(this.KeySelector);
+			return query.OrderByDescending(this.KeySelector);
 		}
 	}
 
 	/// <summary>
-	/// ソートされたアイテムリストに対して、追加のソート条件適用
+	/// IQueryable用追加ソート適用
 	/// </summary>
-	/// <param name="items">ソートを適用するアイテムリスト</param>
-	/// <param name="reverse">ソート方向の反転を行うか否か true:反転する false:反転しない</param>
-	/// <returns>整列されたアイテムリスト</returns>
-	public IOrderedEnumerable<IFileModel> ApplyThenBySort(IOrderedEnumerable<IFileModel> items, bool reverse) {
+	public IOrderedQueryable<MediaFile> ApplyThenBySort(IOrderedQueryable<MediaFile> query, bool reverse) {
 		if (this.Direction == ListSortDirection.Ascending ^ reverse) {
-			return items.ThenBy(this.KeySelector);
+			return query.ThenBy(this.KeySelector);
 		} else {
-			return items.ThenByDescending(this.KeySelector);
+			return query.ThenByDescending(this.KeySelector);
 		}
 	}
 
@@ -108,16 +99,12 @@ public interface ISortItem {
 	}
 
 	/// <summary>
-	/// ソート適用
+	/// IQueryable用ソート適用
 	/// </summary>
-	/// <param name="items">ソートを適用するアイテムリスト</param>
-	/// <returns>整列されたアイテムリスト</returns>
-	public IOrderedEnumerable<IFileModel> ApplySort(IEnumerable<IFileModel> items, bool reverse);
+	public IOrderedQueryable<MediaFile> ApplySort(IQueryable<MediaFile> query, bool reverse);
 
 	/// <summary>
-	/// ソートされたアイテムリストに対して、追加のソート条件適用
+	/// IQueryable用追加ソート適用
 	/// </summary>
-	/// <param name="items">ソートを適用するアイテムリスト</param>
-	/// <returns>整列されたアイテムリスト</returns>
-	public IOrderedEnumerable<IFileModel> ApplyThenBySort(IOrderedEnumerable<IFileModel> items, bool reverse);
+	public IOrderedQueryable<MediaFile> ApplyThenBySort(IOrderedQueryable<MediaFile> query, bool reverse);
 }

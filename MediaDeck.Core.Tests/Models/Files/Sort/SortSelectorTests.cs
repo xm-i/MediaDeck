@@ -40,10 +40,10 @@ public class SortSelectorTests {
 		var files = new[] { new TestFileModel { Id = 1 }, new TestFileModel { Id = 2 } };
 
 		// Act
-		var result = selector.SetSortConditions(files);
+		var result = selector.SetSortConditions(files.AsQueryable());
 
 		// Assert
-		Assert.Same(files, result);
+		Assert.Equal(files, result);
 	}
 
 	/// <summary>
@@ -59,7 +59,7 @@ public class SortSelectorTests {
 		var files = new[] { new TestFileModel { Id = 1 } };
 
 		// Act & Assert
-		Assert.Throws<InvalidOperationException>(() => selector.SetSortConditions(files));
+		Assert.Throws<InvalidOperationException>(() => selector.SetSortConditions(files.AsQueryable()));
 	}
 
 	/// <summary>
@@ -85,7 +85,7 @@ public class SortSelectorTests {
 		};
 
 		// Act
-		var result = selector.SetSortConditions(files).Cast<TestFileModel>().ToList();
+		var result = selector.SetSortConditions(files.AsQueryable()).Cast<TestFileModel>().ToList();
 
 		// Assert
 		Assert.Equal("A", result[0].FilePath);
@@ -116,7 +116,7 @@ public class SortSelectorTests {
 		};
 
 		// Act
-		var result = selector.SetSortConditions(files).Cast<TestFileModel>().ToList();
+		var result = selector.SetSortConditions(files.AsQueryable()).Cast<TestFileModel>().ToList();
 
 		// Assert
 		Assert.Equal("C", result[0].FilePath);
@@ -152,7 +152,7 @@ public class SortSelectorTests {
 		};
 
 		// Act
-		var result = selector.SetSortConditions(files).Cast<TestFileModel>().ToList();
+		var result = selector.SetSortConditions(files.AsQueryable()).Cast<TestFileModel>().ToList();
 
 		// Assert
 		// Rate=5 が最優先。その中で FilePath が A -> B の順

@@ -1,6 +1,5 @@
 using MediaDeck.Common.Base;
 using MediaDeck.Composition.Interfaces.Files;
-using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Composition.Stores.State.Model.Objects;
 using MediaDeck.Database.Tables;
 
@@ -77,27 +76,11 @@ public class FilteringCondition : ModelBase {
 	/// </summary>
 	/// <param name="query">絞り込みクエリを適用するクエリ</param>
 	/// <returns>結果</returns>
-	public IEnumerable<MediaFile> SetFilterConditions(IQueryable<MediaFile> query) {
-		foreach (var filter in this._filterItems.Where(x => x.IncludeSql)) {
+	public IQueryable<MediaFile> SetFilterConditions(IQueryable<MediaFile> query) {
+		foreach (var filter in this._filterItems) {
 			query = query.Where(filter.Condition);
 		}
-
-		var mfs = query.AsEnumerable();
-		foreach (var filter in this._filterItems.Where(x => !x.IncludeSql)) {
-			mfs = mfs.Where(filter.Condition.Compile());
-		}
-		return mfs;
+		return query;
 	}
 
-	/// <summary>
-	/// フィルター条件に合致しているか判定する
-	/// </summary>
-	/// <param name="files">絞り込みを適用するモデルシーケンス</param>
-	/// <returns>絞り込み後シーケンス</returns>
-	public IEnumerable<IFileModel> SetFilterConditions(IEnumerable<IFileModel> files) {
-		foreach (var filter in this._filterItems) {
-			files = files.Where(filter.ConditionForModel);
-		}
-		return files;
-	}
 }

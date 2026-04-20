@@ -3,6 +3,7 @@ using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Composition.Interfaces.Primitives;
 using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Composition.Objects;
+using MediaDeck.Database.Tables;
 using R3;
 
 namespace MediaDeck.Core.Tests.Models.Files.Sort;
@@ -10,15 +11,27 @@ namespace MediaDeck.Core.Tests.Models.Files.Sort;
 /// <summary>
 /// <see cref="IFileModel"/> のテスト用スタブ実装
 /// </summary>
-public class TestFileModel : IFileModel {
+public class TestFileModel : MediaFile, IFileModel {
+	[global::System.Diagnostics.CodeAnalysis.SetsRequiredMembers]
+	public TestFileModel() {
+		this.DirectoryPath = string.Empty;
+		this.FilePath = string.Empty;
+		this.Description = string.Empty;
+	}
+
 	public Observable<Unit> Changed { get; } = Observable.Empty<Unit>();
 	public MediaType MediaType {
 		get; set;
 	}
 	public long Id {
-		get; set;
+		get {
+			return this.MediaFileId;
+		}
+
+		set {
+			this.MediaFileId = value;
+		}
 	}
-	public string FilePath { get; set; } = string.Empty;
 	public string? ThumbnailFilePath {
 		get; set;
 	}
@@ -32,27 +45,68 @@ public class TestFileModel : IFileModel {
 	public ComparableSize? Resolution {
 		get; set;
 	}
-	public int Rate {
-		get; set;
+	public new int Rate {
+		get {
+			return base.Rate;
+		}
+
+		set {
+			base.Rate = value;
+		}
 	}
-	public int UsageCount {
-		get; set;
+	public new int UsageCount {
+		get {
+			return base.UsageCount;
+		}
+
+		set {
+			base.UsageCount = value;
+		}
 	}
-	public string Description { get; set; } = string.Empty;
-	public DateTime CreationTime {
-		get; set;
+	public new DateTime CreationTime {
+		get {
+			return base.CreationTime;
+		}
+
+		set {
+			base.CreationTime = value;
+		}
 	}
-	public DateTime ModifiedTime {
-		get; set;
+	public new DateTime ModifiedTime {
+		get {
+			return base.ModifiedTime;
+		}
+
+		set {
+			base.ModifiedTime = value;
+		}
 	}
-	public DateTime LastAccessTime {
-		get; set;
+	public new DateTime LastAccessTime {
+		get {
+			return base.LastAccessTime;
+		}
+
+		set {
+			base.LastAccessTime = value;
+		}
 	}
-	public DateTime RegisteredTime {
-		get; set;
+	public new DateTime RegisteredTime {
+		get {
+			return base.RegisteredTime;
+		}
+
+		set {
+			base.RegisteredTime = value;
+		}
 	}
-	public long FileSize {
-		get; set;
+	public new long FileSize {
+		get {
+			return base.FileSize;
+		}
+
+		set {
+			base.FileSize = value;
+		}
 	}
 	public Attributes<string> Properties { get; } = new();
 

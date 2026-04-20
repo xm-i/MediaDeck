@@ -1,6 +1,5 @@
 using System.Linq.Expressions;
 
-using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Database.Tables;
 
 using R3.JsonConfig.Attributes;
@@ -14,10 +13,6 @@ public interface ISearchCondition {
 	}
 
 	public Expression<Func<MediaFile, bool>>? WherePredicate {
-		get;
-	}
-
-	public Func<IFileModel, bool>? Filter {
 		get;
 	}
 

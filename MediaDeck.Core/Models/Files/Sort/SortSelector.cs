@@ -2,9 +2,9 @@ using System.ComponentModel;
 
 using MediaDeck.Common.Base;
 using MediaDeck.Common.Extensions;
-using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Composition.Stores.State.Model.Objects;
+using MediaDeck.Database.Tables;
 
 namespace MediaDeck.Core.Models.Files.Sort;
 
@@ -70,27 +70,27 @@ public class SortSelector : ModelBase {
 	}
 
 	/// <summary>
-	/// ソート条件適用
+	/// IQueryable用ソート条件適用
 	/// </summary>
-	/// <param name="array">ソート対象の配列</param>
-	/// <returns>ソート済み配列</returns>
-	public IEnumerable<IFileModel> SetSortConditions(IEnumerable<IFileModel> array) {
+	/// <param name="query">ソート対象のクエリ</param>
+	/// <returns>ソート適用後クエリ</returns>
+	public IQueryable<MediaFile> SetSortConditions(IQueryable<MediaFile> query) {
 		var reverse = this.Direction.Value == ListSortDirection.Descending;
 		if (this.CurrentSortCondition.Value is not { } cond) {
-			return array;
+			return query;
 		}
 		if (cond.SortItemObjects.Count == 0) {
 			throw new InvalidOperationException();
 		}
-		IOrderedEnumerable<IFileModel>? sortedItems = null;
+		IOrderedQueryable<MediaFile>? sortedQuery = null;
 		foreach (var si in cond.SortItemObjects.Select(SortItemFactory.Create)) {
-			if (sortedItems == null) {
-				sortedItems = si.ApplySort(array, reverse);
+			if (sortedQuery == null) {
+				sortedQuery = si.ApplySort(query, reverse);
 				continue;
 			}
 
-			sortedItems = si.ApplyThenBySort(sortedItems, reverse);
+			sortedQuery = si.ApplyThenBySort(sortedQuery, reverse);
 		}
-		return sortedItems!;
+		return sortedQuery!;
 	}
 }

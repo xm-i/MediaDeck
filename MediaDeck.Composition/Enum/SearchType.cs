@@ -55,19 +55,48 @@ public static class SearchTypeConverters {
 	/// <param name="searchType">検索タイプ</param>
 	/// <returns>比較用メソッド</returns>
 	public static Func<T, T, bool> SearchTypeToFunc<T>(SearchTypeComparison searchType) {
-		var op = new Dictionary<SearchTypeComparison, Func<Expression, Expression, BinaryExpression>> {
-				{ SearchTypeComparison.GreaterThan, Expression.GreaterThan },
-				{ SearchTypeComparison.GreaterThanOrEqual, Expression.GreaterThanOrEqual },
-				{ SearchTypeComparison.Equal, Expression.Equal },
-				{ SearchTypeComparison.LessThanOrEqual, Expression.LessThanOrEqual },
-				{ SearchTypeComparison.LessThan, Expression.LessThan }
-			}.First(x => x.Key == searchType)
-			.Value;
+		var op = GetBinaryExpressionFactory(searchType);
 
 		var p1 = Expression.Parameter(typeof(T));
 		var p2 = Expression.Parameter(typeof(T));
 		var func = Expression.Lambda<Func<T, T, bool>>(op(p1, p2), p1, p2);
 
 		return func.Compile();
+	}
+
+	/// <summary>
+	/// 検索タイプに対応するBinaryExpression生成関数を返却する。
+	/// </summary>
+	/// <param name="searchType">検索タイプ</param>
+	/// <returns>BinaryExpression生成関数</returns>
+	public static Func<Expression, Expression, BinaryExpression> GetBinaryExpressionFactory(SearchTypeComparison searchType) {
+		return searchType switch {
+			SearchTypeComparison.GreaterThan => Expression.GreaterThan,
+			SearchTypeComparison.GreaterThanOrEqual => Expression.GreaterThanOrEqual,
+			SearchTypeComparison.Equal => Expression.Equal,
+			SearchTypeComparison.LessThanOrEqual => Expression.LessThanOrEqual,
+			SearchTypeComparison.LessThan => Expression.LessThan,
+			_ => throw new ArgumentOutOfRangeException(nameof(searchType))
+		};
+	}
+
+	/// <summary>
+	/// 検索タイプに対応する比較Expression（MediaFileのプロパティと定数値の比較）を生成する。
+	/// </summary>
+	/// <typeparam name="T">比較する値の型</typeparam>
+	/// <param name="searchType">検索タイプ</param>
+	/// <param name="propertySelector">MediaFileのプロパティセレクター</param>
+	/// <param name="value">比較する定数値</param>
+	/// <returns>Expression&lt;Func&lt;MediaFile, bool&gt;&gt;</returns>
+	public static Expression<Func<TEntity, bool>> BuildComparisonExpression<TEntity, T>(
+		SearchTypeComparison searchType,
+		Expression<Func<TEntity, T>> propertySelector,
+		T value) {
+		var op = GetBinaryExpressionFactory(searchType);
+		var param = propertySelector.Parameters[0];
+		var left = propertySelector.Body;
+		var right = Expression.Constant(value, typeof(T));
+		var body = op(left, right);
+		return Expression.Lambda<Func<TEntity, bool>>(body, param);
 	}
 }

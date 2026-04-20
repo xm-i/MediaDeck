@@ -37,8 +37,8 @@ public class ExtensionConfigViewModel : ViewModelBase {
 	} = new();
 
 	public ExtensionConfigViewModel(ExtensionObjectModel extensionConfigModel, ScanConfigModel scanConfig) {
-		this.Extension = extensionConfigModel.Extension.ToTwoWayBindableReactiveProperty(string.Empty,this.CompositeDisposable).AddTo(this.CompositeDisposable);
-		this.MediaType = extensionConfigModel.MediaType.ToTwoWayBindableReactiveProperty(Composition.Enum.MediaType.Image,this.CompositeDisposable).AddTo(this.CompositeDisposable);
+		this.Extension = extensionConfigModel.Extension.ToTwoWayBindableReactiveProperty(string.Empty, this.CompositeDisposable).AddTo(this.CompositeDisposable);
+		this.MediaType = extensionConfigModel.MediaType.ToTwoWayBindableReactiveProperty(Composition.Enum.MediaType.Image, this.CompositeDisposable).AddTo(this.CompositeDisposable);
 
 		this.RemoveCommand.Subscribe(_ => {
 			scanConfig.RemoveTargetExtension(extensionConfigModel);

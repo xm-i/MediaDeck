@@ -2,7 +2,6 @@ using System.Linq.Expressions;
 
 using MediaDeck.Common.Utilities;
 using MediaDeck.Composition.Interfaces.Files;
-using MediaDeck.Composition.Interfaces.FileTypes.Models;
 using MediaDeck.Core.Models.Maps;
 using MediaDeck.Database.Tables;
 
@@ -60,10 +59,6 @@ public class AddressSearchCondition : ISearchCondition {
 				visitor.Parameters);
 		}
 	}
-
-	public Func<IFileModel, bool>? Filter {
-		get;
-	} = null;
 
 	public bool IsMatchForSuggest(string searchWord) {
 		return this.Address.Name?.Contains(searchWord) ?? false;

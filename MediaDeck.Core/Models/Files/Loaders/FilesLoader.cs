@@ -16,31 +16,70 @@ public class FilesLoader(IDbContextFactory<MediaDeckDbContext> dbFactory, SortSe
 	protected SortSelector SortSelector = sortSelector;
 	private readonly IFileTypeService _fileTypeService = fileTypeService;
 
+	/// <summary>
+	/// 全件取得（従来互換）
+	/// </summary>
 	public async Task<IEnumerable<IFileModel>> Load(IEnumerable<ISearchCondition> searchConditions, CancellationToken cancellationToken = default) {
 		await using var db = await dbFactory.CreateDbContextAsync(cancellationToken);
-		IQueryable<MediaFile> query = db
-				.MediaFiles
-				.AsNoTracking()
-				.Where(searchConditions)
-				.Include(mf => mf.MediaFileTags)
-				.ThenInclude(mft => mft.Tag)
-				.ThenInclude(t => t.TagCategory)
-				.Include(mf => mf.MediaFileTags)
-				.ThenInclude(mft => mft.Tag)
-				.ThenInclude(t => t.TagAliases)
-				.Include(mf => mf.Position);
-
-
-		query = this._fileTypeService.IncludeTables(query);
+		var query = this.BuildQuery(db, searchConditions);
 
 		var files =
 			(await query
 				.AsSplitQuery()
 				.ToArrayAsync(cancellationToken))
-			.Select(this._fileTypeService.CreateFileModelFromRecord)
+			.Select(this._fileTypeService.CreateFileModelFromRecord);
+
+		return files;
+	}
+
+	/// <summary>
+	/// ページネーション対応取得
+	/// </summary>
+	/// <param name="searchConditions">検索条件</param>
+	/// <param name="skip">スキップ件数</param>
+	/// <param name="take">取得件数</param>
+	/// <param name="cancellationToken">キャンセルトークン</param>
+	/// <returns>ページネーション結果（アイテムと総件数）</returns>
+	public async Task<(IEnumerable<IFileModel> Items, int TotalCount)> LoadPaged(IEnumerable<ISearchCondition> searchConditions, int skip, int take, CancellationToken cancellationToken = default) {
+		await using var db = await dbFactory.CreateDbContextAsync(cancellationToken);
+		var query = this.BuildQuery(db, searchConditions);
+
+		var totalCount = await query.CountAsync(cancellationToken);
+
+		var files =
+			(await query
+				.Skip(skip)
+				.Take(take)
+				.AsSplitQuery()
+				.ToArrayAsync(cancellationToken))
+			.Select(this._fileTypeService.CreateFileModelFromRecord);
+
+		return (files, totalCount);
+	}
+
+	/// <summary>
+	/// 検索・フィルター・ソートを適用した IQueryable パイプラインを構築する
+	/// </summary>
+	private IQueryable<MediaFile> BuildQuery(MediaDeckDbContext db, IEnumerable<ISearchCondition> searchConditions) {
+		IQueryable<MediaFile> query = db
+			.MediaFiles
+			.AsNoTracking()
 			.Where(searchConditions)
 			.Where(this.FilterSetter);
 
-		return this.SortSelector.SetSortConditions(files);
+		query = this.SortSelector.SetSortConditions(query);
+
+		query = query
+			.Include(mf => mf.MediaFileTags)
+			.ThenInclude(mft => mft.Tag)
+			.ThenInclude(t => t.TagCategory)
+			.Include(mf => mf.MediaFileTags)
+			.ThenInclude(mft => mft.Tag)
+			.ThenInclude(t => t.TagAliases)
+			.Include(mf => mf.Position);
+
+		query = this._fileTypeService.IncludeTables(query);
+
+		return query;
 	}
 }
