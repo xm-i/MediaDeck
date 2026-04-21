@@ -37,10 +37,7 @@ public class ViewerSelectorViewModel : ViewModelBase {
 			})
 			.AddTo(this.CompositeDisposable);
 
-		this.RefreshCommand.ObserveOn(TimeProvider.System).SubscribeAwait(async (_, ct) =>
-					await this.MediaContentLibraryViewModel.ReloadAsync().ConfigureAwait(false),
-				AwaitOperation.Drop, false)
-			.AddTo(this.CompositeDisposable);
+		this.RefreshCommand.Subscribe(x => this.MediaContentLibraryViewModel.Reload()).AddTo(this.CompositeDisposable);
 	}
 
 	public MediaContentLibraryViewModel MediaContentLibraryViewModel {

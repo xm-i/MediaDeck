@@ -67,7 +67,8 @@ public class MediaContentLibraryViewModel : ViewModelBase {
 		});
 	}
 
-	public async Task ReloadAsync() {
-		await this._mediaContentLibrary.SearchAsync();
+	/// <summary>手動リロードを実行する（Dispatcher 経由で検索を発火する）。</summary>
+	public void Reload() {
+		this.SearchConditionNotificationDispatcher.ReloadRequested.OnNext(Unit.Default);
 	}
 }

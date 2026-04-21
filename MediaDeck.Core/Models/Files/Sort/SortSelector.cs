@@ -4,6 +4,7 @@ using MediaDeck.Common.Base;
 using MediaDeck.Common.Extensions;
 using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Composition.Stores.State.Model.Objects;
+using MediaDeck.Core.Models.NotificationDispatcher;
 using MediaDeck.Database.Tables;
 
 namespace MediaDeck.Core.Models.Files.Sort;
@@ -13,24 +14,28 @@ public class SortSelector : ModelBase {
 	/// <summary>
 	/// コンストラクタ
 	/// </summary>
-	public SortSelector(TabStateModel tabState, SearchDefinitionsStateModel searchDefinitions) {
+	public SortSelector(TabStateModel tabState, SearchDefinitionsStateModel searchDefinitions, SearchConditionNotificationDispatcher dispatcher) {
 		// 設定値初回値読み込み
 		this.SortConditions = searchDefinitions.SortConditions;
 		this.CurrentSortCondition = tabState.SearchState.CurrentSortCondition.ToTwoWayReactiveProperty(x => this.SortConditions.FirstOrDefault(sc => sc.Id == x), x => x?.Id, null, this.CompositeDisposable);
 		this.Direction = tabState.SearchState.SortDirection;
 
-		// 更新
+		// ソート条件変更を内部 Subject に通知しつつ、Dispatcher 経由で検索発火を依頼する
 		this.CurrentSortCondition.Select(_ => Unit.Default)
 			.Merge(this.Direction.Select(_ => Unit.Default))
 			.Subscribe(_ => {
 				this._onUpdateSortConditionChanged.OnNext(Unit.Default);
+				dispatcher.SortChanged.OnNext(Unit.Default);
 			})
 			.AddTo(this.CompositeDisposable);
 
 		IDisposable? before = null;
 		this.CurrentSortCondition.Subscribe(x => {
 			before?.Dispose();
-			before = x?.SortItemObjects.ObserveChanged().Subscribe(_ => this._onUpdateSortConditionChanged.OnNext(Unit.Default));
+			before = x?.SortItemObjects.ObserveChanged().Subscribe(_ => {
+				this._onUpdateSortConditionChanged.OnNext(Unit.Default);
+				dispatcher.SortChanged.OnNext(Unit.Default);
+			});
 		}).AddTo(this.CompositeDisposable);
 	}
 

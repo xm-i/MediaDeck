@@ -58,10 +58,12 @@ public class TabContext : ViewModelBase {
 		this.DetailSelectorViewModel = sp.GetRequiredService<DetailSelectorViewModel>();
 		this.RepositorySelectorViewModel = sp.GetRequiredService<RepositorySelectorViewModel>();
 
-
 		this.ViewerSelectorViewModel.MediaContentLibraryViewModel.SelectedFiles.Subscribe(x => {
 			this.DetailSelectorViewModel.TargetFiles.Value = x.Select(v => v.FileModel).ToArray();
 		}).AddTo(this.CompositeDisposable);
+
+		// 初回ロード
+		this.ViewerSelectorViewModel.MediaContentLibraryViewModel.Reload();
 	}
 
 	protected override void Dispose(bool disposing) {

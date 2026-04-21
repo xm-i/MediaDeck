@@ -343,7 +343,8 @@ public class FileTypeServiceTest {
 		}
 
 		/// <summary>テスト用スタブのため何もしない。</summary>
-		public void Dispose() { }
+		public void Dispose() {
+		}
 	}
 
 	private sealed class TestFileViewModel : IFileViewModel {

@@ -75,7 +75,7 @@ public class SortManagerTests {
 		this._tabState.SearchState.CurrentSortCondition.Value = sortObject.Id;
 		this._tabState.SearchState.SortDirection.Value = System.ComponentModel.ListSortDirection.Ascending;
 
-		var selector = new SortSelector(this._tabState, this._searchDefinitions);
+		var selector = new SortSelector(this._tabState, this._searchDefinitions, new SearchConditionNotificationDispatcher());
 		var unsortedList = new[]
 		{
 			new TestFileModel { FilePath = "FileC.txt" },

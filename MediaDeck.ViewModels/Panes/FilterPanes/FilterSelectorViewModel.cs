@@ -1,5 +1,4 @@
 using MediaDeck.Common.Base;
-using MediaDeck.Core.Models.Files;
 using MediaDeck.Core.Models.Files.Filter;
 using MediaDeck.Core.Stores.State;
 
@@ -13,14 +12,13 @@ public class FilterSelectorViewModel : ViewModelBase {
 	/// <summary>
 	/// コンストラクタ
 	/// </summary>
-	public FilterSelectorViewModel(FilterSelector model, IStateStore stateStore, MediaContentLibrary mediaContentLibrary) {
+	public FilterSelectorViewModel(FilterSelector model, IStateStore stateStore) {
 		this._stateStore = stateStore;
 		this.FilteringConditions = model.FilteringConditions.CreateView(x => new FilteringConditionViewModel(x)).ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
 		this.CurrentCondition = model.CurrentFilteringCondition.Select(x => this.FilteringConditions.FirstOrDefault(c => c.Model == x)).ToBindableReactiveProperty();
-		this.ChangeFilteringConditionSelectionCommand.ObserveOn(TimeProvider.System).SubscribeAwait(async (x, ct) => {
+		this.ChangeFilteringConditionSelectionCommand.Subscribe(x => {
 			model.CurrentFilteringCondition.Value = x?.Model;
-			await mediaContentLibrary.SearchAsync().ConfigureAwait(false);
-		}, AwaitOperation.Drop, false).AddTo(this.CompositeDisposable);
+		}).AddTo(this.CompositeDisposable);
 	}
 
 	private readonly IStateStore _stateStore;

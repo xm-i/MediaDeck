@@ -3,6 +3,7 @@ using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Composition.Stores.State.Model.Objects;
 using MediaDeck.Core.Models.Files.Sort;
+using MediaDeck.Core.Models.NotificationDispatcher;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MediaDeck.Core.Tests.Models.Files.Sort;
@@ -36,7 +37,7 @@ public class SortSelectorTests {
 	[Fact]
 	public void SetSortConditions_ReturnsOriginalArray_WhenCurrentSortConditionIsNull() {
 		// Arrange
-		var selector = new SortSelector(this._tabState, this._searchDefinitions);
+		var selector = new SortSelector(this._tabState, this._searchDefinitions, new SearchConditionNotificationDispatcher());
 		var files = new[] { new TestFileModel { Id = 1 }, new TestFileModel { Id = 2 } };
 
 		// Act
@@ -55,7 +56,7 @@ public class SortSelectorTests {
 		var sortObject = this._searchDefinitions.AddSortCondition();
 		this._tabState.SearchState.CurrentSortCondition.Value = sortObject.Id;
 
-		var selector = new SortSelector(this._tabState, this._searchDefinitions);
+		var selector = new SortSelector(this._tabState, this._searchDefinitions, new SearchConditionNotificationDispatcher());
 		var files = new[] { new TestFileModel { Id = 1 } };
 
 		// Act & Assert
@@ -76,7 +77,7 @@ public class SortSelectorTests {
 		this._tabState.SearchState.CurrentSortCondition.Value = sortObject.Id;
 		this._tabState.SearchState.SortDirection.Value = ListSortDirection.Ascending;
 
-		var selector = new SortSelector(this._tabState, this._searchDefinitions);
+		var selector = new SortSelector(this._tabState, this._searchDefinitions, new SearchConditionNotificationDispatcher());
 		var files = new[]
 		{
 			new TestFileModel { FilePath = "B" },
@@ -107,7 +108,7 @@ public class SortSelectorTests {
 		this._tabState.SearchState.CurrentSortCondition.Value = sortObject.Id;
 		this._tabState.SearchState.SortDirection.Value = ListSortDirection.Descending; // Overall reverse is Desc
 
-		var selector = new SortSelector(this._tabState, this._searchDefinitions);
+		var selector = new SortSelector(this._tabState, this._searchDefinitions, new SearchConditionNotificationDispatcher());
 		var files = new[]
 		{
 			new TestFileModel { FilePath = "B" },
@@ -143,7 +144,7 @@ public class SortSelectorTests {
 		this._tabState.SearchState.CurrentSortCondition.Value = sortObject.Id;
 		this._tabState.SearchState.SortDirection.Value = ListSortDirection.Ascending;
 
-		var selector = new SortSelector(this._tabState, this._searchDefinitions);
+		var selector = new SortSelector(this._tabState, this._searchDefinitions, new SearchConditionNotificationDispatcher());
 		var files = new[]
 		{
 			new TestFileModel { Rate = 5, FilePath = "B" },

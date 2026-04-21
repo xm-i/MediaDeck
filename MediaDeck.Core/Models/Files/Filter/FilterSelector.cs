@@ -1,5 +1,6 @@
 using MediaDeck.Common.Base;
 using MediaDeck.Composition.Stores.State.Model;
+using MediaDeck.Core.Models.NotificationDispatcher;
 using MediaDeck.Database.Tables;
 
 namespace MediaDeck.Core.Models.Files.Filter;
@@ -12,7 +13,7 @@ public class FilterSelector : ModelBase {
 	/// <summary>
 	/// コンストラクタ
 	/// </summary>
-	public FilterSelector(TabStateModel tabState, SearchDefinitionsStateModel searchDefinitions) {
+	public FilterSelector(TabStateModel tabState, SearchDefinitionsStateModel searchDefinitions, SearchConditionNotificationDispatcher dispatcher) {
 		this.FilteringConditions.AddRange(searchDefinitions.FilteringConditions.Select(x => new FilteringCondition(x)));
 
 		this.CurrentFilteringCondition.Value = this.FilteringConditions.FirstOrDefault(x => x.FilterObject.Id == tabState.SearchState.CurrentFilteringCondition.Value);
@@ -20,11 +21,15 @@ public class FilterSelector : ModelBase {
 		IDisposable? beforeCurrent = null;
 		this.CurrentFilteringCondition
 			.Subscribe(x => {
+				// フィルター条件変更を内部 Subject に通知し、Dispatcher 経由で検索発火を依頼する
 				this._onUpdateFilteringChanged.OnNext(Unit.Default);
+				dispatcher.FilterChanged.OnNext(Unit.Default);
 				beforeCurrent?.Dispose();
 				beforeCurrent = x?.OnUpdateFilteringConditions
-					.Subscribe(_ =>
-						this._onUpdateFilteringChanged.OnNext(Unit.Default));
+					.Subscribe(_ => {
+						this._onUpdateFilteringChanged.OnNext(Unit.Default);
+						dispatcher.FilterChanged.OnNext(Unit.Default);
+					});
 				tabState.SearchState.CurrentFilteringCondition.Value = x?.FilterObject.Id;
 			})
 			.AddTo(this.CompositeDisposable);

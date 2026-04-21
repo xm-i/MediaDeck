@@ -18,6 +18,20 @@ public static class R3Ex {
 		return bindable;
 	}
 
+	public static BindableReactiveProperty<TResult> ToTwoWayBindableReactiveProperty<TProperty, TResult>(this ReactiveProperty<TProperty> source, Func<TProperty, TResult> convert, Func<TResult, TProperty> convertBack, TResult initialValue = default!, CompositeDisposable? disposables = null) {
+		var resultRp = new BindableReactiveProperty<TResult>(initialValue);
+		var d1 = source.Subscribe(x => {
+			resultRp.Value = convert(x);
+		});
+		var d2 = resultRp.Subscribe(x => {
+			source.Value = convertBack(x);
+		});
+		if (disposables != null) {
+			d1.AddTo(disposables);
+			d2.AddTo(disposables);
+		}
+		return resultRp;
+	}
 	public static ReactiveProperty<TResult> ToTwoWayReactiveProperty<TProperty, TResult>(this ReactiveProperty<TProperty> source, Func<TProperty, TResult> convert, Func<TResult, TProperty> convertBack, TResult initialValue = default!, CompositeDisposable? disposables = null) {
 		var resultRp = new ReactiveProperty<TResult>(initialValue);
 		var d1 = source.Subscribe(x => {

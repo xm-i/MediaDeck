@@ -100,7 +100,7 @@ public class ViewerPaneBase : UserControlBase<ViewerSelectorViewModel> {
 				var result = await dialog.ShowAsync();
 				if (result == ContentDialogResult.Primary) {
 					await this.ViewModel.SelectedViewerPane.Value.RemoveFilesAsync(targetFiles);
-					await this.ViewModel.MediaContentLibraryViewModel.ReloadAsync();
+					this.ViewModel.MediaContentLibraryViewModel.Reload();
 				}
 				break;
 			case "OpenFolder":
