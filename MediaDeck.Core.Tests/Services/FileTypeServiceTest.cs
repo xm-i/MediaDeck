@@ -341,6 +341,9 @@ public class FileTypeServiceTest {
 		public Task ExecuteFileAsync() {
 			return Task.CompletedTask;
 		}
+
+		/// <summary>テスト用スタブのため何もしない。</summary>
+		public void Dispose() { }
 	}
 
 	private sealed class TestFileViewModel : IFileViewModel {
