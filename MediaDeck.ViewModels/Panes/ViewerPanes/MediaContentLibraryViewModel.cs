@@ -53,7 +53,7 @@ public class MediaContentLibraryViewModel : ViewModelBase {
 		get;
 	} = new();
 
-	public BindableReactiveProperty<long> SearchElapsedMilliseconds {
+	public BindableReactiveProperty<long?> SearchElapsedMilliseconds {
 		get;
 	}
 

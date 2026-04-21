@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Interfaces.FileTypes;
 using MediaDeck.Composition.Interfaces.FileTypes.Models;
@@ -17,44 +18,19 @@ public class FilesLoader(IDbContextFactory<MediaDeckDbContext> dbFactory, SortSe
 	private readonly IFileTypeService _fileTypeService = fileTypeService;
 
 	/// <summary>
-	/// 全件取得（従来互換）
-	/// </summary>
-	public async Task<IEnumerable<IFileModel>> Load(IEnumerable<ISearchCondition> searchConditions, CancellationToken cancellationToken = default) {
-		await using var db = await dbFactory.CreateDbContextAsync(cancellationToken);
-		var query = this.BuildQuery(db, searchConditions);
-
-		var files =
-			(await query
-				.AsSplitQuery()
-				.ToArrayAsync(cancellationToken))
-			.Select(this._fileTypeService.CreateFileModelFromRecord);
-
-		return files;
-	}
-
-	/// <summary>
-	/// ページネーション対応取得
+	/// 検索条件に基づき、IAsyncEnumerable でストリーミング形式でファイルを取得します。
+	/// 列挙中のみ DbContext が維持されます。
 	/// </summary>
 	/// <param name="searchConditions">検索条件</param>
-	/// <param name="skip">スキップ件数</param>
-	/// <param name="take">取得件数</param>
 	/// <param name="cancellationToken">キャンセルトークン</param>
-	/// <returns>ページネーション結果（アイテムと総件数）</returns>
-	public async Task<(IEnumerable<IFileModel> Items, int TotalCount)> LoadPaged(IEnumerable<ISearchCondition> searchConditions, int skip, int take, CancellationToken cancellationToken = default) {
+	/// <returns>IFileModelのストリーム</returns>
+	public async IAsyncEnumerable<IFileModel> GetFilesStreamAsync(IEnumerable<ISearchCondition> searchConditions, [EnumeratorCancellation] CancellationToken cancellationToken = default) {
 		await using var db = await dbFactory.CreateDbContextAsync(cancellationToken);
 		var query = this.BuildQuery(db, searchConditions);
 
-		var totalCount = await query.CountAsync(cancellationToken);
-
-		var files =
-			(await query
-				.Skip(skip)
-				.Take(take)
-				.AsSplitQuery()
-				.ToArrayAsync(cancellationToken))
-			.Select(this._fileTypeService.CreateFileModelFromRecord);
-
-		return (files, totalCount);
+		await foreach (var item in query.AsAsyncEnumerable().WithCancellation(cancellationToken)) {
+			yield return this._fileTypeService.CreateFileModelFromRecord(item);
+		}
 	}
 
 	/// <summary>

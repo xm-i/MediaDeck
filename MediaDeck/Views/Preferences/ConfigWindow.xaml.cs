@@ -26,6 +26,9 @@ public sealed partial class ConfigWindow {
 				case ExecutionConfigPageViewModel:
 					view = typeof(ExecutionConfigPage);
 					break;
+				case SearchConfigPageViewModel:
+					view = typeof(SearchConfigPage);
+					break;
 				default:
 					return;
 			}

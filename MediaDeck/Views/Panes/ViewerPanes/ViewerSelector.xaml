@@ -78,6 +78,8 @@
 			<TextBlock>
 				<Run Text="Count: " />
 				<Run Text="{x:Bind ViewModel.MediaContentLibraryViewModel.Files.Count,Mode=OneWay}" />
+			</TextBlock>
+			<TextBlock Visibility="{x:Bind ViewModel.MediaContentLibraryViewModel.SearchElapsedMilliseconds.Value,Mode=OneWay, Converter={StaticResource NullToCollapseConverter}}">
 				<Run Text="  /  Search: " />
 				<Run Text="{x:Bind ViewModel.MediaContentLibraryViewModel.SearchElapsedMilliseconds.Value,Mode=OneWay}" />
 				<Run Text=" ms" />
