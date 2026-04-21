@@ -79,7 +79,7 @@ public class MediaContentLibrary : ModelBase {
 				totalLoaded++;
 
 				if (isInitial && batch.Count >= initialLoadCount) {
-					this.Files.Clear();
+					this.ClearFiles();
 					this.Files.AddRange(batch);
 					batch.Clear();
 					isInitial = false;
@@ -95,11 +95,11 @@ public class MediaContentLibrary : ModelBase {
 
 			if (batch.Count > 0) {
 				if (isInitial) {
-					this.Files.Clear();
+					this.ClearFiles();
 				}
 				this.Files.AddRange(batch);
 			} else if (isInitial && totalLoaded == 0) {
-				this.Files.Clear();
+				this.ClearFiles();
 			}
 
 			stopwatch.Stop();
@@ -107,5 +107,12 @@ public class MediaContentLibrary : ModelBase {
 		} catch (OperationCanceledException) when (cts.Token.IsCancellationRequested) {
 			// cancelled by a newer search
 		}
+	}
+
+	private void ClearFiles() {
+		foreach (var file in this.Files) {
+			file.Dispose();
+		}
+		this.Files.Clear();
 	}
 }
