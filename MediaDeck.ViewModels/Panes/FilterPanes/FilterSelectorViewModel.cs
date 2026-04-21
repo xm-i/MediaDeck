@@ -17,10 +17,10 @@ public class FilterSelectorViewModel : ViewModelBase {
 		this._stateStore = stateStore;
 		this.FilteringConditions = model.FilteringConditions.CreateView(x => new FilteringConditionViewModel(x)).ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
 		this.CurrentCondition = model.CurrentFilteringCondition.Select(x => this.FilteringConditions.FirstOrDefault(c => c.Model == x)).ToBindableReactiveProperty();
-		this.ChangeFilteringConditionSelectionCommand.Subscribe(async x => {
+		this.ChangeFilteringConditionSelectionCommand.ObserveOn(TimeProvider.System).SubscribeAwait(async (x, ct) => {
 			model.CurrentFilteringCondition.Value = x?.Model;
-			await mediaContentLibrary.SearchAsync();
-		}).AddTo(this.CompositeDisposable);
+			await mediaContentLibrary.SearchAsync().ConfigureAwait(false);
+		}, AwaitOperation.Drop, false).AddTo(this.CompositeDisposable);
 	}
 
 	private readonly IStateStore _stateStore;

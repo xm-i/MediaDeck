@@ -19,15 +19,15 @@ public class SortSelectorViewModel : ViewModelBase {
 		this._stateStore = stateStore;
 		this.SortConditions = model.SortConditions.CreateView(x => new SortConditionViewModel(x)).ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
 		this.CurrentCondition.Value = this.SortConditions.FirstOrDefault(c => c.Model == model.CurrentSortCondition.Value);
-		this.CurrentCondition.Subscribe(async x => {
+		this.CurrentCondition.ObserveOn(TimeProvider.System).SubscribeAwait(async (x, ct) => {
 			model.CurrentSortCondition.Value = x?.Model;
-			await mediaContentLibrary.SearchAsync();
-		}).AddTo(this.CompositeDisposable);
+			await mediaContentLibrary.SearchAsync().ConfigureAwait(false);
+		}, AwaitOperation.Drop, false).AddTo(this.CompositeDisposable);
 		this.Direction.Value = model.Direction.Value;
-		this.Direction.Subscribe(async x => {
+		this.Direction.ObserveOn(TimeProvider.System).SubscribeAwait(async (x, ct) => {
 			model.Direction.Value = x;
-			await mediaContentLibrary.SearchAsync();
-		}).AddTo(this.CompositeDisposable);
+			await mediaContentLibrary.SearchAsync().ConfigureAwait(false);
+		}, AwaitOperation.Drop, false).AddTo(this.CompositeDisposable);
 	}
 
 	private readonly IStateStore _stateStore;
