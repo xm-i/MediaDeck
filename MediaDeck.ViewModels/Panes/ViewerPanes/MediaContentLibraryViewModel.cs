@@ -51,7 +51,7 @@ public class MediaContentLibraryViewModel : ViewModelBase {
 
 	public BindableReactiveProperty<IFileViewModel[]> SelectedFiles {
 		get;
-	} = new();
+	} = new([]);
 
 	public BindableReactiveProperty<long?> SearchElapsedMilliseconds {
 		get;
