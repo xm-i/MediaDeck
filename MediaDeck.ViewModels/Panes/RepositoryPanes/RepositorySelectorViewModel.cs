@@ -6,12 +6,8 @@ namespace MediaDeck.ViewModels.Panes.RepositoryPanes;
 [Inject(InjectServiceLifetime.Scoped)]
 public class RepositorySelectorViewModel : ViewModelBase {
 	public RepositorySelectorViewModel(
-		RepositorySelector repositorySelector) {
-		this.RepositoryPaneViewModels = repositorySelector.Repositories.Select(x => x switch {
-			FolderRepository folderRepository => new FolderRepositoryViewModel(folderRepository),
-			_ => throw new NotImplementedException()
-		})
-			.ToArray();
+		RepositorySelector repositorySelector, FolderRepositoryViewModel folderRepositoryViewModel) {
+		this.RepositoryPaneViewModels = [folderRepositoryViewModel];
 		this.FolderRepositoryViewModel = (this.RepositoryPaneViewModels.First(vm => vm is FolderRepositoryViewModel) as FolderRepositoryViewModel)!;
 		this.SelectedRepositoryPane = repositorySelector.SelectedRepository.Select(x => this.RepositoryPaneViewModels.First(vm => vm.Model == x)).ToBindableReactiveProperty(null!);
 		this.LoadCommand.Subscribe(async _ => {
