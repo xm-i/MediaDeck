@@ -16,6 +16,7 @@
     <Configurations>Debug;Release;Debug-Unpackaged;Release-Unpackaged</Configurations>
     <Packaged>true</Packaged>
     <Packaged Condition="'$(Configuration)' == 'Debug-Unpackaged' Or '$(Configuration)' == 'Release-Unpackaged'">false</Packaged>
+    <DefineConstants Condition="'$(Configuration)' == 'Debug-Unpackaged'">$(DefineConstants);DEBUG</DefineConstants>
     <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
