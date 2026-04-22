@@ -10,6 +10,7 @@
 	xmlns:filterPanes="using:MediaDeck.Views.Panes.FilterPanes"
 	xmlns:detailPanes="using:MediaDeck.Views.Panes.DetailPanes"
 	xmlns:repositoryPanes="using:MediaDeck.Views.Panes.RepositoryPanes"
+	xmlns:viewmodels="using:MediaDeck.ViewModels"
 	mc:Ignorable="d"
 	Title="MediaDeck" >
 	<Grid Loaded="Window_Loaded" >
@@ -34,8 +35,8 @@
 			TabWidthMode="SizeToContent"
 			TabItemsSource="{x:Bind _viewModel.Tabs}">
 			<TabView.TabItemTemplate>
-				<DataTemplate>
-					<TabViewItem Header="{Binding DisplayName.Value}" >
+				<DataTemplate x:DataType="viewmodels:TabContext">
+					<TabViewItem Header="{x:Bind DisplayName.Value}" >
 						<Grid>
 							<Grid.ColumnDefinitions>
 								<ColumnDefinition Width="250" />
@@ -47,13 +48,13 @@
 								<RowDefinition Height="*" />
 							</Grid.RowDefinitions>
 							<repositoryPanes:RepositorySelector Grid.Column="0" Grid.Row="0"
-								DataContext="{Binding RepositorySelectorViewModel}" />
+								DataContext="{x:Bind RepositorySelectorViewModel}" />
 							<filterPanes:FilterSelector Grid.Column="0" Grid.Row="1"
-								DataContext="{Binding FilterSelectorViewModel}" />
+								DataContext="{x:Bind FilterSelectorViewModel}" />
 							<viewerPanes:ViewerSelector Grid.Column="1" Grid.Row="0" Grid.RowSpan="2"
-								DataContext="{Binding ViewerSelectorViewModel}" />
+								DataContext="{x:Bind ViewerSelectorViewModel}" />
 							<detailPanes:DetailSelector Grid.Column="2" Grid.Row="0" Grid.RowSpan="2"
-								DataContext="{Binding DetailSelectorViewModel}" />
+								DataContext="{x:Bind DetailSelectorViewModel}" />
 						</Grid>
 					</TabViewItem>
 				</DataTemplate>
