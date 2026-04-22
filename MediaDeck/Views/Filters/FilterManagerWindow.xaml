@@ -15,7 +15,7 @@
 		</Grid.RowDefinitions>
 
 		<local:FilterManagerView Grid.Row="0"
-			DataContext="{x:Bind ViewModel, Mode=OneWay}" />
+			ViewModel="{x:Bind ViewModel, Mode=OneWay}" />
 
 		<StackPanel Grid.Row="2"
 			Orientation="Horizontal"

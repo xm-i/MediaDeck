@@ -22,7 +22,7 @@
 		<!-- ナビゲーションメニュー（全タブ共通） -->
 		<local:NavigationMenu Grid.Row="0"
 			x:Name="NavigationMenuControl"
-			DataContext="{x:Bind _viewModel.NavigationMenuViewModel}"/>
+			ViewModel="{x:Bind _viewModel.NavigationMenuViewModel}"/>
 
 		<!-- TabView -->
 		<TabView Grid.Row="1"
@@ -48,13 +48,13 @@
 								<RowDefinition Height="*" />
 							</Grid.RowDefinitions>
 							<repositoryPanes:RepositorySelector Grid.Column="0" Grid.Row="0"
-								DataContext="{x:Bind RepositorySelectorViewModel}" />
+								ViewModel="{x:Bind RepositorySelectorViewModel, Mode=OneWay}" />
 							<filterPanes:FilterSelector Grid.Column="0" Grid.Row="1"
-								DataContext="{x:Bind FilterSelectorViewModel}" />
+								ViewModel="{x:Bind FilterSelectorViewModel, Mode=OneWay}" />
 							<viewerPanes:ViewerSelector Grid.Column="1" Grid.Row="0" Grid.RowSpan="2"
-								DataContext="{x:Bind ViewerSelectorViewModel}" />
+								ViewModel="{x:Bind ViewerSelectorViewModel, Mode=OneWay}" />
 							<detailPanes:DetailSelector Grid.Column="2" Grid.Row="0" Grid.RowSpan="2"
-								DataContext="{x:Bind DetailSelectorViewModel}" />
+								ViewModel="{x:Bind DetailSelectorViewModel, Mode=OneWay}" />
 						</Grid>
 					</TabViewItem>
 				</DataTemplate>

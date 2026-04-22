@@ -7,6 +7,6 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	mc:Ignorable="d"
 	Title="FolderManager" >
-	<local:FolderManagerView DataContext="{x:Bind ViewModel}"
+	<local:FolderManagerView ViewModel="{x:Bind ViewModel}"
 		ParentWindow="{x:Bind }" />
 </Window>

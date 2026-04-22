@@ -46,7 +46,7 @@
 		<!-- Content -->
 		<Border Grid.Row="1"
 			Background="{ThemeResource LayerFillColorDefaultBrush}" >
-			<local:FolderRepository DataContext="{x:Bind ViewModel}"
+			<local:FolderRepository ViewModel="{x:Bind ViewModel}"
 				Padding="8" />
 		</Border>
 	</Grid>
