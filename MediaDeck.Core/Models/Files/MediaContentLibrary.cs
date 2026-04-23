@@ -83,7 +83,7 @@ public class MediaContentLibrary : ModelBase {
 			var isInitial = true;
 
 			await foreach (var fileModel in stream.WithCancellation(token)) {
-				batch.Add(fileModel);
+				batch.Add(fileModel.AddTo(this.CompositeDisposable));
 				totalLoaded++;
 
 				if (isInitial && batch.Count >= initialLoadCount) {

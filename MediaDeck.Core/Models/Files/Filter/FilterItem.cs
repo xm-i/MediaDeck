@@ -1,6 +1,5 @@
 using System.Linq.Expressions;
 
-using MediaDeck.Common.Base;
 using MediaDeck.Database.Tables;
 
 namespace MediaDeck.Core.Models.Files.Filter;
@@ -15,7 +14,7 @@ namespace MediaDeck.Core.Models.Files.Filter;
 /// コンストラクタ
 /// </remarks>
 /// <param name="condition">フィルタリング条件（SQL翻訳可能なExpression）</param>
-public class FilterItem(Expression<Func<MediaFile, bool>> condition) : ModelBase {
+public class FilterItem(Expression<Func<MediaFile, bool>> condition) {
 	/// <summary>
 	/// フィルタリング条件
 	/// </summary>

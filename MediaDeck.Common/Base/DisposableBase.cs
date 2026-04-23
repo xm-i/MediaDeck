@@ -1,5 +1,4 @@
 using System.Collections.Concurrent;
-using System.Diagnostics;
 
 using CommunityToolkit.Mvvm.ComponentModel;
 
@@ -77,7 +76,7 @@ public class DisposableBase : ObservableObject, IDisposableBase {
 	/// <summary>
 	/// Dispose
 	/// </summary>
-	public void Dispose() {
+	public virtual void Dispose() {
 		this.Dispose(true);
 		GC.SuppressFinalize(this);
 	}
@@ -118,7 +117,7 @@ public class DisposableBase : ObservableObject, IDisposableBase {
 	~DisposableBase() {
 		this._trackingInfo.RecordFinalize();
 		if (this.DisposeState == DisposeState.NotDisposed) {
-//			Debug.WriteLine($"[DISPOSE LEAK] {this.GetType().FullName} がDisposeされずにGCされました。");
+			//			Debug.WriteLine($"[DISPOSE LEAK] {this.GetType().FullName} がDisposeされずにGCされました。");
 		}
 	}
 #endif

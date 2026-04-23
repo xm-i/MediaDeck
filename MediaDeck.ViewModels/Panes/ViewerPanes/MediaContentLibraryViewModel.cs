@@ -16,11 +16,11 @@ public class MediaContentLibraryViewModel : ViewModelBase {
 		this.SearchConditions =
 			mediaContentLibrary
 				.SearchConditions
-				.ToWritableNotifyCollectionChanged(x => new SearchConditionViewModel(x),
+				.ToWritableNotifyCollectionChanged(x => new SearchConditionViewModel(x).AddTo(this.CompositeDisposable),
 					(SearchConditionViewModel scvm, ISearchCondition sc, ref bool setValue) => scvm.SearchCondition,
 					SynchronizationContextCollectionEventDispatcher.Current);
 
-		this.SearchConditionCandidates = this._mediaContentLibrary.SearchConditionCandidates.CreateView(x => new SearchConditionViewModel(x));
+		this.SearchConditionCandidates = this._mediaContentLibrary.SearchConditionCandidates.CreateView(x => new SearchConditionViewModel(x).AddTo(this.CompositeDisposable));
 		this.FilteredSearchConditionCandidates = this.SearchConditionCandidates.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
 		this.SearchElapsedMilliseconds = mediaContentLibrary.SearchElapsedMilliseconds.ObserveOnCurrentSynchronizationContext().ToBindableReactiveProperty().AddTo(this.CompositeDisposable);
 

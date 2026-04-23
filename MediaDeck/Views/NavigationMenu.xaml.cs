@@ -62,7 +62,7 @@ public sealed partial class NavigationMenu {
 
 	private void MenuFlyoutItem_Click_1(object sender, RoutedEventArgs e) {
 		_ = 1 + 1;
-    }
+	}
 }
 
 

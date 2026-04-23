@@ -14,7 +14,7 @@ public class FilterSelectorViewModel : ViewModelBase {
 	/// </summary>
 	public FilterSelectorViewModel(FilterSelector model, IStateStore stateStore) {
 		this._stateStore = stateStore;
-		this.FilteringConditions = model.FilteringConditions.CreateView(x => new FilteringConditionViewModel(x)).ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
+		this.FilteringConditions = model.FilteringConditions.CreateView(x => new FilteringConditionViewModel(x).AddTo(this.CompositeDisposable)).ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
 		this.CurrentCondition = model.CurrentFilteringCondition.Select(x => this.FilteringConditions.FirstOrDefault(c => c.Model == x)).ToBindableReactiveProperty();
 		this.ChangeFilteringConditionSelectionCommand.Subscribe(x => {
 			model.CurrentFilteringCondition.Value = x?.Model;

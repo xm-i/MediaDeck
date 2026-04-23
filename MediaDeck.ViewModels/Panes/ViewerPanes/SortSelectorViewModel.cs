@@ -17,7 +17,7 @@ public class SortSelectorViewModel : ViewModelBase {
 	/// </summary>
 	public SortSelectorViewModel(SortSelector model, IStateStore stateStore) {
 		this._stateStore = stateStore;
-		this.SortConditions = model.SortConditions.CreateView(x => new SortConditionViewModel(x)).ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
+		this.SortConditions = model.SortConditions.CreateView(x => new SortConditionViewModel(x).AddTo(this.CompositeDisposable)).ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
 		this.CurrentCondition.Value = this.SortConditions.FirstOrDefault(c => c.Model == model.CurrentSortCondition.Value);
 		this.CurrentCondition = model.CurrentSortCondition.ToTwoWayBindableReactiveProperty(
 			x => this.SortConditions.FirstOrDefault(c => c.Model == x),

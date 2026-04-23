@@ -14,7 +14,7 @@ public class FilterSelector : ModelBase {
 	/// コンストラクタ
 	/// </summary>
 	public FilterSelector(TabStateModel tabState, SearchDefinitionsStateModel searchDefinitions, SearchConditionNotificationDispatcher dispatcher) {
-		this.FilteringConditions.AddRange(searchDefinitions.FilteringConditions.Select(x => new FilteringCondition(x)));
+		this.FilteringConditions.AddRange(searchDefinitions.FilteringConditions.Select(x => new FilteringCondition(x).AddTo(this.CompositeDisposable)));
 
 		this.CurrentFilteringCondition.Value = this.FilteringConditions.FirstOrDefault(x => x.FilterObject.Id == tabState.SearchState.CurrentFilteringCondition.Value);
 
@@ -37,7 +37,7 @@ public class FilterSelector : ModelBase {
 		searchDefinitions.FilteringConditions.ObserveChanged()
 			.Subscribe(x => {
 				this.FilteringConditions.Clear();
-				this.FilteringConditions.AddRange(searchDefinitions.FilteringConditions.Select(x => new FilteringCondition(x)));
+				this.FilteringConditions.AddRange(searchDefinitions.FilteringConditions.Select(x => new FilteringCondition(x).AddTo(this.CompositeDisposable)));
 				this.CurrentFilteringCondition.Value = this.FilteringConditions.FirstOrDefault(x => x.DisplayName == this.CurrentFilteringCondition.Value?.DisplayName);
 			})
 			.AddTo(this.CompositeDisposable);

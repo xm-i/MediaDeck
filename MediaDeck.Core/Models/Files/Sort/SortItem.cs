@@ -1,7 +1,6 @@
 using System.ComponentModel;
 using System.Linq.Expressions;
 
-using MediaDeck.Common.Base;
 using MediaDeck.Composition.Enum;
 using MediaDeck.Database.Tables;
 
@@ -10,29 +9,21 @@ namespace MediaDeck.Core.Models.Files.Sort;
 /// <summary>
 /// ソート条件
 /// </summary>
-public class SortItem : ModelBase, ISortItem {
+public class SortItem : ISortItem {
 	/// <summary>
 	/// 保存時のキー値
 	/// </summary>
 	public SortItemKey Key {
-		get {
-			return this.GetValue<SortItemKey>();
-		}
-		set {
-			this.SetValue(value);
-		}
+		get;
+		set;
 	}
 
 	/// <summary>
 	/// ソートの方向
 	/// </summary>
 	public ListSortDirection Direction {
-		get {
-			return this.GetValue<ListSortDirection>();
-		}
-		set {
-			this.SetValue(value);
-		}
+		get;
+		set;
 	}
 
 	/// <summary>
