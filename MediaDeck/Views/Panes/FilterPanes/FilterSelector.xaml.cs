@@ -11,6 +11,9 @@ namespace MediaDeck.Views.Panes.FilterPanes;
 public sealed partial class FilterSelector {
 	public FilterSelector() {
 		this.InitializeComponent();
+		this.Loaded += (_, _) => {
+			this.Bindings.Update();
+		};
 	}
 
 	private void OpenFilterSettingsWindowButton_Click(object sender, RoutedEventArgs e) {

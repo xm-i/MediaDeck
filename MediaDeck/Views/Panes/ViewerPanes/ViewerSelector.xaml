@@ -60,17 +60,17 @@
 		<controls:SwitchPresenter Grid.Row="1"
 			Value="{x:Bind ViewModel.SelectedViewerPane.Value,Mode=OneWay}" >
 			<controls:Case Value="{x:Bind ViewModel.WrapViewerViewModel}" >
-				<local:WrapViewer ViewModel="{x:Bind ViewModel}" />
+				<local:WrapViewer ViewModel="{x:Bind ViewModel,Mode=OneWay}" />
 			</controls:Case>
 			<controls:Case Value="{x:Bind ViewModel.ListViewerViewModel}" >
-				<local:ListViewer ViewModel="{x:Bind ViewModel}" />
+				<local:ListViewer ViewModel="{x:Bind ViewModel,Mode=OneWay}" />
 			</controls:Case>
 			<controls:Case Value="{x:Bind ViewModel.DetailViewerViewModel}" >
-				<local:DetailViewer ViewModel="{x:Bind ViewModel}" />
+				<local:DetailViewer ViewModel="{x:Bind ViewModel,Mode=OneWay}" />
 			</controls:Case>
 			<!-- Mapはちゃんと作るまでコメントアウト
 			<controls:Case Value="{x:Bind ViewModel.MapViewerViewModel}" >
-				<local:MapViewer ViewModel="{x:Bind ViewModel}" />
+				<local:MapViewer ViewModel="{x:Bind ViewModel,Mode=OneWay}" />
 			</controls:Case>
 			-->
 		</controls:SwitchPresenter>

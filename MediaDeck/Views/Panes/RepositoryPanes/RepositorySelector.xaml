@@ -8,8 +8,7 @@
 	xmlns:controls="using:CommunityToolkit.WinUI.Controls"
 	mc:Ignorable="d" >
 
-	<Grid
-		Visibility="{x:Bind ViewModel.SelectedRepositoryPane.Value, Mode=OneWay, Converter={StaticResource NullToCollapseConverter}}" >
+	<Grid>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="Auto" />
 			<RowDefinition Height="*" />
@@ -38,7 +37,7 @@
 			</StackPanel>
 			<controls:Segmented Grid.Column="2"
 				SelectionMode="Single"
-				ItemsSource="{x:Bind ViewModel.RepositoryPaneViewModels}"
+				ItemsSource="{x:Bind ViewModel.RepositoryPaneViewModels, Mode=OneWay}"
 				SelectedItem="{x:Bind ViewModel.SelectedRepositoryPane.Value, Mode=TwoWay}"
 				DisplayMemberPath="Name" />
 		</Grid>
@@ -46,7 +45,7 @@
 		<!-- Content -->
 		<Border Grid.Row="1"
 			Background="{ThemeResource LayerFillColorDefaultBrush}" >
-			<local:FolderRepository ViewModel="{x:Bind ViewModel}"
+			<local:FolderRepository ViewModel="{x:Bind ViewModel,Mode=OneWay}"
 				Padding="8" />
 		</Border>
 	</Grid>

@@ -118,7 +118,7 @@ public class DisposableBase : ObservableObject, IDisposableBase {
 	~DisposableBase() {
 		this._trackingInfo.RecordFinalize();
 		if (this.DisposeState == DisposeState.NotDisposed) {
-			Debug.WriteLine($"[DISPOSE LEAK] {this.GetType().FullName} がDisposeされずにGCされました。");
+//			Debug.WriteLine($"[DISPOSE LEAK] {this.GetType().FullName} がDisposeされずにGCされました。");
 		}
 	}
 #endif

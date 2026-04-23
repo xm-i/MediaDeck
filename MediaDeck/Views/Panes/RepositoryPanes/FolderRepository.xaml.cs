@@ -7,6 +7,9 @@ namespace MediaDeck.Views.Panes.RepositoryPanes;
 public sealed partial class FolderRepository {
 	public FolderRepository() {
 		this.InitializeComponent();
+		this.Loaded += (_, _) => {
+			this.Bindings.Update();
+		};
 	}
 
 	protected override void OnViewModelChanged(RepositorySelectorViewModel? oldViewModel, RepositorySelectorViewModel? newViewModel) {

@@ -5,6 +5,9 @@ namespace MediaDeck.Views.Panes.DetailPanes;
 public sealed partial class DetailSelector {
 	public DetailSelector() {
 		this.InitializeComponent();
+		this.Loaded += (_, _) => {
+			this.Bindings.Update();
+		};
 	}
 
 	protected override void OnViewModelChanged(DetailSelectorViewModel? oldViewModel, DetailSelectorViewModel? newViewModel) {
