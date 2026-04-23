@@ -51,6 +51,9 @@
 					Click="MenuFlyoutItem_Click"
 					Tag="BackgroundTasks" />
 			</MenuBarItem>
+			<MenuBarItem Title="BREAK">
+				<MenuFlyoutItem Click="MenuFlyoutItem_Click_1"/>
+			</MenuBarItem>
 		</MenuBar>
 
 		<Button Grid.Column="1"

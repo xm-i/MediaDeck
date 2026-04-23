@@ -59,6 +59,10 @@ public sealed partial class NavigationMenu {
 		var window = Ioc.Default.GetRequiredService<FileChangeSyncWindow>();
 		this._windowService.ActivateCenteredOnMainWindow(window);
 	}
+
+	private void MenuFlyoutItem_Click_1(object sender, RoutedEventArgs e) {
+		_ = 1 + 1;
+    }
 }
 
 
