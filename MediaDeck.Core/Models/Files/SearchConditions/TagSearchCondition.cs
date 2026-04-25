@@ -35,7 +35,15 @@ public class TagSearchCondition : ISearchCondition {
 
 	public string DisplayText {
 		get {
-			return $"TagName={this.TargetTag.TagName}({this.RepresentativeText})";
+			try {
+				var rep = this.RepresentativeText;
+				if (rep != null) {
+					rep = $" ({rep})";
+				}
+				return $"TagName={this.TargetTag.TagName}{rep}";
+			} catch (InvalidOperationException) {
+				return $"TagId={this.TagId}";
+			}
 		}
 	}
 
