@@ -5,16 +5,17 @@ using MediaDeck.Composition.Interfaces.FileTypes.ViewModels;
 using MediaDeck.Composition.Interfaces.FileTypes.Views;
 using MediaDeck.Database.Tables;
 
+using DbItemType = MediaDeck.Database.Tables.ItemType;
+
 namespace MediaDeck.Core.Services;
 
 /// <summary>
 /// ファイルタイプに関連する操作を提供するサービス実装クラス
 /// </summary>
 [Inject(InjectServiceLifetime.Singleton, typeof(IFileTypeService))]
-public class FileTypeService(IEnumerable<IFileType> fileTypes, IFilePathService filePathService) : IFileTypeService {
+public class FileTypeService(IEnumerable<IFileType> fileTypes) : IFileTypeService {
 	private readonly IFileType[] _fileTypes = fileTypes.ToArray();
 	private readonly IFileType _unknownFileType = fileTypes.First(x => x.MediaType == MediaType.Unknown);
-	private readonly IFilePathService _filePathService = filePathService;
 
 	/// <inheritdoc />
 	public IFileModel CreateFileModelFromRecord(MediaFile mediaFile) {
@@ -56,7 +57,15 @@ public class FileTypeService(IEnumerable<IFileType> fileTypes, IFilePathService 
 	}
 
 	private IFileType GetFileType(MediaFile mediaFile) {
-		return this._fileTypes.FirstOrDefault(x => x.MediaType == this._filePathService.GetMediaType(mediaFile.FilePath)) ?? this._unknownFileType;
+		var mediaType = mediaFile.ItemType switch {
+			DbItemType.Image => MediaType.Image,
+			DbItemType.Video => MediaType.Video,
+			DbItemType.Pdf => MediaType.Pdf,
+			DbItemType.Archive => MediaType.Archive,
+			DbItemType.FolderGroup => MediaType.FolderGroup,
+			_ => MediaType.Unknown
+		};
+		return this._fileTypes.FirstOrDefault(x => x.MediaType == mediaType) ?? this._unknownFileType;
 	}
 
 	private IFileType GetFileType(IFileModel fileModel) {

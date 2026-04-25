@@ -31,6 +31,12 @@ public enum MediaType {
 	Archive,
 
 	/// <summary>
+	/// フォルダグループ
+	/// </summary>
+	[Description("FolderGroup")]
+	FolderGroup,
+
+	/// <summary>
 	/// Unknown
 	/// </summary>
 	[Description("Unknown")]

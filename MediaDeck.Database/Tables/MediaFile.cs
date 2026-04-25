@@ -15,6 +15,14 @@ public class MediaFile {
 	}
 
 	/// <summary>
+	/// アイテム種別
+	/// </summary>
+	public ItemType ItemType {
+		get;
+		set;
+	}
+
+	/// <summary>
 	/// ディレクトリパス
 	/// </summary>
 	public required string DirectoryPath {
@@ -276,6 +284,14 @@ public class MediaFile {
 	/// Container メタデータ
 	/// </summary>
 	public virtual Container? Container {
+		get;
+		set;
+	}
+
+	/// <summary>
+	/// フォルダグループメタデータ
+	/// </summary>
+	public virtual FolderGroupMetadata? FolderGroupMetadata {
 		get;
 		set;
 	}
