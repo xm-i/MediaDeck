@@ -1,5 +1,5 @@
 using System.Drawing;
-using MediaDeck.Composition.Interfaces.FileTypes.Models;
+using MediaDeck.Composition.Interfaces.MediaItemTypes.Models;
 using MediaDeck.Composition.Interfaces.Primitives;
 using MediaDeck.Core.Models.Maps;
 using Moq;
@@ -15,7 +15,7 @@ public class MapPinTests {
 	[Fact]
 	public void Constructor_SetsPropertiesCorrectly() {
 		// Arrange
-		var mockFile = new Mock<IFileModel>();
+		var mockFile = new Mock<IMediaItemModel>();
 		var mockLocation = new Mock<IGpsLocation>();
 		mockFile.Setup(f => f.Location).Returns(mockLocation.Object);
 		var rect = new Rectangle(new Point(10, 20), new Size(30, 40));
@@ -35,8 +35,8 @@ public class MapPinTests {
 	[Fact]
 	public void Items_CountChanged_UpdatesCountProperty() {
 		// Arrange
-		var mockFile1 = new Mock<IFileModel>();
-		var mockFile2 = new Mock<IFileModel>();
+		var mockFile1 = new Mock<IMediaItemModel>();
+		var mockFile2 = new Mock<IMediaItemModel>();
 		var rect = new Rectangle(new Point(0, 0), new Size(100, 100));
 		var mapPin = new MapPin(mockFile1.Object, rect);
 
@@ -50,7 +50,7 @@ public class MapPinTests {
 	[Fact]
 	public void ToString_ReturnsExpectedFormat() {
 		// Arrange
-		var mockFile = new Mock<IFileModel>();
+		var mockFile = new Mock<IMediaItemModel>();
 		mockFile.Setup(f => f.FilePath).Returns("test/path/to/file.jpg");
 		var rect = new Rectangle(new Point(0, 0), new Size(100, 100));
 		var mapPin = new MapPin(mockFile.Object, rect);

@@ -1,5 +1,5 @@
 using MediaDeck.Composition.Enum;
-using MediaDeck.Composition.Interfaces.FileTypes.Models;
+using MediaDeck.Composition.Interfaces.MediaItemTypes.Models;
 using MediaDeck.Composition.Interfaces.Primitives;
 using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Composition.Objects;
@@ -9,9 +9,9 @@ using R3;
 namespace MediaDeck.Core.Tests.Models.Files.Sort;
 
 /// <summary>
-/// <see cref="IFileModel"/> のテスト用スタブ実装
+/// <see cref="IMediaItemModel"/> のテスト用スタブ実装
 /// </summary>
-public class TestFileModel : MediaFile, IFileModel {
+public class TestFileModel : MediaItem, IMediaItemModel {
 	[global::System.Diagnostics.CodeAnalysis.SetsRequiredMembers]
 	public TestFileModel() {
 		this.DirectoryPath = string.Empty;
@@ -25,11 +25,11 @@ public class TestFileModel : MediaFile, IFileModel {
 	}
 	public long Id {
 		get {
-			return this.MediaFileId;
+			return this.MediaItemId;
 		}
 
 		set {
-			this.MediaFileId = value;
+			this.MediaItemId = value;
 		}
 	}
 	public string? ThumbnailFilePath {

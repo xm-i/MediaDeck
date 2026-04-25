@@ -12,7 +12,7 @@ public interface ISearchCondition {
 		get;
 	}
 
-	public Expression<Func<MediaFile, bool>>? WherePredicate {
+	public Expression<Func<MediaItem, bool>>? WherePredicate {
 		get;
 	}
 

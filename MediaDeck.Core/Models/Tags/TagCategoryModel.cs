@@ -55,7 +55,7 @@ public class TagCategoryModel : ITagCategoryModel {
 			this._tagCategoryName = tagCategory.TagCategoryName;
 			this._detail = tagCategory.Detail;
 			this._tags.Clear();
-			this._tags.AddRange(tagCategory.Tags.OrderByDescending(x => x.MediaFileTags.Count).Select(t => factory.Create(t, this)));
+			this._tags.AddRange(tagCategory.Tags.OrderByDescending(x => x.MediaItemTags.Count).Select(t => factory.Create(t, this)));
 		} else {
 			this._tagCategoryId = null;
 			this._tagCategoryName = "未設定";

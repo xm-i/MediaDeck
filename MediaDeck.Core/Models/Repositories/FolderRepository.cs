@@ -35,7 +35,7 @@ public class FolderRepository : RepositoryBase {
 	public override async Task Load() {
 		await using var db = await this._dbFactory.CreateDbContextAsync();
 		var list = (await db
-				.MediaFiles
+				.MediaItems
 				.GroupBy(x => x.DirectoryPath)
 				.Select(x => new ValueCountPair<string>(x.Key, x.Count()))
 				.ToListAsync())

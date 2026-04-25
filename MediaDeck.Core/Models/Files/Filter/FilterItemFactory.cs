@@ -30,18 +30,18 @@ public static class FilterItemFactory {
 			case MediaTypeFilterItemObject mtf:
 				return new FilterItem(x => (x.VideoFile != null) == mtf.IsVideo);
 			case RateFilterItemObject rf:
-				return new FilterItem(SearchTypeConverters.BuildComparisonExpression<MediaFile, int>(rf.SearchType, x => x.Rate, rf.Rate));
+				return new FilterItem(SearchTypeConverters.BuildComparisonExpression<MediaItem, int>(rf.SearchType, x => x.Rate, rf.Rate));
 			case ResolutionFilterItemObject resolutionFilter:
 				if (resolutionFilter.Width is { } w) {
-					return new FilterItem(SearchTypeConverters.BuildComparisonExpression<MediaFile, int>(resolutionFilter.SearchType, x => x.Width, w));
+					return new FilterItem(SearchTypeConverters.BuildComparisonExpression<MediaItem, int>(resolutionFilter.SearchType, x => x.Width, w));
 				} else if (resolutionFilter.Height is { } h) {
-					return new FilterItem(SearchTypeConverters.BuildComparisonExpression<MediaFile, int>(resolutionFilter.SearchType, x => x.Height, h));
+					return new FilterItem(SearchTypeConverters.BuildComparisonExpression<MediaItem, int>(resolutionFilter.SearchType, x => x.Height, h));
 				} else if (resolutionFilter.Resolution is { } r) {
-					return new FilterItem(SearchTypeConverters.BuildComparisonExpression<MediaFile, long>(resolutionFilter.SearchType, x => (long)x.Width * x.Height, (long)r.Area));
+					return new FilterItem(SearchTypeConverters.BuildComparisonExpression<MediaItem, long>(resolutionFilter.SearchType, x => (long)x.Width * x.Height, (long)r.Area));
 				}
 				throw new InvalidOperationException();
 			case TagFilterItemObject tf:
-				return new FilterItem(x => x.MediaFileTags.Select(mft => mft.Tag.TagName).Contains(tf.TagName) == (tf.SearchType == SearchTypeInclude.Include));
+				return new FilterItem(x => x.MediaItemTags.Select(mft => mft.Tag.TagName).Contains(tf.TagName) == (tf.SearchType == SearchTypeInclude.Include));
 			default:
 				throw new ArgumentException("undefined filter", nameof(filterItemObject));
 		}

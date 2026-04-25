@@ -76,7 +76,7 @@ public class FilterSelector : ModelBase {
 	/// </summary>
 	/// <param name="query">絞り込みクエリを適用するクエリ</param>
 	/// <returns>フィルター適用後クエリ</returns>
-	public IQueryable<MediaFile> SetFilterConditions(IQueryable<MediaFile> query) {
+	public IQueryable<MediaItem> SetFilterConditions(IQueryable<MediaItem> query) {
 		return this.CurrentFilteringCondition.Value?.SetFilterConditions(query) ?? query;
 	}
 

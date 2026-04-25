@@ -1,4 +1,4 @@
-using MediaDeck.Composition.Interfaces.FileTypes.Models;
+using MediaDeck.Composition.Interfaces.MediaItemTypes.Models;
 using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Database;
 using MediaDeck.Database.Tables;
@@ -57,7 +57,7 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 			Ruby = string.IsNullOrEmpty(ruby) ? null : ruby,
 			Detail = detail,
 			TagAliases = [],
-			MediaFileTags = [],
+			MediaItemTags = [],
 			TagCategory = null
 		};
 		await db.AddAsync(tag);
@@ -80,7 +80,7 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 		return newTagModel;
 	}
 
-	public async Task AddTagAsync(IFileModel[] fileModels, ITagModel tag) {
+	public async Task AddTagAsync(IMediaItemModel[] fileModels, ITagModel tag) {
 		var target = fileModels.Where(x => !x.Tags.Any(t => t.TagId == tag.TagId)).ToArray();
 		if (!target.Any()) {
 			return;
@@ -93,7 +93,7 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 			return;
 		}
 
-		await db.MediaFileTags.AddRangeAsync(target.Select(x => new MediaFileTag { MediaFileId = x.Id, TagId = tag.TagId }));
+		await db.MediaItemTags.AddRangeAsync(target.Select(x => new MediaItemTag { MediaItemId = x.Id, TagId = tag.TagId }));
 		await db.SaveChangesAsync();
 		foreach (var file in target) {
 			file.Tags.Add(tag);
@@ -102,7 +102,7 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 		await transaction.CommitAsync();
 	}
 
-	public async Task RemoveTagAsync(IFileModel[] fileModels, int tagId) {
+	public async Task RemoveTagAsync(IMediaItemModel[] fileModels, int tagId) {
 		var target = fileModels.Where(x => x.Tags.Any(t => t.TagId == tagId)).ToArray();
 		if (!target.Any()) {
 			return;
@@ -114,14 +114,14 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 		var rel =
 			await
 				db
-					.MediaFileTags
-					.Where(x => ids.Contains(x.MediaFileId) && x.Tag.TagId == tagId)
+					.MediaItemTags
+					.Where(x => ids.Contains(x.MediaItemId) && x.Tag.TagId == tagId)
 					.ToArrayAsync();
 		if (rel.Any()) {
-			db.MediaFileTags.RemoveRange(rel);
+			db.MediaItemTags.RemoveRange(rel);
 			await db.SaveChangesAsync();
 
-			var removedIds = rel.Select(x => x.MediaFileId).ToHashSet();
+			var removedIds = rel.Select(x => x.MediaItemId).ToHashSet();
 			foreach (var file in target) {
 				if (removedIds.Contains(file.Id)) {
 					file.Tags.RemoveAll(x => x.TagId == tagId);
@@ -312,7 +312,7 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 					.Include(x => x.Tags)
 					.ThenInclude(x => x.TagAliases)
 					.Include(x => x.Tags)
-					.ThenInclude(x => x.MediaFileTags)
+					.ThenInclude(x => x.MediaItemTags)
 					.OrderBy(x => x.TagCategoryId)
 					.ToArrayAsync();
 
@@ -322,8 +322,8 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 					.AsSplitQuery()
 					.Where(x => x.TagCategoryId == null)
 					.Include(x => x.TagAliases)
-					.Include(x => x.MediaFileTags)
-					.OrderByDescending(x => x.MediaFileTags.Count)
+					.Include(x => x.MediaItemTags)
+					.OrderByDescending(x => x.MediaItemTags.Count)
 					.ToArrayAsync();
 
 		this._tagCategories.Clear();

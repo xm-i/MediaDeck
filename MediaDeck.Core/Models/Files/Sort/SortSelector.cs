@@ -79,7 +79,7 @@ public class SortSelector : ModelBase {
 	/// </summary>
 	/// <param name="query">ソート対象のクエリ</param>
 	/// <returns>ソート適用後クエリ</returns>
-	public IQueryable<MediaFile> SetSortConditions(IQueryable<MediaFile> query) {
+	public IQueryable<MediaItem> SetSortConditions(IQueryable<MediaItem> query) {
 		var reverse = this.Direction.Value == ListSortDirection.Descending;
 		if (this.CurrentSortCondition.Value is not { } cond) {
 			return query;
@@ -87,7 +87,7 @@ public class SortSelector : ModelBase {
 		if (cond.SortItemObjects.Count == 0) {
 			throw new InvalidOperationException();
 		}
-		IOrderedQueryable<MediaFile>? sortedQuery = null;
+		IOrderedQueryable<MediaItem>? sortedQuery = null;
 		foreach (var si in cond.SortItemObjects.Select(SortItemFactory.Create)) {
 			if (sortedQuery == null) {
 				sortedQuery = si.ApplySort(query, reverse);

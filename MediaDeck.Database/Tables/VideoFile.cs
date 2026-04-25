@@ -7,17 +7,17 @@ namespace MediaDeck.Database.Tables;
 /// </summary>
 public class VideoFile {
 	/// <summary>
-	/// メディアファイルID
+	/// メディアアイテムID
 	/// </summary>
-	public long MediaFileId {
+	public long MediaItemId {
 		get;
 		set;
 	}
 
 	/// <summary>
-	/// メディアファイル
+	/// メディアアイテム
 	/// </summary>
-	public MediaFile MediaFile {
+	public MediaItem MediaItem {
 		get {
 			return field ?? throw new InvalidOperationException();
 		}

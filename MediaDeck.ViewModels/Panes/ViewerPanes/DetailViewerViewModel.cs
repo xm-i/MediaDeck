@@ -1,20 +1,20 @@
-using MediaDeck.Composition.Interfaces.FileTypes;
-using MediaDeck.Composition.Interfaces.FileTypes.ViewModels;
-using MediaDeck.Composition.Interfaces.FileTypes.Views;
+using MediaDeck.Composition.Interfaces.MediaItemTypes;
+using MediaDeck.Composition.Interfaces.MediaItemTypes.ViewModels;
+using MediaDeck.Composition.Interfaces.MediaItemTypes.Views;
 using MediaDeck.Core.Models.Files;
 
 namespace MediaDeck.ViewModels.Panes.ViewerPanes;
 
 [Inject(InjectServiceLifetime.Transient)]
 public class DetailViewerViewModel : ViewerPaneViewModelBase, IDetailViewerViewModel {
-	public DetailViewerViewModel(MediaContentLibraryViewModel mediaContentLibraryViewModel, FilesManager filesManager, IFileTypeService fileTypeService) : base("Detail", filesManager) {
+	public DetailViewerViewModel(MediaContentLibraryViewModel mediaContentLibraryViewModel, FilesManager filesManager, IMediaItemTypeService MediaItemTypeService) : base("Detail", filesManager) {
 		this.MediaContentLibraryViewModel = mediaContentLibraryViewModel;
 		mediaContentLibraryViewModel.SelectedFile.Subscribe(x => {
 			if (x is not { } vm) {
 				this.DetailViewerPreviewControlView.Value = null;
 				return;
 			}
-			this.DetailViewerPreviewControlView.Value = fileTypeService.CreateDetailViewerPreviewControlView(vm);
+			this.DetailViewerPreviewControlView.Value = MediaItemTypeService.CreateDetailViewerPreviewControlView(vm);
 			this.DetailViewerPreviewControlView.Value.DataContext = this;
 			this.SelectedFile.Value = vm;
 			this.SelectedFilePath.Value = vm.FilePath;
@@ -35,7 +35,7 @@ public class DetailViewerViewModel : ViewerPaneViewModelBase, IDetailViewerViewM
 	} = new();
 
 	/// <inheritdoc/>
-	public BindableReactiveProperty<IFileViewModel?> SelectedFile {
+	public BindableReactiveProperty<IMediaItemViewModel?> SelectedFile {
 		get;
 	} = new(null);
 

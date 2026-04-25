@@ -1,4 +1,4 @@
-using MediaDeck.Composition.Interfaces.FileTypes.Models;
+using MediaDeck.Composition.Interfaces.MediaItemTypes.Models;
 using MediaDeck.Composition.Objects;
 using MediaDeck.Core.Models.Files;
 using MediaDeck.Core.Models.NotificationDispatcher;
@@ -69,27 +69,27 @@ public class FilesManagerTests : IDisposable {
 	public async Task RemoveFilesAsync_WhenFilesExist_ShouldRemoveFilesAndNotify() {
 		// Arrange
 		await using (var context = await this._dbFactoryMock.Object.CreateDbContextAsync()) {
-			context.MediaFiles.Add(new MediaFile { MediaFileId = 1, FilePath = "path1.jpg", DirectoryPath = "dir", Description = "" });
-			context.MediaFiles.Add(new MediaFile { MediaFileId = 2, FilePath = "path2.jpg", DirectoryPath = "dir", Description = "" });
-			context.MediaFiles.Add(new MediaFile { MediaFileId = 3, FilePath = "path3.jpg", DirectoryPath = "dir", Description = "" });
+			context.MediaItems.Add(new MediaItem { MediaItemId = 1, FilePath = "path1.jpg", DirectoryPath = "dir", Description = "" });
+			context.MediaItems.Add(new MediaItem { MediaItemId = 2, FilePath = "path2.jpg", DirectoryPath = "dir", Description = "" });
+			context.MediaItems.Add(new MediaItem { MediaItemId = 3, FilePath = "path3.jpg", DirectoryPath = "dir", Description = "" });
 			await context.SaveChangesAsync();
 		}
 
-		var file1Mock = new Mock<IFileModel>();
+		var file1Mock = new Mock<IMediaItemModel>();
 		file1Mock.Setup(m => m.Id).Returns(1);
-		var file2Mock = new Mock<IFileModel>();
+		var file2Mock = new Mock<IMediaItemModel>();
 		file2Mock.Setup(m => m.Id).Returns(2);
 
-		var models = new List<IFileModel> { file1Mock.Object, file2Mock.Object };
+		var models = new List<IMediaItemModel> { file1Mock.Object, file2Mock.Object };
 
 		// Act
 		await this._filesManager.RemoveFilesAsync(models);
 
 		// Assert
 		await using (var context = await this._dbFactoryMock.Object.CreateDbContextAsync()) {
-			var files = await context.MediaFiles.ToListAsync();
+			var files = await context.MediaItems.ToListAsync();
 			files.Count.ShouldBe(1);
-			files.Single().MediaFileId.ShouldBe(3);
+			files.Single().MediaItemId.ShouldBe(3);
 		}
 
 		this._notifications.Count.ShouldBe(1);
@@ -103,21 +103,21 @@ public class FilesManagerTests : IDisposable {
 	public async Task RemoveFilesAsync_WhenSingleFileExists_ShouldRemoveAndNotifySingleMessage() {
 		// Arrange
 		await using (var context = await this._dbFactoryMock.Object.CreateDbContextAsync()) {
-			context.MediaFiles.Add(new MediaFile { MediaFileId = 1, FilePath = "path1.jpg", DirectoryPath = "dir", Description = "" });
+			context.MediaItems.Add(new MediaItem { MediaItemId = 1, FilePath = "path1.jpg", DirectoryPath = "dir", Description = "" });
 			await context.SaveChangesAsync();
 		}
 
-		var fileMock = new Mock<IFileModel>();
+		var fileMock = new Mock<IMediaItemModel>();
 		fileMock.Setup(m => m.Id).Returns(1);
 
-		var models = new List<IFileModel> { fileMock.Object };
+		var models = new List<IMediaItemModel> { fileMock.Object };
 
 		// Act
 		await this._filesManager.RemoveFilesAsync(models);
 
 		// Assert
 		await using (var context = await this._dbFactoryMock.Object.CreateDbContextAsync()) {
-			var files = await context.MediaFiles.ToListAsync();
+			var files = await context.MediaItems.ToListAsync();
 			files.ShouldBeEmpty();
 		}
 
@@ -132,21 +132,21 @@ public class FilesManagerTests : IDisposable {
 	public async Task RemoveFilesAsync_WhenFileNotFound_ShouldNotThrowAndNotNotify() {
 		// Arrange
 		await using (var context = await this._dbFactoryMock.Object.CreateDbContextAsync()) {
-			context.MediaFiles.Add(new MediaFile { MediaFileId = 1, FilePath = "path1.jpg", DirectoryPath = "dir", Description = "" });
+			context.MediaItems.Add(new MediaItem { MediaItemId = 1, FilePath = "path1.jpg", DirectoryPath = "dir", Description = "" });
 			await context.SaveChangesAsync();
 		}
 
-		var fileMock = new Mock<IFileModel>();
+		var fileMock = new Mock<IMediaItemModel>();
 		fileMock.Setup(m => m.Id).Returns(999); // 存在しないID
 
-		var models = new List<IFileModel> { fileMock.Object };
+		var models = new List<IMediaItemModel> { fileMock.Object };
 
 		// Act
 		await Should.NotThrowAsync(() => this._filesManager.RemoveFilesAsync(models));
 
 		// Assert
 		await using (var context = await this._dbFactoryMock.Object.CreateDbContextAsync()) {
-			var files = await context.MediaFiles.ToListAsync();
+			var files = await context.MediaItems.ToListAsync();
 			files.Count.ShouldBe(1);
 		}
 
@@ -160,18 +160,18 @@ public class FilesManagerTests : IDisposable {
 	public async Task RemoveFilesAsync_WhenEmptyListProvided_ShouldNotThrowAndNotNotify() {
 		// Arrange
 		await using (var context = await this._dbFactoryMock.Object.CreateDbContextAsync()) {
-			context.MediaFiles.Add(new MediaFile { MediaFileId = 1, FilePath = "path1.jpg", DirectoryPath = "dir", Description = "" });
+			context.MediaItems.Add(new MediaItem { MediaItemId = 1, FilePath = "path1.jpg", DirectoryPath = "dir", Description = "" });
 			await context.SaveChangesAsync();
 		}
 
-		var models = new List<IFileModel>(); // 空のリスト
+		var models = new List<IMediaItemModel>(); // 空のリスト
 
 		// Act
 		await Should.NotThrowAsync(() => this._filesManager.RemoveFilesAsync(models));
 
 		// Assert
 		await using (var context = await this._dbFactoryMock.Object.CreateDbContextAsync()) {
-			var files = await context.MediaFiles.ToListAsync();
+			var files = await context.MediaItems.ToListAsync();
 			files.Count.ShouldBe(1);
 		}
 
@@ -184,7 +184,7 @@ public class FilesManagerTests : IDisposable {
 	[Fact]
 	public async Task RemoveFilesAsync_WhenNullProvided_ShouldThrowArgumentNullException() {
 		// Arrange
-		IEnumerable<IFileModel> models = null!;
+		IEnumerable<IMediaItemModel> models = null!;
 
 		// Act & Assert
 		await Should.ThrowAsync<ArgumentNullException>(() => this._filesManager.RemoveFilesAsync(models));

@@ -1,4 +1,4 @@
-using MediaDeck.Composition.Interfaces.FileTypes.ViewModels;
+using MediaDeck.Composition.Interfaces.MediaItemTypes.ViewModels;
 using MediaDeck.ViewModels.Tools;
 
 using Microsoft.UI.Xaml;
@@ -27,13 +27,13 @@ public sealed partial class DuplicateDetectorContent {
 			new(null));
 
 	private async void OnOpenFileClick(object sender, RoutedEventArgs e) {
-		if (sender is FrameworkElement { DataContext: IFileViewModel fileViewModel }) {
+		if (sender is FrameworkElement { DataContext: IMediaItemViewModel fileViewModel }) {
 			await fileViewModel.ExecuteFileAsync();
 		}
 	}
 
 	private void OnShowInExplorerClick(object sender, RoutedEventArgs e) {
-		if (sender is FrameworkElement { DataContext: IFileViewModel fileViewModel }) {
+		if (sender is FrameworkElement { DataContext: IMediaItemViewModel fileViewModel }) {
 			DuplicateDetectorViewModel.ShowInExplorer(fileViewModel.FilePath);
 		}
 	}

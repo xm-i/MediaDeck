@@ -1,7 +1,7 @@
 using MediaDeck.Common.Base;
 using MediaDeck.Composition.Interfaces.Files;
-using MediaDeck.Composition.Interfaces.FileTypes;
-using MediaDeck.Composition.Interfaces.FileTypes.ViewModels;
+using MediaDeck.Composition.Interfaces.MediaItemTypes;
+using MediaDeck.Composition.Interfaces.MediaItemTypes.ViewModels;
 using MediaDeck.Core.Models.Files;
 using MediaDeck.Core.Models.NotificationDispatcher;
 
@@ -9,9 +9,9 @@ namespace MediaDeck.ViewModels.Panes.ViewerPanes;
 
 [Inject(InjectServiceLifetime.Scoped)]
 public class MediaContentLibraryViewModel : ViewModelBase {
-	public MediaContentLibraryViewModel(MediaContentLibrary mediaContentLibrary, SearchConditionNotificationDispatcher searchConditionNotificationDispatcher, IFileTypeService fileTypeService) {
+	public MediaContentLibraryViewModel(MediaContentLibrary mediaContentLibrary, SearchConditionNotificationDispatcher searchConditionNotificationDispatcher, IMediaItemTypeService MediaItemTypeService) {
 		this._mediaContentLibrary = mediaContentLibrary;
-		this.Files = mediaContentLibrary.Files.CreateView(fileTypeService.CreateFileViewModel).ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
+		this.Files = mediaContentLibrary.Files.CreateView(MediaItemTypeService.CreateMediaItemViewModel).ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
 
 		this.SearchConditions =
 			mediaContentLibrary
@@ -29,7 +29,7 @@ public class MediaContentLibraryViewModel : ViewModelBase {
 
 	private readonly MediaContentLibrary _mediaContentLibrary;
 
-	public NotifyCollectionChangedSynchronizedViewList<IFileViewModel> Files {
+	public NotifyCollectionChangedSynchronizedViewList<IMediaItemViewModel> Files {
 		get;
 	}
 
@@ -45,11 +45,11 @@ public class MediaContentLibraryViewModel : ViewModelBase {
 		get;
 	}
 
-	public BindableReactiveProperty<IFileViewModel> SelectedFile {
+	public BindableReactiveProperty<IMediaItemViewModel> SelectedFile {
 		get;
 	} = new();
 
-	public BindableReactiveProperty<IFileViewModel[]> SelectedFiles {
+	public BindableReactiveProperty<IMediaItemViewModel[]> SelectedFiles {
 		get;
 	} = new([]);
 

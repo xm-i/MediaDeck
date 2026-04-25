@@ -19,7 +19,7 @@
 				<TextBlock Text="外部プログラム"
 					Style="{StaticResource BodyStrongTextBlockStyle}"
 					Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
-				<TextBlock Text="メディアファイルを開く外部プログラムとその起動引数を設定します。"
+				<TextBlock Text="メディアアイテムを開く外部プログラムとその起動引数を設定します。"
 					Style="{StaticResource CaptionTextBlockStyle}"
 					Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
 			</StackPanel>

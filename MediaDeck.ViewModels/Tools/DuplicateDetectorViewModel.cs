@@ -1,7 +1,7 @@
 using MediaDeck.Common.Base;
 using MediaDeck.Common.Utilities;
-using MediaDeck.Composition.Interfaces.FileTypes;
-using MediaDeck.Composition.Interfaces.FileTypes.ViewModels;
+using MediaDeck.Composition.Interfaces.MediaItemTypes;
+using MediaDeck.Composition.Interfaces.MediaItemTypes.ViewModels;
 using MediaDeck.Core.Primitives;
 using MediaDeck.Core.Services.DuplicateFileDetector;
 
@@ -13,7 +13,7 @@ namespace MediaDeck.ViewModels.Tools;
 [Inject(InjectServiceLifetime.Transient)]
 public class DuplicateDetectorViewModel : ViewModelBase {
 	private readonly DuplicateFileDetectorService _detector;
-	private readonly IFileTypeService _fileTypeService;
+	private readonly IMediaItemTypeService _MediaItemTypeService;
 
 	/// <summary>
 	/// 重複ファイルグループリスト
@@ -32,14 +32,14 @@ public class DuplicateDetectorViewModel : ViewModelBase {
 	/// <summary>
 	/// 選択中グループのファイルViewModelリスト
 	/// </summary>
-	public BindableReactiveProperty<IEnumerable<IFileViewModel>?> SelectedGroupFiles {
+	public BindableReactiveProperty<IEnumerable<IMediaItemViewModel>?> SelectedGroupFiles {
 		get;
 	} = new();
 
 	/// <summary>
 	/// 選択中ファイル
 	/// </summary>
-	public BindableReactiveProperty<IFileViewModel?> SelectedFile {
+	public BindableReactiveProperty<IMediaItemViewModel?> SelectedFile {
 		get;
 	} = new();
 
@@ -95,9 +95,9 @@ public class DuplicateDetectorViewModel : ViewModelBase {
 		get;
 	} = new();
 
-	public DuplicateDetectorViewModel(DuplicateFileDetectorService detector, IFileTypeService fileTypeService) {
+	public DuplicateDetectorViewModel(DuplicateFileDetectorService detector, IMediaItemTypeService MediaItemTypeService) {
 		this._detector = detector;
-		this._fileTypeService = fileTypeService;
+		this._MediaItemTypeService = MediaItemTypeService;
 
 		this.DuplicateGroups = this._detector.DuplicateGroups.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
 
@@ -111,7 +111,7 @@ public class DuplicateDetectorViewModel : ViewModelBase {
 		this.SelectedGroup
 			.Subscribe(g => {
 				this.SelectedGroupFiles.Value = g?.Files
-					.Select(f => this._fileTypeService.CreateFileViewModel(this._fileTypeService.CreateFileModelFromRecord(f)))
+					.Select(f => this._MediaItemTypeService.CreateMediaItemViewModel(this._MediaItemTypeService.CreateMediaItemModelFromRecord(f)))
 					.ToArray();
 			})
 			.AddTo(this.CompositeDisposable);

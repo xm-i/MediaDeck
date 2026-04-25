@@ -36,26 +36,26 @@ public class AddressSearchCondition : ISearchCondition {
 		}
 	}
 
-	public Expression<Func<MediaFile, bool>>? WherePredicate {
+	public Expression<Func<MediaItem, bool>>? WherePredicate {
 		get {
-			Expression<Func<MediaFile, bool>> exp1 = mediaFile => true;
+			Expression<Func<MediaItem, bool>> exp1 = MediaItem => true;
 			var exp = exp1.Body;
 			var visitor = new ParameterVisitor(exp1.Parameters);
 
 			if (!this.Address.IsFailure && !this.Address.IsYet) {
 				var current = this.Address;
 				while (current is { } c && c.Type != null) {
-					Expression<Func<MediaFile, bool>> exp2 = mediaFile =>
-						mediaFile.Position!.Addresses!.Any(a => a.Type == c.Type && a.Name == c.Name);
+					Expression<Func<MediaItem, bool>> exp2 = MediaItem =>
+						MediaItem.Position!.Addresses!.Any(a => a.Type == c.Type && a.Name == c.Name);
 					exp = Expression.AndAlso(exp, visitor.Visit(exp2.Body));
 					current = current.Parent;
 				}
 			} else {
-				Expression<Func<MediaFile, bool>> exp2 = mediaFile =>
-					mediaFile.Latitude != null && mediaFile.Position!.IsAcquired != this.Address.IsYet && !mediaFile.Position.Addresses!.Any();
+				Expression<Func<MediaItem, bool>> exp2 = MediaItem =>
+					MediaItem.Latitude != null && MediaItem.Position!.IsAcquired != this.Address.IsYet && !MediaItem.Position.Addresses!.Any();
 				exp = Expression.AndAlso(exp, visitor.Visit(exp2.Body));
 			}
-			return Expression.Lambda<Func<MediaFile, bool>>(exp,
+			return Expression.Lambda<Func<MediaItem, bool>>(exp,
 				visitor.Parameters);
 		}
 	}

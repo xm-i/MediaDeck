@@ -6,7 +6,7 @@
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:controls="using:CommunityToolkit.WinUI.Controls"
-	xmlns:vmIf="using:MediaDeck.Composition.Interfaces.FileTypes.ViewModels"
+	xmlns:vmIf="using:MediaDeck.Composition.Interfaces.MediaItemTypes.ViewModels"
 	xmlns:viewerpanes="using:MediaDeck.ViewModels.Panes.ViewerPanes"
 	mc:Ignorable="d" >
 	<Grid>
@@ -56,7 +56,7 @@
 				</MenuFlyout>
 			</GridView.Resources>
 			<GridView.ItemTemplate>
-				<DataTemplate x:DataType="vmIf:IFileViewModel" >
+				<DataTemplate x:DataType="vmIf:IMediaItemViewModel" >
 					<Grid DoubleTapped="File_DoubleTapped" >
 						<Image Stretch="Uniform"
 							Height="{Binding DataContext.ItemSize.Value, Mode=OneWay, ElementName=List}"

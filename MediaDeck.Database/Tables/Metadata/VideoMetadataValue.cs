@@ -2,15 +2,15 @@ namespace MediaDeck.Database.Tables.Metadata;
 
 public class VideoMetadataValue {
 	/// <summary>
-	/// メディアファイルID
+	/// メディアアイテムID
 	/// </summary>
-	public long MediaFileId {
+	public long MediaItemId {
 		get;
 		set;
 	}
 
 	/// <summary>
-	/// メディアファイル
+	/// メディアアイテム
 	/// </summary>
 	public VideoFile VideoFile {
 		get {

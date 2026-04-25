@@ -1,4 +1,4 @@
-using MediaDeck.Composition.Interfaces.FileTypes.Models;
+using MediaDeck.Composition.Interfaces.MediaItemTypes.Models;
 using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Core.Models.Tags;
 using MediaDeck.Database;
@@ -28,8 +28,8 @@ public class TagsManagerTests {
 		await using var db = await dbFactory.CreateDbContextAsync();
 		db.TagCategories.Add(new TagCategory { TagCategoryId = 1, TagCategoryName = "Category1", Detail = "CatDetail1", Tags = [] });
 		db.TagCategories.Add(new TagCategory { TagCategoryId = 2, TagCategoryName = "Category2", Detail = "CatDetail2", Tags = [] });
-		db.Tags.Add(new Tag { TagId = 1, TagCategoryId = 1, TagName = "Tag1", Detail = "Detail1", TagCategory = null!, MediaFileTags = [], TagAliases = [] });
-		db.Tags.Add(new Tag { TagId = 2, TagCategoryId = 1, TagName = "Tag2", Detail = "Detail2", TagCategory = null!, MediaFileTags = [], TagAliases = [] });
+		db.Tags.Add(new Tag { TagId = 1, TagCategoryId = 1, TagName = "Tag1", Detail = "Detail1", TagCategory = null!, MediaItemTags = [], TagAliases = [] });
+		db.Tags.Add(new Tag { TagId = 2, TagCategoryId = 1, TagName = "Tag2", Detail = "Detail2", TagCategory = null!, MediaItemTags = [], TagAliases = [] });
 		db.TagAliases.Add(new TagAlias { TagId = 1, TagAliasId = 1, Alias = "Alias1" });
 		await db.SaveChangesAsync();
 	}
@@ -62,7 +62,7 @@ public class TagsManagerTests {
 		var dbName = nameof(this.FindTagByNameAsync_ShouldReturnTag_WhenTagExists);
 		var dbFactory = this.CreateInMemoryDbFactory(dbName);
 		await using (var db = await dbFactory.CreateDbContextAsync()) {
-			db.Tags.Add(new Tag { TagId = 1, TagName = "ExistingTag", Detail = "", TagCategory = null!, MediaFileTags = [], TagAliases = [] });
+			db.Tags.Add(new Tag { TagId = 1, TagName = "ExistingTag", Detail = "", TagCategory = null!, MediaItemTags = [], TagAliases = [] });
 			await db.SaveChangesAsync();
 		}
 		var tagModelFactoryMock = new Mock<ITagModelFactory>();
@@ -131,12 +131,12 @@ public class TagsManagerTests {
 		tagMock.SetupGet(x => x.TagCategory).Returns(new Mock<ITagCategoryModel>().Object);
 		tagMock.SetupGet(x => x.UsageCount).Returns(new ReactiveProperty<int>(0));
 		var fileTags = new List<ITagModel>();
-		var fileModelMock = new Mock<IFileModel>();
+		var fileModelMock = new Mock<IMediaItemModel>();
 		fileModelMock.SetupGet(x => x.Id).Returns(100);
 		fileModelMock.SetupGet(x => x.Tags).Returns(fileTags);
 		await using (var dbSetup = await dbFactory.CreateDbContextAsync()) {
-			dbSetup.MediaFiles.Add(new MediaFile { MediaFileId = 100, FilePath = "test", DirectoryPath = "dir", Description = "" });
-			dbSetup.Tags.Add(new Tag { TagId = 99, TagName = "Tag99", Detail = "", TagCategory = null!, MediaFileTags = [], TagAliases = [] });
+			dbSetup.MediaItems.Add(new MediaItem { MediaItemId = 100, FilePath = "test", DirectoryPath = "dir", Description = "" });
+			dbSetup.Tags.Add(new Tag { TagId = 99, TagName = "Tag99", Detail = "", TagCategory = null!, MediaItemTags = [], TagAliases = [] });
 			await dbSetup.SaveChangesAsync();
 		}
 		await manager.AddTagAsync([fileModelMock.Object], tagMock.Object);
@@ -152,7 +152,7 @@ public class TagsManagerTests {
 		var tagModelFactoryMock = new Mock<ITagModelFactory>();
 		var manager = new TagsManager(dbFactory, tagModelFactoryMock.Object);
 
-		var fileModelMock = new Mock<IFileModel>();
+		var fileModelMock = new Mock<IMediaItemModel>();
 		fileModelMock.SetupGet(x => x.Tags).Returns([]);
 
 		await manager.AddTagAsync([fileModelMock.Object], null!);
@@ -173,12 +173,12 @@ public class TagsManagerTests {
 		tagMock.SetupGet(x => x.TagCategory).Returns(new Mock<ITagCategoryModel>().Object);
 		tagMock.SetupGet(x => x.UsageCount).Returns(new ReactiveProperty<int>(0));
 		var fileTags = new List<ITagModel> { tagMock.Object };
-		var fileModelMock = new Mock<IFileModel>();
+		var fileModelMock = new Mock<IMediaItemModel>();
 		fileModelMock.SetupGet(x => x.Id).Returns(100);
 		fileModelMock.SetupGet(x => x.Tags).Returns(fileTags);
 		await manager.AddTagAsync([fileModelMock.Object], tagMock.Object);
 		await using var db = await dbFactory.CreateDbContextAsync();
-		var rel = await db.MediaFileTags.FirstOrDefaultAsync(x => x.MediaFileId == 100 && x.TagId == 99);
+		var rel = await db.MediaItemTags.FirstOrDefaultAsync(x => x.MediaItemId == 100 && x.TagId == 99);
 		rel.ShouldBeNull();
 	}
 
@@ -195,13 +195,13 @@ public class TagsManagerTests {
 		tagMock.SetupGet(x => x.TagCategory).Returns(new Mock<ITagCategoryModel>().Object);
 		tagMock.SetupGet(x => x.UsageCount).Returns(new ReactiveProperty<int>(1));
 		var fileTags = new List<ITagModel> { tagMock.Object };
-		var fileModelMock = new Mock<IFileModel>();
+		var fileModelMock = new Mock<IMediaItemModel>();
 		fileModelMock.SetupGet(x => x.Id).Returns(100);
 		fileModelMock.SetupGet(x => x.Tags).Returns(fileTags);
 		await using (var dbSetup = await dbFactory.CreateDbContextAsync()) {
-			dbSetup.MediaFiles.Add(new MediaFile { MediaFileId = 100, FilePath = "test2", DirectoryPath = "dir", Description = "" });
-			dbSetup.Tags.Add(new Tag { TagId = 99, TagName = "Tag99", Detail = "", TagCategory = null!, MediaFileTags = [], TagAliases = [] });
-			dbSetup.MediaFileTags.Add(new MediaFileTag { MediaFileId = 100, TagId = 99 });
+			dbSetup.MediaItems.Add(new MediaItem { MediaItemId = 100, FilePath = "test2", DirectoryPath = "dir", Description = "" });
+			dbSetup.Tags.Add(new Tag { TagId = 99, TagName = "Tag99", Detail = "", TagCategory = null!, MediaItemTags = [], TagAliases = [] });
+			dbSetup.MediaItemTags.Add(new MediaItemTag { MediaItemId = 100, TagId = 99 });
 			await dbSetup.SaveChangesAsync();
 		}
 		await manager.RemoveTagAsync([fileModelMock.Object], 99);
@@ -216,7 +216,7 @@ public class TagsManagerTests {
 		var dbFactory = this.CreateInMemoryDbFactory(nameof(this.RemoveTagAsync_ShouldDoNothing_WhenFilesDoNotHaveTag));
 		var tagModelFactoryMock = new Mock<ITagModelFactory>();
 		var manager = new TagsManager(dbFactory, tagModelFactoryMock.Object);
-		var fileModelMock = new Mock<IFileModel>();
+		var fileModelMock = new Mock<IMediaItemModel>();
 		fileModelMock.SetupGet(x => x.Id).Returns(100);
 		fileModelMock.SetupGet(x => x.Tags).Returns(new List<ITagModel>());
 		await manager.RemoveTagAsync([fileModelMock.Object], 99);

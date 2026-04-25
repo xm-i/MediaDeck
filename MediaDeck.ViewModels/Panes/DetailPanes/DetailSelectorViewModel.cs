@@ -1,5 +1,5 @@
 using MediaDeck.Common.Base;
-using MediaDeck.Composition.Interfaces.FileTypes.Models;
+using MediaDeck.Composition.Interfaces.MediaItemTypes.Models;
 using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Core.Models.Files;
 using MediaDeck.Core.Models.Files.SearchConditions;
@@ -106,13 +106,13 @@ public class DetailSelectorViewModel : ViewModelBase {
 		get;
 	}
 
-	public BindableReactiveProperty<IFileModel[]?> TargetFiles {
+	public BindableReactiveProperty<IMediaItemModel[]?> TargetFiles {
 		get;
 	} = new();
 
-	private IFileModel[] TargetFileModels {
+	private IMediaItemModel[] TargetFileModels {
 		get {
-			return this.TargetFiles.Value ?? Array.Empty<IFileModel>();
+			return this.TargetFiles.Value ?? Array.Empty<IMediaItemModel>();
 		}
 	}
 

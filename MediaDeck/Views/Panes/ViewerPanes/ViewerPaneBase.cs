@@ -2,7 +2,7 @@ using System.IO;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.WinUI.Controls;
 using MediaDeck.Common.Utilities;
-using MediaDeck.Composition.Interfaces.FileTypes.ViewModels;
+using MediaDeck.Composition.Interfaces.MediaItemTypes.ViewModels;
 using MediaDeck.Composition.Interfaces.Services;
 using MediaDeck.Core.Models.Files.SearchConditions;
 using MediaDeck.ViewModels.Panes.ViewerPanes;
@@ -28,9 +28,9 @@ public class ViewerPaneBase : UserControlBase<ViewerSelectorViewModel> {
 			return;
 		}
 		if (sender is ListBox listBox) {
-			vm.MediaContentLibraryViewModel.SelectedFiles.Value = listBox.SelectedItems.Select(x => x as IFileViewModel).Where(x => x is { }).ToArray()!;
+			vm.MediaContentLibraryViewModel.SelectedFiles.Value = listBox.SelectedItems.Select(x => x as IMediaItemViewModel).Where(x => x is { }).ToArray()!;
 		} else if (sender is GridView gridView) {
-			vm.MediaContentLibraryViewModel.SelectedFiles.Value = gridView.SelectedItems.Select(x => x as IFileViewModel).Where(x => x is { }).ToArray()!;
+			vm.MediaContentLibraryViewModel.SelectedFiles.Value = gridView.SelectedItems.Select(x => x as IMediaItemViewModel).Where(x => x is { }).ToArray()!;
 		}
 	}
 
@@ -38,7 +38,7 @@ public class ViewerPaneBase : UserControlBase<ViewerSelectorViewModel> {
 		if (sender is not Grid grid) {
 			return;
 		}
-		if (grid.DataContext is not IFileViewModel fileViewModel) {
+		if (grid.DataContext is not IMediaItemViewModel fileViewModel) {
 			return;
 		}
 		await fileViewModel.ExecuteFileAsync();
@@ -50,11 +50,11 @@ public class ViewerPaneBase : UserControlBase<ViewerSelectorViewModel> {
 		}
 
 		var element = e.OriginalSource as FrameworkElement;
-		while (element != null && element.DataContext is not IFileViewModel) {
+		while (element != null && element.DataContext is not IMediaItemViewModel) {
 			element = element.Parent as FrameworkElement;
 		}
 
-		if (element?.DataContext is not IFileViewModel fileViewModel) {
+		if (element?.DataContext is not IMediaItemViewModel fileViewModel) {
 			return;
 		}
 
@@ -73,7 +73,7 @@ public class ViewerPaneBase : UserControlBase<ViewerSelectorViewModel> {
 		if (sender is not MenuFlyoutItem selectedItem) {
 			return;
 		}
-		if (selectedItem.DataContext is not IFileViewModel fvm) {
+		if (selectedItem.DataContext is not IMediaItemViewModel fvm) {
 			return;
 		}
 		switch (selectedItem.Tag.ToString()) {

@@ -1,8 +1,8 @@
 using System.Collections.Concurrent;
 
 using MediaDeck.Common.Base;
-using MediaDeck.Composition.Interfaces.FileTypes;
-using MediaDeck.Composition.Interfaces.FileTypes.Models;
+using MediaDeck.Composition.Interfaces.MediaItemTypes;
+using MediaDeck.Composition.Interfaces.MediaItemTypes.Models;
 using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Composition.Stores.State.Model.Objects;
 using MediaDeck.Core.Models.NotificationDispatcher;
@@ -13,7 +13,7 @@ namespace MediaDeck.Core.Models.Files;
 
 [Inject(InjectServiceLifetime.Singleton)]
 public class FileRegistrar : ServiceBase {
-	private readonly IFileOperator[] _fileOperators;
+	private readonly IMediaItemOperator[] _fileOperators;
 	private readonly ConcurrentDictionary<string, FolderModel> _fileToFolderMap = new();
 	private readonly ILogger<FileRegistrar> _logger;
 	private readonly IFilePathService _filePathService;
@@ -26,11 +26,11 @@ public class FileRegistrar : ServiceBase {
 		get;
 	}
 
-	public FileRegistrar(ConfigModel config, ILogger<FileRegistrar> logger, IFilePathService filePathService, IFileTypeService fileTypeService) {
+	public FileRegistrar(ConfigModel config, ILogger<FileRegistrar> logger, IFilePathService filePathService, IMediaItemTypeService MediaItemTypeService) {
 		this.Config = config;
 		this._logger = logger;
 		this._filePathService = filePathService;
-		this._fileOperators = fileTypeService.CreateFileOperators();
+		this._fileOperators = MediaItemTypeService.CreateMediaItemOperators();
 		this.RegistrationQueue
 			.ObserveAdd()
 			.ThrottleFirst(TimeSpan.FromSeconds(0.1))
@@ -71,7 +71,7 @@ public class FileRegistrar : ServiceBase {
 			try {
 				var type = this._filePathService.GetMediaType(filePath);
 				var fileOperator = this._fileOperators.First(x => x.TargetMediaType == type);
-				var mf = await fileOperator.RegisterFileAsync(filePath).ConfigureAwait(false);
+				var mf = await fileOperator.RegisterMediaItemAsync(filePath).ConfigureAwait(false);
 				if (mf is { } mf2) {
 					FileNotifications.FileRegistered.OnNext(mf2);
 				}

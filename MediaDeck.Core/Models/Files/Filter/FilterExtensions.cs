@@ -9,7 +9,7 @@ public static class FilterExtensions {
 	/// <param name="query">絞り込みクエリを適用するクエリ</param>
 	/// <param name="filter">適用するフィルター</param>
 	/// <returns>フィルター適用後クエリ</returns>
-	public static IQueryable<MediaFile> Where(this IQueryable<MediaFile> query, FilterSelector filter) {
+	public static IQueryable<MediaItem> Where(this IQueryable<MediaItem> query, FilterSelector filter) {
 		return filter.SetFilterConditions(query);
 	}
 }

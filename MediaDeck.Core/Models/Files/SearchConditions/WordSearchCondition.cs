@@ -31,16 +31,16 @@ public class WordSearchCondition : ISearchCondition {
 		}
 	}
 
-	public Expression<Func<MediaFile, bool>>? WherePredicate {
+	public Expression<Func<MediaItem, bool>>? WherePredicate {
 		get {
-			Expression<Func<MediaFile, bool>> exp1 =
-				mediaFile =>
-					EF.Functions.Like(mediaFile.FilePath, $"%{this.Word}%") ||
-					EF.Functions.Like(mediaFile.Position!.DisplayName!, $"%{this.Word}%");
+			Expression<Func<MediaItem, bool>> exp1 =
+				MediaItem =>
+					EF.Functions.Like(MediaItem.FilePath, $"%{this.Word}%") ||
+					EF.Functions.Like(MediaItem.Position!.DisplayName!, $"%{this.Word}%");
 			var exp = exp1.Body;
 			var visitor = new ParameterVisitor(exp1.Parameters);
 
-			return Expression.Lambda<Func<MediaFile, bool>>(exp,
+			return Expression.Lambda<Func<MediaItem, bool>>(exp,
 				visitor.Parameters);
 		}
 	}

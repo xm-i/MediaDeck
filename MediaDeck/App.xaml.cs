@@ -99,7 +99,7 @@ public partial class App {
 
 		serviceCollection.AddGeneratedServices();
 		Composition.DIRegistration.AddGeneratedServices(serviceCollection);
-		FileTypes.DIRegistration.AddGeneratedServices(serviceCollection);
+		MediaItemTypes.DIRegistration.AddGeneratedServices(serviceCollection);
 		ViewModels.DIRegistration.AddGeneratedServices(serviceCollection);
 		Core.DIRegistration.AddGeneratedServices(serviceCollection);
 		Store.DIRegistration.AddGeneratedServices(serviceCollection);

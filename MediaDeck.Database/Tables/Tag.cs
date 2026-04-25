@@ -45,9 +45,9 @@ public class Tag {
 	}
 
 	/// <summary>
-	/// タグをつけているメディアファイル
+	/// タグをつけているメディアアイテム
 	/// </summary>
-	public virtual ICollection<MediaFileTag> MediaFileTags {
+	public virtual ICollection<MediaItemTag> MediaItemTags {
 		get {
 			return field ?? throw new InvalidOperationException();
 		}

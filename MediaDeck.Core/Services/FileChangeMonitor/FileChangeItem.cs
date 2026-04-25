@@ -5,9 +5,9 @@ namespace MediaDeck.Core.Services.FileChangeMonitor;
 /// </summary>
 public class FileChangeItem {
 	/// <summary>
-	/// 既存のメディアファイルID（新規追加の場合はnull）
+	/// 既存のメディアアイテムID（新規追加の場合はnull）
 	/// </summary>
-	public long? MediaFileId {
+	public long? MediaItemId {
 		get;
 		set;
 	}

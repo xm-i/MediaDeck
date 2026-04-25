@@ -1,4 +1,4 @@
-using MediaDeck.Composition.Interfaces.FileTypes.Models;
+using MediaDeck.Composition.Interfaces.MediaItemTypes.Models;
 using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Core.Models.Files;
 using MediaDeck.Core.Models.Tags;
@@ -79,7 +79,7 @@ public class DetailSelectorModelTests {
 		var tagsManager = this.CreateTagsManager(out _, out _);
 		using var model = new DetailSelectorModel(tagsManager);
 
-		var fileMock = new Mock<IFileModel>();
+		var fileMock = new Mock<IMediaItemModel>();
 		fileMock.SetupGet(x => x.Rate).Returns(3);
 		fileMock.SetupGet(x => x.UsageCount).Returns(10);
 		fileMock.SetupGet(x => x.FilePath).Returns("C:\\test\\file.jpg");
@@ -110,7 +110,7 @@ public class DetailSelectorModelTests {
 		var tagsManager = this.CreateTagsManager(out _, out _);
 		using var model = new DetailSelectorModel(tagsManager);
 
-		var fileMock1 = new Mock<IFileModel>();
+		var fileMock1 = new Mock<IMediaItemModel>();
 		fileMock1.SetupGet(x => x.Rate).Returns(2);
 		fileMock1.SetupGet(x => x.UsageCount).Returns(5);
 		fileMock1.SetupGet(x => x.FilePath).Returns("C:\\test\\file1.jpg");
@@ -119,7 +119,7 @@ public class DetailSelectorModelTests {
 		fileMock1.SetupGet(x => x.Properties).Returns([new MediaDeck.Composition.Objects.TitleValuePair<string>("Res", "1920x1080")]);
 		fileMock1.SetupGet(x => x.Changed).Returns(new Subject<Unit>());
 
-		var fileMock2 = new Mock<IFileModel>();
+		var fileMock2 = new Mock<IMediaItemModel>();
 		fileMock2.SetupGet(x => x.Rate).Returns(4);
 		fileMock2.SetupGet(x => x.UsageCount).Returns(15);
 		fileMock2.SetupGet(x => x.FilePath).Returns("C:\\test\\file2.jpg");
@@ -170,10 +170,10 @@ public class DetailSelectorModelTests {
 		tag2.SetupGet(x => x.TagCategory).Returns(new Mock<ITagCategoryModel>().Object);
 		tag2.SetupGet(x => x.UsageCount).Returns(new ReactiveProperty<int>(0));
 
-		var fileMock1 = new Mock<IFileModel>();
+		var fileMock1 = new Mock<IMediaItemModel>();
 		fileMock1.SetupGet(x => x.Tags).Returns([tag1.Object, tag2.Object]);
 
-		var fileMock2 = new Mock<IFileModel>();
+		var fileMock2 = new Mock<IMediaItemModel>();
 		fileMock2.SetupGet(x => x.Tags).Returns([tag1.Object]);
 
 		// Act
@@ -209,14 +209,14 @@ public class DetailSelectorModelTests {
 	}
 
 	/// <summary>
-	/// UpdateDescriptionAsyncがIFileModelに委譲していることを検証する。
+	/// UpdateDescriptionAsyncがIMediaItemModelに委譲していることを検証する。
 	/// </summary>
 	[Fact]
 	public async Task UpdateDescriptionAsync_ShouldDelegateToFileModel() {
 		// Arrange
 		var tagsManager = this.CreateTagsManager(out _, out _);
 		using var model = new DetailSelectorModel(tagsManager);
-		var fileMock = new Mock<IFileModel>();
+		var fileMock = new Mock<IMediaItemModel>();
 		fileMock.Setup(x => x.UpdateDescriptionAsync("New Desc")).Returns(Task.CompletedTask);
 
 		// Act
@@ -227,16 +227,16 @@ public class DetailSelectorModelTests {
 	}
 
 	/// <summary>
-	/// UpdateRateAsyncが複数のIFileModelに委譲していることを検証する。
+	/// UpdateRateAsyncが複数のIMediaItemModelに委譲していることを検証する。
 	/// </summary>
 	[Fact]
 	public async Task UpdateRateAsync_ShouldDelegateToAllFileModels() {
 		// Arrange
 		var tagsManager = this.CreateTagsManager(out _, out _);
 		using var model = new DetailSelectorModel(tagsManager);
-		var fileMock1 = new Mock<IFileModel>();
+		var fileMock1 = new Mock<IMediaItemModel>();
 		fileMock1.Setup(x => x.UpdateRateAsync(4)).Returns(Task.CompletedTask);
-		var fileMock2 = new Mock<IFileModel>();
+		var fileMock2 = new Mock<IMediaItemModel>();
 		fileMock2.Setup(x => x.UpdateRateAsync(4)).Returns(Task.CompletedTask);
 
 		// Act
@@ -264,7 +264,7 @@ public class DetailSelectorModelTests {
 		// By setting Id to 0 (or simply not verifying DB integrity strongly) we might still get FK issues.
 		// So let's intercept DbFactory if needed, OR just mock the Tags list so the test passes.
 		// Actually AddTagAsync returns without touching db if tag is already in file.Tags.
-		var fileMock = new Mock<IFileModel>();
+		var fileMock = new Mock<IMediaItemModel>();
 		fileMock.SetupGet(x => x.Tags).Returns([tagMock.Object]);
 
 		// Act
@@ -286,7 +286,7 @@ public class DetailSelectorModelTests {
 		var tagsManager = this.CreateTagsManager(out _, out _);
 		using var model = new DetailSelectorModel(tagsManager);
 
-		var fileMock = new Mock<IFileModel>();
+		var fileMock = new Mock<IMediaItemModel>();
 		fileMock.SetupGet(x => x.Tags).Returns([]); // Simplified
 
 		// Act

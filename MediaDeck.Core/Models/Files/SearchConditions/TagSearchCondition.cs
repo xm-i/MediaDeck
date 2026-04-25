@@ -47,14 +47,14 @@ public class TagSearchCondition : ISearchCondition {
 		}
 	}
 
-	public Expression<Func<MediaFile, bool>>? WherePredicate {
+	public Expression<Func<MediaItem, bool>>? WherePredicate {
 		get {
-			Expression<Func<MediaFile, bool>> exp1 =
-				mediaFile => mediaFile.MediaFileTags.Select(x => x.TagId).Contains(this.TagId);
+			Expression<Func<MediaItem, bool>> exp1 =
+				MediaItem => MediaItem.MediaItemTags.Select(x => x.TagId).Contains(this.TagId);
 			var exp = exp1.Body;
 			var visitor = new ParameterVisitor(exp1.Parameters);
 
-			return Expression.Lambda<Func<MediaFile, bool>>(exp,
+			return Expression.Lambda<Func<MediaItem, bool>>(exp,
 				visitor.Parameters);
 		}
 	}

@@ -81,13 +81,13 @@ public static class SearchTypeConverters {
 	}
 
 	/// <summary>
-	/// 検索タイプに対応する比較Expression（MediaFileのプロパティと定数値の比較）を生成する。
+	/// 検索タイプに対応する比較Expression（MediaItemのプロパティと定数値の比較）を生成する。
 	/// </summary>
 	/// <typeparam name="T">比較する値の型</typeparam>
 	/// <param name="searchType">検索タイプ</param>
-	/// <param name="propertySelector">MediaFileのプロパティセレクター</param>
+	/// <param name="propertySelector">MediaItemのプロパティセレクター</param>
 	/// <param name="value">比較する定数値</param>
-	/// <returns>Expression&lt;Func&lt;MediaFile, bool&gt;&gt;</returns>
+	/// <returns>Expression&lt;Func&lt;MediaItem, bool&gt;&gt;</returns>
 	public static Expression<Func<TEntity, bool>> BuildComparisonExpression<TEntity, T>(
 		SearchTypeComparison searchType,
 		Expression<Func<TEntity, T>> propertySelector,

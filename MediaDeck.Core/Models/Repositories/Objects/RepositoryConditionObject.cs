@@ -9,5 +9,5 @@ public abstract class RepositoryConditionObject {
 	/// 読み込み条件絞り込み
 	/// </summary>
 	/// <returns>絞り込み関数</returns>
-	public abstract Expression<Func<MediaFile, bool>> WherePredicate();
+	public abstract Expression<Func<MediaItem, bool>> WherePredicate();
 }

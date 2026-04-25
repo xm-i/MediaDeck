@@ -45,8 +45,8 @@ public class FileChangeTrackerTests {
 		const int testSize = 500;
 		using (var db = dbFactory.CreateDbContext()) {
 			for (int i = 0; i < testSize; i++) {
-				db.MediaFiles.Add(new MediaFile {
-					MediaFileId = i + 1,
+				db.MediaItems.Add(new MediaItem {
+					MediaItemId = i + 1,
 					FilePath = $"/test/path/file{i}.txt",
 					DirectoryPath = "/test/path",
 					Description = $"Test file {i}",
@@ -83,13 +83,13 @@ public class FileChangeTrackerTests {
 		this._output.WriteLine($"Processed {testSize} pending items in {stopwatch.ElapsedMilliseconds} ms.");
 
 		// 検証：未処理リストから Pending フラグが消えていることを確認
-		// ConsolidateEvents の処理で Deleted のみで MediaFileId が存在する場合（DBから引けた場合）、
-		// ConsolidateEvents でも残るが、もし追加以外で MediaFileId が null だと削除される。
+		// ConsolidateEvents の処理で Deleted のみで MediaItemId が存在する場合（DBから引けた場合）、
+		// ConsolidateEvents でも残るが、もし追加以外で MediaItemId が null だと削除される。
 		// ここでは DB から取得できたため、IsPending は false になり、リストに残る。
 		Assert.Equal(testSize, tracker.UnprocessedChanges.Count);
 		foreach (var change in tracker.UnprocessedChanges) {
 			Assert.False(change.IsPending);
-			Assert.NotNull(change.MediaFileId); // DBから取得できたはず
+			Assert.NotNull(change.MediaItemId); // DBから取得できたはず
 		}
 	}
 }

@@ -29,7 +29,7 @@ public class SortItem : ISortItem {
 	/// <summary>
 	/// ソートキー（Expression Tree）
 	/// </summary>
-	public Expression<Func<MediaFile, object?>> KeySelector {
+	public Expression<Func<MediaItem, object?>> KeySelector {
 		get;
 	}
 
@@ -39,7 +39,7 @@ public class SortItem : ISortItem {
 	/// <param name="key">保存時のキー</param>
 	/// <param name="dbKeySelector">DB用ソートキー</param>
 	/// <param name="direction">ソート方向</param>
-	public SortItem(SortItemKey key, Expression<Func<MediaFile, object?>> dbKeySelector, ListSortDirection direction = ListSortDirection.Ascending) {
+	public SortItem(SortItemKey key, Expression<Func<MediaItem, object?>> dbKeySelector, ListSortDirection direction = ListSortDirection.Ascending) {
 		this.Key = key;
 		this.KeySelector = dbKeySelector;
 		this.Direction = direction;
@@ -48,7 +48,7 @@ public class SortItem : ISortItem {
 	/// <summary>
 	/// IQueryable用ソート適用
 	/// </summary>
-	public IOrderedQueryable<MediaFile> ApplySort(IQueryable<MediaFile> query, bool reverse) {
+	public IOrderedQueryable<MediaItem> ApplySort(IQueryable<MediaItem> query, bool reverse) {
 		if (this.Direction == ListSortDirection.Ascending ^ reverse) {
 			return query.OrderBy(this.KeySelector);
 		} else {
@@ -59,7 +59,7 @@ public class SortItem : ISortItem {
 	/// <summary>
 	/// IQueryable用追加ソート適用
 	/// </summary>
-	public IOrderedQueryable<MediaFile> ApplyThenBySort(IOrderedQueryable<MediaFile> query, bool reverse) {
+	public IOrderedQueryable<MediaItem> ApplyThenBySort(IOrderedQueryable<MediaItem> query, bool reverse) {
 		if (this.Direction == ListSortDirection.Ascending ^ reverse) {
 			return query.ThenBy(this.KeySelector);
 		} else {
@@ -92,10 +92,10 @@ public interface ISortItem {
 	/// <summary>
 	/// IQueryable用ソート適用
 	/// </summary>
-	public IOrderedQueryable<MediaFile> ApplySort(IQueryable<MediaFile> query, bool reverse);
+	public IOrderedQueryable<MediaItem> ApplySort(IQueryable<MediaItem> query, bool reverse);
 
 	/// <summary>
 	/// IQueryable用追加ソート適用
 	/// </summary>
-	public IOrderedQueryable<MediaFile> ApplyThenBySort(IOrderedQueryable<MediaFile> query, bool reverse);
+	public IOrderedQueryable<MediaItem> ApplyThenBySort(IOrderedQueryable<MediaItem> query, bool reverse);
 }

@@ -11,15 +11,15 @@ namespace MediaDeck.Database;
 /// <param name="dbConnection"></param>
 public class MediaDeckDbContext(DbContextOptions dbContextOptions) : DbContext(dbContextOptions) {
 	/// <summary>
-	/// メディアファイルテーブル
+	/// メディアアイテムテーブル
 	/// </summary>
-	public DbSet<MediaFile> MediaFiles {
+	public DbSet<MediaItem> MediaItems {
 		get;
 		set;
 	} = null!;
 
 	/// <summary>
-	/// メディアファイルテーブル
+	/// メディアアイテムテーブル
 	/// </summary>
 	public DbSet<ImageFile> ImageFiles {
 		get;
@@ -27,7 +27,7 @@ public class MediaDeckDbContext(DbContextOptions dbContextOptions) : DbContext(d
 	} = null!;
 
 	/// <summary>
-	/// メディアファイルテーブル
+	/// メディアアイテムテーブル
 	/// </summary>
 	public DbSet<VideoFile> VideoFiles {
 		get;
@@ -91,9 +91,9 @@ public class MediaDeckDbContext(DbContextOptions dbContextOptions) : DbContext(d
 	} = null!;
 
 	/// <summary>
-	/// メディアファイル・タグ中間テーブル
+	/// メディアアイテム・タグ中間テーブル
 	/// </summary>
-	public DbSet<MediaFileTag> MediaFileTags {
+	public DbSet<MediaItemTag> MediaItemTags {
 		get;
 		set;
 	} = null!;
@@ -160,41 +160,41 @@ public class MediaDeckDbContext(DbContextOptions dbContextOptions) : DbContext(d
 	/// <param name="modelBuilder"></param>
 	protected override void OnModelCreating(ModelBuilder modelBuilder) {
 		// Primary Keys
-		modelBuilder.Entity<MediaFile>().HasKey(mf => mf.MediaFileId);
-		modelBuilder.Entity<ImageFile>().HasKey(i => i.MediaFileId);
-		modelBuilder.Entity<VideoFile>().HasKey(v => v.MediaFileId);
-		modelBuilder.Entity<VideoMetadataValue>().HasKey(v => new { v.MediaFileId, v.Key });
+		modelBuilder.Entity<MediaItem>().HasKey(mf => mf.MediaItemId);
+		modelBuilder.Entity<ImageFile>().HasKey(i => i.MediaItemId);
+		modelBuilder.Entity<VideoFile>().HasKey(v => v.MediaItemId);
+		modelBuilder.Entity<VideoMetadataValue>().HasKey(v => new { v.MediaItemId, v.Key });
 		modelBuilder.Entity<Position>().HasKey(p => new { p.Latitude, p.Longitude });
 		modelBuilder.Entity<PositionAddress>().HasKey(pa => new { pa.Latitude, pa.Longitude, pa.Type });
 		modelBuilder.Entity<PositionNameDetail>().HasKey(pnd => new { pnd.Latitude, pnd.Longitude, pnd.Desc });
-		modelBuilder.Entity<MediaFileTag>().HasKey(mft => new { mft.MediaFileId, mft.TagId });
+		modelBuilder.Entity<MediaItemTag>().HasKey(mft => new { mft.MediaItemId, mft.TagId });
 		modelBuilder.Entity<Tag>().HasKey(t => t.TagId);
 		modelBuilder.Entity<TagAlias>().HasKey(ta => new { ta.TagId, ta.TagAliasId });
 		modelBuilder.Entity<TagCategory>().HasKey(tc => tc.TagCategoryId);
-		modelBuilder.Entity<Jpeg>().HasKey(j => j.MediaFileId);
-		modelBuilder.Entity<Png>().HasKey(p => p.MediaFileId);
-		modelBuilder.Entity<Bmp>().HasKey(b => b.MediaFileId);
-		modelBuilder.Entity<Gif>().HasKey(b => b.MediaFileId);
-		modelBuilder.Entity<Heif>().HasKey(b => b.MediaFileId);
-		modelBuilder.Entity<Container>().HasKey(b => b.MediaFileId);
-		modelBuilder.Entity<FolderGroupMetadata>().HasKey(f => f.MediaFileId);
+		modelBuilder.Entity<Jpeg>().HasKey(j => j.MediaItemId);
+		modelBuilder.Entity<Png>().HasKey(p => p.MediaItemId);
+		modelBuilder.Entity<Bmp>().HasKey(b => b.MediaItemId);
+		modelBuilder.Entity<Gif>().HasKey(b => b.MediaItemId);
+		modelBuilder.Entity<Heif>().HasKey(b => b.MediaItemId);
+		modelBuilder.Entity<Container>().HasKey(b => b.MediaItemId);
+		modelBuilder.Entity<FolderGroupMetadata>().HasKey(f => f.MediaItemId);
 
 		// Index
-		modelBuilder.Entity<MediaFile>()
+		modelBuilder.Entity<MediaItem>()
 			.HasIndex(x => x.FilePath)
 			.IsUnique();
 
-		modelBuilder.Entity<MediaFile>()
+		modelBuilder.Entity<MediaItem>()
 			.HasIndex(x => x.FullHash);
 
 		// Relation
 		modelBuilder.Entity<ImageFile>()
-			.HasOne(i => i.MediaFile)
+			.HasOne(i => i.MediaItem)
 			.WithOne(m => m.ImageFile)
 			.OnDelete(DeleteBehavior.Cascade);
 
 		modelBuilder.Entity<VideoFile>()
-			.HasOne(v => v.MediaFile)
+			.HasOne(v => v.MediaItem)
 			.WithOne(m => m.VideoFile)
 			.OnDelete(DeleteBehavior.Cascade);
 
@@ -204,7 +204,7 @@ public class MediaDeckDbContext(DbContextOptions dbContextOptions) : DbContext(d
 			.OnDelete(DeleteBehavior.Cascade);
 
 		modelBuilder.Entity<Position>()
-			.HasMany(p => p.MediaFiles)
+			.HasMany(p => p.MediaItems)
 			.WithOne(m => m.Position!)
 			.HasForeignKey(p => new { p.Latitude, p.Longitude })
 			.OnDelete(DeleteBehavior.ClientSetNull);
@@ -221,14 +221,14 @@ public class MediaDeckDbContext(DbContextOptions dbContextOptions) : DbContext(d
 			.HasForeignKey(p => new { p.Latitude, p.Longitude })
 			.OnDelete(DeleteBehavior.Cascade);
 
-		modelBuilder.Entity<MediaFileTag>()
-			.HasOne(mft => mft.MediaFile)
-			.WithMany(mf => mf.MediaFileTags)
+		modelBuilder.Entity<MediaItemTag>()
+			.HasOne(mft => mft.MediaItem)
+			.WithMany(mf => mf.MediaItemTags)
 			.OnDelete(DeleteBehavior.Cascade);
 
-		modelBuilder.Entity<MediaFileTag>()
+		modelBuilder.Entity<MediaItemTag>()
 			.HasOne(mft => mft.Tag)
-			.WithMany(t => t.MediaFileTags)
+			.WithMany(t => t.MediaItemTags)
 			.OnDelete(DeleteBehavior.Cascade);
 
 		modelBuilder.Entity<TagAlias>()
@@ -244,37 +244,37 @@ public class MediaDeckDbContext(DbContextOptions dbContextOptions) : DbContext(d
 			.OnDelete(DeleteBehavior.SetNull);
 
 		modelBuilder.Entity<Jpeg>()
-			.HasOne(j => j.MediaFile)
+			.HasOne(j => j.MediaItem)
 			.WithOne(m => m.Jpeg)
 			.OnDelete(DeleteBehavior.Cascade);
 
 		modelBuilder.Entity<Png>()
-			.HasOne(p => p.MediaFile)
+			.HasOne(p => p.MediaItem)
 			.WithOne(m => m.Png)
 			.OnDelete(DeleteBehavior.Cascade);
 
 		modelBuilder.Entity<Bmp>()
-			.HasOne(b => b.MediaFile)
+			.HasOne(b => b.MediaItem)
 			.WithOne(m => m.Bmp)
 			.OnDelete(DeleteBehavior.Cascade);
 
 		modelBuilder.Entity<Gif>()
-			.HasOne(g => g.MediaFile)
+			.HasOne(g => g.MediaItem)
 			.WithOne(m => m.Gif)
 			.OnDelete(DeleteBehavior.Cascade);
 
 		modelBuilder.Entity<Heif>()
-			.HasOne(g => g.MediaFile)
+			.HasOne(g => g.MediaItem)
 			.WithOne(m => m.Heif)
 			.OnDelete(DeleteBehavior.Cascade);
 
 		modelBuilder.Entity<Container>()
-			.HasOne(g => g.MediaFile)
+			.HasOne(g => g.MediaItem)
 			.WithOne(m => m.Container)
 			.OnDelete(DeleteBehavior.Cascade);
 
 		modelBuilder.Entity<FolderGroupMetadata>()
-			.HasOne(f => f.MediaFile)
+			.HasOne(f => f.MediaItem)
 			.WithOne(m => m.FolderGroupMetadata)
 			.OnDelete(DeleteBehavior.Cascade);
 	}

@@ -22,10 +22,10 @@ public class FileStatusUpdatorService {
 	} = new();
 
 	public async Task UpdateFileInfo() {
-		var updateList = new List<MediaFile>();
-		var targetFiles = new List<MediaFile>();
+		var updateList = new List<MediaItem>();
+		var targetFiles = new List<MediaItem>();
 		await using (var db = await this._dbFactory.CreateDbContextAsync()) {
-			targetFiles = await db.MediaFiles.ToListAsync();
+			targetFiles = await db.MediaItems.ToListAsync();
 		}
 		this.TargetCount.Value = targetFiles.Count;
 		this.CompletedCount.Value = 0;
@@ -56,7 +56,7 @@ public class FileStatusUpdatorService {
 
 			if (file.IsExists) {
 				if (needsHashUpdate) {
-					this._fileHashUpdatorService.EnqueueHashUpdate(file.MediaFileId);
+					this._fileHashUpdatorService.EnqueueHashUpdate(file.MediaItemId);
 				}
 				file.FileSize = fileInfo.Length;
 				file.CreationTime = fileInfo.CreationTime;

@@ -14,11 +14,11 @@ namespace MediaDeck.Core.Models.Files.Filter;
 /// コンストラクタ
 /// </remarks>
 /// <param name="condition">フィルタリング条件（SQL翻訳可能なExpression）</param>
-public class FilterItem(Expression<Func<MediaFile, bool>> condition) {
+public class FilterItem(Expression<Func<MediaItem, bool>> condition) {
 	/// <summary>
 	/// フィルタリング条件
 	/// </summary>
-	public Expression<Func<MediaFile, bool>> Condition {
+	public Expression<Func<MediaItem, bool>> Condition {
 		get;
 	} = condition;
 

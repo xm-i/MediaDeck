@@ -1,21 +1,21 @@
 using MediaDeck.Common.Base;
-using MediaDeck.Composition.Interfaces.FileTypes;
-using MediaDeck.Composition.Interfaces.FileTypes.ViewModels;
-using MediaDeck.Composition.Interfaces.FileTypes.Views;
+using MediaDeck.Composition.Interfaces.MediaItemTypes;
+using MediaDeck.Composition.Interfaces.MediaItemTypes.ViewModels;
+using MediaDeck.Composition.Interfaces.MediaItemTypes.Views;
 
 namespace MediaDeck.ViewModels.Thumbnails;
 
 [Inject(InjectServiceLifetime.Transient)]
 public class ThumbnailPickerSelectorViewModel : ViewModelBase {
-	public ThumbnailPickerSelectorViewModel(IFileTypeService fileTypeService) {
+	public ThumbnailPickerSelectorViewModel(IMediaItemTypeService MediaItemTypeService) {
 		this.FileViewModel.Subscribe(async x => {
 			if (x == null) {
 				this.ThumbnailPickerViewModel.Value = null;
 				this.ThumbnailPickerView.Value = null;
 				return;
 			}
-			this.ThumbnailPickerViewModel.Value = fileTypeService.CreateThumbnailPickerViewModel(x);
-			this.ThumbnailPickerView.Value = fileTypeService.CreateThumbnailPickerView(x);
+			this.ThumbnailPickerViewModel.Value = MediaItemTypeService.CreateThumbnailPickerViewModel(x);
+			this.ThumbnailPickerView.Value = MediaItemTypeService.CreateThumbnailPickerView(x);
 			this.ThumbnailPickerView.Value.DataContext = this.ThumbnailPickerViewModel.Value;
 			await this.ThumbnailPickerViewModel.Value.LoadAsync(x);
 		}).AddTo(this.CompositeDisposable);
@@ -30,7 +30,7 @@ public class ThumbnailPickerSelectorViewModel : ViewModelBase {
 		get;
 	} = new();
 
-	public BindableReactiveProperty<IFileViewModel> FileViewModel {
+	public BindableReactiveProperty<IMediaItemViewModel> FileViewModel {
 		get;
 	} = new();
 }

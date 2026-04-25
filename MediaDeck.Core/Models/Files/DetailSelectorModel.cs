@@ -1,4 +1,4 @@
-using MediaDeck.Composition.Interfaces.FileTypes.Models;
+using MediaDeck.Composition.Interfaces.MediaItemTypes.Models;
 using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Core.Primitives;
 
@@ -98,7 +98,7 @@ public class DetailSelectorModel : IDisposable {
 	/// <summary>
 	/// TargetFilesから各種状態を算出してプロパティを更新する
 	/// </summary>
-	public void Refresh(IFileModel[] files) {
+	public void Refresh(IMediaItemModel[] files) {
 		if (files.Length > 0) {
 			this.Properties.Value =
 				files
@@ -141,7 +141,7 @@ public class DetailSelectorModel : IDisposable {
 	/// <summary>
 	/// タグリストを再計算して更新する
 	/// </summary>
-	public void RefreshTags(IFileModel[] files) {
+	public void RefreshTags(IMediaItemModel[] files) {
 		this._tags.Clear();
 		this._tags.AddRange(files
 			.SelectMany(x => x.Tags)
@@ -152,7 +152,7 @@ public class DetailSelectorModel : IDisposable {
 	/// <summary>
 	/// ファイルにタグを追加する
 	/// </summary>
-	public async Task AddTagAsync(IFileModel[] files, ITagModel tag) {
+	public async Task AddTagAsync(IMediaItemModel[] files, ITagModel tag) {
 		await this._tagsManager.AddTagAsync(files, tag);
 		this.RefreshTags(files);
 	}
@@ -160,7 +160,7 @@ public class DetailSelectorModel : IDisposable {
 	/// <summary>
 	/// ファイルからタグを削除する
 	/// </summary>
-	public async Task RemoveTagAsync(IFileModel[] files, int tagId) {
+	public async Task RemoveTagAsync(IMediaItemModel[] files, int tagId) {
 		await this._tagsManager.RemoveTagAsync(files, tagId);
 		this.RefreshTags(files);
 	}
@@ -175,14 +175,14 @@ public class DetailSelectorModel : IDisposable {
 	/// <summary>
 	/// 説明を更新する
 	/// </summary>
-	public async Task UpdateDescriptionAsync(IFileModel file, string description) {
+	public async Task UpdateDescriptionAsync(IMediaItemModel file, string description) {
 		await file.UpdateDescriptionAsync(description);
 	}
 
 	/// <summary>
 	/// 評価を更新する
 	/// </summary>
-	public async Task UpdateRateAsync(IFileModel[] files, int rate) {
+	public async Task UpdateRateAsync(IMediaItemModel[] files, int rate) {
 		foreach (var file in files) {
 			await file.UpdateRateAsync(rate);
 		}

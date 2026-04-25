@@ -65,13 +65,13 @@ public class DisposableBase : ObservableObject, IDisposableBase {
 		}
 	}
 
-	protected DisposableBase() {
 #if DEBUG
+	protected DisposableBase() {
 		this._trackingInfo = new InstanceTrackingInfo(this);
 		var bag = CreatedInstances.GetOrAdd(this.GetType(), _ => []);
 		bag.Add(this._trackingInfo);
-#endif
 	}
+#endif
 
 	/// <summary>
 	/// Dispose
@@ -98,7 +98,7 @@ public class DisposableBase : ObservableObject, IDisposableBase {
 			}
 			if (disposing) {
 #if DEBUG
-				this._trackingInfo.RecordDispose();
+				this._trackingInfo?.RecordDispose();
 #endif
 				this._onDisposed.OnNext(Unit.Default);
 				this._compositeDisposable?.Dispose();
@@ -115,9 +115,9 @@ public class DisposableBase : ObservableObject, IDisposableBase {
 	/// デバッグ用ファイナライザ。Dispose漏れを検出する。
 	/// </summary>
 	~DisposableBase() {
-		this._trackingInfo.RecordFinalize();
+		this._trackingInfo?.RecordFinalize();
 		if (this.DisposeState == DisposeState.NotDisposed) {
-			//			Debug.WriteLine($"[DISPOSE LEAK] {this.GetType().FullName} がDisposeされずにGCされました。");
+			// Debug.WriteLine($"[DISPOSE LEAK] {this.GetType().FullName} がDisposeされずにGCされました。");
 		}
 	}
 #endif

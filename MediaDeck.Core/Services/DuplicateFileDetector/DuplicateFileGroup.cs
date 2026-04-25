@@ -17,7 +17,7 @@ public class DuplicateFileGroup {
 	/// <summary>
 	/// 重複ファイルリスト
 	/// </summary>
-	public required List<MediaFile> Files {
+	public required List<MediaItem> Files {
 		get;
 		init;
 	}

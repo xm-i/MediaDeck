@@ -33,7 +33,7 @@ public class TagModel : ITagModel {
 		this._tagName = tag.TagName;
 		this._detail = tag.Detail;
 		this._romaji = (tag.Ruby ?? tag.TagName.KatakanaToHiragana()).HiraganaToRomaji();
-		this.UsageCount.Value = tag.MediaFileTags.Count;
+		this.UsageCount.Value = tag.MediaItemTags.Count;
 		this._tagAliases = [.. tag.TagAliases.Select(factory.CreateAlias)];
 		this._isInitialized = true;
 		this.IsDirty = false;

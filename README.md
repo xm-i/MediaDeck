@@ -39,12 +39,11 @@ MediaDeck/
 ├── MediaDeck/                  # メインアプリケーション (WinUI 3 / Views)
 ├── MediaDeck.ViewModels/       # ViewModels (R3ベースのプロパティとコマンド)
 ├── MediaDeck.Core/             # ビジネスロジック・モデル・状態管理
-├── MediaDeck.FileTypes/        # メディアタイプ別の個別処理実装
+├── MediaDeck.MediaItemTypes/   # メディアタイプ別の個別処理実装
 ├── MediaDeck.Database/         # データベース層 (EF Core, SQLite)
 ├── MediaDeck.Composition/      # システム全体の共通設定・DI定義
 ├── MediaDeck.Composition.UI/   # UIレイヤー用のDI定義と共通コンポーネント
 ├── MediaDeck.Common/           # 共通ユーティリティ・基底クラス類
-├── MediaDeck.Store/            # 設定・データの永続化管理
 └── lib/                        # 外部ライブラリ・サブモジュール
 ```
 

@@ -1,5 +1,5 @@
 using MediaDeck.Common.Base;
-using MediaDeck.Composition.Interfaces.FileTypes.Models;
+using MediaDeck.Composition.Interfaces.MediaItemTypes.Models;
 using MediaDeck.Composition.Interfaces.Primitives;
 
 namespace MediaDeck.Core.Models.Maps;
@@ -14,7 +14,7 @@ public class MapPin : ModelBase {
 	/// <summary>
 	/// 代表メディア
 	/// </summary>
-	public ReactiveProperty<IFileModel> Core {
+	public ReactiveProperty<IMediaItemModel> Core {
 		get;
 	} = new();
 
@@ -37,10 +37,10 @@ public class MapPin : ModelBase {
 	}
 
 	/// <summary>
-	/// メディアファイルリスト
+	/// メディアアイテムリスト
 	/// VM作成中にコレクションが変化する可能性がある場合は必ずSyncRootでロックすること。
 	/// </summary>
-	public ObservableList<IFileModel> Items {
+	public ObservableList<IMediaItemModel> Items {
 		get;
 	} = [];
 
@@ -60,7 +60,7 @@ public class MapPin : ModelBase {
 	/// </summary>
 	/// <param name="core">代表ファイル</param>
 	/// <param name="rectangle">表示領域</param>
-	public MapPin(IFileModel core, Rectangle rectangle) {
+	public MapPin(IMediaItemModel core, Rectangle rectangle) {
 		this.Core.Value = core;
 		this.Items.Add(core);
 		this.CoreRectangle = rectangle;

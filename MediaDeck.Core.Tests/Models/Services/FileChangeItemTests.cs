@@ -15,7 +15,7 @@ public class FileChangeItemTests {
 		var item = new FileChangeItem();
 
 		// Assert
-		Assert.Null(item.MediaFileId);
+		Assert.Null(item.MediaItemId);
 
 		// CreatedAt は現在時刻に近い値であることを確認
 		var timeDifference = DateTime.UtcNow - item.CreatedAt;
@@ -44,7 +44,7 @@ public class FileChangeItemTests {
 		var now = DateTime.UtcNow;
 
 		// Act
-		item.MediaFileId = 123;
+		item.MediaItemId = 123;
 		item.CreatedAt = now;
 		item.IsPending = true;
 		item.OldPath = "C:\\old\\path.txt";
@@ -56,7 +56,7 @@ public class FileChangeItemTests {
 		item.NewHash = "newhash";
 
 		// Assert
-		Assert.Equal(123, item.MediaFileId);
+		Assert.Equal(123, item.MediaItemId);
 		Assert.Equal(now, item.CreatedAt);
 		Assert.True(item.IsPending);
 		Assert.Equal("C:\\old\\path.txt", item.OldPath);

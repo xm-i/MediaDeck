@@ -63,11 +63,11 @@ public class DuplicateFileDetectorService : ModelBase {
 
 			if (useFullHash) {
 				await using var db = await this._dbFactory.CreateDbContextAsync();
-				groups = await db.MediaFiles
-					.Include(x => x.MediaFileTags)
+				groups = await db.MediaItems
+					.Include(x => x.MediaItemTags)
 					.ThenInclude(x => x.Tag)
 					.ThenInclude(x => x.TagCategory)
-					.Include(x => x.MediaFileTags)
+					.Include(x => x.MediaItemTags)
 					.ThenInclude(x => x.Tag)
 					.ThenInclude(x => x.TagAliases)
 					.Where(x => x.FullHash != null)
@@ -77,11 +77,11 @@ public class DuplicateFileDetectorService : ModelBase {
 					.ToListAsync();
 			} else {
 				await using var db = await this._dbFactory.CreateDbContextAsync();
-				groups = await db.MediaFiles
-					.Include(x => x.MediaFileTags)
+				groups = await db.MediaItems
+					.Include(x => x.MediaItemTags)
 					.ThenInclude(x => x.Tag)
 					.ThenInclude(x => x.TagCategory)
-					.Include(x => x.MediaFileTags)
+					.Include(x => x.MediaItemTags)
 					.ThenInclude(x => x.Tag)
 					.ThenInclude(x => x.TagAliases)
 					.Where(x => x.PreHash != null)

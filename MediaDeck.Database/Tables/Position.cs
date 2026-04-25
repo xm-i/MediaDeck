@@ -86,9 +86,9 @@ public class Position {
 	}
 
 	/// <summary>
-	/// メディアファイル
+	/// メディアアイテム
 	/// </summary>
-	public ICollection<MediaFile> MediaFiles {
+	public ICollection<MediaItem> MediaItems {
 		get {
 			return field ?? throw new InvalidOperationException();
 		}

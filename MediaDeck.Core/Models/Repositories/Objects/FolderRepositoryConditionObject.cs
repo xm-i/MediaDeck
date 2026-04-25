@@ -15,16 +15,16 @@ public class FolderRepositoryConditionObject : RepositoryConditionObject {
 		init;
 	}
 
-	public override Expression<Func<MediaFile, bool>> WherePredicate() {
+	public override Expression<Func<MediaItem, bool>> WherePredicate() {
 		if (this.DirectoryPath == null) {
 			throw new InvalidOperationException();
 		}
 		if (this.IncludeSubDirectories) {
-			return mediaFile =>
-				mediaFile.DirectoryPath == this.DirectoryPath || mediaFile.DirectoryPath.StartsWith($"{this.DirectoryPath}{Path.DirectorySeparatorChar}");
+			return MediaItem =>
+				MediaItem.DirectoryPath == this.DirectoryPath || MediaItem.DirectoryPath.StartsWith($"{this.DirectoryPath}{Path.DirectorySeparatorChar}");
 		} else {
-			return mediaFile =>
-				mediaFile.DirectoryPath == this.DirectoryPath;
+			return MediaItem =>
+				MediaItem.DirectoryPath == this.DirectoryPath;
 		}
 	}
 }

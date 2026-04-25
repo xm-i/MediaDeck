@@ -1,4 +1,4 @@
-using MediaDeck.Composition.Interfaces.FileTypes.Models;
+using MediaDeck.Composition.Interfaces.MediaItemTypes.Models;
 
 namespace MediaDeck.Composition.Interfaces.Tags;
 
@@ -63,7 +63,7 @@ public interface ITagsManager {
 	/// <param name="fileModels">対象ファイル</param>
 	/// <param name="tag">追加するタグ</param>
 	/// <returns>タスク</returns>
-	public Task AddTagAsync(IFileModel[] fileModels, ITagModel tag);
+	public Task AddTagAsync(IMediaItemModel[] fileModels, ITagModel tag);
 
 	/// <summary>
 	/// ファイルからタグを削除する
@@ -71,7 +71,7 @@ public interface ITagsManager {
 	/// <param name="fileModels">対象ファイル</param>
 	/// <param name="tagId">削除するタグのID</param>
 	/// <returns>タスク</returns>
-	public Task RemoveTagAsync(IFileModel[] fileModels, int tagId);
+	public Task RemoveTagAsync(IMediaItemModel[] fileModels, int tagId);
 
 	/// <summary>
 	/// タグカテゴリをシステムから完全に削除する

@@ -2,7 +2,7 @@ using System.Diagnostics;
 
 using MediaDeck.Common.Base;
 using MediaDeck.Composition.Interfaces.Files;
-using MediaDeck.Composition.Interfaces.FileTypes.Models;
+using MediaDeck.Composition.Interfaces.MediaItemTypes.Models;
 using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Composition.Stores.State.Model;
@@ -52,7 +52,7 @@ public class MediaContentLibrary : ModelBase {
 	private readonly SearchConfigModel _searchConfig;
 
 	/// <summary>検索結果ファイルリスト</summary>
-	public ObservableList<IFileModel> Files { get; } = [];
+	public ObservableList<IMediaItemModel> Files { get; } = [];
 
 	/// <summary>現在の検索ワード（トークン）条件リスト</summary>
 	public ObservableList<ISearchCondition> SearchConditions { get; } = [];
@@ -69,7 +69,7 @@ public class MediaContentLibrary : ModelBase {
 	/// </summary>
 	private async ValueTask SearchAsync(CancellationToken token) {
 		this.SearchElapsedMilliseconds.Value = null;
-		var batch = new List<IFileModel>();
+		var batch = new List<IMediaItemModel>();
 		try {
 			var stopwatch = Stopwatch.StartNew();
 

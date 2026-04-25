@@ -116,8 +116,8 @@ public class UpdateFileHashBackgroundServiceTests : IDisposable {
 		// Arrange
 		using (var context = new MediaDeckDbContext(this._options)) {
 			// 同じPreHashを持つレコードを2つ作成
-			context.MediaFiles.Add(new MediaFile { FilePath = "dummy1.jpg", DirectoryPath = "dir", IsExists = true, PreHash = "samehash", Description = string.Empty });
-			context.MediaFiles.Add(new MediaFile { FilePath = "dummy2.jpg", DirectoryPath = "dir", IsExists = true, PreHash = "samehash", Description = string.Empty });
+			context.MediaItems.Add(new MediaItem { FilePath = "dummy1.jpg", DirectoryPath = "dir", IsExists = true, PreHash = "samehash", Description = string.Empty });
+			context.MediaItems.Add(new MediaItem { FilePath = "dummy2.jpg", DirectoryPath = "dir", IsExists = true, PreHash = "samehash", Description = string.Empty });
 			await context.SaveChangesAsync();
 		}
 
@@ -159,7 +159,7 @@ public class UpdateFileHashBackgroundServiceTests : IDisposable {
 	}
 
 	/// <summary>
-	/// キュー内のメディアファイルのPreHashが正しく更新されることを確認する。
+	/// キュー内のメディアアイテムのPreHashが正しく更新されることを確認する。
 	/// </summary>
 	[Fact]
 	public async Task UpdateHashAsync_ShouldUpdatePreHash() {
@@ -167,12 +167,12 @@ public class UpdateFileHashBackgroundServiceTests : IDisposable {
 		var tempFile = Path.Combine(this._tempDir, "test.txt");
 		await File.WriteAllTextAsync(tempFile, "dummy content");
 
-		long mediaFileId;
+		long MediaItemId;
 		using (var context = new MediaDeckDbContext(this._options)) {
-			var mediaFile = new MediaFile { FilePath = tempFile, DirectoryPath = "dir", IsExists = true, Description = string.Empty };
-			context.MediaFiles.Add(mediaFile);
+			var MediaItem = new MediaItem { FilePath = tempFile, DirectoryPath = "dir", IsExists = true, Description = string.Empty };
+			context.MediaItems.Add(MediaItem);
 			await context.SaveChangesAsync();
-			mediaFileId = mediaFile.MediaFileId;
+			MediaItemId = MediaItem.MediaItemId;
 		}
 
 		var mockFactory = this.CreateDbFactoryMock();
@@ -180,31 +180,31 @@ public class UpdateFileHashBackgroundServiceTests : IDisposable {
 		using var service = new FileHashUpdatorService(mockFactory.Object, loggerMock.Object);
 
 		// Act
-		service.EnqueueHashUpdate(mediaFileId);
+		service.EnqueueHashUpdate(MediaItemId);
 		await this.WaitUntilAsync(service.CompletedCount, 1L);
 
 		// Assert
 		using (var context = new MediaDeckDbContext(this._options)) {
-			var updatedMediaFile = await context.MediaFiles.FindAsync(mediaFileId);
-			updatedMediaFile.ShouldNotBeNull();
-			updatedMediaFile.PreHash.ShouldNotBeNullOrEmpty();
-			updatedMediaFile.PreHashUpdatedTime.ShouldNotBeNull();
+			var updatedMediaItem = await context.MediaItems.FindAsync(MediaItemId);
+			updatedMediaItem.ShouldNotBeNull();
+			updatedMediaItem.PreHash.ShouldNotBeNullOrEmpty();
+			updatedMediaItem.PreHashUpdatedTime.ShouldNotBeNull();
 		}
 		service.CompletedCount.Value.ShouldBe(1);
 	}
 
 	/// <summary>
-	/// メディアファイルが存在しない（IsExists == false）場合、処理をスキップすることを確認する。
+	/// メディアアイテムが存在しない（IsExists == false）場合、処理をスキップすることを確認する。
 	/// </summary>
 	[Fact]
-	public async Task UpdateHashAsync_WhenMediaFileNotExists_ShouldContinue() {
+	public async Task UpdateHashAsync_WhenMediaItemNotExists_ShouldContinue() {
 		// Arrange
-		long mediaFileId;
+		long MediaItemId;
 		using (var context = new MediaDeckDbContext(this._options)) {
-			var mediaFile = new MediaFile { FilePath = "dummy.txt", DirectoryPath = "dir", IsExists = false, Description = string.Empty };
-			context.MediaFiles.Add(mediaFile);
+			var MediaItem = new MediaItem { FilePath = "dummy.txt", DirectoryPath = "dir", IsExists = false, Description = string.Empty };
+			context.MediaItems.Add(MediaItem);
 			await context.SaveChangesAsync();
-			mediaFileId = mediaFile.MediaFileId;
+			MediaItemId = MediaItem.MediaItemId;
 		}
 
 		var mockFactory = this.CreateDbFactoryMock();
@@ -212,14 +212,14 @@ public class UpdateFileHashBackgroundServiceTests : IDisposable {
 		using var service = new FileHashUpdatorService(mockFactory.Object, loggerMock.Object);
 
 		// Act
-		service.EnqueueHashUpdate(mediaFileId);
+		service.EnqueueHashUpdate(MediaItemId);
 		await this.WaitUntilAsync(service.CompletedCount, 1L);
 
 		// Assert
 		using (var context = new MediaDeckDbContext(this._options)) {
-			var mediaFile = await context.MediaFiles.FindAsync(mediaFileId);
-			mediaFile.ShouldNotBeNull();
-			mediaFile.PreHash.ShouldBeNull(); // 更新されていないこと
+			var MediaItem = await context.MediaItems.FindAsync(MediaItemId);
+			MediaItem.ShouldNotBeNull();
+			MediaItem.PreHash.ShouldBeNull(); // 更新されていないこと
 		}
 		service.CompletedCount.Value.ShouldBe(1); // finallyブロックでカウントは進む
 	}
@@ -230,12 +230,12 @@ public class UpdateFileHashBackgroundServiceTests : IDisposable {
 	[Fact]
 	public async Task UpdateHashAsync_WhenFileDoesNotExist_ShouldLogErrorAndContinue() {
 		// Arrange
-		long mediaFileId;
+		long MediaItemId;
 		using (var context = new MediaDeckDbContext(this._options)) {
-			var mediaFile = new MediaFile { FilePath = "not_found.txt", DirectoryPath = "dir", IsExists = true, Description = string.Empty };
-			context.MediaFiles.Add(mediaFile);
+			var MediaItem = new MediaItem { FilePath = "not_found.txt", DirectoryPath = "dir", IsExists = true, Description = string.Empty };
+			context.MediaItems.Add(MediaItem);
 			await context.SaveChangesAsync();
-			mediaFileId = mediaFile.MediaFileId;
+			MediaItemId = MediaItem.MediaItemId;
 		}
 
 		var mockFactory = this.CreateDbFactoryMock();
@@ -243,7 +243,7 @@ public class UpdateFileHashBackgroundServiceTests : IDisposable {
 		using var service = new FileHashUpdatorService(mockFactory.Object, loggerMock.Object);
 
 		// Act
-		service.EnqueueHashUpdate(mediaFileId);
+		service.EnqueueHashUpdate(MediaItemId);
 		await this.WaitUntilAsync(service.CompletedCount, 1L);
 
 		// Assert
@@ -260,7 +260,7 @@ public class UpdateFileHashBackgroundServiceTests : IDisposable {
 	}
 
 	/// <summary>
-	/// キュー内のメディアファイルのFullHashが正しく更新されることを確認する。
+	/// キュー内のメディアアイテムのFullHashが正しく更新されることを確認する。
 	/// </summary>
 	[Fact]
 	public async Task UpdateFullHashAsync_ShouldUpdateFullHash() {
@@ -268,12 +268,12 @@ public class UpdateFileHashBackgroundServiceTests : IDisposable {
 		var tempFile = Path.Combine(this._tempDir, "test_full.txt");
 		await File.WriteAllTextAsync(tempFile, "dummy full content");
 
-		long mediaFileId;
+		long MediaItemId;
 		using (var context = new MediaDeckDbContext(this._options)) {
-			var mediaFile = new MediaFile { FilePath = tempFile, DirectoryPath = "dir", IsExists = true, Description = string.Empty };
-			context.MediaFiles.Add(mediaFile);
+			var MediaItem = new MediaItem { FilePath = tempFile, DirectoryPath = "dir", IsExists = true, Description = string.Empty };
+			context.MediaItems.Add(MediaItem);
 			await context.SaveChangesAsync();
-			mediaFileId = mediaFile.MediaFileId;
+			MediaItemId = MediaItem.MediaItemId;
 		}
 
 		var mockFactory = this.CreateDbFactoryMock();
@@ -281,16 +281,16 @@ public class UpdateFileHashBackgroundServiceTests : IDisposable {
 		using var service = new FileHashUpdatorService(mockFactory.Object, loggerMock.Object);
 
 		// Act
-		service.FullHashUpdateQueue.Enqueue(mediaFileId);
+		service.FullHashUpdateQueue.Enqueue(MediaItemId);
 		service.FullHashTargetCount.Value++;
 		await this.WaitUntilAsync(service.FullHashCompletedCount, 1L);
 
 		// Assert
 		using (var context = new MediaDeckDbContext(this._options)) {
-			var updatedMediaFile = await context.MediaFiles.FindAsync(mediaFileId);
-			updatedMediaFile.ShouldNotBeNull();
-			updatedMediaFile.FullHash.ShouldNotBeNullOrEmpty();
-			updatedMediaFile.FullHashUpdatedTime.ShouldNotBeNull();
+			var updatedMediaItem = await context.MediaItems.FindAsync(MediaItemId);
+			updatedMediaItem.ShouldNotBeNull();
+			updatedMediaItem.FullHash.ShouldNotBeNullOrEmpty();
+			updatedMediaItem.FullHashUpdatedTime.ShouldNotBeNull();
 		}
 		service.FullHashCompletedCount.Value.ShouldBe(1);
 	}
@@ -303,13 +303,13 @@ public class UpdateFileHashBackgroundServiceTests : IDisposable {
 		// Arrange
 		long fileId1, fileId2;
 		using (var context = new MediaDeckDbContext(this._options)) {
-			var mediaFile1 = new MediaFile { FilePath = "dummy1.txt", DirectoryPath = "dir", IsExists = true, PreHash = "dup_hash", Description = string.Empty, PreHashUpdatedTime = DateTime.Now };
-			var mediaFile2 = new MediaFile { FilePath = "dummy2.txt", DirectoryPath = "dir", IsExists = true, PreHash = "dup_hash", Description = string.Empty, PreHashUpdatedTime = DateTime.Now };
-			context.MediaFiles.Add(mediaFile1);
-			context.MediaFiles.Add(mediaFile2);
+			var MediaItem1 = new MediaItem { FilePath = "dummy1.txt", DirectoryPath = "dir", IsExists = true, PreHash = "dup_hash", Description = string.Empty, PreHashUpdatedTime = DateTime.Now };
+			var MediaItem2 = new MediaItem { FilePath = "dummy2.txt", DirectoryPath = "dir", IsExists = true, PreHash = "dup_hash", Description = string.Empty, PreHashUpdatedTime = DateTime.Now };
+			context.MediaItems.Add(MediaItem1);
+			context.MediaItems.Add(MediaItem2);
 			await context.SaveChangesAsync();
-			fileId1 = mediaFile1.MediaFileId;
-			fileId2 = mediaFile2.MediaFileId;
+			fileId1 = MediaItem1.MediaItemId;
+			fileId2 = MediaItem2.MediaItemId;
 		}
 
 		var mockFactory = this.CreateDbFactoryMock();

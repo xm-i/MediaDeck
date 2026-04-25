@@ -34,14 +34,14 @@ public class FolderSearchCondition : ISearchCondition {
 		}
 	}
 
-	public Expression<Func<MediaFile, bool>>? WherePredicate {
+	public Expression<Func<MediaItem, bool>>? WherePredicate {
 		get {
 			if (this.IncludeSubDirectories) {
-				return mediaFile =>
-					mediaFile.DirectoryPath == this.FolderPath || mediaFile.DirectoryPath.StartsWith($"{this.FolderPath}{Path.DirectorySeparatorChar}");
+				return MediaItem =>
+					MediaItem.DirectoryPath == this.FolderPath || MediaItem.DirectoryPath.StartsWith($"{this.FolderPath}{Path.DirectorySeparatorChar}");
 			} else {
-				return mediaFile =>
-					mediaFile.DirectoryPath == this.FolderPath;
+				return MediaItem =>
+					MediaItem.DirectoryPath == this.FolderPath;
 			}
 		}
 	}

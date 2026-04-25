@@ -1,5 +1,5 @@
 using MediaDeck.Common.Base;
-using MediaDeck.Composition.Interfaces.FileTypes.ViewModels;
+using MediaDeck.Composition.Interfaces.MediaItemTypes.ViewModels;
 using MediaDeck.Core.Models.Files;
 
 namespace MediaDeck.ViewModels.Panes.ViewerPanes;
@@ -16,7 +16,7 @@ public abstract class ViewerPaneViewModelBase(string name, FilesManager filesMan
 		get;
 	} = new(false);
 
-	public async Task RemoveFilesAsync(IEnumerable<IFileViewModel> fileViewModels) {
+	public async Task RemoveFilesAsync(IEnumerable<IMediaItemViewModel> fileViewModels) {
 		await filesManager.RemoveFilesAsync(fileViewModels.Select(x => x.FileModel));
 	}
 }

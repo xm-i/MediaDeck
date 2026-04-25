@@ -26,6 +26,6 @@ public interface IFileHashUpdatorService : IServiceBase {
 	}
 
 	public Task CheckAndEnqueueFullHashUpdatesAsync(CancellationToken ct = default);
-	public void EnqueueHashUpdate(long mediaFileId);
-	public void EnqueueHashUpdateRange(IEnumerable<long> mediaFileIds);
+	public void EnqueueHashUpdate(long MediaItemId);
+	public void EnqueueHashUpdateRange(IEnumerable<long> MediaItemIds);
 }

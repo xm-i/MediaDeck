@@ -1,4 +1,4 @@
-using MediaDeck.Composition.Interfaces.FileTypes.Models;
+using MediaDeck.Composition.Interfaces.MediaItemTypes.Models;
 using MediaDeck.Composition.Objects;
 using MediaDeck.Core.Models.NotificationDispatcher;
 using MediaDeck.Database;
@@ -27,20 +27,20 @@ public class FilesManager {
 	/// 指定されたファイルをデータベースから削除し、完了通知を発行
 	/// </summary>
 	/// <param name="fileModels">削除するファイルモデルのコレクション</param>
-	public async Task RemoveFilesAsync(IEnumerable<IFileModel> fileModels) {
+	public async Task RemoveFilesAsync(IEnumerable<IMediaItemModel> fileModels) {
 		await using var db = await this._dbFactory.CreateDbContextAsync();
 		using var transaction = await db.Database.BeginTransactionAsync();
 		var ids = fileModels.Select(x => x.Id).ToArray();
 		var targetFiles =
 			await db
-				.MediaFiles
-				.Where(x => ids.Contains(x.MediaFileId))
+				.MediaItems
+				.Where(x => ids.Contains(x.MediaItemId))
 				.ToListAsync();
 
 		if (targetFiles.Count == 0) {
 			return;
 		}
-		db.MediaFiles.RemoveRange(targetFiles);
+		db.MediaItems.RemoveRange(targetFiles);
 		await db.SaveChangesAsync();
 		await transaction.CommitAsync();
 

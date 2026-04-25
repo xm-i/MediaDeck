@@ -76,7 +76,7 @@ public class FilteringCondition : ModelBase {
 	/// </summary>
 	/// <param name="query">絞り込みクエリを適用するクエリ</param>
 	/// <returns>結果</returns>
-	public IQueryable<MediaFile> SetFilterConditions(IQueryable<MediaFile> query) {
+	public IQueryable<MediaItem> SetFilterConditions(IQueryable<MediaItem> query) {
 		foreach (var filter in this._filterItems) {
 			query = query.Where(filter.Condition);
 		}

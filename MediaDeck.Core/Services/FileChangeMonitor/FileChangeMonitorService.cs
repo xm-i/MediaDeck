@@ -101,11 +101,11 @@ public class FileChangeMonitorService : ModelBase {
 					continue;
 				}
 
-				if (item.MediaFileId.HasValue) {
-					var file = await db.MediaFiles.FirstOrDefaultAsync(mf => mf.MediaFileId == item.MediaFileId.Value);
+				if (item.MediaItemId.HasValue) {
+					var file = await db.MediaItems.FirstOrDefaultAsync(mf => mf.MediaItemId == item.MediaItemId.Value);
 					if (file != null) {
 						if (deleteFromDb || item.ChangeType == FileChangeType.Deleted) {
-							db.MediaFiles.Remove(file);
+							db.MediaItems.Remove(file);
 						} else if (item.ChangeType == FileChangeType.Moved || item.ChangeType == FileChangeType.Renamed) {
 							file.FilePath = item.NewPath;
 						}

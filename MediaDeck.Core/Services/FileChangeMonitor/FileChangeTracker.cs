@@ -107,14 +107,14 @@ public class FileChangeTracker : IDisposable {
 				// 1. 先行する変更アイテムが既に UnprocessedChanges にないか確認 (A->B, B->C のケース対応)
 				var predecessor = this.UnprocessedChanges.FirstOrDefault(c => !c.IsPending && c.NewPath == item.OldPath);
 				if (predecessor != null) {
-					item.MediaFileId = predecessor.MediaFileId;
+					item.MediaItemId = predecessor.MediaItemId;
 					item.FileSize = predecessor.FileSize;
 					item.OldHash = predecessor.OldHash;
 				} else {
 					// 2. DBから取得
-					var file = await db.MediaFiles.FirstOrDefaultAsync(mf => mf.FilePath == item.OldPath);
+					var file = await db.MediaItems.FirstOrDefaultAsync(mf => mf.FilePath == item.OldPath);
 					if (file != null) {
-						item.MediaFileId = file.MediaFileId;
+						item.MediaItemId = file.MediaItemId;
 						item.FileSize = file.FileSize;
 						item.OldHash = file.PreHash ?? string.Empty;
 					}
@@ -162,8 +162,8 @@ public class FileChangeTracker : IDisposable {
 				break;
 			}
 
-			// 追加以外でMediaFileIdがないアイテムはもとから管理していなかったファイルのため、対象外として削除する。
-			if (item.ChangeType != FileChangeType.Added && item.MediaFileId is null) {
+			// 追加以外でMediaItemIdがないアイテムはもとから管理していなかったファイルのため、対象外として削除する。
+			if (item.ChangeType != FileChangeType.Added && item.MediaItemId is null) {
 				this.UnprocessedChanges.RemoveAt(i);
 				i--;
 				continue;
@@ -198,8 +198,8 @@ public class FileChangeTracker : IDisposable {
 	private bool TryMergeItems(FileChangeItem item, FileChangeItem next) {
 		bool match = false;
 
-		// 1. 同一MediaFileIdによるマッチ
-		if (item.MediaFileId != null && item.MediaFileId == next.MediaFileId) {
+		// 1. 同一MediaItemIdによるマッチ
+		if (item.MediaItemId != null && item.MediaItemId == next.MediaItemId) {
 			match = true;
 		}
 
@@ -247,7 +247,7 @@ public class FileChangeTracker : IDisposable {
 	/// <param name="items">削除対象のアイテム一覧</param>
 	public void RemoveItems(IEnumerable<FileChangeItem> items) {
 		var targetElements = this.UnprocessedChanges
-			.Where(x => items.Any(i => i.MediaFileId == x.MediaFileId && (x.MediaFileId != null || i.NewPath == x.NewPath)))
+			.Where(x => items.Any(i => i.MediaItemId == x.MediaItemId && (x.MediaItemId != null || i.NewPath == x.NewPath)))
 			.ToList();
 		this.UnprocessedChanges.RemoveRange(targetElements);
 	}

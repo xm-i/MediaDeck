@@ -2,7 +2,7 @@
 <UserControl x:Class="MediaDeck.Views.Tools.DuplicateDetectorContent"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-	xmlns:fvm="using:MediaDeck.Composition.Interfaces.FileTypes.ViewModels"
+	xmlns:fvm="using:MediaDeck.Composition.Interfaces.MediaItemTypes.ViewModels"
 	xmlns:tools="using:MediaDeck.Core.Services.DuplicateFileDetector"
 	xmlns:controls="using:CommunityToolkit.WinUI.Controls"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -147,7 +147,7 @@
 						</Style>
 					</ListView.ItemContainerStyle>
 					<ListView.ItemTemplate>
-						<DataTemplate x:DataType="fvm:IFileViewModel" >
+						<DataTemplate x:DataType="fvm:IMediaItemViewModel" >
 							<Grid Padding="4,4" >
 								<Grid.ColumnDefinitions>
 									<ColumnDefinition Width="50" />
