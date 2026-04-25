@@ -1,5 +1,7 @@
 using System.IO.Compression;
 using System.Threading.Tasks;
+using MediaDeck.Composition.Enum;
+using MediaDeck.Composition.Interfaces.MediaItemTypes;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.ViewModels;
 using MediaDeck.MediaItemTypes.Archive.Models;
 using MediaDeck.MediaItemTypes.Base.Models;
@@ -11,12 +13,12 @@ namespace MediaDeck.MediaItemTypes.Archive.ViewModels;
 [Inject(InjectServiceLifetime.Transient)]
 internal class ArchiveThumbnailPickerViewModel : BaseThumbnailPickerViewModel {
 	private readonly ArchiveMediaItemOperator _ArchiveMediaItemOperator;
-	private readonly IFilePathService _filePathService;
+	private readonly IMediaItemTypeService _mediaItemTypeService;
 	private readonly ILogger<ArchiveThumbnailPickerViewModel> _logger;
 
-	public ArchiveThumbnailPickerViewModel(BaseThumbnailPickerModel thumbnailPickerModel, ArchiveMediaItemOperator PdfMediaItemOperator, IFilePathService filePathService, ILogger<ArchiveThumbnailPickerViewModel> logger) : base(thumbnailPickerModel) {
+	public ArchiveThumbnailPickerViewModel(BaseThumbnailPickerModel thumbnailPickerModel, ArchiveMediaItemOperator PdfMediaItemOperator, IMediaItemTypeService mediaItemTypeService, ILogger<ArchiveThumbnailPickerViewModel> logger) : base(thumbnailPickerModel) {
 		this._ArchiveMediaItemOperator = PdfMediaItemOperator;
-		this._filePathService = filePathService;
+		this._mediaItemTypeService = mediaItemTypeService;
 		this._logger = logger;
 		this.SelectedEntry.Subscribe(x => {
 			if (x is null) {
@@ -66,6 +68,6 @@ internal class ArchiveThumbnailPickerViewModel : BaseThumbnailPickerViewModel {
 		await base.LoadAsync(fileViewModel);
 		this.Entries.Clear();
 		using var archive = ZipFile.OpenRead(fileViewModel.FileModel.FilePath);
-		this.Entries.AddRange(archive.Entries.Where(x => this._filePathService.IsImageFile(x.Name)).Select(x => x.FullName).ToList());
+		this.Entries.AddRange(archive.Entries.Where(x => this._mediaItemTypeService.IsTargetPath(x.Name, MediaType.Image)).Select(x => x.FullName).ToList());
 	}
 }

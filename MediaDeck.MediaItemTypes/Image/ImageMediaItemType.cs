@@ -31,6 +31,12 @@ internal class ImageMediaItemType : BaseMediaItemType<ImageMediaItemOperator, Im
 		return this._ImageMediaItemOperator;
 	}
 
+	public override ItemType ItemType {
+		get {
+			return MediaDeck.Database.Tables.ItemType.Image;
+		}
+	}
+
 	public override ImageMediaItemModel CreateMediaItemModelFromRecord(MediaItem MediaItem) {
 		var ifm = new ImageMediaItemModel(MediaItem.MediaItemId, MediaItem.FilePath, this._ImageMediaItemOperator, this._config);
 		this.SetModelProperties(ifm, MediaItem);

@@ -1,3 +1,5 @@
+using System.IO;
+
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.MediaItemTypes;
 using MediaDeck.Composition.Interfaces.Tags;
@@ -29,6 +31,25 @@ internal class FolderGroupMediaItemType : BaseMediaItemType<FolderGroupMediaItem
 
 	public override FolderGroupMediaItemOperator CreateMediaItemOperator() {
 		return this._fileOperator;
+	}
+
+	public override ItemType ItemType {
+		get {
+			return MediaDeck.Database.Tables.ItemType.FolderGroup;
+		}
+	}
+
+	public override bool IsTargetPath(string path) {
+		return Directory.Exists(path);
+	}
+
+	public override MediaItemPathStatus GetPathStatus(string path) {
+		var directoryInfo = new DirectoryInfo(path);
+		if (!directoryInfo.Exists) {
+			return new(false, 0, DateTime.MinValue, DateTime.MinValue, DateTime.MinValue);
+		}
+
+		return new(true, 0, directoryInfo.CreationTime, directoryInfo.LastWriteTime, directoryInfo.LastAccessTime);
 	}
 
 	public override FolderGroupMediaItemModel CreateMediaItemModelFromRecord(MediaItem MediaItem) {

@@ -26,6 +26,10 @@ public interface IMediaItemType {
 		get;
 	}
 
+	public ItemType ItemType {
+		get;
+	}
+
 	public IMediaItemOperator CreateMediaItemOperator();
 	public IMediaItemModel CreateMediaItemModelFromRecord(MediaItem MediaItem);
 	public IDetailViewerPreviewControlView CreateDetailViewerPreviewControlView(IMediaItemViewModel fileViewModel);
@@ -33,4 +37,36 @@ public interface IMediaItemType {
 	public IThumbnailPickerViewModel CreateThumbnailPickerViewModel();
 	public IThumbnailPickerView CreateThumbnailPickerView();
 	public IQueryable<MediaItem> IncludeTables(IQueryable<MediaItem> MediaItems);
+	public bool IsTargetPath(string path);
+	public MediaItemPathStatus GetPathStatus(string path);
+}
+
+public readonly struct MediaItemPathStatus {
+	public MediaItemPathStatus(bool exists, long fileSize, DateTime creationTime, DateTime modifiedTime, DateTime lastAccessTime) {
+		this.Exists = exists;
+		this.FileSize = fileSize;
+		this.CreationTime = creationTime;
+		this.ModifiedTime = modifiedTime;
+		this.LastAccessTime = lastAccessTime;
+	}
+
+	public bool Exists {
+		get;
+	}
+
+	public long FileSize {
+		get;
+	}
+
+	public DateTime CreationTime {
+		get;
+	}
+
+	public DateTime ModifiedTime {
+		get;
+	}
+
+	public DateTime LastAccessTime {
+		get;
+	}
 }

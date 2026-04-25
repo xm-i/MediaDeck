@@ -1,3 +1,4 @@
+using MediaDeck.Composition.Interfaces.MediaItemTypes;
 using MediaDeck.Database;
 using MediaDeck.Database.Tables;
 
@@ -5,13 +6,15 @@ namespace MediaDeck.Core.Services.FileStatusUpdator;
 
 [Inject(InjectServiceLifetime.Transient)]
 public class FileStatusUpdatorService {
-	public FileStatusUpdatorService(IDbContextFactory<MediaDeckDbContext> dbFactory, IFileHashUpdatorService fileHashUpdatorService) {
+	public FileStatusUpdatorService(IDbContextFactory<MediaDeckDbContext> dbFactory, IFileHashUpdatorService fileHashUpdatorService, IMediaItemTypeService mediaItemTypeService) {
 		this._dbFactory = dbFactory;
 		this._fileHashUpdatorService = fileHashUpdatorService;
+		this._mediaItemTypeService = mediaItemTypeService;
 	}
 
 	private readonly IDbContextFactory<MediaDeckDbContext> _dbFactory;
 	private readonly IFileHashUpdatorService _fileHashUpdatorService;
+	private readonly IMediaItemTypeService _mediaItemTypeService;
 
 	public ReactiveProperty<long> TargetCount {
 		get;
@@ -31,37 +34,35 @@ public class FileStatusUpdatorService {
 		this.CompletedCount.Value = 0;
 		foreach (var file in targetFiles) {
 			this.CompletedCount.Value++;
-			var fileInfo = new FileInfo(file.FilePath);
-			if (fileInfo == null) {
-				continue;
-			}
+			var mediaItemType = this._mediaItemTypeService.GetMediaItemType(file);
+			var pathStatus = mediaItemType.GetPathStatus(file.FilePath);
 			if (
-				file.IsExists == fileInfo.Exists &&
+				file.IsExists == pathStatus.Exists &&
 				(!file.IsExists ||
 					(
-						file.FileSize == fileInfo.Length &&
-						file.CreationTime == fileInfo.CreationTime &&
-						file.ModifiedTime == fileInfo.LastWriteTime &&
-						file.LastAccessTime == fileInfo.LastAccessTime &&
+						file.FileSize == pathStatus.FileSize &&
+						file.CreationTime == pathStatus.CreationTime &&
+						file.ModifiedTime == pathStatus.ModifiedTime &&
+						file.LastAccessTime == pathStatus.LastAccessTime &&
 						file.PreHashUpdatedTime != null &&
-						file.PreHashUpdatedTime >= fileInfo.LastWriteTime
+						file.PreHashUpdatedTime >= pathStatus.ModifiedTime
 					)
 				)
 			) {
 				continue;
 			}
-			var needsHashUpdate = fileInfo.Exists && (file.PreHashUpdatedTime == null || file.PreHashUpdatedTime < fileInfo.LastWriteTime);
+			var needsHashUpdate = pathStatus.Exists && (file.PreHashUpdatedTime == null || file.PreHashUpdatedTime < pathStatus.ModifiedTime);
 
-			file.IsExists = fileInfo.Exists;
+			file.IsExists = pathStatus.Exists;
 
 			if (file.IsExists) {
 				if (needsHashUpdate) {
 					this._fileHashUpdatorService.EnqueueHashUpdate(file.MediaItemId);
 				}
-				file.FileSize = fileInfo.Length;
-				file.CreationTime = fileInfo.CreationTime;
-				file.ModifiedTime = fileInfo.LastWriteTime;
-				file.LastAccessTime = fileInfo.LastAccessTime;
+				file.FileSize = pathStatus.FileSize;
+				file.CreationTime = pathStatus.CreationTime;
+				file.ModifiedTime = pathStatus.ModifiedTime;
+				file.LastAccessTime = pathStatus.LastAccessTime;
 			}
 			updateList.Add(file);
 		}

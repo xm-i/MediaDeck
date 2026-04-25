@@ -31,6 +31,16 @@ internal class UnknownMediaItemType : BaseMediaItemType<UnknownMediaItemOperator
 		return this._UnknownMediaItemOperator;
 	}
 
+	public override ItemType ItemType {
+		get {
+			return MediaDeck.Database.Tables.ItemType.Unknown;
+		}
+	}
+
+	public override bool IsTargetPath(string path) {
+		return false;
+	}
+
 	public override UnknownMediaItemModel CreateMediaItemModelFromRecord(MediaItem MediaItem) {
 		var ifm = new UnknownMediaItemModel(MediaItem.MediaItemId, MediaItem.FilePath, this.CreateMediaItemOperator(), this._config);
 		this.SetModelProperties(ifm, MediaItem);

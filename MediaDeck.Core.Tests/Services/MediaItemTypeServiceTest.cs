@@ -5,7 +5,6 @@ using MediaDeck.Composition.Interfaces.MediaItemTypes.Models;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.ViewModels;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.Views;
 using MediaDeck.Composition.Interfaces.Primitives;
-using MediaDeck.Composition.Interfaces.Services;
 using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Composition.Objects;
 using MediaDeck.Core.Services;
@@ -137,6 +136,42 @@ public class MediaItemTypeServiceTest {
 				@"C:\included\video.dat"]);
 	}
 
+	[Fact]
+	public void GetMediaItemType_ByPath_UsesMatchingType() {
+		var result = this._service.GetMediaItemType(@"C:\media\sample.jpg");
+
+		result.ShouldBeSameAs(ImageMediaItemType);
+	}
+
+	[Fact]
+	public void GetMediaItemType_ByMediaItem_UsesItemTypeMapping() {
+		var mediaItem = CreateMediaItem(@"C:\media\sample.mp4");
+
+		var result = this._service.GetMediaItemType(mediaItem);
+
+		result.ShouldBeSameAs(VideoMediaItemType);
+	}
+
+	[Theory]
+	[InlineData(@"C:\media\sample.jpg", true)]
+	[InlineData(@"C:\media\sample.mp4", true)]
+	[InlineData(@"C:\media\sample.pdf", false)]
+	public void IsTargetPath_ShouldReturnExpectedResult(string path, bool expected) {
+		var result = this._service.IsTargetPath(path);
+
+		result.ShouldBe(expected);
+	}
+
+	[Theory]
+	[InlineData(@"C:\media\sample.jpg", MediaType.Image, true)]
+	[InlineData(@"C:\media\sample.jpg", MediaType.Video, false)]
+	[InlineData(@"C:\media\sample.mp4", MediaType.Video, true)]
+	public void IsTargetPath_WithMediaType_ShouldReturnExpectedResult(string path, MediaType mediaType, bool expected) {
+		var result = this._service.IsTargetPath(path, mediaType);
+
+		result.ShouldBe(expected);
+	}
+
 	/// <summary>
 	/// テスト用の <see cref="MediaItem" /> を生成する。
 	/// </summary>
@@ -151,39 +186,6 @@ public class MediaItemTypeServiceTest {
 		return new MediaItem { DirectoryPath = Path.GetDirectoryName(filePath) ?? string.Empty, FilePath = filePath, Description = string.Empty, MediaItemTags = new List<MediaItemTag>(), ItemType = itemType };
 	}
 
-	/// <summary>
-	/// テスト用のファイルパスサービス。
-	/// </summary>
-	private sealed class TestFilePathService : IFilePathService {
-		public string GetThumbnailRelativeFilePath() {
-			return string.Empty;
-		}
-
-		public string GetThumbnailAbsoluteFilePath(string thumbRelativePath) {
-			return thumbRelativePath;
-		}
-
-		public bool IsTargetFile(string path) {
-			return this.GetMediaType(path) is not null;
-		}
-
-		public bool IsVideoFile(string path) {
-			return this.GetMediaType(path) == MediaType.Video;
-		}
-
-		public bool IsImageFile(string path) {
-			return this.GetMediaType(path) == MediaType.Image;
-		}
-
-		public MediaType? GetMediaType(string path) {
-			return Path.GetExtension(path).ToLowerInvariant() switch {
-				".jpg" => MediaType.Image,
-				".mp4" => MediaType.Video,
-				_ => null
-			};
-		}
-	}
-
 	private sealed class TestMediaItemType : IMediaItemType {
 		public TestMediaItemType(MediaType mediaType, string createdBy) {
 			this.MediaType = mediaType;
@@ -192,6 +194,16 @@ public class MediaItemTypeServiceTest {
 
 		public MediaType MediaType {
 			get;
+		}
+
+		public ItemType ItemType {
+			get {
+				return this.MediaType switch {
+					MediaType.Image => ItemType.Image,
+					MediaType.Video => ItemType.Video,
+					_ => ItemType.Unknown
+				};
+			}
 		}
 
 		public string CreatedBy {
@@ -224,6 +236,18 @@ public class MediaItemTypeServiceTest {
 
 		public IQueryable<MediaItem> IncludeTables(IQueryable<MediaItem> MediaItems) {
 			return MediaItems.Concat(new[] { CreateMediaItem($@"C:\included\{this.CreatedBy}.dat") }).AsQueryable();
+		}
+
+		public bool IsTargetPath(string path) {
+			return this.MediaType switch {
+				MediaType.Image => Path.GetExtension(path).Equals(".jpg", StringComparison.OrdinalIgnoreCase),
+				MediaType.Video => Path.GetExtension(path).Equals(".mp4", StringComparison.OrdinalIgnoreCase),
+				_ => false
+			};
+		}
+
+		public MediaItemPathStatus GetPathStatus(string path) {
+			return new(true, 0, DateTime.MinValue, DateTime.MinValue, DateTime.MinValue);
 		}
 	}
 

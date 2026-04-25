@@ -5,8 +5,6 @@ using MediaDeck.Composition.Interfaces.MediaItemTypes.ViewModels;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.Views;
 using MediaDeck.Database.Tables;
 
-using DbItemType = MediaDeck.Database.Tables.ItemType;
-
 namespace MediaDeck.Core.Services;
 
 /// <summary>
@@ -56,16 +54,25 @@ public class MediaItemTypeService(IEnumerable<IMediaItemType> MediaItemTypes) : 
 		return result;
 	}
 
-	private IMediaItemType GetMediaItemType(MediaItem MediaItem) {
-		var mediaType = MediaItem.ItemType switch {
-			DbItemType.Image => MediaType.Image,
-			DbItemType.Video => MediaType.Video,
-			DbItemType.Pdf => MediaType.Pdf,
-			DbItemType.Archive => MediaType.Archive,
-			DbItemType.FolderGroup => MediaType.FolderGroup,
-			_ => MediaType.Unknown
-		};
-		return this._MediaItemTypes.FirstOrDefault(x => x.MediaType == mediaType) ?? this._UnknownMediaItemType;
+	/// <inheritdoc />
+	public IMediaItemType GetMediaItemType(string path) {
+		return this._MediaItemTypes.FirstOrDefault(x => x.IsTargetPath(path)) ?? this._UnknownMediaItemType;
+	}
+
+	/// <inheritdoc />
+	public IMediaItemType GetMediaItemType(MediaItem MediaItem) {
+		return this._MediaItemTypes.FirstOrDefault(x => x.ItemType == MediaItem.ItemType) ?? this._UnknownMediaItemType;
+	}
+
+	/// <inheritdoc />
+	public bool IsTargetPath(string path) {
+		return this._MediaItemTypes.Any(x => x.MediaType != MediaType.Unknown && x.IsTargetPath(path));
+	}
+
+	/// <inheritdoc />
+	public bool IsTargetPath(string path, MediaType mediaType) {
+		var mediaItemType = this._MediaItemTypes.FirstOrDefault(x => x.MediaType == mediaType);
+		return mediaItemType is not null && mediaItemType.IsTargetPath(path);
 	}
 
 	private IMediaItemType GetMediaItemType(IMediaItemModel fileModel) {

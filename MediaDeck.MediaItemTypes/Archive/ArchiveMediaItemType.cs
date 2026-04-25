@@ -31,6 +31,12 @@ internal class ArchiveMediaItemType : BaseMediaItemType<ArchiveMediaItemOperator
 		return this._ArchiveMediaItemOperator;
 	}
 
+	public override ItemType ItemType {
+		get {
+			return MediaDeck.Database.Tables.ItemType.Archive;
+		}
+	}
+
 	public override ArchiveMediaItemModel CreateMediaItemModelFromRecord(MediaItem MediaItem) {
 		var ifm = new ArchiveMediaItemModel(MediaItem.MediaItemId, MediaItem.FilePath, this._ArchiveMediaItemOperator, this._config);
 		this.SetModelProperties(ifm, MediaItem);

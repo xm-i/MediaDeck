@@ -1,6 +1,5 @@
-using System.Threading.Tasks;
 using System.IO;
-
+using System.Threading.Tasks;
 using MediaDeck.Composition.Enum;
 using MediaDeck.Database;
 using MediaDeck.Database.Tables;

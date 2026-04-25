@@ -31,6 +31,12 @@ internal class PdfMediaItemType : BaseMediaItemType<PdfMediaItemOperator, PdfMed
 		return this._PdfMediaItemOperator;
 	}
 
+	public override ItemType ItemType {
+		get {
+			return MediaDeck.Database.Tables.ItemType.Pdf;
+		}
+	}
+
 	public override PdfMediaItemModel CreateMediaItemModelFromRecord(MediaItem MediaItem) {
 		var ifm = new PdfMediaItemModel(MediaItem.MediaItemId, MediaItem.FilePath, this._PdfMediaItemOperator, this._config);
 		this.SetModelProperties(ifm, MediaItem);

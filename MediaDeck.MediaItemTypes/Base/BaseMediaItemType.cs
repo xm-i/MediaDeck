@@ -34,6 +34,10 @@ internal abstract class BaseMediaItemType<TFileOperator, TFileModel, TFileViewMo
 		get;
 	}
 
+	public abstract ItemType ItemType {
+		get;
+	}
+
 	public abstract TFileOperator CreateMediaItemOperator();
 	public abstract TFileModel CreateMediaItemModelFromRecord(MediaItem MediaItem);
 	public abstract TFileViewModel CreateMediaItemViewModel(TFileModel fileModel);
@@ -41,6 +45,27 @@ internal abstract class BaseMediaItemType<TFileOperator, TFileModel, TFileViewMo
 	public abstract TThumbnailPickerViewModel CreateThumbnailPickerViewModel();
 	public abstract TThumbnailPickerView CreateThumbnailPickerView();
 	public abstract IQueryable<MediaItem> IncludeTables(IQueryable<MediaItem> MediaItems);
+
+	public virtual bool IsTargetPath(string path) {
+		var extension = Path.GetExtension(path);
+		if (string.IsNullOrWhiteSpace(extension)) {
+			return false;
+		}
+
+		return this._config.ScanConfig.TargetExtensions
+			.Any(x =>
+				x.MediaType.Value == this.MediaType &&
+				x.Extension.Value.Equals(extension, StringComparison.CurrentCultureIgnoreCase));
+	}
+
+	public virtual MediaItemPathStatus GetPathStatus(string path) {
+		var fileInfo = new FileInfo(path);
+		if (!fileInfo.Exists) {
+			return new(false, 0, DateTime.MinValue, DateTime.MinValue, DateTime.MinValue);
+		}
+
+		return new(true, fileInfo.Length, fileInfo.CreationTime, fileInfo.LastWriteTime, fileInfo.LastAccessTime);
+	}
 
 	protected void SetModelProperties(TFileModel fileModel, MediaItem MediaItem) {
 		if (MediaItem.ThumbnailFileName != null) {

@@ -42,6 +42,12 @@ internal class VideoMediaItemType : BaseMediaItemType<VideoMediaItemOperator, Vi
 		return this._VideoMediaItemOperator;
 	}
 
+	public override ItemType ItemType {
+		get {
+			return MediaDeck.Database.Tables.ItemType.Video;
+		}
+	}
+
 	public override VideoMediaItemModel CreateMediaItemModelFromRecord(MediaItem MediaItem) {
 		var ifm = new VideoMediaItemModel(MediaItem.MediaItemId, MediaItem.FilePath, this._VideoMediaItemOperator, this._config);
 		this.SetModelProperties(ifm, MediaItem);

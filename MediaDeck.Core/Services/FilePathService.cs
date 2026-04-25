@@ -1,4 +1,3 @@
-using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Stores.Config.Model;
 
 namespace MediaDeck.Core.Services;
@@ -22,26 +21,4 @@ public class FilePathService : IFilePathService {
 		return Path.Combine(this._config.PathConfig.ThumbnailFolderPath.Value, thumbRelativePath);
 	}
 
-	/// <inheritdoc/>
-	public bool IsTargetFile(string path) {
-		return this._config.ScanConfig.TargetExtensions.Any(x => x.Extension.Value.Equals(Path.GetExtension(path), StringComparison.CurrentCultureIgnoreCase));
-	}
-
-	/// <inheritdoc/>
-	public bool IsVideoFile(string path) {
-		return this._config.ScanConfig.TargetExtensions.Where(x => x.MediaType.Value == MediaType.Video).Any(x => x.Extension.Value.Equals(Path.GetExtension(path), StringComparison.CurrentCultureIgnoreCase));
-	}
-
-	/// <inheritdoc/>
-	public bool IsImageFile(string path) {
-		return this._config.ScanConfig.TargetExtensions.Where(x => x.MediaType.Value == MediaType.Image).Any(x => x.Extension.Value.Equals(Path.GetExtension(path), StringComparison.CurrentCultureIgnoreCase));
-	}
-
-	/// <inheritdoc/>
-	public MediaType? GetMediaType(string path) {
-		if (Directory.Exists(path)) {
-			return MediaType.FolderGroup;
-		}
-		return this._config.ScanConfig.TargetExtensions.Where(x => x.Extension.Value.Equals(Path.GetExtension(path), StringComparison.CurrentCultureIgnoreCase)).Select(x => x.MediaType.Value as MediaType?).FirstOrDefault();
-	}
 }

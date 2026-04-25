@@ -17,7 +17,7 @@ public class FileRegistrar : ServiceBase {
 	private readonly IMediaItemOperator[] _fileOperators;
 	private readonly ConcurrentDictionary<string, FolderModel> _fileToFolderMap = new();
 	private readonly ILogger<FileRegistrar> _logger;
-	private readonly IFilePathService _filePathService;
+	private readonly IMediaItemTypeService _mediaItemTypeService;
 
 	public ObservableQueue<string> RegistrationQueue {
 		get;
@@ -27,10 +27,10 @@ public class FileRegistrar : ServiceBase {
 		get;
 	}
 
-	public FileRegistrar(ConfigModel config, ILogger<FileRegistrar> logger, IFilePathService filePathService, IMediaItemTypeService MediaItemTypeService) {
+	public FileRegistrar(ConfigModel config, ILogger<FileRegistrar> logger, IMediaItemTypeService MediaItemTypeService) {
 		this.Config = config;
 		this._logger = logger;
-		this._filePathService = filePathService;
+		this._mediaItemTypeService = MediaItemTypeService;
 		this._fileOperators = MediaItemTypeService.CreateMediaItemOperators();
 		this.RegistrationQueue
 			.ObserveAdd()
@@ -50,7 +50,7 @@ public class FileRegistrar : ServiceBase {
 		var files = await Task.Run(() => {
 			var targets = Directory
 				.EnumerateFiles(folder.FolderPath, "*", SearchOption.AllDirectories)
-				.Where(x => this._filePathService.IsTargetFile(x))
+				.Where(x => this._mediaItemTypeService.IsTargetPath(x))
 				.ToList();
 
 			if (folder.IsGroupingRoot) {
@@ -80,12 +80,12 @@ public class FileRegistrar : ServiceBase {
 	private async Task RegisterFilesAsync() {
 		while (this.RegistrationQueue.TryDequeue(out var filePath)) {
 			try {
-				var type = this._filePathService.GetMediaType(filePath);
-				if (type is null) {
+				var mediaItemType = this._mediaItemTypeService.GetMediaItemType(filePath);
+				if (mediaItemType.MediaType == MediaType.Unknown) {
 					continue;
 				}
 
-				var fileOperator = this._fileOperators.First(x => x.TargetMediaType == type);
+				var fileOperator = this._fileOperators.First(x => x.TargetMediaType == mediaItemType.MediaType);
 				var mf = await fileOperator.RegisterMediaItemAsync(filePath).ConfigureAwait(false);
 				if (mf is { } mf2) {
 					FileNotifications.FileRegistered.OnNext(mf2);

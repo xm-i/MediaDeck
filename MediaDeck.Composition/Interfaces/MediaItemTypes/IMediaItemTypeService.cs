@@ -1,3 +1,4 @@
+using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.Models;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.ViewModels;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.Views;
@@ -43,4 +44,24 @@ public interface IMediaItemTypeService {
 	/// クエリにメディアアイテムタイプ固有の関連テーブルを含めます。
 	/// </summary>
 	public IQueryable<MediaItem> IncludeTables(IQueryable<MediaItem> MediaItems);
+
+	/// <summary>
+	/// パスに対応するメディアアイテムタイプを取得します。
+	/// </summary>
+	public IMediaItemType GetMediaItemType(string path);
+
+	/// <summary>
+	/// レコードに対応するメディアアイテムタイプを取得します。
+	/// </summary>
+	public IMediaItemType GetMediaItemType(MediaItem MediaItem);
+
+	/// <summary>
+	/// パスがいずれかのメディアアイテムタイプの対象かどうかを取得します。
+	/// </summary>
+	public bool IsTargetPath(string path);
+
+	/// <summary>
+	/// 指定したメディアタイプのパス判定を行います。
+	/// </summary>
+	public bool IsTargetPath(string path, MediaType mediaType);
 }

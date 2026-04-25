@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using ImageMagick;
 
 using MediaDeck.Composition.Enum;
+using MediaDeck.Composition.Interfaces.MediaItemTypes;
 using MediaDeck.Database;
 using MediaDeck.Database.Tables;
 using MediaDeck.MediaItemTypes.Base.Models;
@@ -16,16 +17,19 @@ namespace MediaDeck.MediaItemTypes.Archive.Models;
 
 [Inject(InjectServiceLifetime.Transient)]
 internal partial class ArchiveMediaItemOperator : BaseMediaItemOperator {
+	private readonly IMediaItemTypeService _mediaItemTypeService;
 	private readonly IFilePathService _filePathService;
 	private readonly ILogger<ArchiveMediaItemOperator> _logger;
 
 	public ArchiveMediaItemOperator(
 		IFilePathService filePathService,
+		IMediaItemTypeService mediaItemTypeService,
 		ILogger<ArchiveMediaItemOperator> logger,
 		IDbContextFactory<MediaDeckDbContext> dbFactory,
 		IFileHashUpdatorService updateFileHashBackgroundService)
 		: base(dbFactory, updateFileHashBackgroundService, MediaType.Archive) {
 		this._filePathService = filePathService;
+		this._mediaItemTypeService = mediaItemTypeService;
 		this._logger = logger;
 	}
 
@@ -41,7 +45,7 @@ internal partial class ArchiveMediaItemOperator : BaseMediaItemOperator {
 
 		using var archiveFile = ZipFile.Open(filePath, ZipArchiveMode.Read);
 
-		var first = archiveFile.Entries.FirstOrDefault(x => this._filePathService.IsImageFile(x.Name));
+		var first = archiveFile.Entries.FirstOrDefault(x => this._mediaItemTypeService.IsTargetPath(x.Name, MediaType.Image));
 		try {
 			if (first != null) {
 				var image = this.CreateThumbnail(archiveFile, 300, 300, first.FullName);
@@ -70,7 +74,7 @@ internal partial class ArchiveMediaItemOperator : BaseMediaItemOperator {
 			LastAccessTime = fileInfo.Exists ? fileInfo.LastAccessTime : DateTime.MinValue,
 			RegisteredTime = DateTime.Now,
 			IsExists = fileInfo.Exists,
-			Container = new() { PageCount = archiveFile.Entries.Count(x => this._filePathService.IsImageFile(x.Name)), }
+			Container = new() { PageCount = archiveFile.Entries.Count(x => this._mediaItemTypeService.IsTargetPath(x.Name, MediaType.Image)), }
 		};
 
 		if (first != null) {
