@@ -65,6 +65,7 @@ internal partial class VideoMediaItemOperator : BaseMediaItemOperator {
 		var location = GetLocation(metadata);
 
 		var mf = new MediaItem {
+			ItemType = ItemType.Video,
 			DirectoryPath = Path.GetDirectoryName(filePath)!,
 			FilePath = filePath,
 			ThumbnailFileName = thumbRelativePath,

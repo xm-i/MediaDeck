@@ -52,6 +52,7 @@ internal class ImageMediaItemOperator : BaseMediaItemOperator {
 		var fileInfo = new FileInfo(filePath);
 
 		var mf = new MediaItem {
+			ItemType = ItemType.Image,
 			DirectoryPath = Path.GetDirectoryName(filePath)!,
 			FilePath = filePath,
 			ThumbnailFileName = thumbRelativePath,

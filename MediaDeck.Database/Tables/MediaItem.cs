@@ -17,7 +17,7 @@ public class MediaItem {
 	/// <summary>
 	/// アイテム種別
 	/// </summary>
-	public ItemType ItemType {
+	public required ItemType ItemType {
 		get;
 		set;
 	}

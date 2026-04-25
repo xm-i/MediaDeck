@@ -57,6 +57,7 @@ internal partial class ArchiveMediaItemOperator : BaseMediaItemOperator {
 		var fileInfo = new FileInfo(filePath);
 
 		var mf = new MediaItem {
+			ItemType = ItemType.Archive,
 			DirectoryPath = Path.GetDirectoryName(filePath)!,
 			FilePath = filePath,
 			ThumbnailFileName = thumbRelativePath,

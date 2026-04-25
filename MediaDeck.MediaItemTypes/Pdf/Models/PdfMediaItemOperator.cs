@@ -53,6 +53,7 @@ internal partial class PdfMediaItemOperator : BaseMediaItemOperator {
 		var fileInfo = new FileInfo(filePath);
 
 		var mf = new MediaItem {
+			ItemType = ItemType.Pdf,
 			DirectoryPath = Path.GetDirectoryName(filePath)!,
 			FilePath = filePath,
 			ThumbnailFileName = thumbRelativePath,
