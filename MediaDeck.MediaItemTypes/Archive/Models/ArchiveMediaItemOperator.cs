@@ -11,26 +11,32 @@ using MediaDeck.Database.Tables;
 using MediaDeck.MediaItemTypes.Base.Models;
 using MediaDeck.MediaItemTypes.Image.Utils;
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace MediaDeck.MediaItemTypes.Archive.Models;
 
 [Inject(InjectServiceLifetime.Transient)]
 internal partial class ArchiveMediaItemOperator : BaseMediaItemOperator {
-	private readonly IMediaItemTypeService _mediaItemTypeService;
+	private IMediaItemTypeService _mediaItemTypeService {
+		get {
+			return field ??= this._serviceProvider.GetRequiredService<IMediaItemTypeService>();
+		}
+	}
 	private readonly IFilePathService _filePathService;
 	private readonly ILogger<ArchiveMediaItemOperator> _logger;
+	private readonly IServiceProvider _serviceProvider;
 
 	public ArchiveMediaItemOperator(
 		IFilePathService filePathService,
-		IMediaItemTypeService mediaItemTypeService,
 		ILogger<ArchiveMediaItemOperator> logger,
 		IDbContextFactory<MediaDeckDbContext> dbFactory,
-		IFileHashUpdatorService updateFileHashBackgroundService)
+		IFileHashUpdatorService updateFileHashBackgroundService,
+		IServiceProvider serviceProvider)
 		: base(dbFactory, updateFileHashBackgroundService, MediaType.Archive) {
 		this._filePathService = filePathService;
-		this._mediaItemTypeService = mediaItemTypeService;
 		this._logger = logger;
+		this._serviceProvider = serviceProvider;
 	}
 
 	public override async Task<MediaItem?> RegisterMediaItemAsync(string filePath) {
