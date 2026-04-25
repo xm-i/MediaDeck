@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 
 using MediaDeck.Common.Base;
+using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.MediaItemTypes;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.Models;
 using MediaDeck.Composition.Stores.Config.Model;
@@ -46,10 +47,20 @@ public class FileRegistrar : ServiceBase {
 	public async Task ScanFolderAsync(FolderModel folder) {
 		folder.IsScanning.Value = true;
 
-		var files = await Task.Run(() =>
-			Directory.EnumerateFiles(folder.FolderPath, "*", SearchOption.AllDirectories)
+		var files = await Task.Run(() => {
+			var targets = Directory
+				.EnumerateFiles(folder.FolderPath, "*", SearchOption.AllDirectories)
 				.Where(x => this._filePathService.IsTargetFile(x))
-				.ToList());
+				.ToList();
+
+			if (folder.IsGroupingRoot) {
+				targets.AddRange(Directory.EnumerateDirectories(folder.FolderPath, "*", SearchOption.TopDirectoryOnly));
+			}
+
+			return targets
+				.Distinct(StringComparer.OrdinalIgnoreCase)
+				.ToList();
+		});
 
 		folder.TotalCount.Value = files.Count;
 		folder.RemainingCount.Value = files.Count;
@@ -70,6 +81,10 @@ public class FileRegistrar : ServiceBase {
 		while (this.RegistrationQueue.TryDequeue(out var filePath)) {
 			try {
 				var type = this._filePathService.GetMediaType(filePath);
+				if (type is null) {
+					continue;
+				}
+
 				var fileOperator = this._fileOperators.First(x => x.TargetMediaType == type);
 				var mf = await fileOperator.RegisterMediaItemAsync(filePath).ConfigureAwait(false);
 				if (mf is { } mf2) {

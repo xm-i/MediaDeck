@@ -116,8 +116,8 @@ public class UpdateFileHashBackgroundServiceTests : IDisposable {
 		// Arrange
 		using (var context = new MediaDeckDbContext(this._options)) {
 			// 同じPreHashを持つレコードを2つ作成
-			context.MediaItems.Add(new MediaItem { FilePath = "dummy1.jpg", DirectoryPath = "dir", IsExists = true, PreHash = "samehash", Description = string.Empty });
-			context.MediaItems.Add(new MediaItem { FilePath = "dummy2.jpg", DirectoryPath = "dir", IsExists = true, PreHash = "samehash", Description = string.Empty });
+			context.MediaItems.Add(new MediaItem { ItemType = ItemType.Image, FilePath = "dummy1.jpg", DirectoryPath = "dir", IsExists = true, PreHash = "samehash", Description = string.Empty });
+			context.MediaItems.Add(new MediaItem { ItemType = ItemType.Image, FilePath = "dummy2.jpg", DirectoryPath = "dir", IsExists = true, PreHash = "samehash", Description = string.Empty });
 			await context.SaveChangesAsync();
 		}
 
@@ -169,7 +169,7 @@ public class UpdateFileHashBackgroundServiceTests : IDisposable {
 
 		long MediaItemId;
 		using (var context = new MediaDeckDbContext(this._options)) {
-			var MediaItem = new MediaItem { FilePath = tempFile, DirectoryPath = "dir", IsExists = true, Description = string.Empty };
+			var MediaItem = new MediaItem { ItemType = ItemType.Image, FilePath = tempFile, DirectoryPath = "dir", IsExists = true, Description = string.Empty };
 			context.MediaItems.Add(MediaItem);
 			await context.SaveChangesAsync();
 			MediaItemId = MediaItem.MediaItemId;
@@ -201,7 +201,7 @@ public class UpdateFileHashBackgroundServiceTests : IDisposable {
 		// Arrange
 		long MediaItemId;
 		using (var context = new MediaDeckDbContext(this._options)) {
-			var MediaItem = new MediaItem { FilePath = "dummy.txt", DirectoryPath = "dir", IsExists = false, Description = string.Empty };
+			var MediaItem = new MediaItem { ItemType = ItemType.Image, FilePath = "dummy.txt", DirectoryPath = "dir", IsExists = false, Description = string.Empty };
 			context.MediaItems.Add(MediaItem);
 			await context.SaveChangesAsync();
 			MediaItemId = MediaItem.MediaItemId;
@@ -232,7 +232,7 @@ public class UpdateFileHashBackgroundServiceTests : IDisposable {
 		// Arrange
 		long MediaItemId;
 		using (var context = new MediaDeckDbContext(this._options)) {
-			var MediaItem = new MediaItem { FilePath = "not_found.txt", DirectoryPath = "dir", IsExists = true, Description = string.Empty };
+			var MediaItem = new MediaItem { ItemType = ItemType.Image, FilePath = "not_found.txt", DirectoryPath = "dir", IsExists = true, Description = string.Empty };
 			context.MediaItems.Add(MediaItem);
 			await context.SaveChangesAsync();
 			MediaItemId = MediaItem.MediaItemId;
@@ -270,7 +270,7 @@ public class UpdateFileHashBackgroundServiceTests : IDisposable {
 
 		long MediaItemId;
 		using (var context = new MediaDeckDbContext(this._options)) {
-			var MediaItem = new MediaItem { FilePath = tempFile, DirectoryPath = "dir", IsExists = true, Description = string.Empty };
+			var MediaItem = new MediaItem { ItemType = ItemType.Image, FilePath = tempFile, DirectoryPath = "dir", IsExists = true, Description = string.Empty };
 			context.MediaItems.Add(MediaItem);
 			await context.SaveChangesAsync();
 			MediaItemId = MediaItem.MediaItemId;
@@ -303,8 +303,8 @@ public class UpdateFileHashBackgroundServiceTests : IDisposable {
 		// Arrange
 		long fileId1, fileId2;
 		using (var context = new MediaDeckDbContext(this._options)) {
-			var MediaItem1 = new MediaItem { FilePath = "dummy1.txt", DirectoryPath = "dir", IsExists = true, PreHash = "dup_hash", Description = string.Empty, PreHashUpdatedTime = DateTime.Now };
-			var MediaItem2 = new MediaItem { FilePath = "dummy2.txt", DirectoryPath = "dir", IsExists = true, PreHash = "dup_hash", Description = string.Empty, PreHashUpdatedTime = DateTime.Now };
+			var MediaItem1 = new MediaItem { ItemType = ItemType.Image, FilePath = "dummy1.txt", DirectoryPath = "dir", IsExists = true, PreHash = "dup_hash", Description = string.Empty, PreHashUpdatedTime = DateTime.Now };
+			var MediaItem2 = new MediaItem { ItemType = ItemType.Image, FilePath = "dummy2.txt", DirectoryPath = "dir", IsExists = true, PreHash = "dup_hash", Description = string.Empty, PreHashUpdatedTime = DateTime.Now };
 			context.MediaItems.Add(MediaItem1);
 			context.MediaItems.Add(MediaItem2);
 			await context.SaveChangesAsync();

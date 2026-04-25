@@ -6,12 +6,21 @@
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:folderManagerVm="using:MediaDeck.ViewModels.FolderManager"
+	xmlns:converters="using:MediaDeck.Views.Resources.Converters"
 	mc:Ignorable="d" >
+
+	<local:FolderManagerViewUserControl.Resources>
+		<ResourceDictionary>
+			<converters:ToVisibilityConverter x:Key="NullToVisibleConverter"
+				Visible="{x:Null}"
+				Collapse="*" />
+		</ResourceDictionary>
+	</local:FolderManagerViewUserControl.Resources>
 
 	<Grid Padding="12" >
 		<Grid.ColumnDefinitions>
-			<ColumnDefinition Width="300" />
-			<ColumnDefinition Width="12" />
+			<ColumnDefinition Width="320" />
+			<ColumnDefinition Width="16" />
 			<ColumnDefinition Width="*" />
 		</Grid.ColumnDefinitions>
 
@@ -19,9 +28,9 @@
 		<Grid Grid.Column="0" >
 			<Grid.RowDefinitions>
 				<RowDefinition Height="Auto" />
-				<RowDefinition Height="8" />
+				<RowDefinition Height="12" />
 				<RowDefinition Height="*" />
-				<RowDefinition Height="8" />
+				<RowDefinition Height="12" />
 				<RowDefinition Height="Auto" />
 			</Grid.RowDefinitions>
 
@@ -33,49 +42,51 @@
 			<Border Grid.Row="2"
 				BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
 				BorderThickness="1"
-				CornerRadius="4" >
+				CornerRadius="8"
+				Background="{ThemeResource LayerFillColorDefaultBrush}" >
 				<ListBox ItemsSource="{x:Bind ViewModel.Folders}"
-					SelectedItem="{x:Bind ViewModel.SelectedFolder.Value, Mode=TwoWay}" >
+					SelectedItem="{x:Bind ViewModel.SelectedFolder.Value, Mode=TwoWay}"
+					Padding="0,4"
+					BorderThickness="0"
+					Background="Transparent" >
 					<ItemsControl.ItemTemplate>
 						<DataTemplate x:DataType="folderManagerVm:FolderViewModel" >
-							<Grid Padding="4,8" >
+							<Grid Padding="12,8" >
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="Auto" />
+									<ColumnDefinition Width="*" />
+								</Grid.ColumnDefinitions>
 								<Grid.RowDefinitions>
 									<RowDefinition Height="Auto" />
-									<RowDefinition Height="4" />
 									<RowDefinition Height="Auto" />
 								</Grid.RowDefinitions>
-								<TextBlock Grid.Row="0"
+								<FontIcon Grid.Row="0"
+									Grid.RowSpan="2"
+									Glyph="&#xED41;"
+									FontSize="18"
+									Margin="0,0,12,0"
+									Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+									VerticalAlignment="Center" />
+								<TextBlock Grid.Column="1"
+									Grid.Row="0"
 									Text="{x:Bind FolderPath}"
-									TextTrimming="CharacterEllipsis" >
-									<TextBlock.ContextFlyout>
-										<MenuFlyout>
-											<MenuFlyoutItem Text="削除"
-												Click="MenuFlyoutItem_Click"
-												Tag="Remove" />
-										</MenuFlyout>
-									</TextBlock.ContextFlyout>
-								</TextBlock>
-								<StackPanel Grid.Row="2"
-									Spacing="4" >
+									TextTrimming="CharacterEllipsis"
+									VerticalAlignment="Center" />
+								<StackPanel Grid.Column="1"
+									Grid.Row="1"
+									Margin="0,4,0,0"
+									Visibility="{x:Bind IsScanning.Value, Mode=OneWay}" >
 									<ProgressBar
 										Value="{x:Bind ProcessedCount.Value, Mode=OneWay, Converter={StaticResource LongToDoubleConverter}}"
 										Maximum="{x:Bind TotalCount.Value, Mode=OneWay, Converter={StaticResource LongToDoubleConverter}}"
-										Visibility="{x:Bind IsScanning.Value, Mode=OneWay}"
-										Height="4" />
-									<TextBlock FontSize="11"
+										Height="2" />
+									<TextBlock FontSize="10"
 										Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-										Visibility="{x:Bind IsScanning.Value, Mode=OneWay}" >
-										<Run Text="処理中..." />
+										Margin="0,2,0,0" >
 										<Run Text="{x:Bind ProcessedCount.Value, Mode=OneWay}" />
 										<Run Text="/" />
 										<Run Text="{x:Bind TotalCount.Value, Mode=OneWay}" />
-										<Run Text="件" />
-									</TextBlock>
-									<TextBlock FontSize="11"
-										Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-										Visibility="{x:Bind IsScanning.Value, Mode=OneWay, Converter={StaticResource InvertBoolToVisibilityConverter}}" >
-										<Run Text="{x:Bind TotalCount.Value, Mode=OneWay}" />
-										<Run Text="件" />
+										<Run Text="件完了" />
 									</TextBlock>
 								</StackPanel>
 							</Grid>
@@ -84,74 +95,163 @@
 				</ListBox>
 			</Border>
 
-			<StackPanel Grid.Row="4"
-				Orientation="Horizontal"
-				Spacing="8" >
+			<Grid Grid.Row="4" >
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="Auto" />
+					<ColumnDefinition Width="*" />
+					<ColumnDefinition Width="Auto" />
+				</Grid.ColumnDefinitions>
 				<Button x:Name="AddFolderButton"
 					Click="AddFolderButton_Click"
-					ToolTipService.ToolTip="新しいフォルダを追加" >
+					Style="{StaticResource AccentButtonStyle}" >
 					<StackPanel Orientation="Horizontal"
-						Spacing="6" >
-						<FontIcon Glyph="&#xF8AA;"
-							FontSize="12" />
+						Spacing="8" >
+						<FontIcon Glyph="&#xE710;"
+							FontSize="14" />
 						<TextBlock Text="追加" />
 					</StackPanel>
 				</Button>
-				<Button Command="{x:Bind ViewModel.RemoveFolderCommand}"
-					CommandParameter="{x:Bind ViewModel.SelectedFolder.Value, Mode=OneWay}"
-					ToolTipService.ToolTip="選択中のフォルダを削除" >
+
+				<Button Grid.Column="2"
+					Command="{x:Bind ViewModel.ScanCommand}" >
 					<StackPanel Orientation="Horizontal"
-						Spacing="6" >
-						<FontIcon Glyph="&#xF78A;"
-							FontSize="12" />
-						<TextBlock Text="削除" />
+						Spacing="8" >
+						<FontIcon Glyph="&#xE721;"
+							FontSize="14" />
+						<TextBlock Text="すべてスキャン" />
 					</StackPanel>
 				</Button>
-			</StackPanel>
+			</Grid>
 		</Grid>
 
-		<!-- スキャン操作エリア -->
+		<!-- フォルダ詳細・設定 -->
 		<Border Grid.Column="2"
-			Padding="16"
+			Padding="24"
 			Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
 			BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
 			BorderThickness="1"
 			CornerRadius="8" >
 			<Grid>
-				<Grid.RowDefinitions>
-					<RowDefinition Height="Auto" />
-				</Grid.RowDefinitions>
+				<!-- 何も選択されていない場合 -->
+				<StackPanel HorizontalAlignment="Center"
+					VerticalAlignment="Center"
+					Spacing="16"
+					Visibility="{x:Bind ViewModel.SelectedFolder.Value, Mode=OneWay, Converter={StaticResource NullToVisibleConverter}}" >
+					<FontIcon Glyph="&#xE8B7;"
+						FontSize="48"
+						Foreground="{ThemeResource TextFillColorDisabledBrush}" />
+					<TextBlock Text="フォルダを選択してください"
+						Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+				</StackPanel>
 
-				<!-- スキャン操作 -->
-				<StackPanel Grid.Row="0"
-					Spacing="6" >
-					<TextBlock Text="スキャン"
-						FontWeight="SemiBold" />
-					<StackPanel Orientation="Horizontal"
+				<!-- フォルダ選択時 -->
+				<Grid Visibility="{x:Bind ViewModel.SelectedFolder.Value, Mode=OneWay, Converter={StaticResource NullToCollapseConverter}}" >
+					<Grid.RowDefinitions>
+						<RowDefinition Height="Auto" />
+						<RowDefinition Height="32" />
+						<RowDefinition Height="Auto" />
+						<RowDefinition Height="32" />
+						<RowDefinition Height="*" />
+						<RowDefinition Height="Auto" />
+					</Grid.RowDefinitions>
+
+					<!-- ヘッダー -->
+					<StackPanel Grid.Row="0"
 						Spacing="8" >
-						<Button Command="{x:Bind ViewModel.ScanCommand}"
-							Style="{StaticResource AccentButtonStyle}"
-							ToolTipService.ToolTip="すべてのフォルダをスキャン" >
+						<TextBlock Text="フォルダ設定"
+							FontSize="12"
+							FontWeight="SemiBold"
+							Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
+						<TextBlock Text="{x:Bind ViewModel.SelectedFolder.Value.FolderPath, Mode=OneWay}"
+							FontSize="24"
+							FontWeight="Bold"
+							TextWrapping="Wrap" />
+					</StackPanel>
+
+					<!-- 設定項目 -->
+					<StackPanel Grid.Row="2"
+						Spacing="20" >
+						<TextBlock Text="一般設定"
+							FontWeight="SemiBold" />
+						<ToggleSwitch Header="配下フォルダをグループ化"
+							IsOn="{x:Bind ViewModel.SelectedFolder.Value.IsGroupingRoot.Value, Mode=TwoWay}" />
+					</StackPanel>
+
+					<!-- ステータス -->
+					<StackPanel Grid.Row="4"
+						Spacing="12" >
+						<TextBlock Text="ステータス"
+							FontWeight="SemiBold" />
+						<Border Padding="20"
+							Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+							BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
+							BorderThickness="1"
+							CornerRadius="8" >
+							<StackPanel Spacing="12" >
+								<Grid>
+									<TextBlock Text="スキャン状況"
+										VerticalAlignment="Center"
+										Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+									<StackPanel Orientation="Horizontal"
+										HorizontalAlignment="Right" >
+										<TextBlock Text="{x:Bind ViewModel.SelectedFolder.Value.ProcessedCount.Value, Mode=OneWay}"
+											FontSize="20"
+											FontWeight="SemiBold" />
+										<TextBlock Text=" / "
+											VerticalAlignment="Bottom"
+											Margin="4,0,4,2" />
+										<TextBlock Text="{x:Bind ViewModel.SelectedFolder.Value.TotalCount.Value, Mode=OneWay}"
+											VerticalAlignment="Bottom"
+											Margin="0,0,0,2" />
+										<TextBlock Text=" 件"
+											VerticalAlignment="Bottom"
+											Margin="4,0,0,2"
+											FontSize="12"
+											Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+									</StackPanel>
+								</Grid>
+								<ProgressBar
+									Value="{x:Bind ViewModel.SelectedFolder.Value.ProcessedCount.Value, Mode=OneWay, Converter={StaticResource LongToDoubleConverter}}"
+									Maximum="{x:Bind ViewModel.SelectedFolder.Value.TotalCount.Value, Mode=OneWay, Converter={StaticResource LongToDoubleConverter}}"
+									Height="4" />
+								<TextBlock FontSize="12"
+									Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+									Visibility="{x:Bind ViewModel.SelectedFolder.Value.IsScanning.Value, Mode=OneWay}" >
+									<Run Text="スキャン中..." />
+								</TextBlock>
+							</StackPanel>
+						</Border>
+					</StackPanel>
+
+					<!-- アクション -->
+					<Grid Grid.Row="5" >
+						<Button Click="RemoveFolderButton_Click"
+							HorizontalAlignment="Left"
+							Foreground="{ThemeResource SystemFillColorCriticalBrush}" >
 							<StackPanel Orientation="Horizontal"
-								Spacing="6" >
-								<FontIcon Glyph="&#xE721;"
-									FontSize="12" />
-								<TextBlock Text="すべてスキャン" />
+								Spacing="8" >
+								<FontIcon Glyph="&#xE74D;"
+									FontSize="14" />
+								<TextBlock Text="このフォルダを削除" />
 							</StackPanel>
 						</Button>
+
 						<Button Command="{x:Bind ViewModel.ScanSelectedFolderCommand}"
 							CommandParameter="{x:Bind ViewModel.SelectedFolder.Value, Mode=OneWay}"
-							ToolTipService.ToolTip="選択中のフォルダのみスキャン" >
+							Style="{StaticResource AccentButtonStyle}"
+							HorizontalAlignment="Right" >
 							<StackPanel Orientation="Horizontal"
-								Spacing="6" >
+								Spacing="8" >
 								<FontIcon Glyph="&#xE8B7;"
-									FontSize="12" />
-								<TextBlock Text="選択フォルダをスキャン" />
+									FontSize="14" />
+								<TextBlock Text="このフォルダをスキャン" />
 							</StackPanel>
 						</Button>
-					</StackPanel>
-				</StackPanel>
+					</Grid>
+				</Grid>
 			</Grid>
 		</Border>
 	</Grid>
+
+
 </local:FolderManagerViewUserControl>

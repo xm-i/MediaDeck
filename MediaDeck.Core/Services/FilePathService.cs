@@ -39,6 +39,9 @@ public class FilePathService : IFilePathService {
 
 	/// <inheritdoc/>
 	public MediaType? GetMediaType(string path) {
+		if (Directory.Exists(path)) {
+			return MediaType.FolderGroup;
+		}
 		return this._config.ScanConfig.TargetExtensions.Where(x => x.Extension.Value.Equals(Path.GetExtension(path), StringComparison.CurrentCultureIgnoreCase)).Select(x => x.MediaType.Value as MediaType?).FirstOrDefault();
 	}
 }

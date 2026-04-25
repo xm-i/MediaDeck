@@ -17,6 +17,10 @@ public class FolderViewModel : ViewModelBase {
 		get;
 	}
 
+	public BindableReactiveProperty<bool> IsGroupingRoot {
+		get;
+	} = new();
+
 	public BindableReactiveProperty<long> TotalCount {
 		get;
 	}
@@ -32,6 +36,8 @@ public class FolderViewModel : ViewModelBase {
 	public FolderViewModel(FolderModel folderModel) {
 		this._folderModel = folderModel;
 		this.IsScanning = folderModel.IsScanning.ToBindableReactiveProperty();
+		this.IsGroupingRoot.Value = folderModel.IsGroupingRoot;
+		this.IsGroupingRoot.Subscribe(x => folderModel.IsGroupingRoot = x).AddTo(this.CompositeDisposable);
 		this.TotalCount = folderModel.TotalCount.ToBindableReactiveProperty();
 		this.RemainingCount = folderModel.RemainingCount.Debounce(TimeSpan.FromMilliseconds(500)).ObserveOnCurrentSynchronizationContext().ToBindableReactiveProperty();
 		this.ProcessedCount = folderModel.TotalCount

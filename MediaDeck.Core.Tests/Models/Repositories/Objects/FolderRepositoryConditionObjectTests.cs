@@ -41,9 +41,9 @@ public class FolderRepositoryConditionObjectTests {
 		var predicate = obj.WherePredicate().Compile();
 
 		// Assert
-		predicate(new MediaItem { DirectoryPath = "/test/dir", FilePath = "test1.jpg", Description = "desc" }).ShouldBeTrue();
-		predicate(new MediaItem { DirectoryPath = "/test/dir/sub", FilePath = "test2.jpg", Description = "desc" }).ShouldBeFalse();
-		predicate(new MediaItem { DirectoryPath = "/other/dir", FilePath = "test3.jpg", Description = "desc" }).ShouldBeFalse();
+		predicate(new MediaItem { ItemType = ItemType.Image, DirectoryPath = "/test/dir", FilePath = "test1.jpg", Description = "desc" }).ShouldBeTrue();
+		predicate(new MediaItem { ItemType = ItemType.Image, DirectoryPath = "/test/dir/sub", FilePath = "test2.jpg", Description = "desc" }).ShouldBeFalse();
+		predicate(new MediaItem { ItemType = ItemType.Image, DirectoryPath = "/other/dir", FilePath = "test3.jpg", Description = "desc" }).ShouldBeFalse();
 	}
 
 	/// <summary>
@@ -61,13 +61,13 @@ public class FolderRepositoryConditionObjectTests {
 		var predicate = obj.WherePredicate().Compile();
 
 		// Assert
-		predicate(new MediaItem { DirectoryPath = "/test/dir", FilePath = "test1.jpg", Description = "desc" }).ShouldBeTrue();
-		predicate(new MediaItem { DirectoryPath = $"/test/dir{Path.DirectorySeparatorChar}sub", FilePath = "test2.jpg", Description = "desc" }).ShouldBeTrue();
-		predicate(new MediaItem { DirectoryPath = $"/test/dir{Path.DirectorySeparatorChar}sub{Path.DirectorySeparatorChar}deep", FilePath = "test3.jpg", Description = "desc" }).ShouldBeTrue();
+		predicate(new MediaItem { ItemType = ItemType.Image, DirectoryPath = "/test/dir", FilePath = "test1.jpg", Description = "desc" }).ShouldBeTrue();
+		predicate(new MediaItem { ItemType = ItemType.Image, DirectoryPath = $"/test/dir{Path.DirectorySeparatorChar}sub", FilePath = "test2.jpg", Description = "desc" }).ShouldBeTrue();
+		predicate(new MediaItem { ItemType = ItemType.Image, DirectoryPath = $"/test/dir{Path.DirectorySeparatorChar}sub{Path.DirectorySeparatorChar}deep", FilePath = "test3.jpg", Description = "desc" }).ShouldBeTrue();
 
 		// Ensure it doesn't match a sibling directory that just happens to start with the same name
-		predicate(new MediaItem { DirectoryPath = "/test/dirt", FilePath = "test4.jpg", Description = "desc" }).ShouldBeFalse();
+		predicate(new MediaItem { ItemType = ItemType.Image, DirectoryPath = "/test/dirt", FilePath = "test4.jpg", Description = "desc" }).ShouldBeFalse();
 
-		predicate(new MediaItem { DirectoryPath = "/other/dir", FilePath = "test5.jpg", Description = "desc" }).ShouldBeFalse();
+		predicate(new MediaItem { ItemType = ItemType.Image, DirectoryPath = "/other/dir", FilePath = "test5.jpg", Description = "desc" }).ShouldBeFalse();
 	}
 }

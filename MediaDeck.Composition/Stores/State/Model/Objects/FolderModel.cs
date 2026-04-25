@@ -10,6 +10,11 @@ public class FolderModel() {
 		set;
 	} = string.Empty;
 
+	public bool IsGroupingRoot {
+		get;
+		set;
+	}
+
 	[ExcludeProperty]
 	public ReactiveProperty<bool> IsScanning {
 		get;

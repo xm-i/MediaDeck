@@ -34,35 +34,25 @@ public sealed partial class FolderManagerView {
 		this.ViewModel.AddFolderCommand.Execute(folder.Path);
 	}
 
-	private async void MenuFlyoutItem_Click(object sender, RoutedEventArgs e) {
-		if (this.ViewModel is null) {
+	private async void RemoveFolderButton_Click(object sender, RoutedEventArgs e) {
+		if (this.ViewModel?.SelectedFolder.Value is not FolderViewModel target) {
 			return;
 		}
-		if (sender is not MenuFlyoutItem selectedItem) {
+
+		var dialog = new ContentDialog {
+			XamlRoot = this.Content.XamlRoot,
+			Title = "このフォルダを削除しますか？この操作は元に戻せません。",
+			PrimaryButtonText = "削除",
+			CloseButtonText = "キャンセル",
+			DefaultButton = ContentDialogButton.Primary
+		};
+
+		var result = await dialog.ShowAsync();
+
+		if (result != ContentDialogResult.Primary) {
 			return;
 		}
-		switch (selectedItem.Tag.ToString()) {
-			case "Remove":
-				if (selectedItem.DataContext is not FolderViewModel target) {
-					return;
-				}
-
-				var dialog = new ContentDialog {
-					XamlRoot = this.Content.XamlRoot,
-					Title = "このフォルダを削除しますか？この操作は元に戻せません。",
-					PrimaryButtonText = "削除",
-					CloseButtonText = "キャンセル",
-					DefaultButton = ContentDialogButton.Primary
-				};
-
-				var result = await dialog.ShowAsync();
-
-				if (result != ContentDialogResult.Primary) {
-					return;
-				}
-				this.ViewModel.RemoveFolderCommand.Execute(target);
-				break;
-		}
+		this.ViewModel.RemoveFolderCommand.Execute(target);
 	}
 }
 
