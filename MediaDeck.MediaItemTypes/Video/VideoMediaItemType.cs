@@ -4,6 +4,9 @@ using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Database.Tables;
 using MediaDeck.MediaItemTypes.Base;
+using MediaDeck.MediaItemTypes.Base.Models;
+using MediaDeck.MediaItemTypes.Base.ViewModels;
+using MediaDeck.MediaItemTypes.Base.Views;
 using MediaDeck.MediaItemTypes.Video.Models;
 using MediaDeck.MediaItemTypes.Video.ViewModels;
 using MediaDeck.MediaItemTypes.Video.Views;
@@ -13,7 +16,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace MediaDeck.MediaItemTypes.Video;
 
 [Inject(InjectServiceLifetime.Singleton, typeof(IMediaItemType))]
-internal class VideoMediaItemType : BaseMediaItemType<VideoMediaItemOperator, VideoMediaItemModel, VideoMediaItemViewModel, VideoDetailViewerPreviewControlView, VideoThumbnailPickerViewModel, VideoThumbnailPickerView> {
+internal class VideoMediaItemType : BaseMediaItemType<VideoMediaItemOperator, VideoMediaItemModel, DefaultExecutionProgramObjectModel, VideoMediaItemViewModel, DefaultExecutionProgramConfigViewModel, VideoDetailViewerPreviewControlView, VideoThumbnailPickerViewModel, VideoThumbnailPickerView, DefaultExecutionConfigView> {
 	private VideoDetailViewerPreviewControlView? _videoDetailViewerPreviewControlView;
 	private readonly VideoMediaItemOperator _VideoMediaItemOperator;
 	private readonly IServiceProvider _serviceProvider;
@@ -44,12 +47,12 @@ internal class VideoMediaItemType : BaseMediaItemType<VideoMediaItemOperator, Vi
 
 	public override ItemType ItemType {
 		get {
-			return MediaDeck.Database.Tables.ItemType.Video;
+			return ItemType.Video;
 		}
 	}
 
-	public override VideoMediaItemModel CreateMediaItemModelFromRecord(MediaItem MediaItem) {
-		var ifm = new VideoMediaItemModel(MediaItem.MediaItemId, MediaItem.FilePath, this._VideoMediaItemOperator, this._config);
+	public override VideoMediaItemModel CreateMediaItemModelFromRecord(MediaItem MediaItem, IServiceProvider scopedServiceProvider) {
+		var ifm = new VideoMediaItemModel(MediaItem.MediaItemId, MediaItem.FilePath, this._VideoMediaItemOperator, this, scopedServiceProvider);
 		this.SetModelProperties(ifm, MediaItem);
 		return ifm;
 	}
@@ -68,6 +71,22 @@ internal class VideoMediaItemType : BaseMediaItemType<VideoMediaItemOperator, Vi
 
 	public override VideoThumbnailPickerView CreateThumbnailPickerView() {
 		return new VideoThumbnailPickerView();
+	}
+
+	public override DefaultExecutionProgramObjectModel CreateExecutionProgramObjectModel() {
+		return new DefaultExecutionProgramObjectModel() {
+			MediaType = this.MediaType
+		};
+	}
+
+	public override DefaultExecutionProgramConfigViewModel CreateExecutionProgramConfigViewModel(DefaultExecutionProgramObjectModel model) {
+		return new DefaultExecutionProgramConfigViewModel(model, this._serviceProvider.GetRequiredService<IMediaItemTypeService>(), this._serviceProvider.GetRequiredService<ExecutionConfigModel>());
+	}
+
+	public override DefaultExecutionConfigView CreateExecutionConfigView(DefaultExecutionProgramConfigViewModel viewModel) {
+		return new DefaultExecutionConfigView() {
+			ViewModel = viewModel
+		};
 	}
 
 	public override IQueryable<MediaItem> IncludeTables(IQueryable<MediaItem> MediaItems) {

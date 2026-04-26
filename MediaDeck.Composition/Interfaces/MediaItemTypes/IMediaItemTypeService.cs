@@ -13,7 +13,7 @@ public interface IMediaItemTypeService {
 	/// <summary>
 	/// データベースレコードからメディアアイテムモデルを作成します。
 	/// </summary>
-	public IMediaItemModel CreateMediaItemModelFromRecord(MediaItem MediaItem);
+	public IMediaItemModel CreateMediaItemModelFromRecord(MediaItem MediaItem, IServiceProvider scopedServiceProvider);
 
 	/// <summary>
 	/// メディアアイテムモデルからビューモデルを作成します。
@@ -51,6 +51,11 @@ public interface IMediaItemTypeService {
 	public IMediaItemType GetMediaItemType(string path);
 
 	/// <summary>
+	/// 指定したメディアタイプに対応するメディアアイテムタイプを取得します。
+	/// </summary>
+	public IMediaItemType GetMediaItemType(MediaType mediaType);
+
+	/// <summary>
 	/// レコードに対応するメディアアイテムタイプを取得します。
 	/// </summary>
 	public IMediaItemType GetMediaItemType(MediaItem MediaItem);
@@ -64,4 +69,23 @@ public interface IMediaItemTypeService {
 	/// 指定したメディアタイプのパス判定を行います。
 	/// </summary>
 	public bool IsTargetPath(string path, MediaType mediaType);
+
+	/// <summary>
+	/// メディアタイプ
+	/// </summary>
+	/// <param name="mediaType">メディアタイプ</param>
+	/// <returns>実行プログラムオブジェクトモデル</returns>
+	public IExecutionProgramObjectModel CreateExecutionProgramObjectModel(MediaType mediaType);
+
+	/// <summary>
+	/// モデルに対応する実行設定UIのビューモデルを作成します。
+	/// </summary>
+	/// <param name="model">モデル</param>
+	/// <returns>実行プログラム設定ViewModel</returns>
+	public IExecutionProgramConfigViewModel CreateExecutionConfigViewModel(IExecutionProgramObjectModel model);
+
+	/// <summary>
+	/// ビューモデルに対応する実行設定UIを作成します。
+	/// </summary>
+	public IExecutionConfigView CreateExecutionConfigView(IExecutionProgramConfigViewModel viewModel);
 }

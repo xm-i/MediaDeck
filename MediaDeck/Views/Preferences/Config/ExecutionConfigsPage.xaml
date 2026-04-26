@@ -3,7 +3,7 @@
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-	xmlns:config="using:MediaDeck.ViewModels.Preferences.Config"
+	xmlns:config="using:MediaDeck.Composition.Interfaces.MediaItemTypes.ViewModels"
 	mc:Ignorable="d"
 	Background="Transparent"
 	x:Name="PageRoot" >
@@ -27,7 +27,7 @@
 			<!-- プログラムリスト -->
 			<ItemsControl ItemsSource="{x:Bind ViewModel.ExecutionPrograms}" >
 				<ItemsControl.ItemTemplate>
-					<DataTemplate x:DataType="config:ExecutionProgramConfigViewModel" >
+					<DataTemplate x:DataType="config:IExecutionProgramConfigViewModel" >
 						<Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
 							BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
 							BorderThickness="1"
@@ -46,10 +46,7 @@
 										FontSize="16"
 										Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
 										VerticalAlignment="Center" />
-									<ComboBox Width="130"
-										VerticalAlignment="Center"
-										ItemsSource="{x:Bind MediaTypeConditions}"
-										SelectedItem="{x:Bind MediaType.Value, Mode=TwoWay}" />
+									<TextBlock Text="{x:Bind MediaType}" />
 								</StackPanel>
 
 								<!-- 削除ボタン -->
@@ -66,53 +63,39 @@
 										Foreground="{ThemeResource SystemFillColorCriticalBrush}" />
 								</Button>
 
-								<!-- 下段: パスと引数 -->
-								<Grid Grid.Row="1"
+								<!-- 下段: 動的な設定UI (デフォルトはパスと引数) -->
+								<ContentPresenter Grid.Row="1"
 									Grid.Column="0"
 									Grid.ColumnSpan="2"
-									Margin="0,10,0,0"
-									ColumnDefinitions="*,Auto" >
-									<!-- パス入力 -->
-									<TextBox Grid.Column="0"
-										Margin="0,0,8,0"
-										Text="{x:Bind Path.Value, Mode=TwoWay}"
-										PlaceholderText="C:\Programs\MPC-BE\mpc-be64.exe"
-										Header="実行ファイルパス" />
-
-									<!-- 引数入力 -->
-									<TextBox Grid.Column="1"
-										Width="200"
-										Text="{x:Bind Args.Value, Mode=TwoWay}"
-										PlaceholderText="/fullscreen"
-										Header="起動引数" />
-								</Grid>
+									Content="{x:Bind ConfigView.Value, Mode=OneWay}" />
 							</Grid>
 						</Border>
 					</DataTemplate>
 				</ItemsControl.ItemTemplate>
 			</ItemsControl>
 
-			<!-- 追加ボタン -->
-			<Button Command="{x:Bind ViewModel.AddExecutionProgramCommand}"
-				HorizontalAlignment="Stretch"
-				Margin="0,4,0,0"
-				Padding="12"
-				Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-				BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-				BorderThickness="1"
-				CornerRadius="4"
-				HorizontalContentAlignment="Center" >
-				<StackPanel Orientation="Horizontal"
-					Spacing="8" >
-					<FontIcon Glyph="&#xE710;"
-						FontSize="14"
-						Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
-					<TextBlock Text="プログラムを追加"
-						Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
-						FontWeight="SemiBold" />
-				</StackPanel>
-			</Button>
-
+			<!-- 追加セクション -->
+			<Grid ColumnDefinitions="*,Auto"
+				Margin="0,8,0,0"
+				ColumnSpacing="8"
+				VerticalAlignment="Bottom" >
+				<ComboBox Grid.Column="0"
+					HorizontalAlignment="Stretch"
+					Header="追加するメディアタイプ"
+					ItemsSource="{x:Bind ViewModel.AvailableMediaTypes}"
+					SelectedItem="{x:Bind ViewModel.SelectedMediaType.Value, Mode=TwoWay}" />
+				<Button Grid.Column="1"
+					VerticalAlignment="Bottom"
+					Command="{x:Bind ViewModel.AddExecutionProgramCommand}">
+					<StackPanel Orientation="Horizontal"
+						Spacing="8" >
+						<FontIcon Glyph="&#xE710;"
+							FontSize="14" />
+						<TextBlock Text="プログラムを追加"
+							FontWeight="SemiBold" />
+					</StackPanel>
+				</Button>
+			</Grid>
 		</StackPanel>
 	</ScrollViewer>
 </Page>

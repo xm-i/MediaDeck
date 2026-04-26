@@ -1,8 +1,6 @@
 using System.Linq.Expressions;
-
-using MediaDeck.Composition.Interfaces.Files;
+using MediaDeck.Composition.Interfaces.Notifications;
 using MediaDeck.Database.Tables;
-
 using R3.JsonConfig.Attributes;
 
 namespace MediaDeck.Core.Models.Files.SearchConditions;
@@ -10,7 +8,8 @@ namespace MediaDeck.Core.Models.Files.SearchConditions;
 [GenerateR3JsonConfigDto]
 [JsonConfigDerivedType("folder")]
 [Inject(InjectServiceLifetime.Transient)]
-public class FolderSearchCondition : ISearchCondition {
+[Inject(InjectServiceLifetime.Transient, typeof(IFolderSearchCondition))]
+public class FolderSearchCondition : IFolderSearchCondition {
 	public FolderSearchCondition() {
 	}
 

@@ -47,7 +47,7 @@ public class MediaItemTypeServiceTest {
 	public void CreateMediaItemModelFromRecord_UsesMatchingMediaItemType() {
 		var MediaItem = CreateMediaItem(@"C:\media\sample.jpg");
 
-		var result = this._service.CreateMediaItemModelFromRecord(MediaItem);
+		var result = this._service.CreateMediaItemModelFromRecord(MediaItem, null!);
 
 		var testFileModel = result.ShouldBeOfType<TestFileModel>();
 		testFileModel.CreatedBy.ShouldBe("image");
@@ -60,7 +60,7 @@ public class MediaItemTypeServiceTest {
 	public void CreateMediaItemModelFromRecord_FallsBackToUnknownWhenMediaTypeIsNotRegistered() {
 		var MediaItem = CreateMediaItem(@"C:\media\sample.txt");
 
-		var result = this._service.CreateMediaItemModelFromRecord(MediaItem);
+		var result = this._service.CreateMediaItemModelFromRecord(MediaItem, null!);
 
 		var testFileModel = result.ShouldBeOfType<TestFileModel>();
 		testFileModel.CreatedBy.ShouldBe("unknown");
@@ -214,7 +214,7 @@ public class MediaItemTypeServiceTest {
 			return new TestFileOperator(this.MediaType, this.CreatedBy);
 		}
 
-		public IMediaItemModel CreateMediaItemModelFromRecord(MediaItem MediaItem) {
+		public IMediaItemModel CreateMediaItemModelFromRecord(MediaItem MediaItem, IServiceProvider scopedServiceProvider) {
 			return new TestFileModel(this.MediaType, MediaItem.FilePath, this.CreatedBy);
 		}
 
@@ -248,6 +248,22 @@ public class MediaItemTypeServiceTest {
 
 		public MediaItemPathStatus GetPathStatus(string path) {
 			return new(true, 0, DateTime.MinValue, DateTime.MinValue, DateTime.MinValue);
+		}
+
+		public Task ExecuteAsync(string filePath, IServiceProvider scopedServiceProvider) {
+			return Task.CompletedTask;
+		}
+
+		public IExecutionProgramObjectModel CreateExecutionProgramObjectModel() {
+			return null!;
+		}
+
+		public IExecutionProgramConfigViewModel CreateExecutionProgramConfigViewModel(IExecutionProgramObjectModel model) {
+			return null!;
+		}
+
+		public IExecutionConfigView CreateExecutionConfigView(IExecutionProgramConfigViewModel viewModel) {
+			return null!;
 		}
 	}
 

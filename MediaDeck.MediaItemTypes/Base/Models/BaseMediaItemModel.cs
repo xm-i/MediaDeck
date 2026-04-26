@@ -3,16 +3,17 @@ using System.Threading.Tasks;
 using MediaDeck.Common.Base;
 using MediaDeck.Common.Utilities;
 using MediaDeck.Composition.Enum;
+using MediaDeck.Composition.Interfaces.MediaItemTypes;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.Models;
 using MediaDeck.Composition.Interfaces.Primitives;
 using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Composition.Objects;
-using MediaDeck.Composition.Stores.Config.Model;
 
 namespace MediaDeck.MediaItemTypes.Base.Models;
 
 internal abstract class BaseMediaItemModel : ModelBase, IMediaItemModel {
-	private readonly ConfigModel _config;
+	private readonly IMediaItemType _mediaItemType;
+	private readonly IServiceProvider _scopedServiceProvider;
 
 	protected IMediaItemOperator FileOperator {
 		get;
@@ -26,8 +27,17 @@ internal abstract class BaseMediaItemModel : ModelBase, IMediaItemModel {
 		}
 	}
 
-	internal BaseMediaItemModel(long id, string filePath, IMediaItemOperator fileOperator, MediaType mediaType, ConfigModel config) : base() {
-		this._config = config;
+	/// <summary>
+	/// BaseMediaItemModel のコンストラクタ。
+	/// </summary>
+	/// <param name="id">メディアアイテムID</param>
+	/// <param name="filePath">ファイルパス</param>
+	/// <param name="fileOperator">ファイルオペレーター</param>
+	/// <param name="mediaType">メディアタイプ</param>
+	/// <param name="mediaItemType">このモデルに対応するメディアアイテムタイプ。実行ロジック等の委譲先。</param>
+	internal BaseMediaItemModel(long id, string filePath, IMediaItemOperator fileOperator, MediaType mediaType, IMediaItemType mediaItemType, IServiceProvider scopedServiceProvider) : base() {
+		this._mediaItemType = mediaItemType;
+		this._scopedServiceProvider = scopedServiceProvider;
 		this.FileOperator = fileOperator;
 		this.Id = id;
 		this.FilePath = filePath;
@@ -180,15 +190,11 @@ internal abstract class BaseMediaItemModel : ModelBase, IMediaItemModel {
 		this._changed.OnNext(Unit.Default);
 	}
 
+	/// <summary>
+	/// ファイルを実行する。実行ロジックは IMediaItemType.ExecuteAsync に委譲する。
+	/// </summary>
 	public async Task ExecuteFileAsync() {
-		var epo = this._config.ExecutionConfig.ExecutionPrograms.FirstOrDefault(x => x.MediaType.Value == this.MediaType);
-		if (epo is null) {
-			ShellUtility.ShellExecute(this.FilePath);
-		} else {
-			var arguments = string.Format(epo.Args.Value, $"\"{this.FilePath}\"");
-			ShellUtility.ShellExecute(epo.Path.Value, arguments);
-		}
-
+		await this._mediaItemType.ExecuteAsync(this.FilePath, this._scopedServiceProvider);
 		await this.IncrementUsageCountAsync();
 	}
 }

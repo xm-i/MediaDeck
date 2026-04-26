@@ -1,4 +1,5 @@
 using MediaDeck.Composition.Interfaces.Files;
+using MediaDeck.Composition.Interfaces.Notifications;
 
 namespace MediaDeck.Core.Models.NotificationDispatcher;
 
@@ -7,8 +8,8 @@ namespace MediaDeck.Core.Models.NotificationDispatcher;
 /// ソート・フィルター・検索ワード（トークン）など、すべての検索トリガーを集約し、
 /// 外部クラスは <see cref="SearchRequested"/> を監視するだけで全条件変更を受信できる。
 /// </summary>
-[Inject(InjectServiceLifetime.Scoped)]
-public class SearchConditionNotificationDispatcher : IDisposable {
+[Inject(InjectServiceLifetime.Scoped, typeof(ISearchConditionNotificationDispatcher))]
+public class SearchConditionNotificationDispatcher : ISearchConditionNotificationDispatcher {
 	/// <summary>コンストラクタ</summary>
 	public SearchConditionNotificationDispatcher() {
 		// 検索ワード（トークン）の追加・削除・更新はユーザーのキーボード操作で高頻度に変化しうるため

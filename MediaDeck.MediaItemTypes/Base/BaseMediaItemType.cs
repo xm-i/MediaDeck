@@ -1,7 +1,7 @@
 using System.IO;
+using System.Threading.Tasks;
 
-
-
+using MediaDeck.Common.Utilities;
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.MediaItemTypes;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.Models;
@@ -11,16 +11,21 @@ using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Composition.Objects;
 using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Database.Tables;
+using MediaDeck.MediaItemTypes.Base.Models;
 
 namespace MediaDeck.MediaItemTypes.Base;
 
-internal abstract class BaseMediaItemType<TFileOperator, TFileModel, TFileViewModel, TDetailViewerPreviewControlView, TThumbnailPickerViewModel, TThumbnailPickerView> : IMediaItemType<TFileOperator, TFileModel, TFileViewModel, TDetailViewerPreviewControlView, TThumbnailPickerViewModel, TThumbnailPickerView>
+internal abstract class BaseMediaItemType<TFileOperator, TFileModel, TExecutionProgramObjectModel, TFileViewModel, TExecutionProgramConfigViewModel, TDetailViewerPreviewControlView, TThumbnailPickerViewModel, TThumbnailPickerView, TExecutionConfigView>
+	: IMediaItemType<TFileOperator, TFileModel, TExecutionProgramObjectModel, TFileViewModel, TExecutionProgramConfigViewModel, TDetailViewerPreviewControlView, TThumbnailPickerViewModel, TThumbnailPickerView, TExecutionConfigView>
 	where TFileOperator : IMediaItemOperator
 	where TFileModel : IMediaItemModel
+	where TExecutionProgramObjectModel : IExecutionProgramObjectModel
 	where TFileViewModel : IMediaItemViewModel
+	where TExecutionProgramConfigViewModel : IExecutionProgramConfigViewModel
 	where TDetailViewerPreviewControlView : IDetailViewerPreviewControlView
 	where TThumbnailPickerViewModel : IThumbnailPickerViewModel
-	where TThumbnailPickerView : IThumbnailPickerView {
+	where TThumbnailPickerView : IThumbnailPickerView
+	where TExecutionConfigView : IExecutionConfigView {
 	protected readonly ConfigModel _config;
 	protected readonly ITagsManager _tagsManager;
 
@@ -39,7 +44,7 @@ internal abstract class BaseMediaItemType<TFileOperator, TFileModel, TFileViewMo
 	}
 
 	public abstract TFileOperator CreateMediaItemOperator();
-	public abstract TFileModel CreateMediaItemModelFromRecord(MediaItem MediaItem);
+	public abstract TFileModel CreateMediaItemModelFromRecord(MediaItem MediaItem, IServiceProvider scopedServiceProvider);
 	public abstract TFileViewModel CreateMediaItemViewModel(TFileModel fileModel);
 	public abstract TDetailViewerPreviewControlView CreateDetailViewerPreviewControlView(TFileViewModel fileViewModel);
 	public abstract TThumbnailPickerViewModel CreateThumbnailPickerViewModel();
@@ -67,6 +72,35 @@ internal abstract class BaseMediaItemType<TFileOperator, TFileModel, TFileViewMo
 		return new(true, fileInfo.Length, fileInfo.CreationTime, fileInfo.LastWriteTime, fileInfo.LastAccessTime);
 	}
 
+	/// <summary>
+	/// 指定されたファイルパスに対してこのメディアタイプ固有の実行処理を行う。
+	/// デフォルト実装では、ExecutionConfig の外部プログラム設定に従って実行する。
+	/// 各メディアタイプで独自の実行ロジックが必要な場合はオーバーライドする。
+	/// </summary>
+	/// <param name="filePath">実行対象のファイルパス</param>
+	/// <param name="scopedServiceProvider">実行するタブのスコープを切ったサービスプロバイダー</param>
+	/// <returns>非同期タスク</returns>
+	public virtual Task ExecuteAsync(string filePath, IServiceProvider scopedServiceProvider) {
+		var epo = this._config.ExecutionConfig.ExecutionPrograms.FirstOrDefault(x => x.MediaType == this.MediaType) as DefaultExecutionProgramObjectModel;
+		if (epo is null) {
+			ShellUtility.ShellExecute(filePath);
+		} else {
+			var arguments = string.Format(epo.Args.Value, $"\"{filePath}\"");
+			ShellUtility.ShellExecute(epo.Path.Value, arguments);
+		}
+
+		return Task.CompletedTask;
+	}
+
+	/// <inheritdoc />
+	public abstract TExecutionProgramObjectModel CreateExecutionProgramObjectModel();
+
+	/// <inheritdoc />
+	public abstract TExecutionProgramConfigViewModel CreateExecutionProgramConfigViewModel(TExecutionProgramObjectModel model);
+
+	/// <inheritdoc />
+	public abstract TExecutionConfigView CreateExecutionConfigView(TExecutionProgramConfigViewModel viewModel);
+
 	protected void SetModelProperties(TFileModel fileModel, MediaItem MediaItem) {
 		if (MediaItem.ThumbnailFileName != null) {
 			fileModel.ThumbnailFilePath = Path.Combine(this._config.PathConfig.ThumbnailFolderPath.Value, MediaItem.ThumbnailFileName);
@@ -91,8 +125,8 @@ internal abstract class BaseMediaItemType<TFileOperator, TFileModel, TFileViewMo
 		return this.CreateMediaItemOperator();
 	}
 
-	IMediaItemModel IMediaItemType.CreateMediaItemModelFromRecord(MediaItem MediaItem) {
-		return this.CreateMediaItemModelFromRecord(MediaItem);
+	IMediaItemModel IMediaItemType.CreateMediaItemModelFromRecord(MediaItem MediaItem, IServiceProvider scopedServiceProvider) {
+		return this.CreateMediaItemModelFromRecord(MediaItem, scopedServiceProvider);
 	}
 
 	IMediaItemViewModel IMediaItemType.CreateMediaItemViewModel(IMediaItemModel fileModel) {
@@ -110,4 +144,17 @@ internal abstract class BaseMediaItemType<TFileOperator, TFileModel, TFileViewMo
 	IThumbnailPickerView IMediaItemType.CreateThumbnailPickerView() {
 		return this.CreateThumbnailPickerView();
 	}
+
+	IExecutionProgramObjectModel IMediaItemType.CreateExecutionProgramObjectModel() {
+		return this.CreateExecutionProgramObjectModel();
+	}
+
+	public IExecutionProgramConfigViewModel CreateExecutionProgramConfigViewModel(IExecutionProgramObjectModel model) {
+		return this.CreateExecutionProgramConfigViewModel((TExecutionProgramObjectModel)model);
+	}
+
+	public IExecutionConfigView CreateExecutionConfigView(IExecutionProgramConfigViewModel viewModel) {
+		return this.CreateExecutionConfigView((TExecutionProgramConfigViewModel)viewModel);
+	}
+
 }

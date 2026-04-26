@@ -1,14 +1,13 @@
 using System.Diagnostics;
-
 using MediaDeck.Common.Base;
 using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.Models;
+using MediaDeck.Composition.Interfaces.Notifications;
 using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Core.Models.Files.Loaders;
 using MediaDeck.Core.Models.Files.SearchConditions;
-using MediaDeck.Core.Models.NotificationDispatcher;
 using MediaDeck.Core.Models.Repositories;
 
 namespace MediaDeck.Core.Models.Files;
@@ -16,7 +15,7 @@ namespace MediaDeck.Core.Models.Files;
 [Inject(InjectServiceLifetime.Scoped)]
 public class MediaContentLibrary : ModelBase {
 	/// <summary>コンストラクタ</summary>
-	public MediaContentLibrary(FilesLoader filesLoader, SearchConfigModel searchConfig, SearchConditionNotificationDispatcher dispatcher, ITagsManager tagsManager, FolderRepository folderRepository, TabStateModel tabState) {
+	public MediaContentLibrary(FilesLoader filesLoader, SearchConfigModel searchConfig, ISearchConditionNotificationDispatcher dispatcher, ITagsManager tagsManager, FolderRepository folderRepository, TabStateModel tabState) {
 		this._filesLoader = filesLoader;
 		this._searchConfig = searchConfig;
 

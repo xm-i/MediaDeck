@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
 
 using AutoDiAttributes;
 using MediaDeck.Common.Base;
@@ -14,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 using R3;
+using R3.JsonConfig;
 
 namespace MediaDeck.Store.Config;
 
@@ -45,6 +47,15 @@ public class ConfigStore : DisposableBase, IConfigStore {
 		this.Load();
 	}
 
+	public JsonSerializerOptions JsonSerializerOptions {
+		get {
+			return field ??= new JsonSerializerOptions() {
+				WriteIndented = true,
+				TypeInfoResolver = ConfigJsonSerializerContext.Default.WithAddedModifier(ForJsonConverterRegistry.ApplyPolymorphism)
+			};
+		}
+	}
+
 	/// <summary>
 	///     保存済み設定を読み込みます。
 	/// </summary>
@@ -55,7 +66,7 @@ public class ConfigStore : DisposableBase, IConfigStore {
 			if (File.Exists(this.ConfigFilePath)) {
 				try {
 					var json = File.ReadAllText(this.ConfigFilePath);
-					var loaded = JsonSerializer.Deserialize(json, ConfigJsonSerializerContext.Default.ConfigModelForJson);
+					var loaded = JsonSerializer.Deserialize<ConfigModelForJson>(json, this.JsonSerializerOptions);
 					if (loaded != null) {
 						this.Config = ConfigModelForJson.CreateModel(loaded, scope.ServiceProvider);
 						this._logger.LogInformation("アプリケーション設定の読み込みに成功しました");
@@ -84,7 +95,7 @@ public class ConfigStore : DisposableBase, IConfigStore {
 			Directory.CreateDirectory(Path.GetDirectoryName(this.ConfigFilePath)!);
 
 			var jsonDto = ConfigModelForJson.CreateJson(this.Config);
-			var json = JsonSerializer.Serialize(jsonDto, ConfigJsonSerializerContext.Default.ConfigModelForJson);
+			var json = JsonSerializer.Serialize(jsonDto, this.JsonSerializerOptions);
 			File.WriteAllText(this.ConfigFilePath, json);
 			this._logger.LogInformation("アプリケーション設定を保存しました: {FilePath}", this.ConfigFilePath);
 		} catch (Exception e) {

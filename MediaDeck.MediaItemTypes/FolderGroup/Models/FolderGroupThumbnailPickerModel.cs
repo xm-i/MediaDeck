@@ -17,11 +17,13 @@ internal class FolderGroupThumbnailPickerModel(
 	IDbContextFactory<MediaDeckDbContext> dbFactory,
 	ILogger<FolderGroupThumbnailPickerModel> logger,
 	IFilePathService filePathService,
-	IMediaItemTypeService mediaItemTypeService)
+	IMediaItemTypeService mediaItemTypeService,
+	IServiceProvider scopedServiceProvider)
 	: BaseThumbnailPickerModel(dbFactory, logger, filePathService) {
 	private readonly IDbContextFactory<MediaDeckDbContext> _dbFactory = dbFactory;
 	private readonly IFilePathService _filePathService = filePathService;
 	private readonly IMediaItemTypeService _mediaItemTypeService = mediaItemTypeService;
+	private readonly IServiceProvider _scopedServiceProvider = scopedServiceProvider;
 
 	/// <summary>
 	/// フォルダ内のアイテムリスト
@@ -54,7 +56,7 @@ internal class FolderGroupThumbnailPickerModel(
 			.OrderBy(x => x.FilePath)
 			.ToListAsync())
 			.Select(x => {
-				var model = this._mediaItemTypeService.CreateMediaItemModelFromRecord(x);
+				var model = this._mediaItemTypeService.CreateMediaItemModelFromRecord(x, this._scopedServiceProvider);
 				var vm = this._mediaItemTypeService.CreateMediaItemViewModel(model);
 				return vm;
 			});

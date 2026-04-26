@@ -4,15 +4,19 @@ using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Database.Tables;
 using MediaDeck.MediaItemTypes.Base;
+using MediaDeck.MediaItemTypes.Base.Models;
+using MediaDeck.MediaItemTypes.Base.ViewModels;
+using MediaDeck.MediaItemTypes.Base.Views;
 using MediaDeck.MediaItemTypes.Unknown.Models;
 using MediaDeck.MediaItemTypes.Unknown.ViewModels;
 using MediaDeck.MediaItemTypes.Unknown.Views;
+
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MediaDeck.MediaItemTypes.Unknown;
 
 [Inject(InjectServiceLifetime.Singleton, typeof(IMediaItemType))]
-internal class UnknownMediaItemType : BaseMediaItemType<UnknownMediaItemOperator, UnknownMediaItemModel, UnknownMediaItemViewModel, UnknownDetailViewerPreviewControlView, UnknownThumbnailPickerViewModel, UnknownThumbnailPickerView> {
+internal class UnknownMediaItemType : BaseMediaItemType<UnknownMediaItemOperator, UnknownMediaItemModel, DefaultExecutionProgramObjectModel, UnknownMediaItemViewModel, DefaultExecutionProgramConfigViewModel, UnknownDetailViewerPreviewControlView, UnknownThumbnailPickerViewModel, UnknownThumbnailPickerView, DefaultExecutionConfigView> {
 	private UnknownDetailViewerPreviewControlView? _unknownDetailViewerPreviewControlView;
 	private readonly UnknownMediaItemOperator _UnknownMediaItemOperator;
 	private readonly IServiceProvider _serviceProvider;
@@ -33,7 +37,7 @@ internal class UnknownMediaItemType : BaseMediaItemType<UnknownMediaItemOperator
 
 	public override ItemType ItemType {
 		get {
-			return MediaDeck.Database.Tables.ItemType.Unknown;
+			return ItemType.Unknown;
 		}
 	}
 
@@ -41,8 +45,8 @@ internal class UnknownMediaItemType : BaseMediaItemType<UnknownMediaItemOperator
 		return false;
 	}
 
-	public override UnknownMediaItemModel CreateMediaItemModelFromRecord(MediaItem MediaItem) {
-		var ifm = new UnknownMediaItemModel(MediaItem.MediaItemId, MediaItem.FilePath, this.CreateMediaItemOperator(), this._config);
+	public override UnknownMediaItemModel CreateMediaItemModelFromRecord(MediaItem MediaItem, IServiceProvider scopedServiceProvider) {
+		var ifm = new UnknownMediaItemModel(MediaItem.MediaItemId, MediaItem.FilePath, this.CreateMediaItemOperator(), this, scopedServiceProvider);
 		this.SetModelProperties(ifm, MediaItem);
 		return ifm;
 	}
@@ -63,6 +67,22 @@ internal class UnknownMediaItemType : BaseMediaItemType<UnknownMediaItemOperator
 		return new UnknownThumbnailPickerView();
 	}
 
+
+	public override DefaultExecutionProgramObjectModel CreateExecutionProgramObjectModel() {
+		return new DefaultExecutionProgramObjectModel() {
+			MediaType = this.MediaType
+		};
+	}
+
+	public override DefaultExecutionProgramConfigViewModel CreateExecutionProgramConfigViewModel(DefaultExecutionProgramObjectModel model) {
+		return new DefaultExecutionProgramConfigViewModel(model, this._serviceProvider.GetRequiredService<IMediaItemTypeService>(), this._serviceProvider.GetRequiredService<ExecutionConfigModel>());
+	}
+
+	public override DefaultExecutionConfigView CreateExecutionConfigView(DefaultExecutionProgramConfigViewModel viewModel) {
+		return new DefaultExecutionConfigView() {
+			ViewModel = viewModel
+		};
+	}
 	public override IQueryable<MediaItem> IncludeTables(IQueryable<MediaItem> MediaItems) {
 		return MediaItems;
 	}

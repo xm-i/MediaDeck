@@ -7,12 +7,16 @@ using MediaDeck.MediaItemTypes.Archive.Models;
 using MediaDeck.MediaItemTypes.Archive.ViewModels;
 using MediaDeck.MediaItemTypes.Archive.Views;
 using MediaDeck.MediaItemTypes.Base;
+using MediaDeck.MediaItemTypes.Base.Models;
+using MediaDeck.MediaItemTypes.Base.ViewModels;
+using MediaDeck.MediaItemTypes.Base.Views;
+
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MediaDeck.MediaItemTypes.Archive;
 
 [Inject(InjectServiceLifetime.Singleton, typeof(IMediaItemType))]
-internal class ArchiveMediaItemType : BaseMediaItemType<ArchiveMediaItemOperator, ArchiveMediaItemModel, ArchiveMediaItemViewModel, ArchiveDetailViewerPreviewControlView, ArchiveThumbnailPickerViewModel, ArchiveThumbnailPickerView> {
+internal class ArchiveMediaItemType : BaseMediaItemType<ArchiveMediaItemOperator, ArchiveMediaItemModel, DefaultExecutionProgramObjectModel, ArchiveMediaItemViewModel, DefaultExecutionProgramConfigViewModel, ArchiveDetailViewerPreviewControlView, ArchiveThumbnailPickerViewModel, ArchiveThumbnailPickerView, DefaultExecutionConfigView> {
 	private ArchiveDetailViewerPreviewControlView? _archiveDetailViewerPreviewControlView;
 	private readonly ArchiveMediaItemOperator _ArchiveMediaItemOperator;
 	private readonly IServiceProvider _serviceProvider;
@@ -33,12 +37,12 @@ internal class ArchiveMediaItemType : BaseMediaItemType<ArchiveMediaItemOperator
 
 	public override ItemType ItemType {
 		get {
-			return MediaDeck.Database.Tables.ItemType.Archive;
+			return ItemType.Archive;
 		}
 	}
 
-	public override ArchiveMediaItemModel CreateMediaItemModelFromRecord(MediaItem MediaItem) {
-		var ifm = new ArchiveMediaItemModel(MediaItem.MediaItemId, MediaItem.FilePath, this._ArchiveMediaItemOperator, this._config);
+	public override ArchiveMediaItemModel CreateMediaItemModelFromRecord(MediaItem MediaItem, IServiceProvider scopedServiceProvider) {
+		var ifm = new ArchiveMediaItemModel(MediaItem.MediaItemId, MediaItem.FilePath, this._ArchiveMediaItemOperator, this, scopedServiceProvider);
 		this.SetModelProperties(ifm, MediaItem);
 		return ifm;
 	}
@@ -62,5 +66,21 @@ internal class ArchiveMediaItemType : BaseMediaItemType<ArchiveMediaItemOperator
 	public override IQueryable<MediaItem> IncludeTables(IQueryable<MediaItem> MediaItems) {
 		return MediaItems
 			.Include(mf => mf.Container);
+	}
+
+	public override DefaultExecutionProgramObjectModel CreateExecutionProgramObjectModel() {
+		return new DefaultExecutionProgramObjectModel() {
+			MediaType = this.MediaType
+		};
+	}
+
+	public override DefaultExecutionProgramConfigViewModel CreateExecutionProgramConfigViewModel(DefaultExecutionProgramObjectModel model) {
+		return new DefaultExecutionProgramConfigViewModel(model, this._serviceProvider.GetRequiredService<IMediaItemTypeService>(), this._serviceProvider.GetRequiredService<ExecutionConfigModel>());
+	}
+
+	public override DefaultExecutionConfigView CreateExecutionConfigView(DefaultExecutionProgramConfigViewModel viewModel) {
+		return new DefaultExecutionConfigView() {
+			ViewModel = viewModel
+		};
 	}
 }

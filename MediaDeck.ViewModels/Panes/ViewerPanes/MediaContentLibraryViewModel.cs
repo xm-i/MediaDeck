@@ -2,14 +2,14 @@ using MediaDeck.Common.Base;
 using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Interfaces.MediaItemTypes;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.ViewModels;
+using MediaDeck.Composition.Interfaces.Notifications;
 using MediaDeck.Core.Models.Files;
-using MediaDeck.Core.Models.NotificationDispatcher;
 
 namespace MediaDeck.ViewModels.Panes.ViewerPanes;
 
 [Inject(InjectServiceLifetime.Scoped)]
 public class MediaContentLibraryViewModel : ViewModelBase {
-	public MediaContentLibraryViewModel(MediaContentLibrary mediaContentLibrary, SearchConditionNotificationDispatcher searchConditionNotificationDispatcher, IMediaItemTypeService MediaItemTypeService) {
+	public MediaContentLibraryViewModel(MediaContentLibrary mediaContentLibrary, ISearchConditionNotificationDispatcher searchConditionNotificationDispatcher, IMediaItemTypeService MediaItemTypeService) {
 		this._mediaContentLibrary = mediaContentLibrary;
 		this.Files = mediaContentLibrary.Files.CreateView(MediaItemTypeService.CreateMediaItemViewModel).ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
 
@@ -57,7 +57,7 @@ public class MediaContentLibraryViewModel : ViewModelBase {
 		get;
 	}
 
-	public SearchConditionNotificationDispatcher SearchConditionNotificationDispatcher {
+	public ISearchConditionNotificationDispatcher SearchConditionNotificationDispatcher {
 		get;
 	}
 

@@ -1,6 +1,6 @@
 using MediaDeck.Common.Base;
+using MediaDeck.Composition.Interfaces.Notifications;
 using MediaDeck.Composition.Stores.State.Model;
-using MediaDeck.Core.Models.NotificationDispatcher;
 using MediaDeck.Database.Tables;
 
 namespace MediaDeck.Core.Models.Files.Filter;
@@ -13,7 +13,7 @@ public class FilterSelector : ModelBase {
 	/// <summary>
 	/// コンストラクタ
 	/// </summary>
-	public FilterSelector(TabStateModel tabState, SearchDefinitionsStateModel searchDefinitions, SearchConditionNotificationDispatcher dispatcher) {
+	public FilterSelector(TabStateModel tabState, SearchDefinitionsStateModel searchDefinitions, ISearchConditionNotificationDispatcher dispatcher) {
 		this.FilteringConditions.AddRange(searchDefinitions.FilteringConditions.Select(x => new FilteringCondition(x).AddTo(this.CompositeDisposable)));
 
 		this.CurrentFilteringCondition.Value = this.FilteringConditions.FirstOrDefault(x => x.FilterObject.Id == tabState.SearchState.CurrentFilteringCondition.Value);

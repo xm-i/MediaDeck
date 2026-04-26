@@ -12,10 +12,11 @@ using MediaDeck.Database.Tables;
 namespace MediaDeck.Core.Models.Files.Loaders;
 
 [Inject(InjectServiceLifetime.Scoped)]
-public class FilesLoader(IDbContextFactory<MediaDeckDbContext> dbFactory, SortSelector sortSelector, FilterSelector filterSetter, IMediaItemTypeService MediaItemTypeService) {
+public class FilesLoader(IDbContextFactory<MediaDeckDbContext> dbFactory, SortSelector sortSelector, FilterSelector filterSetter, IMediaItemTypeService MediaItemTypeService, IServiceProvider scopedServiceProvider) {
 	protected FilterSelector FilterSetter = filterSetter;
 	protected SortSelector SortSelector = sortSelector;
 	private readonly IMediaItemTypeService _MediaItemTypeService = MediaItemTypeService;
+	private readonly IServiceProvider _scopedServiceProvider = scopedServiceProvider;
 
 	/// <summary>
 	/// 検索条件に基づき、IAsyncEnumerable でストリーミング形式でファイルを取得します。
@@ -29,7 +30,7 @@ public class FilesLoader(IDbContextFactory<MediaDeckDbContext> dbFactory, SortSe
 		var query = this.BuildQuery(db, searchConditions);
 
 		await foreach (var item in query.AsAsyncEnumerable().WithCancellation(cancellationToken)) {
-			yield return this._MediaItemTypeService.CreateMediaItemModelFromRecord(item);
+			yield return this._MediaItemTypeService.CreateMediaItemModelFromRecord(item, this._scopedServiceProvider);
 		}
 	}
 

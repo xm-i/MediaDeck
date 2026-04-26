@@ -1,7 +1,9 @@
 using System.IO;
-
+using System.Threading.Tasks;
+using MediaDeck.Common.Extensions;
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.MediaItemTypes;
+using MediaDeck.Composition.Interfaces.Notifications;
 using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Database.Tables;
@@ -14,7 +16,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace MediaDeck.MediaItemTypes.FolderGroup;
 
 [Inject(InjectServiceLifetime.Singleton, typeof(IMediaItemType))]
-internal class FolderGroupMediaItemType : BaseMediaItemType<FolderGroupMediaItemOperator, FolderGroupMediaItemModel, FolderGroupMediaItemViewModel, FolderGroupDetailViewerPreviewControlView, FolderGroupThumbnailPickerViewModel, FolderGroupThumbnailPickerView> {
+internal class FolderGroupMediaItemType : BaseMediaItemType<FolderGroupMediaItemOperator, FolderGroupMediaItemModel, FolderGroupExecutionProgramObjectModel, FolderGroupMediaItemViewModel, FolderGroupExecutionProgramConfigViewModel, FolderGroupDetailViewerPreviewControlView, FolderGroupThumbnailPickerViewModel, FolderGroupThumbnailPickerView, FolderGroupExecutionConfigView> {
 	private FolderGroupDetailViewerPreviewControlView? _detailViewerPreviewControlView;
 	private readonly FolderGroupMediaItemOperator _fileOperator;
 	private readonly IServiceProvider _serviceProvider;
@@ -35,7 +37,7 @@ internal class FolderGroupMediaItemType : BaseMediaItemType<FolderGroupMediaItem
 
 	public override ItemType ItemType {
 		get {
-			return MediaDeck.Database.Tables.ItemType.FolderGroup;
+			return ItemType.FolderGroup;
 		}
 	}
 
@@ -52,8 +54,57 @@ internal class FolderGroupMediaItemType : BaseMediaItemType<FolderGroupMediaItem
 		return new(true, 0, directoryInfo.CreationTime, directoryInfo.LastWriteTime, directoryInfo.LastAccessTime);
 	}
 
-	public override FolderGroupMediaItemModel CreateMediaItemModelFromRecord(MediaItem MediaItem) {
-		var model = new FolderGroupMediaItemModel(MediaItem.MediaItemId, MediaItem.FilePath, this._fileOperator, this._config);
+
+	/// <summary>
+	/// フォルダグループの実行処理。
+	/// 設定に応じて外部プログラムを起動するか、MediaDeck内でそのフォルダを開く。
+	/// </summary>
+	/// <param name="filePath">実行ファイルパス</param>
+	/// <param name="scopedServiceProvider">実行するタブのスコープを切ったサービスプロバイダー</param>
+	public override Task ExecuteAsync(string filePath, IServiceProvider scopedServiceProvider) {
+		var epo = this._config.ExecutionConfig.ExecutionPrograms.FirstOrDefault(x => x.MediaType == this.MediaType) as FolderGroupExecutionProgramObjectModel;
+
+		// 実行方法が Internal の場合
+		if (epo?.ExecutionType.Value == ExecutionType.Internal) {
+			// 現在のフォルダ条件を削除し、対象のパスを検索トークンとして追加する
+			var searchDispatcher = scopedServiceProvider.GetRequiredService<ISearchConditionNotificationDispatcher>();
+			searchDispatcher.UpdateRequest.OnNext(conditions => {
+				conditions.RemoveRange(conditions.Where(x => x is IFolderSearchCondition));
+
+				// IFolderSearchCondition をサービスプロバイダーから取得して設定する
+				var folderCondition = this._serviceProvider.GetRequiredService<IFolderSearchCondition>();
+				folderCondition.FolderPath = filePath;
+				folderCondition.IncludeSubDirectories = true;
+
+				conditions.Add(folderCondition);
+			});
+			return Task.CompletedTask;
+		}
+
+		// それ以外（External または設定なし）はベースクラスのロジック（外部起動）を使用
+		return base.ExecuteAsync(filePath, scopedServiceProvider);
+	}
+
+	/// <inheritdoc />
+	public override FolderGroupExecutionProgramObjectModel CreateExecutionProgramObjectModel() {
+		var model = new FolderGroupExecutionProgramObjectModel();
+		return model;
+	}
+
+	/// <inheritdoc />
+	public override FolderGroupExecutionProgramConfigViewModel CreateExecutionProgramConfigViewModel(FolderGroupExecutionProgramObjectModel model) {
+		return new FolderGroupExecutionProgramConfigViewModel(model, this._serviceProvider.GetRequiredService<IMediaItemTypeService>(), this._serviceProvider.GetRequiredService<ExecutionConfigModel>());
+	}
+
+	/// <inheritdoc />
+	public override FolderGroupExecutionConfigView CreateExecutionConfigView(FolderGroupExecutionProgramConfigViewModel viewModel) {
+		return new FolderGroupExecutionConfigView {
+			ViewModel = viewModel
+		};
+	}
+
+	public override FolderGroupMediaItemModel CreateMediaItemModelFromRecord(MediaItem MediaItem, IServiceProvider scopedServiceProvider) {
+		var model = new FolderGroupMediaItemModel(MediaItem.MediaItemId, MediaItem.FilePath, this._fileOperator, this, scopedServiceProvider);
 		this.SetModelProperties(model, MediaItem);
 		return model;
 	}

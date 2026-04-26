@@ -16,8 +16,8 @@ public class MediaItemTypeService(IEnumerable<IMediaItemType> MediaItemTypes) : 
 	private readonly IMediaItemType _UnknownMediaItemType = MediaItemTypes.First(x => x.MediaType == MediaType.Unknown);
 
 	/// <inheritdoc />
-	public IMediaItemModel CreateMediaItemModelFromRecord(MediaItem MediaItem) {
-		return this.GetMediaItemType(MediaItem).CreateMediaItemModelFromRecord(MediaItem);
+	public IMediaItemModel CreateMediaItemModelFromRecord(MediaItem MediaItem, IServiceProvider scopedServiceProvider) {
+		return this.GetMediaItemType(MediaItem).CreateMediaItemModelFromRecord(MediaItem, scopedServiceProvider);
 	}
 
 	/// <inheritdoc />
@@ -60,6 +60,11 @@ public class MediaItemTypeService(IEnumerable<IMediaItemType> MediaItemTypes) : 
 	}
 
 	/// <inheritdoc />
+	public IMediaItemType GetMediaItemType(MediaType mediaType) {
+		return this._MediaItemTypes.First(x => x.MediaType == mediaType);
+	}
+
+	/// <inheritdoc />
 	public IMediaItemType GetMediaItemType(MediaItem MediaItem) {
 		return this._MediaItemTypes.FirstOrDefault(x => x.ItemType == MediaItem.ItemType) ?? this._UnknownMediaItemType;
 	}
@@ -73,6 +78,24 @@ public class MediaItemTypeService(IEnumerable<IMediaItemType> MediaItemTypes) : 
 	public bool IsTargetPath(string path, MediaType mediaType) {
 		var mediaItemType = this._MediaItemTypes.FirstOrDefault(x => x.MediaType == mediaType);
 		return mediaItemType is not null && mediaItemType.IsTargetPath(path);
+	}
+
+	/// <inheritdoc />
+	public IExecutionProgramObjectModel CreateExecutionProgramObjectModel(MediaType mediaType) {
+		var mediaItemType = this._MediaItemTypes.First(x => x.MediaType == mediaType);
+		return mediaItemType.CreateExecutionProgramObjectModel();
+	}
+
+	/// <inheritdoc />
+	public IExecutionProgramConfigViewModel CreateExecutionConfigViewModel(IExecutionProgramObjectModel model) {
+		var mediaItemType = this._MediaItemTypes.First(x => x.MediaType == model.MediaType);
+		return mediaItemType.CreateExecutionProgramConfigViewModel(model);
+	}
+
+	/// <inheritdoc />
+	public IExecutionConfigView CreateExecutionConfigView(IExecutionProgramConfigViewModel viewModel) {
+		var mediaItemType = this._MediaItemTypes.First(x => x.MediaType == viewModel.MediaType);
+		return mediaItemType.CreateExecutionConfigView(viewModel);
 	}
 
 	private IMediaItemType GetMediaItemType(IMediaItemModel fileModel) {

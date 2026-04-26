@@ -1,4 +1,5 @@
 using MediaDeck.Common.Extensions;
+using MediaDeck.Composition.Interfaces.Notifications;
 using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Core.Models.Files.SearchConditions;
 using MediaDeck.Core.Models.NotificationDispatcher;
@@ -12,7 +13,7 @@ namespace MediaDeck.Core.Models.Repositories;
 public class FolderRepository : RepositoryBase {
 	private readonly TabStateModel _tabState;
 
-	public FolderRepository(IDbContextFactory<MediaDeckDbContext> dbFactory, SearchConditionNotificationDispatcher searchConditionNotificationDispatcher, TabStateModel tabState) {
+	public FolderRepository(IDbContextFactory<MediaDeckDbContext> dbFactory, ISearchConditionNotificationDispatcher searchConditionNotificationDispatcher, TabStateModel tabState) {
 		this._dbFactory = dbFactory;
 		this._searchConditionNotificationDispatcher = searchConditionNotificationDispatcher;
 		this._tabState = tabState;
@@ -24,7 +25,7 @@ public class FolderRepository : RepositoryBase {
 	}
 
 	private readonly IDbContextFactory<MediaDeckDbContext> _dbFactory;
-	private readonly SearchConditionNotificationDispatcher _searchConditionNotificationDispatcher;
+	private readonly ISearchConditionNotificationDispatcher _searchConditionNotificationDispatcher;
 
 	public ReactiveProperty<FolderObject> RootFolder {
 		get;

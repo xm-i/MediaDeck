@@ -1,9 +1,9 @@
 using MediaDeck.Common.Base;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.Models;
+using MediaDeck.Composition.Interfaces.Notifications;
 using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Core.Models.Files;
 using MediaDeck.Core.Models.Files.SearchConditions;
-using MediaDeck.Core.Models.NotificationDispatcher;
 using MediaDeck.Core.Primitives;
 using MediaDeck.ViewModels.Tags;
 
@@ -25,7 +25,7 @@ public class DetailSelectorViewModel : ViewModelBase {
 	}
 
 	public DetailSelectorViewModel(DetailSelectorModel model,
-		SearchConditionNotificationDispatcher searchConditionNotificationDispatcher,
+		ISearchConditionNotificationDispatcher searchConditionNotificationDispatcher,
 		ITagModelFactory tagModelFactory) {
 		this._model = model;
 		this.TagModelFactory = tagModelFactory;

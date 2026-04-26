@@ -1,7 +1,8 @@
 using MediaDeck.Common.Base;
+using MediaDeck.Composition.Enum;
+using MediaDeck.Composition.Interfaces.MediaItemTypes;
+using MediaDeck.Composition.Interfaces.MediaItemTypes.ViewModels;
 using MediaDeck.Composition.Stores.Config.Model;
-
-using Microsoft.Extensions.DependencyInjection;
 
 namespace MediaDeck.ViewModels.Preferences.Config;
 
@@ -31,23 +32,38 @@ public class ExecutionConfigPageViewModel : ViewModelBase, IConfigPageViewModel 
 
 	private readonly ExecutionConfigModel _executionConfig;
 
-	public ExecutionConfigPageViewModel(ExecutionConfigModel executionConfig) {
+	public ExecutionConfigPageViewModel(ExecutionConfigModel executionConfig, IMediaItemTypeService mediaItemTypeService) {
 		this._executionConfig = executionConfig;
+
+		this.AvailableMediaTypes = Enum.GetValues<MediaType>().Where(x => x != MediaType.Unknown).ToArray();
+		this.SelectedMediaType = new ReactiveProperty<MediaType>(this.AvailableMediaTypes.First());
+
+		var collectionChanged = Observable.Merge(
+			this._executionConfig.ExecutionPrograms.ObserveAdd().Select(_ => Unit.Default),
+			this._executionConfig.ExecutionPrograms.ObserveRemove().Select(_ => Unit.Default),
+			this._executionConfig.ExecutionPrograms.ObserveReset().Select(_ => Unit.Default)
+		).Prepend(Unit.Default);
+
+		var canAdd = this.SelectedMediaType
+			.CombineLatest(collectionChanged, (type, _) => !this._executionConfig.ExecutionPrograms.Any(x => x.MediaType == type));
+
+		this.AddExecutionProgramCommand = canAdd.ToReactiveCommand();
 		this.AddExecutionProgramCommand.Subscribe(_ => {
-			this._executionConfig.AddExecutionProgram();
+			this._executionConfig.AddExecutionProgram(this.SelectedMediaType.Value);
 		})
 			.AddTo(this.CompositeDisposable);
+
 		this.ExecutionPrograms =
 			this._executionConfig
 				.ExecutionPrograms
-				.CreateView(x => new ExecutionProgramConfigViewModel(x, executionConfig))
+				.CreateView(x => mediaItemTypeService.CreateExecutionConfigViewModel(x))
 				.ToNotifyCollectionChanged();
 	}
 
 	/// <summary>
 	/// 外部プログラムの一覧
 	/// </summary>
-	public INotifyCollectionChangedSynchronizedViewList<ExecutionProgramConfigViewModel> ExecutionPrograms {
+	public INotifyCollectionChangedSynchronizedViewList<IExecutionProgramConfigViewModel> ExecutionPrograms {
 		get;
 	}
 
@@ -56,5 +72,19 @@ public class ExecutionConfigPageViewModel : ViewModelBase, IConfigPageViewModel 
 	/// </summary>
 	public ReactiveCommand AddExecutionProgramCommand {
 		get;
-	} = new();
+	}
+
+	/// <summary>
+	/// 選択されたメディアタイプ
+	/// </summary>
+	public ReactiveProperty<MediaType> SelectedMediaType {
+		get;
+	}
+
+	/// <summary>
+	/// 利用可能なメディアタイプの一覧
+	/// </summary>
+	public MediaType[] AvailableMediaTypes {
+		get;
+	}
 }
