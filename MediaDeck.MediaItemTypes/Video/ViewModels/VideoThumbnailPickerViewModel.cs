@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 namespace MediaDeck.MediaItemTypes.Video.ViewModels;
 
 [Inject(InjectServiceLifetime.Transient)]
-internal class VideoThumbnailPickerViewModel : BaseThumbnailPickerViewModel<BaseThumbnailPickerModel> {
+public class VideoThumbnailPickerViewModel : BaseThumbnailPickerViewModel<BaseThumbnailPickerModel> {
 	public VideoThumbnailPickerViewModel(
 		BaseThumbnailPickerModel thumbnailPickerModel,
 		VideoMediaItemOperator VideoMediaItemOperator,
@@ -24,11 +24,11 @@ internal class VideoThumbnailPickerViewModel : BaseThumbnailPickerViewModel<Base
 
 	private readonly Subject<TimeSpan> _updateTimeSubject = new();
 
-	internal BindableReactiveProperty<TimeSpan> Time {
+	public BindableReactiveProperty<TimeSpan> Time {
 		get;
 	} = new();
 
-	internal BindableReactiveProperty<string> VideoFilePath {
+	public BindableReactiveProperty<string> VideoFilePath {
 		get;
 	} = new();
 
@@ -49,7 +49,7 @@ internal class VideoThumbnailPickerViewModel : BaseThumbnailPickerViewModel<Base
 		this.VideoFilePath.Value = fileViewModel.FilePath;
 	}
 
-	internal void UpdateTime(TimeSpan time) {
+	public void UpdateTime(TimeSpan time) {
 		this._updateTimeSubject.OnNext(time);
 	}
 }

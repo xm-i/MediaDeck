@@ -8,7 +8,7 @@ using MediaDeck.MediaItemTypes.Base.Models;
 namespace MediaDeck.MediaItemTypes.Unknown.Models;
 
 [Inject(InjectServiceLifetime.Transient)]
-internal partial class UnknownMediaItemOperator : BaseMediaItemOperator {
+public partial class UnknownMediaItemOperator : BaseMediaItemOperator {
 	public UnknownMediaItemOperator(
 		IDbContextFactory<MediaDeckDbContext> dbFactory,
 		IFileHashUpdatorService updateFileHashBackgroundService)

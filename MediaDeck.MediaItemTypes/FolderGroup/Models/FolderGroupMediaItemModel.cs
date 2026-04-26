@@ -7,4 +7,4 @@ namespace MediaDeck.MediaItemTypes.FolderGroup.Models;
 /// <summary>
 /// フォルダグループのメディアアイテムモデル
 /// </summary>
-internal class FolderGroupMediaItemModel(long id, string filePath, FolderGroupMediaItemOperator fileOperator, IMediaItemType mediaItemType, IServiceProvider scopedServiceProvider) : BaseMediaItemModel(id, filePath, fileOperator, MediaType.FolderGroup, mediaItemType, scopedServiceProvider);
+public class FolderGroupMediaItemModel(long id, string filePath, FolderGroupMediaItemOperator fileOperator, IMediaItemType mediaItemType, IServiceProvider scopedServiceProvider) : BaseMediaItemModel(id, filePath, fileOperator, MediaType.FolderGroup, mediaItemType, scopedServiceProvider);

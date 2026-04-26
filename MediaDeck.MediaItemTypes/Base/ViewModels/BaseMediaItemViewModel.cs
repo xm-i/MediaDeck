@@ -9,7 +9,7 @@ using MediaDeck.Composition.Objects;
 
 namespace MediaDeck.MediaItemTypes.Base.ViewModels;
 
-internal abstract class BaseMediaItemViewModel : ViewModelBase, IMediaItemViewModel {
+public abstract class BaseMediaItemViewModel : ViewModelBase, IMediaItemViewModel {
 	protected BaseMediaItemViewModel(IMediaItemModel fileModel, MediaType mediaType) {
 		this.FileModel = fileModel;
 		this.FilePath = fileModel.FilePath;

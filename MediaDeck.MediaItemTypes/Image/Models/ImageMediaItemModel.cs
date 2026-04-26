@@ -4,4 +4,4 @@ using MediaDeck.MediaItemTypes.Base.Models;
 
 namespace MediaDeck.MediaItemTypes.Image.Models;
 
-internal class ImageMediaItemModel(long id, string filePath, ImageMediaItemOperator fileOperator, IMediaItemType mediaItemType, IServiceProvider scopedServiceProvider) : BaseMediaItemModel(id, filePath, fileOperator, MediaType.Image, mediaItemType, scopedServiceProvider);
+public class ImageMediaItemModel(long id, string filePath, ImageMediaItemOperator fileOperator, IMediaItemType mediaItemType, IServiceProvider scopedServiceProvider) : BaseMediaItemModel(id, filePath, fileOperator, MediaType.Image, mediaItemType, scopedServiceProvider);

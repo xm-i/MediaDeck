@@ -9,11 +9,11 @@ using Microsoft.Extensions.Logging;
 namespace MediaDeck.MediaItemTypes.Base.Models;
 
 [Inject(InjectServiceLifetime.Transient)]
-internal class BaseThumbnailPickerModel(IDbContextFactory<MediaDeckDbContext> dbFactory, ILogger<BaseThumbnailPickerModel> logger, IFilePathService filePathService) {
+public class BaseThumbnailPickerModel(IDbContextFactory<MediaDeckDbContext> dbFactory, ILogger<BaseThumbnailPickerModel> logger, IFilePathService filePathService) {
 	private readonly IDbContextFactory<MediaDeckDbContext> _dbFactory = dbFactory;
 	private readonly IFilePathService _filePathService = filePathService;
 
-	internal async Task UpdateThumbnailAsync(IMediaItemModel fileModel, byte[] thumbnail) {
+	public async Task UpdateThumbnailAsync(IMediaItemModel fileModel, byte[] thumbnail) {
 		var thumbRelativePath = fileModel.ThumbnailFilePath ?? this._filePathService.GetThumbnailRelativeFilePath();
 		var thumbPath = this._filePathService.GetThumbnailAbsoluteFilePath(thumbRelativePath);
 		await File.WriteAllBytesAsync(thumbPath, thumbnail);
@@ -32,7 +32,7 @@ internal class BaseThumbnailPickerModel(IDbContextFactory<MediaDeckDbContext> db
 		await transaction.CommitAsync();
 	}
 
-	internal async Task<byte[]?> LoadThumbnailAsync(IMediaItemModel fileModel) {
+	public async Task<byte[]?> LoadThumbnailAsync(IMediaItemModel fileModel) {
 		if (fileModel.ThumbnailFilePath is not { } path) {
 			return null;
 		}

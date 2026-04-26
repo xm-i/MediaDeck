@@ -7,7 +7,7 @@ using MediaDeck.Database.Tables;
 
 namespace MediaDeck.MediaItemTypes.Base.Models;
 
-internal abstract class BaseMediaItemOperator : IMediaItemOperator {
+public abstract class BaseMediaItemOperator : IMediaItemOperator {
 	protected readonly IDbContextFactory<MediaDeckDbContext> _dbFactory;
 	protected readonly IFileHashUpdatorService _updateFileHashBackgroundService;
 

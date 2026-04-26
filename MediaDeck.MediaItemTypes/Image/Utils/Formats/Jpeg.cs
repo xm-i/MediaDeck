@@ -10,14 +10,14 @@ namespace MediaDeck.MediaItemTypes.Image.Utils.Formats;
 /// <summary>
 /// Jpegメタデータ取得クラス
 /// </summary>
-internal class Jpeg : ImageBase {
+public class Jpeg : ImageBase {
 	private readonly IReadOnlyList<MetadataExtractor.Directory> _reader;
 
 	/// <summary>
 	/// コンストラクタ
 	/// </summary>
 	/// <param name="stream">画像ファイルストリーム</param>
-	internal Jpeg(Stream stream) : base(stream) {
+	public Jpeg(Stream stream) : base(stream) {
 		this._reader = JpegMetadataReader.ReadMetadata(stream);
 		var d = this._reader.First(x => x is JpegDirectory);
 		var gps = this._reader.FirstOrDefault(x => x is GpsDirectory);
@@ -43,7 +43,7 @@ internal class Jpeg : ImageBase {
 		}
 	}
 
-	internal Database.Tables.Metadata.Jpeg CreateMetadataRecord() {
+	public Database.Tables.Metadata.Jpeg CreateMetadataRecord() {
 		var metadata = new Database.Tables.Metadata.Jpeg();
 
 		var gps = this._reader.FirstOrDefault(x => x is GpsDirectory);

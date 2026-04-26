@@ -9,7 +9,7 @@ namespace MediaDeck.MediaItemTypes.FolderGroup.ViewModels;
 /// フォルダグループのサムネイルピッカーViewModel
 /// </summary>
 [Inject(InjectServiceLifetime.Transient)]
-internal class FolderGroupThumbnailPickerViewModel : BaseThumbnailPickerViewModel<FolderGroupThumbnailPickerModel> {
+public class FolderGroupThumbnailPickerViewModel : BaseThumbnailPickerViewModel<FolderGroupThumbnailPickerModel> {
 	public FolderGroupThumbnailPickerViewModel(FolderGroupThumbnailPickerModel thumbnailPickerModel) : base(thumbnailPickerModel) {
 
 		// UIスレッドへの同期を伴うビューリストを作成

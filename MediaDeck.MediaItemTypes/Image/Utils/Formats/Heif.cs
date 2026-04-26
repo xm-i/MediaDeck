@@ -10,14 +10,14 @@ namespace MediaDeck.MediaItemTypes.Image.Utils.Formats;
 /// <summary>
 /// Heifメタデータ取得クラス
 /// </summary>
-internal class Heif : ImageBase {
+public class Heif : ImageBase {
 	private readonly IReadOnlyList<MetadataExtractor.Directory> _reader;
 
 	/// <summary>
 	/// コンストラクタ
 	/// </summary>
 	/// <param name="stream">画像ファイルストリーム</param>
-	internal Heif(Stream stream) : base(stream) {
+	public Heif(Stream stream) : base(stream) {
 		this._reader = HeifMetadataReader.ReadMetadata(stream);
 		var d = this._reader.OfType<HeicImagePropertiesDirectory>().First();
 		var gps = this._reader.FirstOrDefault(x => x is GpsDirectory);
@@ -43,7 +43,7 @@ internal class Heif : ImageBase {
 		}
 	}
 
-	internal Database.Tables.Metadata.Heif CreateMetadataRecord() {
+	public Database.Tables.Metadata.Heif CreateMetadataRecord() {
 		var metadata = new Database.Tables.Metadata.Heif();
 		var gps = this._reader.FirstOrDefault(x => x is GpsDirectory);
 		var ifd0 = this._reader.FirstOrDefault(x => x is ExifDirectoryBase);

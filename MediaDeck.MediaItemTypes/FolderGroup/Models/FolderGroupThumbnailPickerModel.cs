@@ -13,7 +13,7 @@ using Microsoft.Extensions.Logging;
 namespace MediaDeck.MediaItemTypes.FolderGroup.Models;
 
 [Inject(InjectServiceLifetime.Transient)]
-internal class FolderGroupThumbnailPickerModel(
+public class FolderGroupThumbnailPickerModel(
 	IDbContextFactory<MediaDeckDbContext> dbFactory,
 	ILogger<FolderGroupThumbnailPickerModel> logger,
 	IFilePathService filePathService,
@@ -35,7 +35,7 @@ internal class FolderGroupThumbnailPickerModel(
 	/// </summary>
 	/// <param name="folderPath">フォルダパス</param>
 	/// <returns>アイテム一覧</returns>
-	internal async Task LoadItemsInFolderAsync(string folderPath) {
+	public async Task LoadItemsInFolderAsync(string folderPath) {
 		await using var db = await this._dbFactory.CreateDbContextAsync();
 		IQueryable<MediaItem> query = db
 			.MediaItems

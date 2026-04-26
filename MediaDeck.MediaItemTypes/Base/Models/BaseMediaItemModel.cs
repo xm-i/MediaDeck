@@ -11,7 +11,7 @@ using MediaDeck.Composition.Objects;
 
 namespace MediaDeck.MediaItemTypes.Base.Models;
 
-internal abstract class BaseMediaItemModel : ModelBase, IMediaItemModel {
+public abstract class BaseMediaItemModel : ModelBase, IMediaItemModel {
 	private readonly IMediaItemType _mediaItemType;
 	private readonly IServiceProvider _scopedServiceProvider;
 
@@ -35,7 +35,7 @@ internal abstract class BaseMediaItemModel : ModelBase, IMediaItemModel {
 	/// <param name="fileOperator">ファイルオペレーター</param>
 	/// <param name="mediaType">メディアタイプ</param>
 	/// <param name="mediaItemType">このモデルに対応するメディアアイテムタイプ。実行ロジック等の委譲先。</param>
-	internal BaseMediaItemModel(long id, string filePath, IMediaItemOperator fileOperator, MediaType mediaType, IMediaItemType mediaItemType, IServiceProvider scopedServiceProvider) : base() {
+	public BaseMediaItemModel(long id, string filePath, IMediaItemOperator fileOperator, MediaType mediaType, IMediaItemType mediaItemType, IServiceProvider scopedServiceProvider) : base() {
 		this._mediaItemType = mediaItemType;
 		this._scopedServiceProvider = scopedServiceProvider;
 		this.FileOperator = fileOperator;

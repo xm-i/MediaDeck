@@ -9,7 +9,7 @@ using MediaDeck.MediaItemTypes.Base.Models;
 namespace MediaDeck.MediaItemTypes.FolderGroup.Models;
 
 [Inject(InjectServiceLifetime.Transient)]
-internal partial class FolderGroupMediaItemOperator : BaseMediaItemOperator {
+public partial class FolderGroupMediaItemOperator : BaseMediaItemOperator {
 	private readonly IFilePathService _filePathService;
 
 	public FolderGroupMediaItemOperator(

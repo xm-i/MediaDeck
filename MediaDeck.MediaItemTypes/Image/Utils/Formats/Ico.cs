@@ -8,12 +8,12 @@ namespace MediaDeck.MediaItemTypes.Image.Utils.Formats;
 /// <summary>
 /// Icoメタデータ取得クラス
 /// </summary>
-internal class Ico : ImageBase {
+public class Ico : ImageBase {
 	/// <summary>
 	/// コンストラクタ
 	/// </summary>
 	/// <param name="stream">画像ファイルストリーム</param>
-	internal Ico(Stream stream) : base(stream) {
+	public Ico(Stream stream) : base(stream) {
 		var reader = IcoMetadataReader.ReadMetadata(stream);
 		var d = reader.First(x => x is IcoDirectory);
 		this.Width = d.GetUInt16(IcoDirectory.TagImageWidth);

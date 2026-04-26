@@ -17,7 +17,7 @@ using Microsoft.Extensions.Logging;
 namespace MediaDeck.MediaItemTypes.Archive.Models;
 
 [Inject(InjectServiceLifetime.Transient)]
-internal partial class ArchiveMediaItemOperator : BaseMediaItemOperator {
+public partial class ArchiveMediaItemOperator : BaseMediaItemOperator {
 	private IMediaItemTypeService _mediaItemTypeService {
 		get {
 			return field ??= this._serviceProvider.GetRequiredService<IMediaItemTypeService>();
@@ -116,7 +116,7 @@ internal partial class ArchiveMediaItemOperator : BaseMediaItemOperator {
 	/// <param name="height">サムネイル高さ</param>
 	/// <param name="fileName">サムネイルにするファイル名</param>
 	/// <returns>作成されたサムネイルファイル</returns>
-	internal byte[] CreateThumbnail(ZipArchive archiveFile, uint width, uint height, string fileName) {
+	public byte[] CreateThumbnail(ZipArchive archiveFile, uint width, uint height, string fileName) {
 		using var ms = new MemoryStream();
 		using var stream = archiveFile.Entries.FirstOrDefault(x => x.FullName == fileName)!.Open();
 		using var mi = new MagickImage(stream);

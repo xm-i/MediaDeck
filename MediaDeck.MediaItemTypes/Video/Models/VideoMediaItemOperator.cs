@@ -15,7 +15,7 @@ using Microsoft.Extensions.Logging;
 namespace MediaDeck.MediaItemTypes.Video.Models;
 
 [Inject(InjectServiceLifetime.Transient)]
-internal partial class VideoMediaItemOperator : BaseMediaItemOperator {
+public partial class VideoMediaItemOperator : BaseMediaItemOperator {
 	private readonly ConfigModel _config;
 	private readonly IFilePathService _filePathService;
 	private readonly ILogger<VideoMediaItemOperator> _logger;
@@ -103,7 +103,7 @@ internal partial class VideoMediaItemOperator : BaseMediaItemOperator {
 	/// <param name="height">サムネイル高さ</param>
 	/// <param name="time">時間指定</param>
 	/// <returns>作成されたサムネイルファイル名</returns>
-	internal byte[] CreateThumbnail(IMediaItemModel fileModel, int width, int height, TimeSpan time) {
+	public byte[] CreateThumbnail(IMediaItemModel fileModel, int width, int height, TimeSpan time) {
 		var metadata = FFProbe.Analyse(fileModel.FilePath);
 		if (metadata.PrimaryVideoStream is not { } videoStream) {
 			throw new Exception("PrimaryVideoStream is null");
@@ -121,7 +121,7 @@ internal partial class VideoMediaItemOperator : BaseMediaItemOperator {
 	/// <param name="height">サムネイル高さ</param>
 	/// <param name="time">時間指定</param>
 	/// <returns>作成されたサムネイルファイル名</returns>
-	internal byte[] CreateThumbnail(string filePath, int originalWidth, int originalHeight, int width, int height, TimeSpan time) {
+	public byte[] CreateThumbnail(string filePath, int originalWidth, int originalHeight, int width, int height, TimeSpan time) {
 		if (originalWidth / width > originalHeight / height) {
 			height = -1;
 		} else {

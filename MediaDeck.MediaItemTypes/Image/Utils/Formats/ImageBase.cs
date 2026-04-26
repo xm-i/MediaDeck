@@ -10,69 +10,69 @@ namespace MediaDeck.MediaItemTypes.Image.Utils.Formats;
 /// <remarks>
 /// コンストラクタで受け取ったStreamをDisposeする。
 /// </remarks>
-internal abstract class ImageBase : IImage {
+public abstract class ImageBase : IImage {
 	private bool _disposedValue;
 	private readonly Stream _stream;
 
 	/// <inheritdoc/>
 	public int Width {
 		get;
-		protected internal init;
+		protected init;
 	}
 
 	/// <inheritdoc/>
 	public int Height {
 		get;
-		protected internal init;
+		protected init;
 	}
 
 	/// <inheritdoc/>
 	public Rational[]? Latitude {
 		get;
-		protected internal init;
+		protected init;
 	}
 
 	/// <inheritdoc/>
 	public Rational[]? Longitude {
 		get;
-		protected internal init;
+		protected init;
 	}
 
 	/// <inheritdoc/>
 	public Rational? Altitude {
 		get;
-		protected internal init;
+		protected init;
 	}
 
 	/// <inheritdoc/>
 	public string? LatitudeRef {
 		get;
-		protected internal init;
+		protected init;
 	}
 
 	/// <inheritdoc/>
 	public string? LongitudeRef {
 		get;
-		protected internal init;
+		protected init;
 	}
 
 	/// <inheritdoc/>
 	public byte? AltitudeRef {
 		get;
-		protected internal init;
+		protected init;
 	}
 
 	/// <inheritdoc/>
 	public int? Orientation {
 		get;
-		protected internal init;
+		protected init;
 	}
 
 	/// <summary>
 	/// コンストラクタ
 	/// </summary>
 	/// <param name="stream">破棄するためのStreamオブジェクト</param>
-	protected internal ImageBase(Stream stream) {
+	protected ImageBase(Stream stream) {
 		this._stream = stream;
 	}
 

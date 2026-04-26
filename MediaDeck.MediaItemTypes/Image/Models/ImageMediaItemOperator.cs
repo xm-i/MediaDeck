@@ -14,7 +14,7 @@ using MediaDeck.MediaItemTypes.Image.Utils.Formats;
 namespace MediaDeck.MediaItemTypes.Image.Models;
 
 [Inject(InjectServiceLifetime.Transient)]
-internal class ImageMediaItemOperator : BaseMediaItemOperator {
+public class ImageMediaItemOperator : BaseMediaItemOperator {
 	private readonly IFilePathService _filePathService;
 
 	public ImageMediaItemOperator(
@@ -106,7 +106,7 @@ internal class ImageMediaItemOperator : BaseMediaItemOperator {
 		return mf;
 	}
 
-	internal byte[] CreateThumbnail(IMediaItemModel fileModel, uint width, uint height) {
+	public byte[] CreateThumbnail(IMediaItemModel fileModel, uint width, uint height) {
 		using var fileFs = File.OpenRead(fileModel.FilePath);
 		using var ms = new MemoryStream();
 		using var mi = new MagickImage(fileFs);
@@ -117,7 +117,7 @@ internal class ImageMediaItemOperator : BaseMediaItemOperator {
 		return ms.ToArray();
 	}
 
-	internal byte[] CreateThumbnail(Stream fileStream, uint width, uint height) {
+	public byte[] CreateThumbnail(Stream fileStream, uint width, uint height) {
 		using var ms = new MemoryStream();
 		using var mi = new MagickImage(fileStream);
 		mi.AutoOrient();

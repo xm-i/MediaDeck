@@ -7,4 +7,4 @@ namespace MediaDeck.MediaItemTypes.FolderGroup.ViewModels;
 /// <summary>
 /// フォルダグループのメディアアイテムViewModel
 /// </summary>
-internal class FolderGroupMediaItemViewModel(IMediaItemModel fileModel) : BaseMediaItemViewModel(fileModel, MediaType.FolderGroup);
+public class FolderGroupMediaItemViewModel(IMediaItemModel fileModel) : BaseMediaItemViewModel(fileModel, MediaType.FolderGroup);

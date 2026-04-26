@@ -9,21 +9,21 @@ namespace MediaDeck.MediaItemTypes.Image.Utils.Formats;
 /// <summary>
 /// Pngメタデータ取得クラス
 /// </summary>
-internal class Png : ImageBase {
+public class Png : ImageBase {
 	private readonly IReadOnlyList<MetadataExtractor.Directory> _reader;
 
 	/// <summary>
 	/// コンストラクタ
 	/// </summary>
 	/// <param name="stream">画像ファイルストリーム</param>
-	internal Png(Stream stream) : base(stream) {
+	public Png(Stream stream) : base(stream) {
 		this._reader = PngMetadataReader.ReadMetadata(stream);
 		var d = this._reader.First(x => x is PngDirectory);
 		this.Width = d.GetUInt16(PngDirectory.TagImageWidth);
 		this.Height = d.GetUInt16(PngDirectory.TagImageHeight);
 	}
 
-	internal Database.Tables.Metadata.Png CreateMetadataRecord() {
+	public Database.Tables.Metadata.Png CreateMetadataRecord() {
 		var metadata = new Database.Tables.Metadata.Png();
 
 		var p = this._reader.FirstOrDefault(x => x is PngDirectory);

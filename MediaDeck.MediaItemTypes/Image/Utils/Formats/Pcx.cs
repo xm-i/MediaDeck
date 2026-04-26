@@ -8,12 +8,12 @@ namespace MediaDeck.MediaItemTypes.Image.Utils.Formats;
 /// <summary>
 /// Pcxメタデータ取得クラス
 /// </summary>
-internal class Pcx : ImageBase {
+public class Pcx : ImageBase {
 	/// <summary>
 	/// コンストラクタ
 	/// </summary>
 	/// <param name="stream">画像ファイルストリーム</param>
-	internal Pcx(Stream stream) : base(stream) {
+	public Pcx(Stream stream) : base(stream) {
 		var d = PcxMetadataReader.ReadMetadata(stream);
 		var xStart = d.GetUInt16(PcxDirectory.TagXMin);
 		var xEnd = d.GetUInt16(PcxDirectory.TagXMax);

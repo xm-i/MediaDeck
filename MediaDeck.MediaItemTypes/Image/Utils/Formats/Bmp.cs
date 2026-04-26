@@ -9,21 +9,21 @@ namespace MediaDeck.MediaItemTypes.Image.Utils.Formats;
 /// <summary>
 /// Bmpメタデータ取得クラス
 /// </summary>
-internal class Bmp : ImageBase {
+public class Bmp : ImageBase {
 	private readonly IReadOnlyList<MetadataExtractor.Directory> _reader;
 
 	/// <summary>
 	/// コンストラクタ
 	/// </summary>
 	/// <param name="stream">画像ファイルストリーム</param>
-	internal Bmp(Stream stream) : base(stream) {
+	public Bmp(Stream stream) : base(stream) {
 		this._reader = BmpMetadataReader.ReadMetadata(stream);
 		var d = this._reader.First(x => x is BmpHeaderDirectory);
 		this.Width = d.GetUInt16(BmpHeaderDirectory.TagImageWidth);
 		this.Height = d.GetUInt16(BmpHeaderDirectory.TagImageHeight);
 	}
 
-	internal Database.Tables.Metadata.Bmp CreateMetadataRecord() {
+	public Database.Tables.Metadata.Bmp CreateMetadataRecord() {
 		var metadata = new Database.Tables.Metadata.Bmp();
 
 		var b = this._reader.FirstOrDefault(x => x is BmpHeaderDirectory);

@@ -1,4 +1,3 @@
-using System.Drawing.Imaging;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -9,24 +8,24 @@ using MediaDeck.MediaItemTypes.Base.Models;
 
 using Microsoft.Extensions.Logging;
 
-using Patagames.Pdf.Enums;
-using Patagames.Pdf.Net;
-
 namespace MediaDeck.MediaItemTypes.Pdf.Models;
 
 [Inject(InjectServiceLifetime.Transient)]
-internal partial class PdfMediaItemOperator : BaseMediaItemOperator {
+public partial class PdfMediaItemOperator : BaseMediaItemOperator {
 	private readonly IFilePathService _filePathService;
 	private readonly ILogger<PdfMediaItemOperator> _logger;
+	private readonly IPdfDocumentOperator _pdfDocumentOperator;
 
 	public PdfMediaItemOperator(
 		IFilePathService filePathService,
 		ILogger<PdfMediaItemOperator> logger,
 		IDbContextFactory<MediaDeckDbContext> dbFactory,
-		IFileHashUpdatorService updateFileHashBackgroundService)
+		IFileHashUpdatorService updateFileHashBackgroundService,
+		IPdfDocumentOperator pdfDocumentOperator)
 		: base(dbFactory, updateFileHashBackgroundService, MediaType.Pdf) {
 		this._filePathService = filePathService;
 		this._logger = logger;
+		this._pdfDocumentOperator = pdfDocumentOperator;
 	}
 
 	public override async Task<MediaItem?> RegisterMediaItemAsync(string filePath) {
@@ -40,7 +39,7 @@ internal partial class PdfMediaItemOperator : BaseMediaItemOperator {
 		var thumbRelativePath = this._filePathService.GetThumbnailRelativeFilePath();
 		var thumbPath = this._filePathService.GetThumbnailAbsoluteFilePath(thumbRelativePath);
 		try {
-			var image = this.CreateThumbnail(filePath, 300, 300, 1);
+			var image = this._pdfDocumentOperator.CreateThumbnail(filePath, 300, 300, 1);
 			new FileInfo(thumbPath).Directory?.Create();
 			File.WriteAllBytes(thumbPath, image);
 		} catch (Exception ex) {
@@ -49,7 +48,7 @@ internal partial class PdfMediaItemOperator : BaseMediaItemOperator {
 			thumbRelativePath = null;
 		}
 
-		var pdfDocument = PdfDocument.Load(filePath);
+		var pdfDocument = this._pdfDocumentOperator.GetPdfProperties(filePath);
 		var fileInfo = new FileInfo(filePath);
 
 		var mf = new MediaItem {
@@ -66,9 +65,9 @@ internal partial class PdfMediaItemOperator : BaseMediaItemOperator {
 			LastAccessTime = fileInfo.Exists ? fileInfo.LastAccessTime : DateTime.MinValue,
 			RegisteredTime = DateTime.Now,
 			IsExists = fileInfo.Exists,
-			Width = (int)pdfDocument.Pages[0].Width,
-			Height = (int)pdfDocument.Pages[1].Height,
-			Container = new() { PageCount = pdfDocument.Pages.Count }
+			Width = (int)pdfDocument.Width,
+			Height = (int)pdfDocument.Height,
+			Container = new() { PageCount = pdfDocument.PageCount }
 		};
 
 		await db.MediaItems.AddAsync(mf);
@@ -78,25 +77,5 @@ internal partial class PdfMediaItemOperator : BaseMediaItemOperator {
 		this._updateFileHashBackgroundService.EnqueueHashUpdate(mf.MediaItemId);
 
 		return mf;
-	}
-
-	/// <summary>
-	/// サムネイル作成
-	/// </summary>
-	/// <param name="filePath">動画ファイルパス</param>
-	/// <param name="width">サムネイル幅</param>
-	/// <param name="height">サムネイル高さ</param>
-	/// <param name="pageNumber">サムネイルにするページ番号</param>
-	/// <returns>作成されたサムネイルファイル名</returns>
-	internal byte[] CreateThumbnail(string filePath, int width, int height, int pageNumber = 1) {
-		var pdfDoc = PdfDocument.Load(filePath);
-		var page = pdfDoc.Pages[pageNumber - 1];
-		using var pdfBitmap = new PdfBitmap(width, height, true);
-		page.Render(pdfBitmap, 0, 0, width, height, PageRotate.Normal, RenderFlags.FPDF_NONE);
-		using var ms = new MemoryStream();
-
-		using var image = pdfBitmap.GetImage();
-		image.Save(ms, ImageFormat.Jpeg);
-		return ms.ToArray();
 	}
 }

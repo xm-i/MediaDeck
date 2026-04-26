@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 namespace MediaDeck.MediaItemTypes.Archive.ViewModels;
 
 [Inject(InjectServiceLifetime.Transient)]
-internal class ArchiveThumbnailPickerViewModel : BaseThumbnailPickerViewModel<BaseThumbnailPickerModel> {
+public class ArchiveThumbnailPickerViewModel : BaseThumbnailPickerViewModel<BaseThumbnailPickerModel> {
 	private readonly ArchiveMediaItemOperator _ArchiveMediaItemOperator;
 	private readonly IMediaItemTypeService _mediaItemTypeService;
 	private readonly ILogger<ArchiveThumbnailPickerViewModel> _logger;
@@ -30,15 +30,15 @@ internal class ArchiveThumbnailPickerViewModel : BaseThumbnailPickerViewModel<Ba
 		}).AddTo(this.CompositeDisposable);
 	}
 
-	internal BindableReactiveProperty<string?> FileName {
+	public BindableReactiveProperty<string?> FileName {
 		get;
 	} = new();
 
-	internal ObservableList<string> Entries {
+	public ObservableList<string> Entries {
 		get;
 	} = [];
 
-	internal BindableReactiveProperty<string?> SelectedEntry {
+	public BindableReactiveProperty<string?> SelectedEntry {
 		get;
 	} = new();
 

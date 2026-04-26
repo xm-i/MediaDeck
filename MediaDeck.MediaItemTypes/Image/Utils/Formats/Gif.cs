@@ -9,21 +9,21 @@ namespace MediaDeck.MediaItemTypes.Image.Utils.Formats;
 /// <summary>
 /// Gifメタデータ取得クラス
 /// </summary>
-internal class Gif : ImageBase {
+public class Gif : ImageBase {
 	private readonly IReadOnlyList<MetadataExtractor.Directory> _reader;
 
 	/// <summary>
 	/// コンストラクタ
 	/// </summary>
 	/// <param name="stream">画像ファイルストリーム</param>
-	internal Gif(Stream stream) : base(stream) {
+	public Gif(Stream stream) : base(stream) {
 		this._reader = GifMetadataReader.ReadMetadata(stream);
 		var d = this._reader.First(x => x is GifHeaderDirectory);
 		this.Width = d.GetUInt16(GifHeaderDirectory.TagImageWidth);
 		this.Height = d.GetUInt16(GifHeaderDirectory.TagImageHeight);
 	}
 
-	internal Database.Tables.Metadata.Gif CreateMetadataRecord() {
+	public Database.Tables.Metadata.Gif CreateMetadataRecord() {
 		var metadata = new Database.Tables.Metadata.Gif();
 
 		var h = this._reader.FirstOrDefault(x => x is GifHeaderDirectory);
