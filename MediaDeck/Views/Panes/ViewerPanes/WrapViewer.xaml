@@ -58,9 +58,10 @@
 			<GridView.ItemTemplate>
 				<DataTemplate x:DataType="vmIf:IMediaItemViewModel" >
 					<Grid DoubleTapped="File_DoubleTapped" >
-						<Image Stretch="Uniform"
+						<ContentControl
+							Content="{x:Bind ThumbnailControlView, Mode=OneWay}"
 							Height="{Binding DataContext.ItemSize.Value, Mode=OneWay, ElementName=List}"
-							Source="{x:Bind ThumbnailFilePath.Value, Mode=OneWay}" />
+							HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
 						<Grid Opacity="0.7"
 							Background="DarkGray"
 							Visibility="{x:Bind Exists, Converter={StaticResource InvertBoolToVisibilityConverter}}" />

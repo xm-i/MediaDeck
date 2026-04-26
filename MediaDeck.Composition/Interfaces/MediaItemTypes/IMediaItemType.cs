@@ -19,6 +19,7 @@ public interface IMediaItemType<TFileOperator, TFileModel, TExecutionProgramObje
 	public new TFileOperator CreateMediaItemOperator();
 	public new TFileModel CreateMediaItemModelFromRecord(MediaItem MediaItem, IServiceProvider scopedServiceProvider);
 	public TDetailViewerPreviewControlView CreateDetailViewerPreviewControlView(TFileViewModel fileViewModel);
+	public IThumbnailControlView CreateThumbnailControlView(TFileViewModel fileViewModel);
 	public TFileViewModel CreateMediaItemViewModel(TFileModel fileModel);
 	public new TThumbnailPickerViewModel CreateThumbnailPickerViewModel();
 	public new TThumbnailPickerView CreateThumbnailPickerView();
@@ -44,6 +45,7 @@ public interface IMediaItemType {
 	public IMediaItemOperator CreateMediaItemOperator();
 	public IMediaItemModel CreateMediaItemModelFromRecord(MediaItem MediaItem, IServiceProvider scopedServiceProvider);
 	public IDetailViewerPreviewControlView CreateDetailViewerPreviewControlView(IMediaItemViewModel fileViewModel);
+	public IThumbnailControlView CreateThumbnailControlView(IMediaItemViewModel fileViewModel);
 	public IMediaItemViewModel CreateMediaItemViewModel(IMediaItemModel fileModel);
 	public IThumbnailPickerViewModel CreateThumbnailPickerViewModel();
 	public IThumbnailPickerView CreateThumbnailPickerView();

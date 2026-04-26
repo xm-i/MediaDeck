@@ -1,5 +1,6 @@
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.MediaItemTypes;
+using MediaDeck.Composition.Interfaces.MediaItemTypes.Views;
 using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Database.Tables;
@@ -51,7 +52,7 @@ public class UnknownMediaItemType : BaseMediaItemType<UnknownMediaItemOperator, 
 	}
 
 	public override UnknownMediaItemViewModel CreateMediaItemViewModel(UnknownMediaItemModel fileModel) {
-		return new UnknownMediaItemViewModel(fileModel);
+		return new UnknownMediaItemViewModel(fileModel, this);
 	}
 
 	public override UnknownDetailViewerPreviewControlView CreateDetailViewerPreviewControlView(UnknownMediaItemViewModel fileViewModel) {
@@ -60,6 +61,10 @@ public class UnknownMediaItemType : BaseMediaItemType<UnknownMediaItemOperator, 
 
 	public override UnknownThumbnailPickerViewModel CreateThumbnailPickerViewModel() {
 		return this._serviceProvider.GetRequiredService<UnknownThumbnailPickerViewModel>();
+	}
+
+	public override IThumbnailControlView CreateThumbnailControlView(UnknownMediaItemViewModel fileViewModel) {
+		return new UnknownThumbnailControlView { DataContext = fileViewModel };
 	}
 
 	public override UnknownThumbnailPickerView CreateThumbnailPickerView() {

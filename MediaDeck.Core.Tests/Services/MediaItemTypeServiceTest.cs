@@ -222,6 +222,10 @@ public class MediaItemTypeServiceTest {
 			return new TestDetailViewerPreviewControlView(this.CreatedBy) { DataContext = fileViewModel };
 		}
 
+		public IThumbnailControlView CreateThumbnailControlView(IMediaItemViewModel fileViewModel) {
+			return new TestThumbnailControlView(this.CreatedBy) { DataContext = fileViewModel };
+		}
+
 		public IMediaItemViewModel CreateMediaItemViewModel(IMediaItemModel fileModel) {
 			return new TestFileViewModel(fileModel, this.CreatedBy);
 		}
@@ -412,6 +416,12 @@ public class MediaItemTypeServiceTest {
 			get;
 		}
 
+		public IThumbnailControlView ThumbnailControlView {
+			get {
+				return new TestThumbnailControlView(this.CreatedBy) { DataContext = this };
+			}
+		}
+
 		public bool Exists {
 			get;
 		}
@@ -442,6 +452,21 @@ public class MediaItemTypeServiceTest {
 
 	private sealed class TestDetailViewerPreviewControlView : IDetailViewerPreviewControlView {
 		public TestDetailViewerPreviewControlView(string createdBy) {
+			this.CreatedBy = createdBy;
+		}
+
+		public object DataContext {
+			get;
+			set;
+		} = null!;
+
+		public string CreatedBy {
+			get;
+		}
+	}
+
+	private sealed class TestThumbnailControlView : IThumbnailControlView {
+		public TestThumbnailControlView(string createdBy) {
 			this.CreatedBy = createdBy;
 		}
 

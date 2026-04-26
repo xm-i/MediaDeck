@@ -1,16 +1,19 @@
 using System.Threading.Tasks;
+
 using MediaDeck.Common.Base;
 using MediaDeck.Composition.Constants;
 using MediaDeck.Composition.Enum;
+using MediaDeck.Composition.Interfaces.MediaItemTypes;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.Models;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.ViewModels;
+using MediaDeck.Composition.Interfaces.MediaItemTypes.Views;
 using MediaDeck.Composition.Interfaces.Primitives;
 using MediaDeck.Composition.Objects;
 
 namespace MediaDeck.MediaItemTypes.Base.ViewModels;
 
 public abstract class BaseMediaItemViewModel : ViewModelBase, IMediaItemViewModel {
-	protected BaseMediaItemViewModel(IMediaItemModel fileModel, MediaType mediaType) {
+	protected BaseMediaItemViewModel(IMediaItemModel fileModel, IMediaItemType mediaItemType, MediaType mediaType) {
 		this.FileModel = fileModel;
 		this.FilePath = fileModel.FilePath;
 		this.ThumbnailFilePath = new($"file:///{fileModel.ThumbnailFilePath ?? FilePathConstants.NoThumbnailFilePath}");
@@ -18,9 +21,11 @@ public abstract class BaseMediaItemViewModel : ViewModelBase, IMediaItemViewMode
 		this.Properties = fileModel.Properties;
 		this.MediaType = mediaType;
 		this.Location = fileModel.Location;
+		this._mediaItemType = mediaItemType;
 	}
 
 	private long _thumbnailRefreshTicks = 0;
+	private readonly IMediaItemType _mediaItemType;
 
 	public IMediaItemModel FileModel {
 		get;
@@ -32,6 +37,12 @@ public abstract class BaseMediaItemViewModel : ViewModelBase, IMediaItemViewMode
 
 	public BindableReactiveProperty<string> ThumbnailFilePath {
 		get;
+	}
+
+	public IThumbnailControlView ThumbnailControlView {
+		get {
+			return field ??= this._mediaItemType.CreateThumbnailControlView(this);
+		}
 	}
 
 	public bool Exists {

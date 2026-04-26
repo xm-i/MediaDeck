@@ -1,5 +1,6 @@
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.MediaItemTypes;
+using MediaDeck.Composition.Interfaces.MediaItemTypes.Views;
 using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Database.Tables;
@@ -10,7 +11,6 @@ using MediaDeck.MediaItemTypes.Image.ViewModels;
 using MediaDeck.MediaItemTypes.UI.Base;
 using MediaDeck.MediaItemTypes.UI.Base.Views;
 using MediaDeck.MediaItemTypes.UI.Image.Views;
-
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MediaDeck.MediaItemTypes.UI.Image;
@@ -48,7 +48,7 @@ public class ImageMediaItemType : BaseMediaItemType<ImageMediaItemOperator, Imag
 	}
 
 	public override ImageMediaItemViewModel CreateMediaItemViewModel(ImageMediaItemModel fileModel) {
-		return new ImageMediaItemViewModel(fileModel);
+		return new ImageMediaItemViewModel(fileModel, this);
 	}
 
 	public override ImageDetailViewerPreviewControlView CreateDetailViewerPreviewControlView(ImageMediaItemViewModel fileViewModel) {
@@ -57,6 +57,10 @@ public class ImageMediaItemType : BaseMediaItemType<ImageMediaItemOperator, Imag
 
 	public override ImageThumbnailPickerViewModel CreateThumbnailPickerViewModel() {
 		return this._serviceProvider.GetRequiredService<ImageThumbnailPickerViewModel>();
+	}
+
+	public override IThumbnailControlView CreateThumbnailControlView(ImageMediaItemViewModel fileViewModel) {
+		return new ImageThumbnailControlView { DataContext = fileViewModel };
 	}
 
 	public override ImageThumbnailPickerView CreateThumbnailPickerView() {

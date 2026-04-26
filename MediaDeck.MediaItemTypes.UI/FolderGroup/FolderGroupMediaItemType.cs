@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using MediaDeck.Common.Extensions;
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.MediaItemTypes;
+using MediaDeck.Composition.Interfaces.MediaItemTypes.Views;
 using MediaDeck.Composition.Interfaces.Notifications;
 using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Composition.Stores.Config.Model;
@@ -110,7 +111,7 @@ public class FolderGroupMediaItemType : BaseMediaItemType<FolderGroupMediaItemOp
 	}
 
 	public override FolderGroupMediaItemViewModel CreateMediaItemViewModel(FolderGroupMediaItemModel fileModel) {
-		return new FolderGroupMediaItemViewModel(fileModel);
+		return new FolderGroupMediaItemViewModel(fileModel, this);
 	}
 
 	public override FolderGroupDetailViewerPreviewControlView CreateDetailViewerPreviewControlView(FolderGroupMediaItemViewModel fileViewModel) {
@@ -119,6 +120,10 @@ public class FolderGroupMediaItemType : BaseMediaItemType<FolderGroupMediaItemOp
 
 	public override FolderGroupThumbnailPickerViewModel CreateThumbnailPickerViewModel() {
 		return this._serviceProvider.GetRequiredService<FolderGroupThumbnailPickerViewModel>();
+	}
+
+	public override IThumbnailControlView CreateThumbnailControlView(FolderGroupMediaItemViewModel fileViewModel) {
+		return new FolderGroupThumbnailControlView { DataContext = fileViewModel };
 	}
 
 	public override FolderGroupThumbnailPickerView CreateThumbnailPickerView() {

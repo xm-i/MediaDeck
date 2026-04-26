@@ -109,12 +109,11 @@
 							<ColumnDefinition Width="150" />
 							<ColumnDefinition Width="60" />
 						</Grid.ColumnDefinitions>
-						<Image Grid.Column="0"
-							Stretch="Uniform"
-							Margin="4"
+						<ContentControl Grid.Column="0" Margin="4"
+							Content="{x:Bind ThumbnailControlView, Mode=OneWay}"
 							Height="{Binding DataContext.ItemSize.Value, Mode=OneWay, ElementName=List}"
 							Width="{Binding DataContext.ItemSize.Value, Mode=OneWay, ElementName=List}"
-							Source="{x:Bind ThumbnailFilePath.Value, Mode=OneWay}" />
+							HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
 						<TextBlock Grid.Column="1"
 							Text="{x:Bind FilePath}"
 							VerticalAlignment="Center"

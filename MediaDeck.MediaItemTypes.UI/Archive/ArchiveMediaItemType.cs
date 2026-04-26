@@ -1,5 +1,6 @@
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.MediaItemTypes;
+using MediaDeck.Composition.Interfaces.MediaItemTypes.Views;
 using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Database.Tables;
@@ -47,7 +48,7 @@ public class ArchiveMediaItemType : BaseMediaItemType<ArchiveMediaItemOperator, 
 	}
 
 	public override ArchiveMediaItemViewModel CreateMediaItemViewModel(ArchiveMediaItemModel fileModel) {
-		return new ArchiveMediaItemViewModel(fileModel);
+		return new ArchiveMediaItemViewModel(fileModel, this);
 	}
 
 	public override ArchiveDetailViewerPreviewControlView CreateDetailViewerPreviewControlView(ArchiveMediaItemViewModel fileViewModel) {
@@ -56,6 +57,10 @@ public class ArchiveMediaItemType : BaseMediaItemType<ArchiveMediaItemOperator, 
 
 	public override ArchiveThumbnailPickerViewModel CreateThumbnailPickerViewModel() {
 		return this._serviceProvider.GetRequiredService<ArchiveThumbnailPickerViewModel>();
+	}
+
+	public override IThumbnailControlView CreateThumbnailControlView(ArchiveMediaItemViewModel fileViewModel) {
+		return new ArchiveThumbnailControlView { DataContext = fileViewModel };
 	}
 
 	public override ArchiveThumbnailPickerView CreateThumbnailPickerView() {

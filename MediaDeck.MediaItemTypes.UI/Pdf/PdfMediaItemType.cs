@@ -1,5 +1,6 @@
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.MediaItemTypes;
+using MediaDeck.Composition.Interfaces.MediaItemTypes.Views;
 using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Database.Tables;
@@ -47,7 +48,7 @@ public class PdfMediaItemType : BaseMediaItemType<PdfMediaItemOperator, PdfMedia
 	}
 
 	public override PdfMediaItemViewModel CreateMediaItemViewModel(PdfMediaItemModel fileModel) {
-		return new PdfMediaItemViewModel(fileModel);
+		return new PdfMediaItemViewModel(fileModel, this);
 	}
 
 	public override PdfDetailViewerPreviewControlView CreateDetailViewerPreviewControlView(PdfMediaItemViewModel fileViewModel) {
@@ -56,6 +57,10 @@ public class PdfMediaItemType : BaseMediaItemType<PdfMediaItemOperator, PdfMedia
 
 	public override PdfThumbnailPickerViewModel CreateThumbnailPickerViewModel() {
 		return this._serviceProvider.GetRequiredService<PdfThumbnailPickerViewModel>();
+	}
+
+	public override IThumbnailControlView CreateThumbnailControlView(PdfMediaItemViewModel fileViewModel) {
+		return new PdfThumbnailControlView { DataContext = fileViewModel };
 	}
 
 	public override PdfThumbnailPickerView CreateThumbnailPickerView() {

@@ -11,6 +11,7 @@ namespace MediaDeck.ViewModels.Panes.ViewerPanes;
 public class MediaContentLibraryViewModel : ViewModelBase {
 	public MediaContentLibraryViewModel(MediaContentLibrary mediaContentLibrary, ISearchConditionNotificationDispatcher searchConditionNotificationDispatcher, IMediaItemTypeService MediaItemTypeService) {
 		this._mediaContentLibrary = mediaContentLibrary;
+		var synchronizationContext = SynchronizationContext.Current;
 		this.Files = mediaContentLibrary.Files.CreateView(MediaItemTypeService.CreateMediaItemViewModel).ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
 
 		this.SearchConditions =

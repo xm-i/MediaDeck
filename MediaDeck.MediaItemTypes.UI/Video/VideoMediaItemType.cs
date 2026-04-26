@@ -1,5 +1,6 @@
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.MediaItemTypes;
+using MediaDeck.Composition.Interfaces.MediaItemTypes.Views;
 using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Database.Tables;
@@ -57,7 +58,7 @@ public class VideoMediaItemType : BaseMediaItemType<VideoMediaItemOperator, Vide
 	}
 
 	public override VideoMediaItemViewModel CreateMediaItemViewModel(VideoMediaItemModel fileModel) {
-		return new VideoMediaItemViewModel(fileModel);
+		return new VideoMediaItemViewModel(fileModel, this);
 	}
 
 	public override VideoDetailViewerPreviewControlView CreateDetailViewerPreviewControlView(VideoMediaItemViewModel fileViewModel) {
@@ -66,6 +67,10 @@ public class VideoMediaItemType : BaseMediaItemType<VideoMediaItemOperator, Vide
 
 	public override VideoThumbnailPickerViewModel CreateThumbnailPickerViewModel() {
 		return this._serviceProvider.GetRequiredService<VideoThumbnailPickerViewModel>();
+	}
+
+	public override IThumbnailControlView CreateThumbnailControlView(VideoMediaItemViewModel fileViewModel) {
+		return new VideoThumbnailControlView { DataContext = fileViewModel };
 	}
 
 	public override VideoThumbnailPickerView CreateThumbnailPickerView() {

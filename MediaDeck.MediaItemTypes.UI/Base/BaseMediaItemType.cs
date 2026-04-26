@@ -47,6 +47,7 @@ public abstract class BaseMediaItemType<TFileOperator, TFileModel, TExecutionPro
 	public abstract TFileModel CreateMediaItemModelFromRecord(MediaItem MediaItem, IServiceProvider scopedServiceProvider);
 	public abstract TFileViewModel CreateMediaItemViewModel(TFileModel fileModel);
 	public abstract TDetailViewerPreviewControlView CreateDetailViewerPreviewControlView(TFileViewModel fileViewModel);
+	public abstract IThumbnailControlView CreateThumbnailControlView(TFileViewModel fileViewModel);
 	public abstract TThumbnailPickerViewModel CreateThumbnailPickerViewModel();
 	public abstract TThumbnailPickerView CreateThumbnailPickerView();
 	public abstract IQueryable<MediaItem> IncludeTables(IQueryable<MediaItem> MediaItems);
@@ -137,6 +138,10 @@ public abstract class BaseMediaItemType<TFileOperator, TFileModel, TExecutionPro
 		return this.CreateDetailViewerPreviewControlView((TFileViewModel)fileViewModel);
 	}
 
+	IThumbnailControlView IMediaItemType.CreateThumbnailControlView(IMediaItemViewModel fileViewModel) {
+		return this.CreateThumbnailControlView((TFileViewModel)fileViewModel);
+	}
+
 	IThumbnailPickerViewModel IMediaItemType.CreateThumbnailPickerViewModel() {
 		return this.CreateThumbnailPickerViewModel();
 	}
@@ -156,5 +161,4 @@ public abstract class BaseMediaItemType<TFileOperator, TFileModel, TExecutionPro
 	public IExecutionConfigView CreateExecutionConfigView(IExecutionProgramConfigViewModel viewModel) {
 		return this.CreateExecutionConfigView((TExecutionProgramConfigViewModel)viewModel);
 	}
-
 }
