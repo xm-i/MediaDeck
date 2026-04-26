@@ -1,4 +1,5 @@
 using MediaDeck.ViewModels;
+using MediaDeck.Views.Dialogs;
 
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -40,5 +41,32 @@ public sealed partial class MainWindow {
 
 	private void Window_Loaded(object sender, RoutedEventArgs e) {
 		this._viewModel.WindowActivatedCommand.Execute(Unit.Default);
+	}
+
+	private async void TabHeader_DoubleTapped(object sender, Microsoft.UI.Xaml.Input.DoubleTappedRoutedEventArgs e) {
+		if (sender is FrameworkElement fe && fe.DataContext is TabContext tabContext) {
+			await this.ShowRenameTabDialogAsync(tabContext);
+			e.Handled = true;
+		}
+	}
+
+	private async void TabViewItem_KeyDown(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e) {
+		if (e.Key == Windows.System.VirtualKey.F2) {
+			if (sender is FrameworkElement fe && fe.DataContext is TabContext tabContext) {
+				await this.ShowRenameTabDialogAsync(tabContext);
+				e.Handled = true;
+			}
+		}
+	}
+
+	private async System.Threading.Tasks.Task ShowRenameTabDialogAsync(TabContext tabContext) {
+		var dialog = new TabRenameDialog(tabContext.TabState.DisplayName.Value) {
+			XamlRoot = this.Content.XamlRoot
+		};
+
+		var result = await dialog.ShowAsync();
+		if (result == ContentDialogResult.Primary && !string.IsNullOrWhiteSpace(dialog.ResultText)) {
+			tabContext.TabState.DisplayName.Value = dialog.ResultText;
+		}
 	}
 }

@@ -36,7 +36,12 @@
 			TabItemsSource="{x:Bind _viewModel.Tabs}">
 			<TabView.TabItemTemplate>
 				<DataTemplate x:DataType="viewmodels:TabContext">
-					<TabViewItem Header="{x:Bind DisplayName.Value}" >
+					<TabViewItem KeyDown="TabViewItem_KeyDown" >
+						<TabViewItem.Header>
+							<Grid Background="Transparent" DoubleTapped="TabHeader_DoubleTapped">
+								<TextBlock Text="{x:Bind DisplayName.Value, Mode=OneWay}" />
+							</Grid>
+						</TabViewItem.Header>
 						<Grid>
 							<Grid.ColumnDefinitions>
 								<ColumnDefinition Width="250" />
