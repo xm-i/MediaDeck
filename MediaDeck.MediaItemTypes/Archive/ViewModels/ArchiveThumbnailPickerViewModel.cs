@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 namespace MediaDeck.MediaItemTypes.Archive.ViewModels;
 
 [Inject(InjectServiceLifetime.Transient)]
-internal class ArchiveThumbnailPickerViewModel : BaseThumbnailPickerViewModel {
+internal class ArchiveThumbnailPickerViewModel : BaseThumbnailPickerViewModel<BaseThumbnailPickerModel> {
 	private readonly ArchiveMediaItemOperator _ArchiveMediaItemOperator;
 	private readonly IMediaItemTypeService _mediaItemTypeService;
 	private readonly ILogger<ArchiveThumbnailPickerViewModel> _logger;

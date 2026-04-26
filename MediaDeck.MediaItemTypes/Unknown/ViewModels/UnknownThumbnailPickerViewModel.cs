@@ -4,7 +4,7 @@ using MediaDeck.MediaItemTypes.Base.ViewModels;
 namespace MediaDeck.MediaItemTypes.Unknown.ViewModels;
 
 [Inject(InjectServiceLifetime.Transient)]
-internal class UnknownThumbnailPickerViewModel : BaseThumbnailPickerViewModel {
+internal class UnknownThumbnailPickerViewModel : BaseThumbnailPickerViewModel<BaseThumbnailPickerModel> {
 	public UnknownThumbnailPickerViewModel(BaseThumbnailPickerModel thumbnailPickerModel) : base(thumbnailPickerModel) { }
 
 	public override void RecreateThumbnail() {

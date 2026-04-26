@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 namespace MediaDeck.MediaItemTypes.Video.ViewModels;
 
 [Inject(InjectServiceLifetime.Transient)]
-internal class VideoThumbnailPickerViewModel : BaseThumbnailPickerViewModel {
+internal class VideoThumbnailPickerViewModel : BaseThumbnailPickerViewModel<BaseThumbnailPickerModel> {
 	public VideoThumbnailPickerViewModel(
 		BaseThumbnailPickerModel thumbnailPickerModel,
 		VideoMediaItemOperator VideoMediaItemOperator,

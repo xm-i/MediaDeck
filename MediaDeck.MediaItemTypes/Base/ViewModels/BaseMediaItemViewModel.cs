@@ -1,5 +1,5 @@
 using System.Threading.Tasks;
-
+using MediaDeck.Common.Base;
 using MediaDeck.Composition.Constants;
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.Models;
@@ -9,7 +9,7 @@ using MediaDeck.Composition.Objects;
 
 namespace MediaDeck.MediaItemTypes.Base.ViewModels;
 
-internal abstract class BaseMediaItemViewModel : IMediaItemViewModel {
+internal abstract class BaseMediaItemViewModel : ViewModelBase, IMediaItemViewModel {
 	protected BaseMediaItemViewModel(IMediaItemModel fileModel, MediaType mediaType) {
 		this.FileModel = fileModel;
 		this.FilePath = fileModel.FilePath;

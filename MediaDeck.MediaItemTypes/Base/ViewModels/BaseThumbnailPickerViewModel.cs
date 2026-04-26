@@ -6,8 +6,9 @@ using MediaDeck.MediaItemTypes.Base.Models;
 
 namespace MediaDeck.MediaItemTypes.Base.ViewModels;
 
-internal abstract class BaseThumbnailPickerViewModel : ViewModelBase, IThumbnailPickerViewModel {
-	internal BaseThumbnailPickerViewModel(BaseThumbnailPickerModel thumbnailPickerModel) {
+internal abstract class BaseThumbnailPickerViewModel<TThumbnailPickerModel> : ViewModelBase, IThumbnailPickerViewModel
+	where TThumbnailPickerModel : BaseThumbnailPickerModel {
+	internal BaseThumbnailPickerViewModel(TThumbnailPickerModel thumbnailPickerModel) {
 		this.RecreateThumbnailCommand.Subscribe(_ => this.RecreateThumbnail()).AddTo(this.CompositeDisposable);
 		this.SaveCommand.Subscribe(async _ => await this.SaveAsync()).AddTo(this.CompositeDisposable);
 		this.thumbnailPickerModel = thumbnailPickerModel;
@@ -15,7 +16,7 @@ internal abstract class BaseThumbnailPickerViewModel : ViewModelBase, IThumbnail
 	}
 
 	protected IMediaItemViewModel? targetFileViewModel;
-	protected BaseThumbnailPickerModel thumbnailPickerModel;
+	protected TThumbnailPickerModel thumbnailPickerModel;
 
 	public BindableReactiveProperty<byte[]?> OriginalThumbnail {
 		get;
