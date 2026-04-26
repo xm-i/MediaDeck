@@ -10,12 +10,10 @@ namespace MediaDeck.Composition.Stores.Config.Model;
 [Inject(InjectServiceLifetime.Singleton)]
 [GenerateR3JsonConfigDto]
 public class ScanConfigModel {
-	public IServiceProvider ScopedServiceProvider {
-		get;
-	}
+	private readonly IServiceProvider _serviceProvider;
 
 	public ScanConfigModel(IServiceProvider serviceProvider) {
-		this.ScopedServiceProvider = serviceProvider;
+		this._serviceProvider = serviceProvider;
 		(string, MediaType)[] extensions = [
 			(".jpg", MediaType.Image),
 			(".jpeg", MediaType.Image),
@@ -48,7 +46,7 @@ public class ScanConfigModel {
 		];
 		this.TargetExtensions = [
 			.. extensions.Select(x => {
-				var model = this.ScopedServiceProvider.GetRequiredService<ExtensionObjectModel>();
+				var model = this._serviceProvider.GetRequiredService<ExtensionObjectModel>();
 				model.Extension.Value = x.Item1;
 				model.MediaType.Value = x.Item2;
 				return model;
@@ -57,7 +55,7 @@ public class ScanConfigModel {
 	}
 
 	public void AddTargetExtension() {
-		var config = this.ScopedServiceProvider.GetRequiredService<ExtensionObjectModel>();
+		var config = this._serviceProvider.GetRequiredService<ExtensionObjectModel>();
 		this.TargetExtensions.Add(config);
 	}
 

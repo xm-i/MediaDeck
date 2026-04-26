@@ -9,12 +9,10 @@ namespace MediaDeck.Composition.Stores.Config.Model;
 [Inject(InjectServiceLifetime.Singleton)]
 [GenerateR3JsonConfigDto]
 public class ExecutionConfigModel {
-	public IServiceProvider ScopedServiceProvider {
-		get;
-	}
+	private readonly IServiceProvider _serviceProvider;
 
 	public ExecutionConfigModel(IServiceProvider serviceProvider) {
-		this.ScopedServiceProvider = serviceProvider;
+		this._serviceProvider = serviceProvider;
 	}
 
 	/// <summary>
@@ -26,7 +24,7 @@ public class ExecutionConfigModel {
 	} = [];
 
 	public void AddExecutionProgram() {
-		var programConfig = this.ScopedServiceProvider.GetRequiredService<ExecutionProgramObjectModel>();
+		var programConfig = this._serviceProvider.GetRequiredService<ExecutionProgramObjectModel>();
 		this.ExecutionPrograms.Add(programConfig);
 	}
 

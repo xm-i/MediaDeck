@@ -7,14 +7,6 @@ namespace MediaDeck.Composition.Stores.Config.Model.Objects;
 [Inject(InjectServiceLifetime.Transient)]
 [GenerateR3JsonConfigDto]
 public class ExtensionObjectModel {
-	public IServiceProvider ScopedServiceProvider {
-		get;
-	}
-
-	public ExtensionObjectModel(IServiceProvider serviceProvider) {
-		this.ScopedServiceProvider = serviceProvider;
-	}
-
 	public ReactiveProperty<string> Extension {
 		get;
 		set;

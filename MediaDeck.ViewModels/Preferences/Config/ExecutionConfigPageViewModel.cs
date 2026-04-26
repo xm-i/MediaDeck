@@ -40,7 +40,7 @@ public class ExecutionConfigPageViewModel : ViewModelBase, IConfigPageViewModel 
 		this.ExecutionPrograms =
 			this._executionConfig
 				.ExecutionPrograms
-				.CreateView(x => x.ScopedServiceProvider.GetRequiredService<ExecutionProgramConfigViewModel>())
+				.CreateView(x => new ExecutionProgramConfigViewModel(x, executionConfig))
 				.ToNotifyCollectionChanged();
 	}
 

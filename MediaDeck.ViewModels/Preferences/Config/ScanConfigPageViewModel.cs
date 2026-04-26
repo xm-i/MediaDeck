@@ -40,7 +40,7 @@ public class ScanConfigPageViewModel : ViewModelBase, IConfigPageViewModel {
 		this.TargetExtensions =
 			this._scanConfig
 				.TargetExtensions
-				.CreateView(x => x.ScopedServiceProvider.GetRequiredService<ExtensionConfigViewModel>())
+				.CreateView(x => new ExtensionConfigViewModel(x, scanConfig))
 				.ToNotifyCollectionChanged();
 	}
 
