@@ -80,7 +80,7 @@ public partial class App {
 
 		Log.Logger = new LoggerConfiguration()
 			.Enrich.WithThreadId()
-#if DEBUG || DEBUG_UNPACKAGED
+#if DEBUG
 			.MinimumLevel.Verbose()
 			.MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Information)
 #else
