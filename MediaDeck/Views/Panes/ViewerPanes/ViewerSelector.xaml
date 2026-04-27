@@ -25,8 +25,9 @@
 			</Grid.ColumnDefinitions>
 			<controls:Segmented Grid.Column="1"
 				SelectionMode="Single"
-				ItemsSource="{x:Bind ViewModel.ViewerPaneViewModels}"
-				SelectedItem="{x:Bind ViewModel.SelectedViewerPane.Value,Mode=TwoWay}"
+				ItemsSource="{x:Bind ViewModel.ViewerPaneViewModels, Mode=OneWay}"
+				SelectedItem="{x:Bind ViewModel.SelectedViewerPane.Value,Mode=OneWay}"
+				SelectionChanged="Segmented_SelectionChanged"
 				DisplayMemberPath="Name" />
 			<StackPanel Grid.Column="3"
 				Orientation="Horizontal"
@@ -59,17 +60,17 @@
 		</Grid>
 		<controls:SwitchPresenter Grid.Row="1"
 			Value="{x:Bind ViewModel.SelectedViewerPane.Value,Mode=OneWay}" >
-			<controls:Case Value="{x:Bind ViewModel.WrapViewerViewModel}" >
+			<controls:Case Value="{x:Bind ViewModel.WrapViewerViewModel,Mode=OneWay}" >
 				<local:WrapViewer ViewModel="{x:Bind ViewModel,Mode=OneWay}" />
 			</controls:Case>
-			<controls:Case Value="{x:Bind ViewModel.ListViewerViewModel}" >
+			<controls:Case Value="{x:Bind ViewModel.ListViewerViewModel,Mode=OneWay}" >
 				<local:ListViewer ViewModel="{x:Bind ViewModel,Mode=OneWay}" />
 			</controls:Case>
-			<controls:Case Value="{x:Bind ViewModel.DetailViewerViewModel}" >
+			<controls:Case Value="{x:Bind ViewModel.DetailViewerViewModel,Mode=OneWay}" >
 				<local:DetailViewer ViewModel="{x:Bind ViewModel,Mode=OneWay}" />
 			</controls:Case>
 			<!-- Mapはちゃんと作るまでコメントアウト
-			<controls:Case Value="{x:Bind ViewModel.MapViewerViewModel}" >
+			<controls:Case Value="{x:Bind ViewModel.MapViewerViewModel,Mode=OneWay}" >
 				<local:MapViewer ViewModel="{x:Bind ViewModel,Mode=OneWay}" />
 			</controls:Case>
 			-->

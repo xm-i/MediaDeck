@@ -19,6 +19,17 @@ public sealed partial class ViewerSelector {
 		var window = Ioc.Default.GetRequiredService<SortManagerWindow>();
 		Ioc.Default.GetRequiredService<IWindowService>().ActivateCenteredOnMainWindow(window);
 	}
+
+	private void Segmented_SelectionChanged(object sender, Microsoft.UI.Xaml.Controls.SelectionChangedEventArgs e) {
+		if (this.ViewModel == null) {
+			return;
+		}
+		if (e.AddedItems.Count != 1 || e.AddedItems[0] is not ViewerPaneViewModelBase selectedViewerPane) {
+			return;
+		}
+
+		this.ViewModel.SelectedViewerPane.Value = selectedViewerPane;
+	}
 }
 
 
