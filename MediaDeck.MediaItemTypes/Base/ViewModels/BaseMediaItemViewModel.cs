@@ -41,7 +41,7 @@ public abstract class BaseMediaItemViewModel : ViewModelBase, IMediaItemViewMode
 
 	public IThumbnailControlView ThumbnailControlView {
 		get {
-			return field ??= this._mediaItemType.CreateThumbnailControlView(this);
+			return this._mediaItemType.CreateThumbnailControlView(this);
 		}
 	}
 
