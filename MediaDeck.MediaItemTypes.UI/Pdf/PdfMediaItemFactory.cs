@@ -20,15 +20,18 @@ public class PdfMediaItemFactory : BaseMediaItemFactory<PdfMediaItemOperator, Pd
 	private PdfDetailViewerPreviewControlView? _pdfDetailViewerPreviewControlView;
 	private readonly PdfMediaItemOperator _PdfMediaItemOperator;
 	private readonly IServiceProvider _serviceProvider;
+	private readonly IMediaItemTypeProvider _mediaItemTypeProvider;
 
 	public PdfMediaItemFactory(
 		PdfMediaItemOperator PdfMediaItemOperator,
 		ConfigModel config,
 		ITagsManager tagsManager,
+		IMediaItemTypeProvider mediaItemTypeProvider,
 		IServiceProvider serviceProvider)
 		: base(config, tagsManager, MediaType.Pdf) {
 		this._PdfMediaItemOperator = PdfMediaItemOperator;
 		this._serviceProvider = serviceProvider;
+		this._mediaItemTypeProvider = mediaItemTypeProvider;
 	}
 
 	public override PdfMediaItemOperator CreateMediaItemOperator() {
@@ -42,7 +45,7 @@ public class PdfMediaItemFactory : BaseMediaItemFactory<PdfMediaItemOperator, Pd
 	}
 
 	public override PdfMediaItemModel CreateMediaItemModelFromRecord(MediaItem MediaItem, IServiceProvider scopedServiceProvider) {
-		var ifm = new PdfMediaItemModel(MediaItem.MediaItemId, MediaItem.FilePath, this._PdfMediaItemOperator, this, scopedServiceProvider);
+		var ifm = new PdfMediaItemModel(MediaItem.MediaItemId, MediaItem.FilePath, this._PdfMediaItemOperator, this._mediaItemTypeProvider, scopedServiceProvider);
 		this.SetModelProperties(ifm, MediaItem);
 		return ifm;
 	}
@@ -81,10 +84,5 @@ public class PdfMediaItemFactory : BaseMediaItemFactory<PdfMediaItemOperator, Pd
 		return new DefaultExecutionConfigView() {
 			ViewModel = viewModel
 		};
-	}
-
-	public override IQueryable<MediaItem> IncludeTables(IQueryable<MediaItem> MediaItems) {
-		return MediaItems
-			.Include(mf => mf.Container);
 	}
 }

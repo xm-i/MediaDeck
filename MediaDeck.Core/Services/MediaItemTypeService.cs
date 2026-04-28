@@ -11,9 +11,11 @@ namespace MediaDeck.Core.Services;
 /// メディアアイテムタイプに関連する操作を提供するサービス実装クラス
 /// </summary>
 [Inject(InjectServiceLifetime.Singleton, typeof(IMediaItemTypeService))]
-public class MediaItemTypeService(IEnumerable<IMediaItemFactory> mediaItemFactories) : IMediaItemTypeService {
+public class MediaItemTypeService(IEnumerable<IMediaItemFactory> mediaItemFactories, IEnumerable<IMediaItemTypeProvider> mediaItemTypeProviders) : IMediaItemTypeService {
 	private readonly IMediaItemFactory[] _mediaItemFactories = mediaItemFactories.ToArray();
 	private readonly IMediaItemFactory _unknownMediaItemFactory = mediaItemFactories.First(x => x.MediaType == MediaType.Unknown);
+	private readonly IMediaItemTypeProvider[] _mediaItemTypeProviders = mediaItemTypeProviders.ToArray();
+	private readonly IMediaItemTypeProvider _unknownMediaItemProvider = mediaItemTypeProviders.First(x => x.MediaType == MediaType.Unknown);
 
 	/// <inheritdoc />
 	public IMediaItemModel CreateMediaItemModelFromRecord(MediaItem MediaItem, IServiceProvider scopedServiceProvider) {
@@ -48,15 +50,16 @@ public class MediaItemTypeService(IEnumerable<IMediaItemFactory> mediaItemFactor
 	/// <inheritdoc />
 	public IQueryable<MediaItem> IncludeTables(IQueryable<MediaItem> MediaItems) {
 		var result = MediaItems;
-		foreach (var MediaItemType in this._mediaItemFactories) {
-			result = MediaItemType.IncludeTables(result);
+		foreach (var provider in this._mediaItemTypeProviders) {
+			result = provider.IncludeTables(result);
 		}
 		return result;
 	}
 
 	/// <inheritdoc />
 	public IMediaItemFactory GetMediaItemFactory(string path) {
-		return this._mediaItemFactories.FirstOrDefault(x => x.IsTargetPath(path)) ?? this._unknownMediaItemFactory;
+		var type = this._mediaItemTypeProviders.FirstOrDefault(x => x.IsTargetPath(path))?.MediaType ?? this._unknownMediaItemFactory.MediaType;
+		return this.GetMediaItemFactory(type);
 	}
 
 	/// <inheritdoc />
@@ -69,15 +72,20 @@ public class MediaItemTypeService(IEnumerable<IMediaItemFactory> mediaItemFactor
 		return this._mediaItemFactories.FirstOrDefault(x => x.ItemType == MediaItem.ItemType) ?? this._unknownMediaItemFactory;
 	}
 
+	public IMediaItemTypeProvider GetMediaItemTypeProvider(ItemType mediaType) {
+		var factory = this._mediaItemFactories.FirstOrDefault(x => x.ItemType == mediaType);
+		return this._mediaItemTypeProviders.FirstOrDefault(x => x.MediaType == factory?.MediaType) ?? this._unknownMediaItemProvider;
+	}
+
 	/// <inheritdoc />
 	public bool IsTargetPath(string path) {
-		return this._mediaItemFactories.Any(x => x.IsTargetPath(path));
+		return this._mediaItemTypeProviders.Any(x => x.IsTargetPath(path));
 	}
 
 	/// <inheritdoc />
 	public bool IsTargetPath(string path, MediaType mediaType) {
-		var mediaItemFactory = this._mediaItemFactories.FirstOrDefault(x => x.MediaType == mediaType);
-		return mediaItemFactory is not null && mediaItemFactory.IsTargetPath(path);
+		var mediaItemTypeProvider = this._mediaItemTypeProviders.FirstOrDefault(x => x.MediaType == mediaType);
+		return mediaItemTypeProvider is not null && mediaItemTypeProvider.IsTargetPath(path);
 	}
 
 	/// <inheritdoc />

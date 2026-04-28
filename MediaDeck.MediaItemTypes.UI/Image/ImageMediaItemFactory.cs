@@ -20,15 +20,18 @@ public class ImageMediaItemFactory : BaseMediaItemFactory<ImageMediaItemOperator
 	private ImageDetailViewerPreviewControlView? _imageDetailViewerPreviewControlView;
 	private readonly ImageMediaItemOperator _ImageMediaItemOperator;
 	private readonly IServiceProvider _serviceProvider;
+	private readonly IMediaItemTypeProvider _mediaItemTypeProvider;
 
 	public ImageMediaItemFactory(
 		ImageMediaItemOperator ImageMediaItemOperator,
 		ConfigModel config,
 		ITagsManager tagsManager,
+		IMediaItemTypeProvider mediaItemTypeProvider,
 		IServiceProvider serviceProvider)
 		: base(config, tagsManager, MediaType.Image) {
 		this._ImageMediaItemOperator = ImageMediaItemOperator;
 		this._serviceProvider = serviceProvider;
+		this._mediaItemTypeProvider = mediaItemTypeProvider;
 	}
 
 	public override ImageMediaItemOperator CreateMediaItemOperator() {
@@ -42,7 +45,7 @@ public class ImageMediaItemFactory : BaseMediaItemFactory<ImageMediaItemOperator
 	}
 
 	public override ImageMediaItemModel CreateMediaItemModelFromRecord(MediaItem MediaItem, IServiceProvider scopedServiceProvider) {
-		var ifm = new ImageMediaItemModel(MediaItem.MediaItemId, MediaItem.FilePath, this._ImageMediaItemOperator, this, scopedServiceProvider);
+		var ifm = new ImageMediaItemModel(MediaItem.MediaItemId, MediaItem.FilePath, this._ImageMediaItemOperator, this._mediaItemTypeProvider, scopedServiceProvider);
 		this.SetModelProperties(ifm, MediaItem);
 		return ifm;
 	}
@@ -82,14 +85,5 @@ public class ImageMediaItemFactory : BaseMediaItemFactory<ImageMediaItemOperator
 		return new DefaultExecutionConfigView() {
 			ViewModel = viewModel
 		};
-	}
-	public override IQueryable<MediaItem> IncludeTables(IQueryable<MediaItem> MediaItems) {
-		return MediaItems
-			.Include(mf => mf.ImageFile)
-			.Include(mf => mf.Jpeg)
-			.Include(mf => mf.Png)
-			.Include(mf => mf.Bmp)
-			.Include(mf => mf.Gif)
-			.Include(mf => mf.Heif);
 	}
 }

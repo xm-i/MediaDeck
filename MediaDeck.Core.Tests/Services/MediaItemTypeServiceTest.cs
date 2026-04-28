@@ -19,25 +19,41 @@ namespace MediaDeck.Core.Tests.Services;
 /// </summary>
 public class MediaItemTypeServiceTest {
 	/// <summary>
-	/// Unknown用のテストファイルタイプ。
+	/// Unknown用のテストファクトリ。
 	/// </summary>
-	private static readonly TestMediaItemType UnknownMediaItemType = new(MediaType.Unknown, "unknown");
+	private static readonly TestMediaItemFactory UnknownMediaItemFactory = new(MediaType.Unknown, "unknown");
 
 	/// <summary>
-	/// Image用のテストファイルタイプ。
+	/// Image用のテストファクトリ。
 	/// </summary>
-	private static readonly TestMediaItemType ImageMediaItemType = new(MediaType.Image, "image");
+	private static readonly TestMediaItemFactory ImageMediaItemFactory = new(MediaType.Image, "image");
 
 	/// <summary>
-	/// Video用のテストファイルタイプ。
+	/// Video用のテストファクトリ。
 	/// </summary>
-	private static readonly TestMediaItemType VideoMediaItemType = new(MediaType.Video, "video");
+	private static readonly TestMediaItemFactory VideoMediaItemFactory = new(MediaType.Video, "video");
+
+	/// <summary>
+	/// Unknown用のテストプロバイダー。
+	/// </summary>
+	private static readonly TestMediaItemTypeProvider UnknownMediaItemProvider = new(MediaType.Unknown, "unknown");
+
+	/// <summary>
+	/// Image用のテストプロバイダー。
+	/// </summary>
+	private static readonly TestMediaItemTypeProvider ImageMediaItemProvider = new(MediaType.Image, "image");
+
+	/// <summary>
+	/// Video用のテストプロバイダー。
+	/// </summary>
+	private static readonly TestMediaItemTypeProvider VideoMediaItemProvider = new(MediaType.Video, "video");
 
 	private readonly MediaItemTypeService _service;
 
 	public MediaItemTypeServiceTest() {
-		var MediaItemTypes = new[] { UnknownMediaItemType, ImageMediaItemType, VideoMediaItemType };
-		this._service = new MediaItemTypeService(MediaItemTypes);
+		var factories = new[] { UnknownMediaItemFactory, ImageMediaItemFactory, VideoMediaItemFactory };
+		var providers = new[] { UnknownMediaItemProvider, ImageMediaItemProvider, VideoMediaItemProvider };
+		this._service = new MediaItemTypeService(factories, providers);
 	}
 
 	/// <summary>
@@ -140,7 +156,7 @@ public class MediaItemTypeServiceTest {
 	public void GetMediaItemType_ByPath_UsesMatchingType() {
 		var result = this._service.GetMediaItemFactory(@"C:\media\sample.jpg");
 
-		result.ShouldBeSameAs(ImageMediaItemType);
+		result.ShouldBeSameAs(ImageMediaItemFactory);
 	}
 
 	[Fact]
@@ -149,7 +165,7 @@ public class MediaItemTypeServiceTest {
 
 		var result = this._service.GetMediaItemFactory(mediaItem);
 
-		result.ShouldBeSameAs(VideoMediaItemType);
+		result.ShouldBeSameAs(VideoMediaItemFactory);
 	}
 
 	[Theory]
@@ -186,8 +202,8 @@ public class MediaItemTypeServiceTest {
 		return new MediaItem { DirectoryPath = Path.GetDirectoryName(filePath) ?? string.Empty, FilePath = filePath, Description = string.Empty, MediaItemTags = new List<MediaItemTag>(), ItemType = itemType };
 	}
 
-	private sealed class TestMediaItemType : IMediaItemFactory {
-		public TestMediaItemType(MediaType mediaType, string createdBy) {
+	private sealed class TestMediaItemFactory : IMediaItemFactory {
+		public TestMediaItemFactory(MediaType mediaType, string createdBy) {
 			this.MediaType = mediaType;
 			this.CreatedBy = createdBy;
 		}
@@ -238,6 +254,33 @@ public class MediaItemTypeServiceTest {
 			return new TestThumbnailPickerView(this.CreatedBy);
 		}
 
+		public IExecutionProgramObjectModel CreateExecutionProgramObjectModel() {
+			return null!;
+		}
+
+		public IExecutionProgramConfigViewModel CreateExecutionProgramConfigViewModel(IExecutionProgramObjectModel model) {
+			return null!;
+		}
+
+		public IExecutionConfigView CreateExecutionConfigView(IExecutionProgramConfigViewModel viewModel) {
+			return null!;
+		}
+	}
+
+	private sealed class TestMediaItemTypeProvider : IMediaItemTypeProvider {
+		public TestMediaItemTypeProvider(MediaType mediaType, string createdBy) {
+			this.MediaType = mediaType;
+			this.CreatedBy = createdBy;
+		}
+
+		public MediaType MediaType {
+			get;
+		}
+
+		public string CreatedBy {
+			get;
+		}
+
 		public IQueryable<MediaItem> IncludeTables(IQueryable<MediaItem> MediaItems) {
 			return MediaItems.Concat(new[] { CreateMediaItem($@"C:\included\{this.CreatedBy}.dat") }).AsQueryable();
 		}
@@ -256,18 +299,6 @@ public class MediaItemTypeServiceTest {
 
 		public Task ExecuteAsync(string filePath, IServiceProvider scopedServiceProvider) {
 			return Task.CompletedTask;
-		}
-
-		public IExecutionProgramObjectModel CreateExecutionProgramObjectModel() {
-			return null!;
-		}
-
-		public IExecutionProgramConfigViewModel CreateExecutionProgramConfigViewModel(IExecutionProgramObjectModel model) {
-			return null!;
-		}
-
-		public IExecutionConfigView CreateExecutionConfigView(IExecutionProgramConfigViewModel viewModel) {
-			return null!;
 		}
 	}
 

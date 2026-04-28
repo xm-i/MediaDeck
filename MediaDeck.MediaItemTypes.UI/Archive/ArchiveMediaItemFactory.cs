@@ -20,15 +20,18 @@ public class ArchiveMediaItemFactory : BaseMediaItemFactory<ArchiveMediaItemOper
 	private ArchiveDetailViewerPreviewControlView? _archiveDetailViewerPreviewControlView;
 	private readonly ArchiveMediaItemOperator _ArchiveMediaItemOperator;
 	private readonly IServiceProvider _serviceProvider;
+	private readonly IMediaItemTypeProvider _mediaItemTypeProvider;
 
 	public ArchiveMediaItemFactory(
 		ArchiveMediaItemOperator ArchiveMediaItemOperator,
 		ConfigModel config,
 		ITagsManager tagsManager,
+		IMediaItemTypeProvider mediaItemTypeProvider,
 		IServiceProvider serviceProvider)
 		: base(config, tagsManager, MediaType.Archive) {
 		this._ArchiveMediaItemOperator = ArchiveMediaItemOperator;
 		this._serviceProvider = serviceProvider;
+		this._mediaItemTypeProvider = mediaItemTypeProvider;
 	}
 
 	public override ArchiveMediaItemOperator CreateMediaItemOperator() {
@@ -42,7 +45,7 @@ public class ArchiveMediaItemFactory : BaseMediaItemFactory<ArchiveMediaItemOper
 	}
 
 	public override ArchiveMediaItemModel CreateMediaItemModelFromRecord(MediaItem MediaItem, IServiceProvider scopedServiceProvider) {
-		var ifm = new ArchiveMediaItemModel(MediaItem.MediaItemId, MediaItem.FilePath, this._ArchiveMediaItemOperator, this, scopedServiceProvider);
+		var ifm = new ArchiveMediaItemModel(MediaItem.MediaItemId, MediaItem.FilePath, this._ArchiveMediaItemOperator, this._mediaItemTypeProvider, scopedServiceProvider);
 		this.SetModelProperties(ifm, MediaItem);
 		return ifm;
 	}
@@ -65,11 +68,6 @@ public class ArchiveMediaItemFactory : BaseMediaItemFactory<ArchiveMediaItemOper
 
 	public override ArchiveThumbnailPickerView CreateThumbnailPickerView() {
 		return new ArchiveThumbnailPickerView();
-	}
-
-	public override IQueryable<MediaItem> IncludeTables(IQueryable<MediaItem> MediaItems) {
-		return MediaItems
-			.Include(mf => mf.Container);
 	}
 
 	public override DefaultExecutionProgramObjectModel CreateExecutionProgramObjectModel() {

@@ -20,15 +20,18 @@ public class VideoMediaItemFactory : BaseMediaItemFactory<VideoMediaItemOperator
 	private VideoDetailViewerPreviewControlView? _videoDetailViewerPreviewControlView;
 	private readonly VideoMediaItemOperator _VideoMediaItemOperator;
 	private readonly IServiceProvider _serviceProvider;
+	private readonly IMediaItemTypeProvider _mediaItemTypeProvider;
 
 	public VideoMediaItemFactory(
 		VideoMediaItemOperator VideoMediaItemOperator,
 		ConfigModel config,
 		ITagsManager tagsManager,
+		IMediaItemTypeProvider mediaItemTypeProvider,
 		IServiceProvider serviceProvider)
 		: base(config, tagsManager, MediaType.Video) {
 		this._VideoMediaItemOperator = VideoMediaItemOperator;
 		this._serviceProvider = serviceProvider;
+		this._mediaItemTypeProvider = mediaItemTypeProvider;
 
 		FlyleafLib.Engine.Start(new FlyleafLib.EngineConfig() {
 #if DEBUG
@@ -52,7 +55,7 @@ public class VideoMediaItemFactory : BaseMediaItemFactory<VideoMediaItemOperator
 	}
 
 	public override VideoMediaItemModel CreateMediaItemModelFromRecord(MediaItem MediaItem, IServiceProvider scopedServiceProvider) {
-		var ifm = new VideoMediaItemModel(MediaItem.MediaItemId, MediaItem.FilePath, this._VideoMediaItemOperator, this, scopedServiceProvider);
+		var ifm = new VideoMediaItemModel(MediaItem.MediaItemId, MediaItem.FilePath, this._VideoMediaItemOperator, this._mediaItemTypeProvider, scopedServiceProvider);
 		this.SetModelProperties(ifm, MediaItem);
 		return ifm;
 	}
@@ -91,10 +94,5 @@ public class VideoMediaItemFactory : BaseMediaItemFactory<VideoMediaItemOperator
 		return new DefaultExecutionConfigView() {
 			ViewModel = viewModel
 		};
-	}
-
-	public override IQueryable<MediaItem> IncludeTables(IQueryable<MediaItem> MediaItems) {
-		return MediaItems
-			.Include(mf => mf.VideoFile);
 	}
 }

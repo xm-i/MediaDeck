@@ -20,15 +20,18 @@ public class UnknownMediaItemFactory : BaseMediaItemFactory<UnknownMediaItemOper
 	private UnknownDetailViewerPreviewControlView? _unknownDetailViewerPreviewControlView;
 	private readonly UnknownMediaItemOperator _UnknownMediaItemOperator;
 	private readonly IServiceProvider _serviceProvider;
+	private readonly IMediaItemTypeProvider _mediaItemTypeProvider;
 
 	public UnknownMediaItemFactory(
 		UnknownMediaItemOperator UnknownMediaItemOperator,
 		ConfigModel config,
 		ITagsManager tagsManager,
+		IMediaItemTypeProvider mediaItemTypeProvider,
 		IServiceProvider serviceProvider)
 		: base(config, tagsManager, MediaType.Unknown) {
 		this._UnknownMediaItemOperator = UnknownMediaItemOperator;
 		this._serviceProvider = serviceProvider;
+		this._mediaItemTypeProvider = mediaItemTypeProvider;
 	}
 
 	public override UnknownMediaItemOperator CreateMediaItemOperator() {
@@ -41,12 +44,9 @@ public class UnknownMediaItemFactory : BaseMediaItemFactory<UnknownMediaItemOper
 		}
 	}
 
-	public override bool IsTargetPath(string path) {
-		return false;
-	}
 
 	public override UnknownMediaItemModel CreateMediaItemModelFromRecord(MediaItem MediaItem, IServiceProvider scopedServiceProvider) {
-		var ifm = new UnknownMediaItemModel(MediaItem.MediaItemId, MediaItem.FilePath, this.CreateMediaItemOperator(), this, scopedServiceProvider);
+		var ifm = new UnknownMediaItemModel(MediaItem.MediaItemId, MediaItem.FilePath, this.CreateMediaItemOperator(), this._mediaItemTypeProvider, scopedServiceProvider);
 		this.SetModelProperties(ifm, MediaItem);
 		return ifm;
 	}
@@ -86,8 +86,5 @@ public class UnknownMediaItemFactory : BaseMediaItemFactory<UnknownMediaItemOper
 		return new DefaultExecutionConfigView() {
 			ViewModel = viewModel
 		};
-	}
-	public override IQueryable<MediaItem> IncludeTables(IQueryable<MediaItem> MediaItems) {
-		return MediaItems;
 	}
 }

@@ -46,20 +46,24 @@ public interface IMediaItemTypeService {
 	public IQueryable<MediaItem> IncludeTables(IQueryable<MediaItem> MediaItems);
 
 	/// <summary>
-	/// パスに対応するメディアアイテムタイプを取得します。
+	/// パスに対応するメディアアイテムFactoryを取得します。
 	/// </summary>
 	public IMediaItemFactory GetMediaItemFactory(string path);
 
 	/// <summary>
-	/// 指定したメディアタイプに対応するメディアアイテムタイプを取得します。
+	/// 指定したメディアタイプに対応するメディアアイテムFactoryを取得します。
 	/// </summary>
 	public IMediaItemFactory GetMediaItemFactory(MediaType mediaType);
 
 	/// <summary>
-	/// レコードに対応するメディアアイテムタイプを取得します。
+	/// レコードに対応するメディアアイテムFactoryを取得します。
 	/// </summary>
 	public IMediaItemFactory GetMediaItemFactory(MediaItem MediaItem);
 
+	/// <summary>
+	/// 指定したメディアタイプに対応するメディアアイテムタイププロバイダーを取得します。
+	/// </summary>
+	public IMediaItemTypeProvider GetMediaItemTypeProvider(ItemType mediaType);
 	/// <summary>
 	/// パスがいずれかのメディアアイテムタイプの対象かどうかを取得します。
 	/// </summary>
