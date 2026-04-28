@@ -1,31 +1,28 @@
 using System.IO;
+
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.MediaItemTypes;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.Models;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.ViewModels;
-using MediaDeck.Composition.Interfaces.MediaItemTypes.Views;
 using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Composition.Objects;
 using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Database.Tables;
 
-namespace MediaDeck.MediaItemTypes.UI.Base;
+namespace MediaDeck.MediaItemTypes.Base;
 
-public abstract class BaseMediaItemFactory<TFileOperator, TFileModel, TExecutionProgramObjectModel, TFileViewModel, TExecutionProgramConfigViewModel, TDetailViewerPreviewControlView, TThumbnailPickerViewModel, TThumbnailPickerView, TExecutionConfigView>
-	: IMediaItemFactory<TFileOperator, TFileModel, TExecutionProgramObjectModel, TFileViewModel, TExecutionProgramConfigViewModel, TDetailViewerPreviewControlView, TThumbnailPickerViewModel, TThumbnailPickerView, TExecutionConfigView>
+public abstract class BaseMediaItemFactoryCore<TFileOperator, TFileModel, TExecutionProgramObjectModel, TFileViewModel, TExecutionProgramConfigViewModel, TThumbnailPickerViewModel>
+	: IMediaItemFactoryCore<TFileOperator, TFileModel, TExecutionProgramObjectModel, TFileViewModel, TExecutionProgramConfigViewModel, TThumbnailPickerViewModel>
 	where TFileOperator : IMediaItemOperator
 	where TFileModel : IMediaItemModel
 	where TExecutionProgramObjectModel : IExecutionProgramObjectModel
 	where TFileViewModel : IMediaItemViewModel
 	where TExecutionProgramConfigViewModel : IExecutionProgramConfigViewModel
-	where TDetailViewerPreviewControlView : IDetailViewerPreviewControlView
-	where TThumbnailPickerViewModel : IThumbnailPickerViewModel
-	where TThumbnailPickerView : IThumbnailPickerView
-	where TExecutionConfigView : IExecutionConfigView {
+	where TThumbnailPickerViewModel : IThumbnailPickerViewModel {
 	protected readonly ConfigModel _config;
 	protected readonly ITagsManager _tagsManager;
 
-	public BaseMediaItemFactory(ConfigModel config, ITagsManager tagsManager, MediaType mediaType) {
+	public BaseMediaItemFactoryCore(ConfigModel config, ITagsManager tagsManager, MediaType mediaType) {
 		this._config = config;
 		this._tagsManager = tagsManager;
 		this.MediaType = mediaType;
@@ -42,10 +39,7 @@ public abstract class BaseMediaItemFactory<TFileOperator, TFileModel, TExecution
 	public abstract TFileOperator CreateMediaItemOperator();
 	public abstract TFileModel CreateMediaItemModelFromRecord(MediaItem MediaItem, IServiceProvider scopedServiceProvider);
 	public abstract TFileViewModel CreateMediaItemViewModel(TFileModel fileModel);
-	public abstract TDetailViewerPreviewControlView CreateDetailViewerPreviewControlView(TFileViewModel fileViewModel);
-	public abstract IThumbnailControlView CreateThumbnailControlView(TFileViewModel fileViewModel);
 	public abstract TThumbnailPickerViewModel CreateThumbnailPickerViewModel();
-	public abstract TThumbnailPickerView CreateThumbnailPickerView();
 
 	/// <inheritdoc />
 	public abstract TExecutionProgramObjectModel CreateExecutionProgramObjectModel();
@@ -53,8 +47,6 @@ public abstract class BaseMediaItemFactory<TFileOperator, TFileModel, TExecution
 	/// <inheritdoc />
 	public abstract TExecutionProgramConfigViewModel CreateExecutionProgramConfigViewModel(TExecutionProgramObjectModel model);
 
-	/// <inheritdoc />
-	public abstract TExecutionConfigView CreateExecutionConfigView(TExecutionProgramConfigViewModel viewModel);
 
 	protected void SetModelProperties(TFileModel fileModel, MediaItem MediaItem) {
 		if (MediaItem.ThumbnailFileName != null) {
@@ -76,43 +68,27 @@ public abstract class BaseMediaItemFactory<TFileOperator, TFileModel, TExecution
 		fileModel.Tags = [.. MediaItem.MediaItemTags.Select(mft => this._tagsManager.Tags.FirstOrDefault(t => t.TagId == mft.TagId)).OfType<ITagModel>()];
 	}
 
-	IMediaItemOperator IMediaItemFactory.CreateMediaItemOperator() {
+	IMediaItemOperator IMediaItemFactoryCore.CreateMediaItemOperator() {
 		return this.CreateMediaItemOperator();
 	}
 
-	IMediaItemModel IMediaItemFactory.CreateMediaItemModelFromRecord(MediaItem MediaItem, IServiceProvider scopedServiceProvider) {
+	IMediaItemModel IMediaItemFactoryCore.CreateMediaItemModelFromRecord(MediaItem MediaItem, IServiceProvider scopedServiceProvider) {
 		return this.CreateMediaItemModelFromRecord(MediaItem, scopedServiceProvider);
 	}
 
-	IMediaItemViewModel IMediaItemFactory.CreateMediaItemViewModel(IMediaItemModel fileModel) {
+	IMediaItemViewModel IMediaItemFactoryCore.CreateMediaItemViewModel(IMediaItemModel fileModel) {
 		return this.CreateMediaItemViewModel((TFileModel)fileModel);
 	}
 
-	IDetailViewerPreviewControlView IMediaItemFactory.CreateDetailViewerPreviewControlView(IMediaItemViewModel fileViewModel) {
-		return this.CreateDetailViewerPreviewControlView((TFileViewModel)fileViewModel);
-	}
-
-	IThumbnailControlView IMediaItemFactory.CreateThumbnailControlView(IMediaItemViewModel fileViewModel) {
-		return this.CreateThumbnailControlView((TFileViewModel)fileViewModel);
-	}
-
-	IThumbnailPickerViewModel IMediaItemFactory.CreateThumbnailPickerViewModel() {
+	IThumbnailPickerViewModel IMediaItemFactoryCore.CreateThumbnailPickerViewModel() {
 		return this.CreateThumbnailPickerViewModel();
 	}
 
-	IThumbnailPickerView IMediaItemFactory.CreateThumbnailPickerView() {
-		return this.CreateThumbnailPickerView();
-	}
-
-	IExecutionProgramObjectModel IMediaItemFactory.CreateExecutionProgramObjectModel() {
+	IExecutionProgramObjectModel IMediaItemFactoryCore.CreateExecutionProgramObjectModel() {
 		return this.CreateExecutionProgramObjectModel();
 	}
 
 	public IExecutionProgramConfigViewModel CreateExecutionProgramConfigViewModel(IExecutionProgramObjectModel model) {
 		return this.CreateExecutionProgramConfigViewModel((TExecutionProgramObjectModel)model);
-	}
-
-	public IExecutionConfigView CreateExecutionConfigView(IExecutionProgramConfigViewModel viewModel) {
-		return this.CreateExecutionConfigView((TExecutionProgramConfigViewModel)viewModel);
 	}
 }

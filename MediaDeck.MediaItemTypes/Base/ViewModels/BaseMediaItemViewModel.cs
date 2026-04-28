@@ -13,7 +13,7 @@ using MediaDeck.Composition.Objects;
 namespace MediaDeck.MediaItemTypes.Base.ViewModels;
 
 public abstract class BaseMediaItemViewModel : ViewModelBase, IMediaItemViewModel {
-	protected BaseMediaItemViewModel(IMediaItemModel fileModel, IMediaItemFactory mediaItemFactory, MediaType mediaType) {
+	protected BaseMediaItemViewModel(IMediaItemModel fileModel, IMediaItemFactoryCore mediaItemFactory, MediaType mediaType) {
 		this.FileModel = fileModel;
 		this.FilePath = fileModel.FilePath;
 		this.ThumbnailFilePath = new($"file:///{fileModel.ThumbnailFilePath ?? FilePathConstants.NoThumbnailFilePath}");
@@ -21,7 +21,7 @@ public abstract class BaseMediaItemViewModel : ViewModelBase, IMediaItemViewMode
 		this.Properties = fileModel.Properties;
 		this.MediaType = mediaType;
 		this.Location = fileModel.Location;
-		this._mediaItemFactory = mediaItemFactory;
+		this._mediaItemFactory = (IMediaItemFactory)mediaItemFactory; // TODO: 無理やりキャストなんとかする
 	}
 
 	private long _thumbnailRefreshTicks = 0;

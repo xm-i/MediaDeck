@@ -1,0 +1,66 @@
+using MediaDeck.Composition.Enum;
+using MediaDeck.Composition.Interfaces.MediaItemTypes;
+using MediaDeck.Composition.Interfaces.Tags;
+using MediaDeck.Composition.Stores.Config.Model;
+using MediaDeck.Database.Tables;
+using MediaDeck.MediaItemTypes.Base;
+using MediaDeck.MediaItemTypes.Base.Models;
+using MediaDeck.MediaItemTypes.Base.ViewModels;
+using MediaDeck.MediaItemTypes.Pdf.Models;
+using MediaDeck.MediaItemTypes.Pdf.ViewModels;
+
+using Microsoft.Extensions.DependencyInjection;
+
+namespace MediaDeck.MediaItemTypes.Pdf;
+
+public class PdfMediaItemFactoryCore : BaseMediaItemFactoryCore<PdfMediaItemOperator, PdfMediaItemModel, DefaultExecutionProgramObjectModel, PdfMediaItemViewModel, DefaultExecutionProgramConfigViewModel, PdfThumbnailPickerViewModel> {
+	private readonly PdfMediaItemOperator _PdfMediaItemOperator;
+	private readonly IServiceProvider _serviceProvider;
+	private readonly IMediaItemTypeProvider _mediaItemTypeProvider;
+
+	public PdfMediaItemFactoryCore(
+		PdfMediaItemOperator PdfMediaItemOperator,
+		ConfigModel config,
+		ITagsManager tagsManager,
+		IMediaItemTypeProvider mediaItemTypeProvider,
+		IServiceProvider serviceProvider)
+		: base(config, tagsManager, MediaType.Pdf) {
+		this._PdfMediaItemOperator = PdfMediaItemOperator;
+		this._serviceProvider = serviceProvider;
+		this._mediaItemTypeProvider = mediaItemTypeProvider;
+	}
+
+	public override PdfMediaItemOperator CreateMediaItemOperator() {
+		return this._PdfMediaItemOperator;
+	}
+
+	public override ItemType ItemType {
+		get {
+			return ItemType.Pdf;
+		}
+	}
+
+	public override PdfMediaItemModel CreateMediaItemModelFromRecord(MediaItem MediaItem, IServiceProvider scopedServiceProvider) {
+		var ifm = new PdfMediaItemModel(MediaItem.MediaItemId, MediaItem.FilePath, this._PdfMediaItemOperator, this._mediaItemTypeProvider, scopedServiceProvider);
+		this.SetModelProperties(ifm, MediaItem);
+		return ifm;
+	}
+
+	public override PdfMediaItemViewModel CreateMediaItemViewModel(PdfMediaItemModel fileModel) {
+		return new PdfMediaItemViewModel(fileModel, this);
+	}
+
+	public override PdfThumbnailPickerViewModel CreateThumbnailPickerViewModel() {
+		return this._serviceProvider.GetRequiredService<PdfThumbnailPickerViewModel>();
+	}
+
+	public override DefaultExecutionProgramObjectModel CreateExecutionProgramObjectModel() {
+		return new DefaultExecutionProgramObjectModel() {
+			MediaType = this.MediaType
+		};
+	}
+
+	public override DefaultExecutionProgramConfigViewModel CreateExecutionProgramConfigViewModel(DefaultExecutionProgramObjectModel model) {
+		return new DefaultExecutionProgramConfigViewModel(model, this._serviceProvider.GetRequiredService<IMediaItemTypeService>(), this._serviceProvider.GetRequiredService<ExecutionConfigModel>());
+	}
+}

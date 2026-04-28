@@ -5,4 +5,4 @@ using MediaDeck.MediaItemTypes.Base.ViewModels;
 
 namespace MediaDeck.MediaItemTypes.Archive.ViewModels;
 
-public class ArchiveMediaItemViewModel(IMediaItemModel fileModel, IMediaItemFactory mediaItemFactory) : BaseMediaItemViewModel(fileModel, mediaItemFactory, MediaType.Archive);
+public class ArchiveMediaItemViewModel(IMediaItemModel fileModel, IMediaItemFactoryCore mediaItemFactory) : BaseMediaItemViewModel(fileModel, mediaItemFactory, MediaType.Archive);

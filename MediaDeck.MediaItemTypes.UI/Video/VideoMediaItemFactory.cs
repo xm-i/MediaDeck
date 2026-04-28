@@ -1,26 +1,22 @@
-using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.MediaItemTypes;
+using MediaDeck.Composition.Interfaces.MediaItemTypes.ViewModels;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.Views;
 using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Composition.Stores.Config.Model;
-using MediaDeck.Database.Tables;
 using MediaDeck.MediaItemTypes.Base.Models;
 using MediaDeck.MediaItemTypes.Base.ViewModels;
-using MediaDeck.MediaItemTypes.UI.Base;
 using MediaDeck.MediaItemTypes.UI.Base.Views;
 using MediaDeck.MediaItemTypes.UI.Video.Views;
+using MediaDeck.MediaItemTypes.Video;
 using MediaDeck.MediaItemTypes.Video.Models;
 using MediaDeck.MediaItemTypes.Video.ViewModels;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace MediaDeck.MediaItemTypes.UI.Video;
 
 [Inject(InjectServiceLifetime.Singleton, typeof(IMediaItemFactory))]
-public class VideoMediaItemFactory : BaseMediaItemFactory<VideoMediaItemOperator, VideoMediaItemModel, DefaultExecutionProgramObjectModel, VideoMediaItemViewModel, DefaultExecutionProgramConfigViewModel, VideoDetailViewerPreviewControlView, VideoThumbnailPickerViewModel, VideoThumbnailPickerView, DefaultExecutionConfigView> {
+public class VideoMediaItemFactory : VideoMediaItemFactoryCore,
+	IMediaItemFactory<VideoMediaItemOperator, VideoMediaItemModel, DefaultExecutionProgramObjectModel, VideoMediaItemViewModel, DefaultExecutionProgramConfigViewModel, VideoDetailViewerPreviewControlView, VideoThumbnailPickerViewModel, VideoThumbnailPickerView, DefaultExecutionConfigView> {
 	private VideoDetailViewerPreviewControlView? _videoDetailViewerPreviewControlView;
-	private readonly VideoMediaItemOperator _VideoMediaItemOperator;
-	private readonly IServiceProvider _serviceProvider;
-	private readonly IMediaItemTypeProvider _mediaItemTypeProvider;
 
 	public VideoMediaItemFactory(
 		VideoMediaItemOperator VideoMediaItemOperator,
@@ -28,10 +24,7 @@ public class VideoMediaItemFactory : BaseMediaItemFactory<VideoMediaItemOperator
 		ITagsManager tagsManager,
 		IMediaItemTypeProvider mediaItemTypeProvider,
 		IServiceProvider serviceProvider)
-		: base(config, tagsManager, MediaType.Video) {
-		this._VideoMediaItemOperator = VideoMediaItemOperator;
-		this._serviceProvider = serviceProvider;
-		this._mediaItemTypeProvider = mediaItemTypeProvider;
+		: base(VideoMediaItemOperator, config, tagsManager, mediaItemTypeProvider, serviceProvider) {
 
 		FlyleafLib.Engine.Start(new FlyleafLib.EngineConfig() {
 #if DEBUG
@@ -44,55 +37,38 @@ public class VideoMediaItemFactory : BaseMediaItemFactory<VideoMediaItemOperator
 		});
 	}
 
-	public override VideoMediaItemOperator CreateMediaItemOperator() {
-		return this._VideoMediaItemOperator;
-	}
 
-	public override ItemType ItemType {
-		get {
-			return ItemType.Video;
-		}
-	}
-
-	public override VideoMediaItemModel CreateMediaItemModelFromRecord(MediaItem MediaItem, IServiceProvider scopedServiceProvider) {
-		var ifm = new VideoMediaItemModel(MediaItem.MediaItemId, MediaItem.FilePath, this._VideoMediaItemOperator, this._mediaItemTypeProvider, scopedServiceProvider);
-		this.SetModelProperties(ifm, MediaItem);
-		return ifm;
-	}
-
-	public override VideoMediaItemViewModel CreateMediaItemViewModel(VideoMediaItemModel fileModel) {
-		return new VideoMediaItemViewModel(fileModel, this);
-	}
-
-	public override VideoDetailViewerPreviewControlView CreateDetailViewerPreviewControlView(VideoMediaItemViewModel fileViewModel) {
+	public VideoDetailViewerPreviewControlView CreateDetailViewerPreviewControlView(VideoMediaItemViewModel fileViewModel) {
 		return this._videoDetailViewerPreviewControlView ??= new VideoDetailViewerPreviewControlView();
 	}
 
-	public override VideoThumbnailPickerViewModel CreateThumbnailPickerViewModel() {
-		return this._serviceProvider.GetRequiredService<VideoThumbnailPickerViewModel>();
-	}
-
-	public override IThumbnailControlView CreateThumbnailControlView(VideoMediaItemViewModel fileViewModel) {
+	public IThumbnailControlView CreateThumbnailControlView(VideoMediaItemViewModel fileViewModel) {
 		return new VideoThumbnailControlView { DataContext = fileViewModel };
 	}
 
-	public override VideoThumbnailPickerView CreateThumbnailPickerView() {
+	public VideoThumbnailPickerView CreateThumbnailPickerView() {
 		return new VideoThumbnailPickerView();
 	}
 
-	public override DefaultExecutionProgramObjectModel CreateExecutionProgramObjectModel() {
-		return new DefaultExecutionProgramObjectModel() {
-			MediaType = this.MediaType
-		};
-	}
-
-	public override DefaultExecutionProgramConfigViewModel CreateExecutionProgramConfigViewModel(DefaultExecutionProgramObjectModel model) {
-		return new DefaultExecutionProgramConfigViewModel(model, this._serviceProvider.GetRequiredService<IMediaItemTypeService>(), this._serviceProvider.GetRequiredService<ExecutionConfigModel>());
-	}
-
-	public override DefaultExecutionConfigView CreateExecutionConfigView(DefaultExecutionProgramConfigViewModel viewModel) {
+	public DefaultExecutionConfigView CreateExecutionConfigView(DefaultExecutionProgramConfigViewModel viewModel) {
 		return new DefaultExecutionConfigView() {
 			ViewModel = viewModel
 		};
+	}
+
+	public IDetailViewerPreviewControlView CreateDetailViewerPreviewControlView(IMediaItemViewModel fileViewModel) {
+		return this.CreateDetailViewerPreviewControlView((VideoMediaItemViewModel)fileViewModel);
+	}
+
+	public IThumbnailControlView CreateThumbnailControlView(IMediaItemViewModel fileViewModel) {
+		return this.CreateThumbnailControlView((VideoMediaItemViewModel)fileViewModel);
+	}
+
+	IThumbnailPickerView IMediaItemFactory.CreateThumbnailPickerView() {
+		return this.CreateThumbnailPickerView();
+	}
+
+	public IExecutionConfigView CreateExecutionConfigView(IExecutionProgramConfigViewModel viewModel) {
+		return this.CreateExecutionConfigView((DefaultExecutionProgramConfigViewModel)viewModel);
 	}
 }

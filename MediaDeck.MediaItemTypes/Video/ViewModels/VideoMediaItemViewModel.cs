@@ -5,4 +5,4 @@ using MediaDeck.MediaItemTypes.Base.ViewModels;
 
 namespace MediaDeck.MediaItemTypes.Video.ViewModels;
 
-public class VideoMediaItemViewModel(IMediaItemModel fileModel, IMediaItemFactory mediaItemFactory) : BaseMediaItemViewModel(fileModel, mediaItemFactory, MediaType.Video);
+public class VideoMediaItemViewModel(IMediaItemModel fileModel, IMediaItemFactoryCore mediaItemFactory) : BaseMediaItemViewModel(fileModel, mediaItemFactory, MediaType.Video);

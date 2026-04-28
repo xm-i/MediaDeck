@@ -1,26 +1,22 @@
-using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.MediaItemTypes;
+using MediaDeck.Composition.Interfaces.MediaItemTypes.ViewModels;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.Views;
 using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Composition.Stores.Config.Model;
-using MediaDeck.Database.Tables;
 using MediaDeck.MediaItemTypes.Base.Models;
 using MediaDeck.MediaItemTypes.Base.ViewModels;
-using MediaDeck.MediaItemTypes.UI.Base;
 using MediaDeck.MediaItemTypes.UI.Base.Views;
 using MediaDeck.MediaItemTypes.UI.Unknown.Views;
+using MediaDeck.MediaItemTypes.Unknown;
 using MediaDeck.MediaItemTypes.Unknown.Models;
 using MediaDeck.MediaItemTypes.Unknown.ViewModels;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace MediaDeck.MediaItemTypes.UI.Unknown;
 
 [Inject(InjectServiceLifetime.Singleton, typeof(IMediaItemFactory))]
-public class UnknownMediaItemFactory : BaseMediaItemFactory<UnknownMediaItemOperator, UnknownMediaItemModel, DefaultExecutionProgramObjectModel, UnknownMediaItemViewModel, DefaultExecutionProgramConfigViewModel, UnknownDetailViewerPreviewControlView, UnknownThumbnailPickerViewModel, UnknownThumbnailPickerView, DefaultExecutionConfigView> {
+public class UnknownMediaItemFactory : UnknownMediaItemFactoryCore,
+	IMediaItemFactory<UnknownMediaItemOperator, UnknownMediaItemModel, DefaultExecutionProgramObjectModel, UnknownMediaItemViewModel, DefaultExecutionProgramConfigViewModel, UnknownDetailViewerPreviewControlView, UnknownThumbnailPickerViewModel, UnknownThumbnailPickerView, DefaultExecutionConfigView> {
 	private UnknownDetailViewerPreviewControlView? _unknownDetailViewerPreviewControlView;
-	private readonly UnknownMediaItemOperator _UnknownMediaItemOperator;
-	private readonly IServiceProvider _serviceProvider;
-	private readonly IMediaItemTypeProvider _mediaItemTypeProvider;
 
 	public UnknownMediaItemFactory(
 		UnknownMediaItemOperator UnknownMediaItemOperator,
@@ -28,63 +24,41 @@ public class UnknownMediaItemFactory : BaseMediaItemFactory<UnknownMediaItemOper
 		ITagsManager tagsManager,
 		IMediaItemTypeProvider mediaItemTypeProvider,
 		IServiceProvider serviceProvider)
-		: base(config, tagsManager, MediaType.Unknown) {
-		this._UnknownMediaItemOperator = UnknownMediaItemOperator;
-		this._serviceProvider = serviceProvider;
-		this._mediaItemTypeProvider = mediaItemTypeProvider;
+		: base(UnknownMediaItemOperator, config, tagsManager, mediaItemTypeProvider, serviceProvider) {
 	}
 
-	public override UnknownMediaItemOperator CreateMediaItemOperator() {
-		return this._UnknownMediaItemOperator;
-	}
-
-	public override ItemType ItemType {
-		get {
-			return ItemType.Unknown;
-		}
-	}
-
-
-	public override UnknownMediaItemModel CreateMediaItemModelFromRecord(MediaItem MediaItem, IServiceProvider scopedServiceProvider) {
-		var ifm = new UnknownMediaItemModel(MediaItem.MediaItemId, MediaItem.FilePath, this.CreateMediaItemOperator(), this._mediaItemTypeProvider, scopedServiceProvider);
-		this.SetModelProperties(ifm, MediaItem);
-		return ifm;
-	}
-
-	public override UnknownMediaItemViewModel CreateMediaItemViewModel(UnknownMediaItemModel fileModel) {
-		return new UnknownMediaItemViewModel(fileModel, this);
-	}
-
-	public override UnknownDetailViewerPreviewControlView CreateDetailViewerPreviewControlView(UnknownMediaItemViewModel fileViewModel) {
+	public UnknownDetailViewerPreviewControlView CreateDetailViewerPreviewControlView(UnknownMediaItemViewModel fileViewModel) {
 		return this._unknownDetailViewerPreviewControlView ??= new UnknownDetailViewerPreviewControlView();
 	}
 
-	public override UnknownThumbnailPickerViewModel CreateThumbnailPickerViewModel() {
-		return this._serviceProvider.GetRequiredService<UnknownThumbnailPickerViewModel>();
-	}
-
-	public override IThumbnailControlView CreateThumbnailControlView(UnknownMediaItemViewModel fileViewModel) {
+	public IThumbnailControlView CreateThumbnailControlView(UnknownMediaItemViewModel fileViewModel) {
 		return new UnknownThumbnailControlView { DataContext = fileViewModel };
 	}
 
-	public override UnknownThumbnailPickerView CreateThumbnailPickerView() {
+	public UnknownThumbnailPickerView CreateThumbnailPickerView() {
 		return new UnknownThumbnailPickerView();
 	}
 
 
-	public override DefaultExecutionProgramObjectModel CreateExecutionProgramObjectModel() {
-		return new DefaultExecutionProgramObjectModel() {
-			MediaType = this.MediaType
-		};
-	}
-
-	public override DefaultExecutionProgramConfigViewModel CreateExecutionProgramConfigViewModel(DefaultExecutionProgramObjectModel model) {
-		return new DefaultExecutionProgramConfigViewModel(model, this._serviceProvider.GetRequiredService<IMediaItemTypeService>(), this._serviceProvider.GetRequiredService<ExecutionConfigModel>());
-	}
-
-	public override DefaultExecutionConfigView CreateExecutionConfigView(DefaultExecutionProgramConfigViewModel viewModel) {
+	public DefaultExecutionConfigView CreateExecutionConfigView(DefaultExecutionProgramConfigViewModel viewModel) {
 		return new DefaultExecutionConfigView() {
 			ViewModel = viewModel
 		};
+	}
+
+	public IDetailViewerPreviewControlView CreateDetailViewerPreviewControlView(IMediaItemViewModel fileViewModel) {
+		return this.CreateDetailViewerPreviewControlView((UnknownMediaItemViewModel)fileViewModel);
+	}
+
+	public IThumbnailControlView CreateThumbnailControlView(IMediaItemViewModel fileViewModel) {
+		return this.CreateThumbnailControlView((UnknownMediaItemViewModel)fileViewModel);
+	}
+
+	IThumbnailPickerView IMediaItemFactory.CreateThumbnailPickerView() {
+		return this.CreateThumbnailPickerView();
+	}
+
+	public IExecutionConfigView CreateExecutionConfigView(IExecutionProgramConfigViewModel viewModel) {
+		return this.CreateExecutionConfigView((DefaultExecutionProgramConfigViewModel)viewModel);
 	}
 }
