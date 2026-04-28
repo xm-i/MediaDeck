@@ -11,7 +11,7 @@ namespace MediaDeck.ViewModels;
 public class MainWindowViewModel : ViewModelBase {
 	private readonly IServiceProvider _rootServiceProvider;
 	private readonly IStateStore _stateStore;
-	private readonly ISynchronizedView<TabStateModel, TabContext> _tabsView;
+
 
 	public MainWindowViewModel(
 		IServiceProvider serviceProvider,
@@ -22,9 +22,13 @@ public class MainWindowViewModel : ViewModelBase {
 		this._stateStore = stateStore;
 		this.NavigationMenuViewModel = navigationMenuViewModel;
 
-		this._tabsView = stateStore.RootState.Tabs.CreateView(tabState => new TabContext(tabState));
-		this._tabsView.ObserveRemove().Subscribe(e => e.Value.View.Dispose()).AddTo(this.CompositeDisposable);
-		this.Tabs = this._tabsView.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
+		this.Tabs = stateStore.RootState.Tabs.ToWritableNotifyCollectionChanged(
+			tabState => new TabContext(tabState),
+			(TabContext tabContext, TabStateModel tabState, ref bool setValue) => {
+				setValue = true;
+				return tabContext.TabState;
+			},
+			SynchronizationContextCollectionEventDispatcher.Current);
 
 		this.WindowActivatedCommand.Subscribe(_ => {
 			backgroundTasksViewModel.Start();
@@ -33,7 +37,7 @@ public class MainWindowViewModel : ViewModelBase {
 			if (!this.Tabs.Any()) {
 				this.AddTab();
 			} else {
-				var idx = Math.Clamp(stateStore.RootState.ActiveTabIndex, 0, this._tabsView.Count - 1);
+				var idx = Math.Clamp(stateStore.RootState.ActiveTabIndex, 0, ((IReadOnlyList<TabContext>)this.Tabs).Count - 1);
 				this.SelectedTab.Value = this.Tabs.ElementAt(idx);
 			}
 		}).AddTo(this.CompositeDisposable);
@@ -95,6 +99,7 @@ public class MainWindowViewModel : ViewModelBase {
 	/// 指定タブを閉じる
 	/// </summary>
 	public void CloseTab(TabContext tab) {
+		tab.Dispose();
 		this._stateStore.UnregisterTab(tab.TabState);
 
 		if (this.SelectedTab.Value == tab) {
@@ -118,7 +123,7 @@ public class MainWindowViewModel : ViewModelBase {
 			foreach (var tab in this.Tabs) {
 				tab.Dispose();
 			}
-			this._tabsView.Dispose();
+			this.Tabs.Dispose();
 		}
 		base.Dispose(disposing);
 	}
