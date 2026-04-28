@@ -138,7 +138,7 @@ public class MediaItemTypeServiceTest {
 
 	[Fact]
 	public void GetMediaItemType_ByPath_UsesMatchingType() {
-		var result = this._service.GetMediaItemType(@"C:\media\sample.jpg");
+		var result = this._service.GetMediaItemFactory(@"C:\media\sample.jpg");
 
 		result.ShouldBeSameAs(ImageMediaItemType);
 	}
@@ -147,7 +147,7 @@ public class MediaItemTypeServiceTest {
 	public void GetMediaItemType_ByMediaItem_UsesItemTypeMapping() {
 		var mediaItem = CreateMediaItem(@"C:\media\sample.mp4");
 
-		var result = this._service.GetMediaItemType(mediaItem);
+		var result = this._service.GetMediaItemFactory(mediaItem);
 
 		result.ShouldBeSameAs(VideoMediaItemType);
 	}
@@ -186,7 +186,7 @@ public class MediaItemTypeServiceTest {
 		return new MediaItem { DirectoryPath = Path.GetDirectoryName(filePath) ?? string.Empty, FilePath = filePath, Description = string.Empty, MediaItemTags = new List<MediaItemTag>(), ItemType = itemType };
 	}
 
-	private sealed class TestMediaItemType : IMediaItemType {
+	private sealed class TestMediaItemType : IMediaItemFactory {
 		public TestMediaItemType(MediaType mediaType, string createdBy) {
 			this.MediaType = mediaType;
 			this.CreatedBy = createdBy;

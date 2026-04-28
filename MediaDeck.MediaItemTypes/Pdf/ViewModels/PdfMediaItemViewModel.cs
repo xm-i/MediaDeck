@@ -5,5 +5,5 @@ using MediaDeck.MediaItemTypes.Base.ViewModels;
 
 namespace MediaDeck.MediaItemTypes.Pdf.ViewModels;
 
-public class PdfMediaItemViewModel(IMediaItemModel fileModel, IMediaItemType mediaItemType) : BaseMediaItemViewModel(fileModel, mediaItemType, MediaType.Pdf) {
+public class PdfMediaItemViewModel(IMediaItemModel fileModel, IMediaItemFactory mediaItemFactory) : BaseMediaItemViewModel(fileModel, mediaItemFactory, MediaType.Pdf) {
 }

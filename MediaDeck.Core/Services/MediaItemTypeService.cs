@@ -11,98 +11,98 @@ namespace MediaDeck.Core.Services;
 /// メディアアイテムタイプに関連する操作を提供するサービス実装クラス
 /// </summary>
 [Inject(InjectServiceLifetime.Singleton, typeof(IMediaItemTypeService))]
-public class MediaItemTypeService(IEnumerable<IMediaItemType> MediaItemTypes) : IMediaItemTypeService {
-	private readonly IMediaItemType[] _MediaItemTypes = MediaItemTypes.ToArray();
-	private readonly IMediaItemType _UnknownMediaItemType = MediaItemTypes.First(x => x.MediaType == MediaType.Unknown);
+public class MediaItemTypeService(IEnumerable<IMediaItemFactory> mediaItemFactories) : IMediaItemTypeService {
+	private readonly IMediaItemFactory[] _mediaItemFactories = mediaItemFactories.ToArray();
+	private readonly IMediaItemFactory _unknownMediaItemFactory = mediaItemFactories.First(x => x.MediaType == MediaType.Unknown);
 
 	/// <inheritdoc />
 	public IMediaItemModel CreateMediaItemModelFromRecord(MediaItem MediaItem, IServiceProvider scopedServiceProvider) {
-		return this.GetMediaItemType(MediaItem).CreateMediaItemModelFromRecord(MediaItem, scopedServiceProvider);
+		return this.GetMediaItemFactory(MediaItem).CreateMediaItemModelFromRecord(MediaItem, scopedServiceProvider);
 	}
 
 	/// <inheritdoc />
 	public IMediaItemViewModel CreateMediaItemViewModel(IMediaItemModel fileModel) {
-		return this.GetMediaItemType(fileModel).CreateMediaItemViewModel(fileModel);
+		return this.GetMediaItemFactory(fileModel).CreateMediaItemViewModel(fileModel);
 	}
 
 	/// <inheritdoc />
 	public IDetailViewerPreviewControlView CreateDetailViewerPreviewControlView(IMediaItemViewModel fileViewModel) {
-		return this.GetMediaItemType(fileViewModel).CreateDetailViewerPreviewControlView(fileViewModel);
+		return this.GetMediaItemFactory(fileViewModel).CreateDetailViewerPreviewControlView(fileViewModel);
 	}
 
 	/// <inheritdoc />
 	public IThumbnailPickerViewModel CreateThumbnailPickerViewModel(IMediaItemViewModel fileViewModel) {
-		return this.GetMediaItemType(fileViewModel).CreateThumbnailPickerViewModel();
+		return this.GetMediaItemFactory(fileViewModel).CreateThumbnailPickerViewModel();
 	}
 
 	/// <inheritdoc />
 	public IThumbnailPickerView CreateThumbnailPickerView(IMediaItemViewModel fileViewModel) {
-		return this.GetMediaItemType(fileViewModel).CreateThumbnailPickerView();
+		return this.GetMediaItemFactory(fileViewModel).CreateThumbnailPickerView();
 	}
 
 	/// <inheritdoc />
 	public IMediaItemOperator[] CreateMediaItemOperators() {
-		return this._MediaItemTypes.Select(x => x.CreateMediaItemOperator()).ToArray();
+		return this._mediaItemFactories.Select(x => x.CreateMediaItemOperator()).ToArray();
 	}
 
 	/// <inheritdoc />
 	public IQueryable<MediaItem> IncludeTables(IQueryable<MediaItem> MediaItems) {
 		var result = MediaItems;
-		foreach (var MediaItemType in this._MediaItemTypes) {
+		foreach (var MediaItemType in this._mediaItemFactories) {
 			result = MediaItemType.IncludeTables(result);
 		}
 		return result;
 	}
 
 	/// <inheritdoc />
-	public IMediaItemType GetMediaItemType(string path) {
-		return this._MediaItemTypes.FirstOrDefault(x => x.IsTargetPath(path)) ?? this._UnknownMediaItemType;
+	public IMediaItemFactory GetMediaItemFactory(string path) {
+		return this._mediaItemFactories.FirstOrDefault(x => x.IsTargetPath(path)) ?? this._unknownMediaItemFactory;
 	}
 
 	/// <inheritdoc />
-	public IMediaItemType GetMediaItemType(MediaType mediaType) {
-		return this._MediaItemTypes.First(x => x.MediaType == mediaType);
+	public IMediaItemFactory GetMediaItemFactory(MediaType mediaType) {
+		return this._mediaItemFactories.First(x => x.MediaType == mediaType);
 	}
 
 	/// <inheritdoc />
-	public IMediaItemType GetMediaItemType(MediaItem MediaItem) {
-		return this._MediaItemTypes.FirstOrDefault(x => x.ItemType == MediaItem.ItemType) ?? this._UnknownMediaItemType;
+	public IMediaItemFactory GetMediaItemFactory(MediaItem MediaItem) {
+		return this._mediaItemFactories.FirstOrDefault(x => x.ItemType == MediaItem.ItemType) ?? this._unknownMediaItemFactory;
 	}
 
 	/// <inheritdoc />
 	public bool IsTargetPath(string path) {
-		return this._MediaItemTypes.Any(x => x.MediaType != MediaType.Unknown && x.IsTargetPath(path));
+		return this._mediaItemFactories.Any(x => x.IsTargetPath(path));
 	}
 
 	/// <inheritdoc />
 	public bool IsTargetPath(string path, MediaType mediaType) {
-		var mediaItemType = this._MediaItemTypes.FirstOrDefault(x => x.MediaType == mediaType);
-		return mediaItemType is not null && mediaItemType.IsTargetPath(path);
+		var mediaItemFactory = this._mediaItemFactories.FirstOrDefault(x => x.MediaType == mediaType);
+		return mediaItemFactory is not null && mediaItemFactory.IsTargetPath(path);
 	}
 
 	/// <inheritdoc />
 	public IExecutionProgramObjectModel CreateExecutionProgramObjectModel(MediaType mediaType) {
-		var mediaItemType = this._MediaItemTypes.First(x => x.MediaType == mediaType);
-		return mediaItemType.CreateExecutionProgramObjectModel();
+		var mediaItemFactory = this._mediaItemFactories.First(x => x.MediaType == mediaType);
+		return mediaItemFactory.CreateExecutionProgramObjectModel();
 	}
 
 	/// <inheritdoc />
 	public IExecutionProgramConfigViewModel CreateExecutionConfigViewModel(IExecutionProgramObjectModel model) {
-		var mediaItemType = this._MediaItemTypes.First(x => x.MediaType == model.MediaType);
-		return mediaItemType.CreateExecutionProgramConfigViewModel(model);
+		var mediaItemFactory = this._mediaItemFactories.First(x => x.MediaType == model.MediaType);
+		return mediaItemFactory.CreateExecutionProgramConfigViewModel(model);
 	}
 
 	/// <inheritdoc />
 	public IExecutionConfigView CreateExecutionConfigView(IExecutionProgramConfigViewModel viewModel) {
-		var mediaItemType = this._MediaItemTypes.First(x => x.MediaType == viewModel.MediaType);
-		return mediaItemType.CreateExecutionConfigView(viewModel);
+		var mediaItemFactory = this._mediaItemFactories.First(x => x.MediaType == viewModel.MediaType);
+		return mediaItemFactory.CreateExecutionConfigView(viewModel);
 	}
 
-	private IMediaItemType GetMediaItemType(IMediaItemModel fileModel) {
-		return this._MediaItemTypes.FirstOrDefault(x => x.MediaType == fileModel.MediaType) ?? this._UnknownMediaItemType;
+	private IMediaItemFactory GetMediaItemFactory(IMediaItemModel fileModel) {
+		return this._mediaItemFactories.FirstOrDefault(x => x.MediaType == fileModel.MediaType) ?? this._unknownMediaItemFactory;
 	}
 
-	private IMediaItemType GetMediaItemType(IMediaItemViewModel fileViewModel) {
-		return this._MediaItemTypes.FirstOrDefault(x => x.MediaType == fileViewModel.MediaType) ?? this._UnknownMediaItemType;
+	private IMediaItemFactory GetMediaItemFactory(IMediaItemViewModel fileViewModel) {
+		return this._mediaItemFactories.FirstOrDefault(x => x.MediaType == fileViewModel.MediaType) ?? this._unknownMediaItemFactory;
 	}
 }

@@ -5,5 +5,5 @@ using MediaDeck.MediaItemTypes.Base.ViewModels;
 
 namespace MediaDeck.MediaItemTypes.Image.ViewModels;
 
-public class ImageMediaItemViewModel(IMediaItemModel fileModel, IMediaItemType mediaItemType) : BaseMediaItemViewModel(fileModel, mediaItemType, MediaType.Image) {
+public class ImageMediaItemViewModel(IMediaItemModel fileModel, IMediaItemFactory mediaItemFactory) : BaseMediaItemViewModel(fileModel, mediaItemFactory, MediaType.Image) {
 }

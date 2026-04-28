@@ -6,7 +6,7 @@ using MediaDeck.Database.Tables;
 
 namespace MediaDeck.Composition.Interfaces.MediaItemTypes;
 
-public interface IMediaItemType<TFileOperator, TFileModel, TExecutionProgramObjectModel, TFileViewModel, TExecutionProgramConfigViewModel, TDetailViewerPreviewControlView, TThumbnailPickerViewModel, TThumbnailPickerView, TExecutionConfigView> : IMediaItemType
+public interface IMediaItemFactory<TFileOperator, TFileModel, TExecutionProgramObjectModel, TFileViewModel, TExecutionProgramConfigViewModel, TDetailViewerPreviewControlView, TThumbnailPickerViewModel, TThumbnailPickerView, TExecutionConfigView> : IMediaItemFactory
 	where TFileOperator : IMediaItemOperator
 	where TFileModel : IMediaItemModel
 	where TExecutionProgramObjectModel : IExecutionProgramObjectModel
@@ -33,7 +33,7 @@ public interface IMediaItemType<TFileOperator, TFileModel, TExecutionProgramObje
 	public TExecutionConfigView CreateExecutionConfigView(TExecutionProgramConfigViewModel viewModel);
 }
 
-public interface IMediaItemType {
+public interface IMediaItemFactory {
 	public MediaType MediaType {
 		get;
 	}

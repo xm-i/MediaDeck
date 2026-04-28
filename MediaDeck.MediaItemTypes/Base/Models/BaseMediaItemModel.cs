@@ -12,7 +12,7 @@ using MediaDeck.Composition.Objects;
 namespace MediaDeck.MediaItemTypes.Base.Models;
 
 public abstract class BaseMediaItemModel : ModelBase, IMediaItemModel {
-	private readonly IMediaItemType _mediaItemType;
+	private readonly IMediaItemFactory _mediaItemFactory;
 	private readonly IServiceProvider _scopedServiceProvider;
 
 	protected IMediaItemOperator FileOperator {
@@ -34,9 +34,9 @@ public abstract class BaseMediaItemModel : ModelBase, IMediaItemModel {
 	/// <param name="filePath">ファイルパス</param>
 	/// <param name="fileOperator">ファイルオペレーター</param>
 	/// <param name="mediaType">メディアタイプ</param>
-	/// <param name="mediaItemType">このモデルに対応するメディアアイテムタイプ。実行ロジック等の委譲先。</param>
-	public BaseMediaItemModel(long id, string filePath, IMediaItemOperator fileOperator, MediaType mediaType, IMediaItemType mediaItemType, IServiceProvider scopedServiceProvider) : base() {
-		this._mediaItemType = mediaItemType;
+	/// <param name="mediaItemFactory">このモデルに対応するメディアアイテムタイプ。実行ロジック等の委譲先。</param>
+	public BaseMediaItemModel(long id, string filePath, IMediaItemOperator fileOperator, MediaType mediaType, IMediaItemFactory mediaItemFactory, IServiceProvider scopedServiceProvider) : base() {
+		this._mediaItemFactory = mediaItemFactory;
 		this._scopedServiceProvider = scopedServiceProvider;
 		this.FileOperator = fileOperator;
 		this.Id = id;
@@ -194,7 +194,7 @@ public abstract class BaseMediaItemModel : ModelBase, IMediaItemModel {
 	/// ファイルを実行する。実行ロジックは IMediaItemType.ExecuteAsync に委譲する。
 	/// </summary>
 	public async Task ExecuteFileAsync() {
-		await this._mediaItemType.ExecuteAsync(this.FilePath, this._scopedServiceProvider);
+		await this._mediaItemFactory.ExecuteAsync(this.FilePath, this._scopedServiceProvider);
 		await this.IncrementUsageCountAsync();
 	}
 }

@@ -16,13 +16,13 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace MediaDeck.MediaItemTypes.UI.FolderGroup;
 
-[Inject(InjectServiceLifetime.Singleton, typeof(IMediaItemType))]
-public class FolderGroupMediaItemType : BaseMediaItemType<FolderGroupMediaItemOperator, FolderGroupMediaItemModel, FolderGroupExecutionProgramObjectModel, FolderGroupMediaItemViewModel, FolderGroupExecutionProgramConfigViewModel, FolderGroupDetailViewerPreviewControlView, FolderGroupThumbnailPickerViewModel, FolderGroupThumbnailPickerView, FolderGroupExecutionConfigView> {
+[Inject(InjectServiceLifetime.Singleton, typeof(IMediaItemFactory))]
+public class FolderGroupMediaItemFactory : BaseMediaItemFactory<FolderGroupMediaItemOperator, FolderGroupMediaItemModel, FolderGroupExecutionProgramObjectModel, FolderGroupMediaItemViewModel, FolderGroupExecutionProgramConfigViewModel, FolderGroupDetailViewerPreviewControlView, FolderGroupThumbnailPickerViewModel, FolderGroupThumbnailPickerView, FolderGroupExecutionConfigView> {
 	private FolderGroupDetailViewerPreviewControlView? _detailViewerPreviewControlView;
 	private readonly FolderGroupMediaItemOperator _fileOperator;
 	private readonly IServiceProvider _serviceProvider;
 
-	public FolderGroupMediaItemType(
+	public FolderGroupMediaItemFactory(
 		FolderGroupMediaItemOperator fileOperator,
 		ConfigModel config,
 		ITagsManager tagsManager,

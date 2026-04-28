@@ -48,17 +48,17 @@ public interface IMediaItemTypeService {
 	/// <summary>
 	/// パスに対応するメディアアイテムタイプを取得します。
 	/// </summary>
-	public IMediaItemType GetMediaItemType(string path);
+	public IMediaItemFactory GetMediaItemFactory(string path);
 
 	/// <summary>
 	/// 指定したメディアタイプに対応するメディアアイテムタイプを取得します。
 	/// </summary>
-	public IMediaItemType GetMediaItemType(MediaType mediaType);
+	public IMediaItemFactory GetMediaItemFactory(MediaType mediaType);
 
 	/// <summary>
 	/// レコードに対応するメディアアイテムタイプを取得します。
 	/// </summary>
-	public IMediaItemType GetMediaItemType(MediaItem MediaItem);
+	public IMediaItemFactory GetMediaItemFactory(MediaItem MediaItem);
 
 	/// <summary>
 	/// パスがいずれかのメディアアイテムタイプの対象かどうかを取得します。

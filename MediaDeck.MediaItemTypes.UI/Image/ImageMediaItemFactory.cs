@@ -15,13 +15,13 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace MediaDeck.MediaItemTypes.UI.Image;
 
-[Inject(InjectServiceLifetime.Singleton, typeof(IMediaItemType))]
-public class ImageMediaItemType : BaseMediaItemType<ImageMediaItemOperator, ImageMediaItemModel, DefaultExecutionProgramObjectModel, ImageMediaItemViewModel, DefaultExecutionProgramConfigViewModel, ImageDetailViewerPreviewControlView, ImageThumbnailPickerViewModel, ImageThumbnailPickerView, DefaultExecutionConfigView> {
+[Inject(InjectServiceLifetime.Singleton, typeof(IMediaItemFactory))]
+public class ImageMediaItemFactory : BaseMediaItemFactory<ImageMediaItemOperator, ImageMediaItemModel, DefaultExecutionProgramObjectModel, ImageMediaItemViewModel, DefaultExecutionProgramConfigViewModel, ImageDetailViewerPreviewControlView, ImageThumbnailPickerViewModel, ImageThumbnailPickerView, DefaultExecutionConfigView> {
 	private ImageDetailViewerPreviewControlView? _imageDetailViewerPreviewControlView;
 	private readonly ImageMediaItemOperator _ImageMediaItemOperator;
 	private readonly IServiceProvider _serviceProvider;
 
-	public ImageMediaItemType(
+	public ImageMediaItemFactory(
 		ImageMediaItemOperator ImageMediaItemOperator,
 		ConfigModel config,
 		ITagsManager tagsManager,

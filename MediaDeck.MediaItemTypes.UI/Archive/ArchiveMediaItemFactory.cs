@@ -15,13 +15,13 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace MediaDeck.MediaItemTypes.UI.Archive;
 
-[Inject(InjectServiceLifetime.Singleton, typeof(IMediaItemType))]
-public class ArchiveMediaItemType : BaseMediaItemType<ArchiveMediaItemOperator, ArchiveMediaItemModel, DefaultExecutionProgramObjectModel, ArchiveMediaItemViewModel, DefaultExecutionProgramConfigViewModel, ArchiveDetailViewerPreviewControlView, ArchiveThumbnailPickerViewModel, ArchiveThumbnailPickerView, DefaultExecutionConfigView> {
+[Inject(InjectServiceLifetime.Singleton, typeof(IMediaItemFactory))]
+public class ArchiveMediaItemFactory : BaseMediaItemFactory<ArchiveMediaItemOperator, ArchiveMediaItemModel, DefaultExecutionProgramObjectModel, ArchiveMediaItemViewModel, DefaultExecutionProgramConfigViewModel, ArchiveDetailViewerPreviewControlView, ArchiveThumbnailPickerViewModel, ArchiveThumbnailPickerView, DefaultExecutionConfigView> {
 	private ArchiveDetailViewerPreviewControlView? _archiveDetailViewerPreviewControlView;
 	private readonly ArchiveMediaItemOperator _ArchiveMediaItemOperator;
 	private readonly IServiceProvider _serviceProvider;
 
-	public ArchiveMediaItemType(
+	public ArchiveMediaItemFactory(
 		ArchiveMediaItemOperator ArchiveMediaItemOperator,
 		ConfigModel config,
 		ITagsManager tagsManager,

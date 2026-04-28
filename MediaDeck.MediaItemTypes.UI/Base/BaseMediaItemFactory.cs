@@ -15,8 +15,8 @@ using MediaDeck.MediaItemTypes.Base.Models;
 
 namespace MediaDeck.MediaItemTypes.UI.Base;
 
-public abstract class BaseMediaItemType<TFileOperator, TFileModel, TExecutionProgramObjectModel, TFileViewModel, TExecutionProgramConfigViewModel, TDetailViewerPreviewControlView, TThumbnailPickerViewModel, TThumbnailPickerView, TExecutionConfigView>
-	: IMediaItemType<TFileOperator, TFileModel, TExecutionProgramObjectModel, TFileViewModel, TExecutionProgramConfigViewModel, TDetailViewerPreviewControlView, TThumbnailPickerViewModel, TThumbnailPickerView, TExecutionConfigView>
+public abstract class BaseMediaItemFactory<TFileOperator, TFileModel, TExecutionProgramObjectModel, TFileViewModel, TExecutionProgramConfigViewModel, TDetailViewerPreviewControlView, TThumbnailPickerViewModel, TThumbnailPickerView, TExecutionConfigView>
+	: IMediaItemFactory<TFileOperator, TFileModel, TExecutionProgramObjectModel, TFileViewModel, TExecutionProgramConfigViewModel, TDetailViewerPreviewControlView, TThumbnailPickerViewModel, TThumbnailPickerView, TExecutionConfigView>
 	where TFileOperator : IMediaItemOperator
 	where TFileModel : IMediaItemModel
 	where TExecutionProgramObjectModel : IExecutionProgramObjectModel
@@ -29,7 +29,7 @@ public abstract class BaseMediaItemType<TFileOperator, TFileModel, TExecutionPro
 	protected readonly ConfigModel _config;
 	protected readonly ITagsManager _tagsManager;
 
-	public BaseMediaItemType(ConfigModel config, ITagsManager tagsManager, MediaType mediaType) {
+	public BaseMediaItemFactory(ConfigModel config, ITagsManager tagsManager, MediaType mediaType) {
 		this._config = config;
 		this._tagsManager = tagsManager;
 		this.MediaType = mediaType;
@@ -122,35 +122,35 @@ public abstract class BaseMediaItemType<TFileOperator, TFileModel, TExecutionPro
 		fileModel.Tags = [.. MediaItem.MediaItemTags.Select(mft => this._tagsManager.Tags.FirstOrDefault(t => t.TagId == mft.TagId)).OfType<ITagModel>()];
 	}
 
-	IMediaItemOperator IMediaItemType.CreateMediaItemOperator() {
+	IMediaItemOperator IMediaItemFactory.CreateMediaItemOperator() {
 		return this.CreateMediaItemOperator();
 	}
 
-	IMediaItemModel IMediaItemType.CreateMediaItemModelFromRecord(MediaItem MediaItem, IServiceProvider scopedServiceProvider) {
+	IMediaItemModel IMediaItemFactory.CreateMediaItemModelFromRecord(MediaItem MediaItem, IServiceProvider scopedServiceProvider) {
 		return this.CreateMediaItemModelFromRecord(MediaItem, scopedServiceProvider);
 	}
 
-	IMediaItemViewModel IMediaItemType.CreateMediaItemViewModel(IMediaItemModel fileModel) {
+	IMediaItemViewModel IMediaItemFactory.CreateMediaItemViewModel(IMediaItemModel fileModel) {
 		return this.CreateMediaItemViewModel((TFileModel)fileModel);
 	}
 
-	IDetailViewerPreviewControlView IMediaItemType.CreateDetailViewerPreviewControlView(IMediaItemViewModel fileViewModel) {
+	IDetailViewerPreviewControlView IMediaItemFactory.CreateDetailViewerPreviewControlView(IMediaItemViewModel fileViewModel) {
 		return this.CreateDetailViewerPreviewControlView((TFileViewModel)fileViewModel);
 	}
 
-	IThumbnailControlView IMediaItemType.CreateThumbnailControlView(IMediaItemViewModel fileViewModel) {
+	IThumbnailControlView IMediaItemFactory.CreateThumbnailControlView(IMediaItemViewModel fileViewModel) {
 		return this.CreateThumbnailControlView((TFileViewModel)fileViewModel);
 	}
 
-	IThumbnailPickerViewModel IMediaItemType.CreateThumbnailPickerViewModel() {
+	IThumbnailPickerViewModel IMediaItemFactory.CreateThumbnailPickerViewModel() {
 		return this.CreateThumbnailPickerViewModel();
 	}
 
-	IThumbnailPickerView IMediaItemType.CreateThumbnailPickerView() {
+	IThumbnailPickerView IMediaItemFactory.CreateThumbnailPickerView() {
 		return this.CreateThumbnailPickerView();
 	}
 
-	IExecutionProgramObjectModel IMediaItemType.CreateExecutionProgramObjectModel() {
+	IExecutionProgramObjectModel IMediaItemFactory.CreateExecutionProgramObjectModel() {
 		return this.CreateExecutionProgramObjectModel();
 	}
 

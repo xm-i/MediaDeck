@@ -15,13 +15,13 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace MediaDeck.MediaItemTypes.UI.Unknown;
 
-[Inject(InjectServiceLifetime.Singleton, typeof(IMediaItemType))]
-public class UnknownMediaItemType : BaseMediaItemType<UnknownMediaItemOperator, UnknownMediaItemModel, DefaultExecutionProgramObjectModel, UnknownMediaItemViewModel, DefaultExecutionProgramConfigViewModel, UnknownDetailViewerPreviewControlView, UnknownThumbnailPickerViewModel, UnknownThumbnailPickerView, DefaultExecutionConfigView> {
+[Inject(InjectServiceLifetime.Singleton, typeof(IMediaItemFactory))]
+public class UnknownMediaItemFactory : BaseMediaItemFactory<UnknownMediaItemOperator, UnknownMediaItemModel, DefaultExecutionProgramObjectModel, UnknownMediaItemViewModel, DefaultExecutionProgramConfigViewModel, UnknownDetailViewerPreviewControlView, UnknownThumbnailPickerViewModel, UnknownThumbnailPickerView, DefaultExecutionConfigView> {
 	private UnknownDetailViewerPreviewControlView? _unknownDetailViewerPreviewControlView;
 	private readonly UnknownMediaItemOperator _UnknownMediaItemOperator;
 	private readonly IServiceProvider _serviceProvider;
 
-	public UnknownMediaItemType(
+	public UnknownMediaItemFactory(
 		UnknownMediaItemOperator UnknownMediaItemOperator,
 		ConfigModel config,
 		ITagsManager tagsManager,

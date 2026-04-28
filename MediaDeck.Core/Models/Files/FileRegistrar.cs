@@ -80,12 +80,12 @@ public class FileRegistrar : ServiceBase {
 	private async Task RegisterFilesAsync() {
 		while (this.RegistrationQueue.TryDequeue(out var filePath)) {
 			try {
-				var mediaItemType = this._mediaItemTypeService.GetMediaItemType(filePath);
-				if (mediaItemType.MediaType == MediaType.Unknown) {
+				var mediaItemFactory = this._mediaItemTypeService.GetMediaItemFactory(filePath);
+				if (mediaItemFactory.MediaType == MediaType.Unknown) {
 					continue;
 				}
 
-				var fileOperator = this._fileOperators.First(x => x.TargetMediaType == mediaItemType.MediaType);
+				var fileOperator = this._fileOperators.First(x => x.TargetMediaType == mediaItemFactory.MediaType);
 				var mf = await fileOperator.RegisterMediaItemAsync(filePath).ConfigureAwait(false);
 				if (mf is { } mf2) {
 					FileNotifications.FileRegistered.OnNext(mf2);

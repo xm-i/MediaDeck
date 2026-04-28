@@ -15,13 +15,13 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace MediaDeck.MediaItemTypes.UI.Pdf;
 
-[Inject(InjectServiceLifetime.Singleton, typeof(IMediaItemType))]
-public class PdfMediaItemType : BaseMediaItemType<PdfMediaItemOperator, PdfMediaItemModel, DefaultExecutionProgramObjectModel, PdfMediaItemViewModel, DefaultExecutionProgramConfigViewModel, PdfDetailViewerPreviewControlView, PdfThumbnailPickerViewModel, PdfThumbnailPickerView, DefaultExecutionConfigView> {
+[Inject(InjectServiceLifetime.Singleton, typeof(IMediaItemFactory))]
+public class PdfMediaItemFactory : BaseMediaItemFactory<PdfMediaItemOperator, PdfMediaItemModel, DefaultExecutionProgramObjectModel, PdfMediaItemViewModel, DefaultExecutionProgramConfigViewModel, PdfDetailViewerPreviewControlView, PdfThumbnailPickerViewModel, PdfThumbnailPickerView, DefaultExecutionConfigView> {
 	private PdfDetailViewerPreviewControlView? _pdfDetailViewerPreviewControlView;
 	private readonly PdfMediaItemOperator _PdfMediaItemOperator;
 	private readonly IServiceProvider _serviceProvider;
 
-	public PdfMediaItemType(
+	public PdfMediaItemFactory(
 		PdfMediaItemOperator PdfMediaItemOperator,
 		ConfigModel config,
 		ITagsManager tagsManager,

@@ -13,7 +13,7 @@ using MediaDeck.Composition.Objects;
 namespace MediaDeck.MediaItemTypes.Base.ViewModels;
 
 public abstract class BaseMediaItemViewModel : ViewModelBase, IMediaItemViewModel {
-	protected BaseMediaItemViewModel(IMediaItemModel fileModel, IMediaItemType mediaItemType, MediaType mediaType) {
+	protected BaseMediaItemViewModel(IMediaItemModel fileModel, IMediaItemFactory mediaItemFactory, MediaType mediaType) {
 		this.FileModel = fileModel;
 		this.FilePath = fileModel.FilePath;
 		this.ThumbnailFilePath = new($"file:///{fileModel.ThumbnailFilePath ?? FilePathConstants.NoThumbnailFilePath}");
@@ -21,11 +21,11 @@ public abstract class BaseMediaItemViewModel : ViewModelBase, IMediaItemViewMode
 		this.Properties = fileModel.Properties;
 		this.MediaType = mediaType;
 		this.Location = fileModel.Location;
-		this._mediaItemType = mediaItemType;
+		this._mediaItemFactory = mediaItemFactory;
 	}
 
 	private long _thumbnailRefreshTicks = 0;
-	private readonly IMediaItemType _mediaItemType;
+	private readonly IMediaItemFactory _mediaItemFactory;
 
 	public IMediaItemModel FileModel {
 		get;
@@ -41,7 +41,7 @@ public abstract class BaseMediaItemViewModel : ViewModelBase, IMediaItemViewMode
 
 	public IThumbnailControlView ThumbnailControlView {
 		get {
-			return this._mediaItemType.CreateThumbnailControlView(this);
+			return this._mediaItemFactory.CreateThumbnailControlView(this);
 		}
 	}
 

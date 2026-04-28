@@ -4,4 +4,4 @@ using MediaDeck.MediaItemTypes.Base.Models;
 
 namespace MediaDeck.MediaItemTypes.Archive.Models;
 
-public class ArchiveMediaItemModel(long id, string filePath, ArchiveMediaItemOperator fileOperator, IMediaItemType mediaItemType, IServiceProvider scopedServiceProvider) : BaseMediaItemModel(id, filePath, fileOperator, MediaType.Archive, mediaItemType, scopedServiceProvider);
+public class ArchiveMediaItemModel(long id, string filePath, ArchiveMediaItemOperator fileOperator, IMediaItemFactory mediaItemFactory, IServiceProvider scopedServiceProvider) : BaseMediaItemModel(id, filePath, fileOperator, MediaType.Archive, mediaItemFactory, scopedServiceProvider);
