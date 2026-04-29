@@ -44,9 +44,11 @@ public partial class FolderGroupMediaItemOperator : BaseMediaItemOperator {
 
 		var directoryInfo = new DirectoryInfo(filePath);
 
+		var directoryPath = directoryInfo.Parent?.FullName ?? filePath;
+		var isUnderFolderGroup = await this.GetIsUnderFolderGroup(db, directoryPath);
 		var mediaItem = new MediaItem {
 			ItemType = ItemType.FolderGroup,
-			DirectoryPath = directoryInfo.Parent?.FullName ?? filePath,
+			DirectoryPath = directoryPath,
 			FilePath = filePath,
 			ThumbnailFileName = thumbRelativePath,
 			Rate = -1,
@@ -58,11 +60,16 @@ public partial class FolderGroupMediaItemOperator : BaseMediaItemOperator {
 			LastAccessTime = directoryInfo.Exists ? directoryInfo.LastAccessTime : DateTime.MinValue,
 			RegisteredTime = DateTime.Now,
 			IsExists = directoryInfo.Exists,
+			IsUnderFolderGroup = isUnderFolderGroup,
 			FolderGroupMetadata = new FolderGroupMetadata()
 		};
 
 		await db.MediaItems.AddAsync(mediaItem);
 		await db.SaveChangesAsync();
+
+		await db.MediaItems.Where(x => x.DirectoryPath == filePath || x.DirectoryPath.StartsWith(filePath + Path.DirectorySeparatorChar))
+			.ExecuteUpdateAsync(x => x.SetProperty(p => p.IsUnderFolderGroup, true));
+
 		await transaction.CommitAsync();
 
 		return mediaItem;

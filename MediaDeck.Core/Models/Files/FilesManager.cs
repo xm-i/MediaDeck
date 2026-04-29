@@ -2,6 +2,7 @@ using MediaDeck.Composition.Interfaces.MediaItemTypes.Models;
 using MediaDeck.Composition.Objects;
 using MediaDeck.Core.Models.NotificationDispatcher;
 using MediaDeck.Database;
+using MediaDeck.Database.Tables;
 
 namespace MediaDeck.Core.Models.Files;
 
@@ -40,7 +41,18 @@ public class FilesManager {
 		if (targetFiles.Count == 0) {
 			return;
 		}
+
 		db.MediaItems.RemoveRange(targetFiles);
+
+		var folderGroups = targetFiles.Where(x => x.ItemType == ItemType.FolderGroup).Select(fg => fg.FilePath).ToArray();
+		if (folderGroups.Any()) {
+			var targets = db.MediaItems.Where(x => folderGroups.Any(fg => fg == x.DirectoryPath || x.DirectoryPath.StartsWith(fg + Path.DirectorySeparatorChar))).ToArray();
+			foreach (var target in targets) {
+				target.IsUnderFolderGroup = db.MediaItems.Any(fg => target.DirectoryPath == fg.FilePath && target.DirectoryPath.StartsWith(fg.FilePath + Path.DirectorySeparatorChar));
+			}
+			db.UpdateRange(targets);
+		}
+
 		await db.SaveChangesAsync();
 		await transaction.CommitAsync();
 

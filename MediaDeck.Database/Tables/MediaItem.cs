@@ -209,7 +209,7 @@ public class MediaItem {
 	/// <summary>
 	/// フォルダグループ配下のファイルか
 	/// </summary>
-	public bool IsUnderFolderGroup {
+	public required bool IsUnderFolderGroup {
 		get;
 		set;
 	}

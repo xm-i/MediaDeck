@@ -63,10 +63,12 @@ public partial class VideoMediaItemOperator : BaseMediaItemOperator {
 
 		var fileInfo = new FileInfo(filePath);
 		var location = GetLocation(metadata);
+		var directoryPath = Path.GetDirectoryName(filePath)!;
+		var isUnderFolderGroup = await this.GetIsUnderFolderGroup(db, directoryPath);
 
 		var mf = new MediaItem {
 			ItemType = ItemType.Video,
-			DirectoryPath = Path.GetDirectoryName(filePath)!,
+			DirectoryPath = directoryPath,
 			FilePath = filePath,
 			ThumbnailFileName = thumbRelativePath,
 			Rate = -1,
@@ -83,6 +85,7 @@ public partial class VideoMediaItemOperator : BaseMediaItemOperator {
 			Altitude = location?.Altitude,
 			Width = metadata.PrimaryVideoStream?.Width ?? 0,
 			Height = metadata.PrimaryVideoStream?.Height ?? 0,
+			IsUnderFolderGroup = isUnderFolderGroup,
 			VideoFile = new() { Duration = metadata.PrimaryVideoStream?.Duration.TotalSeconds, Rotation = metadata.PrimaryVideoStream?.Rotation, VideoMetadataValues = metadata.PrimaryVideoStream?.Tags?.Select(x => new VideoMetadataValue() { Key = x.Key, Value = x.Value }).ToList() ?? [] }
 		};
 

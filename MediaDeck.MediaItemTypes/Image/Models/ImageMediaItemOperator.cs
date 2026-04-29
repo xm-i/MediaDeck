@@ -50,10 +50,12 @@ public class ImageMediaItemOperator : BaseMediaItemOperator {
 		}
 
 		var fileInfo = new FileInfo(filePath);
+		var directoryPath = Path.GetDirectoryName(filePath)!;
+		var isUnderFolderGroup = await this.GetIsUnderFolderGroup(db, directoryPath);
 
 		var mf = new MediaItem {
 			ItemType = ItemType.Image,
-			DirectoryPath = Path.GetDirectoryName(filePath)!,
+			DirectoryPath = directoryPath,
 			FilePath = filePath,
 			ThumbnailFileName = thumbRelativePath,
 			Rate = -1,
@@ -64,7 +66,8 @@ public class ImageMediaItemOperator : BaseMediaItemOperator {
 			ModifiedTime = fileInfo.Exists ? fileInfo.LastWriteTime : DateTime.MinValue,
 			LastAccessTime = fileInfo.Exists ? fileInfo.LastAccessTime : DateTime.MinValue,
 			RegisteredTime = DateTime.Now,
-			IsExists = fileInfo.Exists
+			IsExists = fileInfo.Exists,
+			IsUnderFolderGroup = isUnderFolderGroup
 		};
 
 		// metadata

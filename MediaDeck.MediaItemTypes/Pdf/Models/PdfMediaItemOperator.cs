@@ -50,10 +50,12 @@ public partial class PdfMediaItemOperator : BaseMediaItemOperator {
 
 		var pdfDocument = this._pdfDocumentOperator.GetPdfProperties(filePath);
 		var fileInfo = new FileInfo(filePath);
+		var directoryPath = Path.GetDirectoryName(filePath)!;
+		var isUnderFolderGroup = await this.GetIsUnderFolderGroup(db, directoryPath);
 
 		var mf = new MediaItem {
 			ItemType = ItemType.Pdf,
-			DirectoryPath = Path.GetDirectoryName(filePath)!,
+			DirectoryPath = directoryPath,
 			FilePath = filePath,
 			ThumbnailFileName = thumbRelativePath,
 			Rate = -1,
@@ -67,6 +69,7 @@ public partial class PdfMediaItemOperator : BaseMediaItemOperator {
 			IsExists = fileInfo.Exists,
 			Width = (int)pdfDocument.Width,
 			Height = (int)pdfDocument.Height,
+			IsUnderFolderGroup = isUnderFolderGroup,
 			Container = new() { PageCount = pdfDocument.PageCount }
 		};
 

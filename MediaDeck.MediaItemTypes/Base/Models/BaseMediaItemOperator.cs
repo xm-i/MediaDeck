@@ -1,3 +1,4 @@
+using System.IO;
 using System.Threading.Tasks;
 
 using MediaDeck.Composition.Enum;
@@ -65,6 +66,10 @@ public abstract class BaseMediaItemOperator : IMediaItemOperator {
 
 	public MediaType TargetMediaType {
 		get;
+	}
+
+	protected async Task<bool> GetIsUnderFolderGroup(MediaDeckDbContext dbContext, string directoryPath) {
+		return await dbContext.MediaItems.AnyAsync(x => directoryPath == x.FilePath && directoryPath.StartsWith(x.FilePath + Path.PathSeparator));
 	}
 
 	public abstract Task<MediaItem?> RegisterMediaItemAsync(string filePath);

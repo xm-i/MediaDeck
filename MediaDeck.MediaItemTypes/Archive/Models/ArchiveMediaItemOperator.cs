@@ -65,10 +65,11 @@ public partial class ArchiveMediaItemOperator : BaseMediaItemOperator {
 		}
 
 		var fileInfo = new FileInfo(filePath);
-
+		var directoryPath = Path.GetDirectoryName(filePath)!;
+		var isUnderFolderGroup = await this.GetIsUnderFolderGroup(db, directoryPath);
 		var mf = new MediaItem {
 			ItemType = ItemType.Archive,
-			DirectoryPath = Path.GetDirectoryName(filePath)!,
+			DirectoryPath = directoryPath,
 			FilePath = filePath,
 			ThumbnailFileName = thumbRelativePath,
 			Rate = -1,
@@ -80,6 +81,7 @@ public partial class ArchiveMediaItemOperator : BaseMediaItemOperator {
 			LastAccessTime = fileInfo.Exists ? fileInfo.LastAccessTime : DateTime.MinValue,
 			RegisteredTime = DateTime.Now,
 			IsExists = fileInfo.Exists,
+			IsUnderFolderGroup = isUnderFolderGroup,
 			Container = new() { PageCount = archiveFile.Entries.Count(x => this._mediaItemTypeService.IsTargetPath(x.Name, MediaType.Image)), }
 		};
 
