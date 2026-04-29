@@ -16,7 +16,7 @@ public class ArchiveThumbnailPickerViewModel : BaseThumbnailPickerViewModel<Base
 	private readonly IMediaItemTypeService _mediaItemTypeService;
 	private readonly ILogger<ArchiveThumbnailPickerViewModel> _logger;
 
-	public ArchiveThumbnailPickerViewModel(BaseThumbnailPickerModel thumbnailPickerModel, ArchiveMediaItemOperator PdfMediaItemOperator, IMediaItemTypeService mediaItemTypeService, ILogger<ArchiveThumbnailPickerViewModel> logger) : base(thumbnailPickerModel) {
+	public ArchiveThumbnailPickerViewModel(BaseThumbnailPickerModel thumbnailPickerModel, ArchiveMediaItemOperator PdfMediaItemOperator, IMediaItemTypeService mediaItemTypeService, ILogger<ArchiveThumbnailPickerViewModel> logger, IFilePickerService filePickerService) : base(thumbnailPickerModel, filePickerService) {
 		this._ArchiveMediaItemOperator = PdfMediaItemOperator;
 		this._mediaItemTypeService = mediaItemTypeService;
 		this._logger = logger;

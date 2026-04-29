@@ -97,6 +97,10 @@
 				<TextBlock Text="Recreate" />
 			</Button>
 			<Button controls:DockPanel.Dock="Right"
+				Command="{x:Bind ViewModel.PickThumbnailFromFileCommand}" >
+				<TextBlock Text="Browse..." />
+			</Button>
+			<Button controls:DockPanel.Dock="Right"
 				Command="{x:Bind ViewModel.SaveCommand}" >
 				<TextBlock Text="Save" />
 			</Button>

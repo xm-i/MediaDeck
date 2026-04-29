@@ -12,7 +12,8 @@ public class VideoThumbnailPickerViewModel : BaseThumbnailPickerViewModel<BaseTh
 	public VideoThumbnailPickerViewModel(
 		BaseThumbnailPickerModel thumbnailPickerModel,
 		VideoMediaItemOperator VideoMediaItemOperator,
-		ILogger<VideoThumbnailPickerViewModel> logger) : base(thumbnailPickerModel) {
+		ILogger<VideoThumbnailPickerViewModel> logger,
+		IFilePickerService filePickerService) : base(thumbnailPickerModel, filePickerService) {
 		this._VideoMediaItemOperator = VideoMediaItemOperator;
 		this._logger = logger;
 		this._updateTimeSubject.ObserveOnCurrentSynchronizationContext().Subscribe(x => this.Time.Value = x).AddTo(this.CompositeDisposable);

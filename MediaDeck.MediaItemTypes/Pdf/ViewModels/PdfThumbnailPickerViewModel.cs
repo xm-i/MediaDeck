@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 namespace MediaDeck.MediaItemTypes.Pdf.ViewModels;
 
 [Inject(InjectServiceLifetime.Transient)]
-public class PdfThumbnailPickerViewModel(BaseThumbnailPickerModel thumbnailPickerModel, IPdfDocumentOperator pdfDocumentOperator, ILogger<PdfThumbnailPickerViewModel> logger) : BaseThumbnailPickerViewModel<BaseThumbnailPickerModel>(thumbnailPickerModel) {
+public class PdfThumbnailPickerViewModel(BaseThumbnailPickerModel thumbnailPickerModel, IPdfDocumentOperator pdfDocumentOperator, ILogger<PdfThumbnailPickerViewModel> logger, IFilePickerService filePickerService) : BaseThumbnailPickerViewModel<BaseThumbnailPickerModel>(thumbnailPickerModel, filePickerService) {
 	private readonly IPdfDocumentOperator _pdfDocumentOperator = pdfDocumentOperator;
 	private readonly ILogger<PdfThumbnailPickerViewModel> _logger = logger;
 

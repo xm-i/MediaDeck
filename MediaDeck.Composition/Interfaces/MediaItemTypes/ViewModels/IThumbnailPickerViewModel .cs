@@ -13,6 +13,10 @@ public interface IThumbnailPickerViewModel {
 		get;
 	}
 
+	public ReactiveCommand PickThumbnailFromFileCommand {
+		get;
+	}
+
 	public ReactiveCommand SaveCommand {
 		get;
 	}
