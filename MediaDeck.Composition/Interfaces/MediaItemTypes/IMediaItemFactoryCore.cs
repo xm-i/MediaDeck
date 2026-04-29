@@ -13,7 +13,7 @@ public interface IMediaItemFactoryCore<TFileOperator, TFileModel, TExecutionProg
 	where TExecutionProgramConfigViewModel : IExecutionProgramConfigViewModel
 	where TThumbnailPickerViewModel : IThumbnailPickerViewModel {
 	public new TFileOperator CreateMediaItemOperator();
-	public new TFileModel CreateMediaItemModelFromRecord(MediaItem MediaItem, IServiceProvider scopedServiceProvider);
+	public new TFileModel CreateMediaItemModelFromRecord(MediaItem MediaItem);
 	public TFileViewModel CreateMediaItemViewModel(TFileModel fileModel);
 	public new TThumbnailPickerViewModel CreateThumbnailPickerViewModel();
 	/// <inheritdoc/>
@@ -33,7 +33,7 @@ public interface IMediaItemFactoryCore {
 	}
 
 	public IMediaItemOperator CreateMediaItemOperator();
-	public IMediaItemModel CreateMediaItemModelFromRecord(MediaItem MediaItem, IServiceProvider scopedServiceProvider);
+	public IMediaItemModel CreateMediaItemModelFromRecord(MediaItem MediaItem);
 	public IMediaItemViewModel CreateMediaItemViewModel(IMediaItemModel fileModel);
 	public IThumbnailPickerViewModel CreateThumbnailPickerViewModel();
 	/// <summary>

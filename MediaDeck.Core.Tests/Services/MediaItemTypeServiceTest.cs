@@ -63,7 +63,7 @@ public class MediaItemTypeServiceTest {
 	public void CreateMediaItemModelFromRecord_UsesMatchingMediaItemType() {
 		var MediaItem = CreateMediaItem(@"C:\media\sample.jpg");
 
-		var result = this._service.CreateMediaItemModelFromRecord(MediaItem, null!);
+		var result = this._service.CreateMediaItemModelFromRecord(MediaItem);
 
 		var testFileModel = result.ShouldBeOfType<TestFileModel>();
 		testFileModel.CreatedBy.ShouldBe("image");
@@ -76,7 +76,7 @@ public class MediaItemTypeServiceTest {
 	public void CreateMediaItemModelFromRecord_FallsBackToUnknownWhenMediaTypeIsNotRegistered() {
 		var MediaItem = CreateMediaItem(@"C:\media\sample.txt");
 
-		var result = this._service.CreateMediaItemModelFromRecord(MediaItem, null!);
+		var result = this._service.CreateMediaItemModelFromRecord(MediaItem);
 
 		var testFileModel = result.ShouldBeOfType<TestFileModel>();
 		testFileModel.CreatedBy.ShouldBe("unknown");
@@ -230,7 +230,7 @@ public class MediaItemTypeServiceTest {
 			return new TestFileOperator(this.MediaType, this.CreatedBy);
 		}
 
-		public IMediaItemModel CreateMediaItemModelFromRecord(MediaItem MediaItem, IServiceProvider scopedServiceProvider) {
+		public IMediaItemModel CreateMediaItemModelFromRecord(MediaItem MediaItem) {
 			return new TestFileModel(this.MediaType, MediaItem.FilePath, this.CreatedBy);
 		}
 

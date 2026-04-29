@@ -13,30 +13,47 @@ using MediaDeck.Composition.Objects;
 namespace MediaDeck.MediaItemTypes.Base.ViewModels;
 
 public abstract class BaseMediaItemViewModel : ViewModelBase, IMediaItemViewModel {
-	protected BaseMediaItemViewModel(IMediaItemModel fileModel, IMediaItemFactoryCore mediaItemFactory, MediaType mediaType) {
-		this.FileModel = fileModel;
-		this.FilePath = fileModel.FilePath;
-		this.ThumbnailFilePath = new($"file:///{fileModel.ThumbnailFilePath ?? FilePathConstants.NoThumbnailFilePath}");
-		this.Exists = fileModel.Exists;
-		this.Properties = fileModel.Properties;
+	protected BaseMediaItemViewModel(IMediaItemFactory mediaItemFactory, MediaType mediaType) : base() {
+		this._mediaItemFactory = mediaItemFactory;
 		this.MediaType = mediaType;
+	}
+
+	public virtual void Initialize(IMediaItemModel fileModel) {
+		this._fileModel = fileModel;
+		this._filePath = fileModel.FilePath;
+		this._thumbnailFilePath = new($"file:///{fileModel.ThumbnailFilePath ?? FilePathConstants.NoThumbnailFilePath}");
+		this._exists = fileModel.Exists;
+		this._properties = fileModel.Properties;
 		this.Location = fileModel.Location;
-		this._mediaItemFactory = (IMediaItemFactory)mediaItemFactory; // TODO: 無理やりキャストなんとかする
+		this._thumbnailFilePath.AddTo(this.CompositeDisposable);
+	}
+
+	private InvalidOperationException CreateNotInitializedException() {
+		return new($"{this.GetType().Name} is not initialized.");
 	}
 
 	private long _thumbnailRefreshTicks = 0;
 	private readonly IMediaItemFactory _mediaItemFactory;
 
+	private IMediaItemModel? _fileModel;
 	public IMediaItemModel FileModel {
-		get;
+		get {
+			return this._fileModel ?? throw this.CreateNotInitializedException();
+		}
 	}
 
+	private string? _filePath;
 	public string FilePath {
-		get;
+		get {
+			return this._filePath ?? throw this.CreateNotInitializedException();
+		}
 	}
 
+	private BindableReactiveProperty<string>? _thumbnailFilePath;
 	public BindableReactiveProperty<string> ThumbnailFilePath {
-		get;
+		get {
+			return this._thumbnailFilePath ?? throw this.CreateNotInitializedException();
+		}
 	}
 
 	public IThumbnailControlView ThumbnailControlView {
@@ -45,23 +62,31 @@ public abstract class BaseMediaItemViewModel : ViewModelBase, IMediaItemViewMode
 		}
 	}
 
+	private bool? _exists;
 	public bool Exists {
-		get;
+		get {
+			return this._exists ?? throw this.CreateNotInitializedException();
+		}
 	}
 
+	private Attributes<string>? _properties;
 	/// <summary>
 	/// プロパティ
 	/// </summary>
 	public Attributes<string> Properties {
-		get;
+		get {
+			return this._properties ?? throw this.CreateNotInitializedException();
+		}
 	}
 
 	public MediaType MediaType {
 		get;
+		private set;
 	}
 
 	public IGpsLocation? Location {
 		get;
+		private set;
 	}
 
 	public virtual async Task ExecuteFileAsync() {

@@ -1,5 +1,4 @@
 using MediaDeck.Composition.Enum;
-using MediaDeck.Composition.Interfaces.MediaItemTypes;
 using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Database.Tables;
@@ -16,18 +15,15 @@ namespace MediaDeck.MediaItemTypes.Archive;
 public class ArchiveMediaItemFactoryCore : BaseMediaItemFactoryCore<ArchiveMediaItemOperator, ArchiveMediaItemModel, DefaultExecutionProgramObjectModel, ArchiveMediaItemViewModel, DefaultExecutionProgramConfigViewModel, ArchiveThumbnailPickerViewModel> {
 	private readonly ArchiveMediaItemOperator _ArchiveMediaItemOperator;
 	private readonly IServiceProvider _serviceProvider;
-	private readonly IMediaItemTypeProvider _mediaItemTypeProvider;
 
 	public ArchiveMediaItemFactoryCore(
 		ArchiveMediaItemOperator ArchiveMediaItemOperator,
 		ConfigModel config,
 		ITagsManager tagsManager,
-		IMediaItemTypeProvider mediaItemTypeProvider,
 		IServiceProvider serviceProvider)
 		: base(config, tagsManager, MediaType.Archive) {
 		this._ArchiveMediaItemOperator = ArchiveMediaItemOperator;
 		this._serviceProvider = serviceProvider;
-		this._mediaItemTypeProvider = mediaItemTypeProvider;
 	}
 
 	public override ArchiveMediaItemOperator CreateMediaItemOperator() {
@@ -40,14 +36,17 @@ public class ArchiveMediaItemFactoryCore : BaseMediaItemFactoryCore<ArchiveMedia
 		}
 	}
 
-	public override ArchiveMediaItemModel CreateMediaItemModelFromRecord(MediaItem MediaItem, IServiceProvider scopedServiceProvider) {
-		var ifm = new ArchiveMediaItemModel(MediaItem.MediaItemId, MediaItem.FilePath, this._ArchiveMediaItemOperator, this._mediaItemTypeProvider, scopedServiceProvider);
+	public override ArchiveMediaItemModel CreateMediaItemModelFromRecord(MediaItem MediaItem) {
+		var ifm = this._serviceProvider.GetRequiredService<ArchiveMediaItemModel>();
+		ifm.Initialize(MediaItem.MediaItemId, MediaItem.FilePath);
 		this.SetModelProperties(ifm, MediaItem);
 		return ifm;
 	}
 
 	public override ArchiveMediaItemViewModel CreateMediaItemViewModel(ArchiveMediaItemModel fileModel) {
-		return new ArchiveMediaItemViewModel(fileModel, this);
+		var vm = this._serviceProvider.GetRequiredService<ArchiveMediaItemViewModel>();
+		vm.Initialize(fileModel);
+		return vm;
 	}
 
 	public override ArchiveThumbnailPickerViewModel CreateThumbnailPickerViewModel() {
@@ -55,12 +54,14 @@ public class ArchiveMediaItemFactoryCore : BaseMediaItemFactoryCore<ArchiveMedia
 	}
 
 	public override DefaultExecutionProgramObjectModel CreateExecutionProgramObjectModel() {
-		return new DefaultExecutionProgramObjectModel() {
-			MediaType = this.MediaType
-		};
+		var model = this._serviceProvider.GetRequiredService<DefaultExecutionProgramObjectModel>();
+		model.MediaType = this.MediaType;
+		return model;
 	}
 
 	public override DefaultExecutionProgramConfigViewModel CreateExecutionProgramConfigViewModel(DefaultExecutionProgramObjectModel model) {
-		return new DefaultExecutionProgramConfigViewModel(model, this._serviceProvider.GetRequiredService<IMediaItemTypeService>(), this._serviceProvider.GetRequiredService<ExecutionConfigModel>());
+		var vm = this._serviceProvider.GetRequiredService<DefaultExecutionProgramConfigViewModel>();
+		vm.Initialize(model);
+		return vm;
 	}
 }

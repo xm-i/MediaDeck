@@ -37,7 +37,7 @@ public abstract class BaseMediaItemFactoryCore<TFileOperator, TFileModel, TExecu
 	}
 
 	public abstract TFileOperator CreateMediaItemOperator();
-	public abstract TFileModel CreateMediaItemModelFromRecord(MediaItem MediaItem, IServiceProvider scopedServiceProvider);
+	public abstract TFileModel CreateMediaItemModelFromRecord(MediaItem MediaItem);
 	public abstract TFileViewModel CreateMediaItemViewModel(TFileModel fileModel);
 	public abstract TThumbnailPickerViewModel CreateThumbnailPickerViewModel();
 
@@ -72,8 +72,8 @@ public abstract class BaseMediaItemFactoryCore<TFileOperator, TFileModel, TExecu
 		return this.CreateMediaItemOperator();
 	}
 
-	IMediaItemModel IMediaItemFactoryCore.CreateMediaItemModelFromRecord(MediaItem MediaItem, IServiceProvider scopedServiceProvider) {
-		return this.CreateMediaItemModelFromRecord(MediaItem, scopedServiceProvider);
+	IMediaItemModel IMediaItemFactoryCore.CreateMediaItemModelFromRecord(MediaItem MediaItem) {
+		return this.CreateMediaItemModelFromRecord(MediaItem);
 	}
 
 	IMediaItemViewModel IMediaItemFactoryCore.CreateMediaItemViewModel(IMediaItemModel fileModel) {

@@ -13,18 +13,19 @@ using MediaDeck.MediaItemTypes.UI.Image.Views;
 
 namespace MediaDeck.MediaItemTypes.UI.Image;
 
-[Inject(InjectServiceLifetime.Singleton, typeof(IMediaItemFactory))]
+[Inject(InjectServiceLifetime.Scoped, typeof(IMediaItemFactory))]
+[Inject(InjectServiceLifetime.Scoped, typeof(IMediaItemFactoryOf<ImageMediaItemViewModel>))]
 public class ImageMediaItemFactory : ImageMediaItemFactoryCore,
-	IMediaItemFactory<ImageMediaItemOperator, ImageMediaItemModel, DefaultExecutionProgramObjectModel, ImageMediaItemViewModel, DefaultExecutionProgramConfigViewModel, ImageDetailViewerPreviewControlView, ImageThumbnailPickerViewModel, ImageThumbnailPickerView, DefaultExecutionConfigView> {
+	IMediaItemFactory<ImageMediaItemOperator, ImageMediaItemModel, DefaultExecutionProgramObjectModel, ImageMediaItemViewModel, DefaultExecutionProgramConfigViewModel, ImageDetailViewerPreviewControlView, ImageThumbnailPickerViewModel, ImageThumbnailPickerView, DefaultExecutionConfigView>,
+	IMediaItemFactoryOf<ImageMediaItemViewModel> {
 	private ImageDetailViewerPreviewControlView? _imageDetailViewerPreviewControlView;
 
 	public ImageMediaItemFactory(
 		ImageMediaItemOperator ImageMediaItemOperator,
 		ConfigModel config,
 		ITagsManager tagsManager,
-		IMediaItemTypeProvider mediaItemTypeProvider,
 		IServiceProvider serviceProvider)
-		: base(ImageMediaItemOperator, config, tagsManager, mediaItemTypeProvider, serviceProvider) {
+		: base(ImageMediaItemOperator, config, tagsManager, serviceProvider) {
 	}
 
 	public ImageDetailViewerPreviewControlView CreateDetailViewerPreviewControlView(ImageMediaItemViewModel fileViewModel) {

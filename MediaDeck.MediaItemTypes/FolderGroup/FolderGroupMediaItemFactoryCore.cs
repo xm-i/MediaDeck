@@ -1,5 +1,4 @@
 using MediaDeck.Composition.Enum;
-using MediaDeck.Composition.Interfaces.MediaItemTypes;
 using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Database.Tables;
@@ -14,18 +13,15 @@ namespace MediaDeck.MediaItemTypes.FolderGroup;
 public class FolderGroupMediaItemFactoryCore : BaseMediaItemFactoryCore<FolderGroupMediaItemOperator, FolderGroupMediaItemModel, FolderGroupExecutionProgramObjectModel, FolderGroupMediaItemViewModel, FolderGroupExecutionProgramConfigViewModel, FolderGroupThumbnailPickerViewModel> {
 	private readonly FolderGroupMediaItemOperator _fileOperator;
 	private readonly IServiceProvider _serviceProvider;
-	private readonly IMediaItemTypeProvider _mediaItemTypeProvider;
 
 	public FolderGroupMediaItemFactoryCore(
 		FolderGroupMediaItemOperator fileOperator,
 		ConfigModel config,
 		ITagsManager tagsManager,
-		IMediaItemTypeProvider mediaItemTypeProvider,
 		IServiceProvider serviceProvider)
 		: base(config, tagsManager, MediaType.FolderGroup) {
 		this._fileOperator = fileOperator;
 		this._serviceProvider = serviceProvider;
-		this._mediaItemTypeProvider = mediaItemTypeProvider;
 	}
 
 	public override FolderGroupMediaItemOperator CreateMediaItemOperator() {
@@ -38,28 +34,35 @@ public class FolderGroupMediaItemFactoryCore : BaseMediaItemFactoryCore<FolderGr
 		}
 	}
 
-	/// <inheritdoc />
-	public override FolderGroupExecutionProgramObjectModel CreateExecutionProgramObjectModel() {
-		var model = new FolderGroupExecutionProgramObjectModel();
-		return model;
-	}
-
-	/// <inheritdoc />
-	public override FolderGroupExecutionProgramConfigViewModel CreateExecutionProgramConfigViewModel(FolderGroupExecutionProgramObjectModel model) {
-		return new FolderGroupExecutionProgramConfigViewModel(model, this._serviceProvider.GetRequiredService<IMediaItemTypeService>(), this._serviceProvider.GetRequiredService<ExecutionConfigModel>());
-	}
-
-	public override FolderGroupMediaItemModel CreateMediaItemModelFromRecord(MediaItem MediaItem, IServiceProvider scopedServiceProvider) {
-		var model = new FolderGroupMediaItemModel(MediaItem.MediaItemId, MediaItem.FilePath, this._fileOperator, this._mediaItemTypeProvider, scopedServiceProvider);
+	public override FolderGroupMediaItemModel CreateMediaItemModelFromRecord(MediaItem MediaItem) {
+		var model = this._serviceProvider.GetRequiredService<FolderGroupMediaItemModel>();
+		model.Initialize(MediaItem.MediaItemId, MediaItem.FilePath);
 		this.SetModelProperties(model, MediaItem);
 		return model;
 	}
 
 	public override FolderGroupMediaItemViewModel CreateMediaItemViewModel(FolderGroupMediaItemModel fileModel) {
-		return new FolderGroupMediaItemViewModel(fileModel, this);
+		var vm = this._serviceProvider.GetRequiredService<FolderGroupMediaItemViewModel>();
+		vm.Initialize(fileModel);
+		return vm;
 	}
 
 	public override FolderGroupThumbnailPickerViewModel CreateThumbnailPickerViewModel() {
 		return this._serviceProvider.GetRequiredService<FolderGroupThumbnailPickerViewModel>();
 	}
+
+	/// <inheritdoc />
+	public override FolderGroupExecutionProgramObjectModel CreateExecutionProgramObjectModel() {
+		var model = this._serviceProvider.GetRequiredService<FolderGroupExecutionProgramObjectModel>();
+		model.MediaType = this.MediaType;
+		return model;
+	}
+
+	/// <inheritdoc />
+	public override FolderGroupExecutionProgramConfigViewModel CreateExecutionProgramConfigViewModel(FolderGroupExecutionProgramObjectModel model) {
+		var vm = this._serviceProvider.GetRequiredService<FolderGroupExecutionProgramConfigViewModel>();
+		vm.Initialize(model);
+		return vm;
+	}
+
 }

@@ -17,6 +17,7 @@ public abstract class BaseMediaItemModel : ModelBase, IMediaItemModel {
 
 	protected IMediaItemOperator FileOperator {
 		get;
+		private set;
 	}
 
 	private readonly Subject<Unit> _changed = new();
@@ -30,31 +31,44 @@ public abstract class BaseMediaItemModel : ModelBase, IMediaItemModel {
 	/// <summary>
 	/// BaseMediaItemModel のコンストラクタ。
 	/// </summary>
-	/// <param name="id">メディアアイテムID</param>
-	/// <param name="filePath">ファイルパス</param>
-	/// <param name="fileOperator">ファイルオペレーター</param>
-	/// <param name="mediaType">メディアタイプ</param>
-	/// <param name="mediaItemTypeProvider">このモデルに対応するメディアアイテムタイプ。実行ロジック等の委譲先。</param>
-	public BaseMediaItemModel(long id, string filePath, IMediaItemOperator fileOperator, MediaType mediaType, IMediaItemTypeProvider mediaItemTypeProvider, IServiceProvider scopedServiceProvider) : base() {
+	protected BaseMediaItemModel(IMediaItemOperator fileOperator, MediaType mediaType, IMediaItemTypeProvider mediaItemTypeProvider, IServiceProvider scopedServiceProvider) : base() {
 		this._mediaItemTypeProvider = mediaItemTypeProvider;
 		this._scopedServiceProvider = scopedServiceProvider;
 		this.FileOperator = fileOperator;
-		this.Id = id;
-		this.FilePath = filePath;
 		this.MediaType = mediaType;
 		this._changed.AddTo(this.CompositeDisposable);
+	}
+
+	/// <summary>
+	/// モデルを初期化します。
+	/// </summary>
+	/// <param name="id">メディアアイテムID</param>
+	/// <param name="filePath">ファイルパス</param>
+	public virtual void Initialize(long id, string filePath) {
+		this._id = id;
+		this._filePath = filePath;
+	}
+
+	private InvalidOperationException CreateNotInitializedException() {
+		return new($"{this.GetType().Name} is not initialized.");
 	}
 
 	public MediaType MediaType {
 		get;
 	}
 
+	private long? _id;
 	public long Id {
-		get;
+		get {
+			return this._id ?? throw this.CreateNotInitializedException();
+		}
 	}
 
+	private string? _filePath;
 	public string FilePath {
-		get;
+		get {
+			return this._filePath ?? throw this.CreateNotInitializedException();
+		}
 	}
 
 	public string? ThumbnailFilePath {

@@ -1,5 +1,4 @@
 using MediaDeck.Composition.Enum;
-using MediaDeck.Composition.Interfaces.MediaItemTypes;
 using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Database.Tables;
@@ -16,18 +15,15 @@ namespace MediaDeck.MediaItemTypes.Video;
 public class VideoMediaItemFactoryCore : BaseMediaItemFactoryCore<VideoMediaItemOperator, VideoMediaItemModel, DefaultExecutionProgramObjectModel, VideoMediaItemViewModel, DefaultExecutionProgramConfigViewModel, VideoThumbnailPickerViewModel> {
 	private readonly VideoMediaItemOperator _VideoMediaItemOperator;
 	private readonly IServiceProvider _serviceProvider;
-	private readonly IMediaItemTypeProvider _mediaItemTypeProvider;
 
 	public VideoMediaItemFactoryCore(
 		VideoMediaItemOperator VideoMediaItemOperator,
 		ConfigModel config,
 		ITagsManager tagsManager,
-		IMediaItemTypeProvider mediaItemTypeProvider,
 		IServiceProvider serviceProvider)
 		: base(config, tagsManager, MediaType.Video) {
 		this._VideoMediaItemOperator = VideoMediaItemOperator;
 		this._serviceProvider = serviceProvider;
-		this._mediaItemTypeProvider = mediaItemTypeProvider;
 	}
 
 	public override VideoMediaItemOperator CreateMediaItemOperator() {
@@ -40,14 +36,17 @@ public class VideoMediaItemFactoryCore : BaseMediaItemFactoryCore<VideoMediaItem
 		}
 	}
 
-	public override VideoMediaItemModel CreateMediaItemModelFromRecord(MediaItem MediaItem, IServiceProvider scopedServiceProvider) {
-		var ifm = new VideoMediaItemModel(MediaItem.MediaItemId, MediaItem.FilePath, this._VideoMediaItemOperator, this._mediaItemTypeProvider, scopedServiceProvider);
+	public override VideoMediaItemModel CreateMediaItemModelFromRecord(MediaItem MediaItem) {
+		var ifm = this._serviceProvider.GetRequiredService<VideoMediaItemModel>();
+		ifm.Initialize(MediaItem.MediaItemId, MediaItem.FilePath);
 		this.SetModelProperties(ifm, MediaItem);
 		return ifm;
 	}
 
 	public override VideoMediaItemViewModel CreateMediaItemViewModel(VideoMediaItemModel fileModel) {
-		return new VideoMediaItemViewModel(fileModel, this);
+		var vm = this._serviceProvider.GetRequiredService<VideoMediaItemViewModel>();
+		vm.Initialize(fileModel);
+		return vm;
 	}
 
 	public override VideoThumbnailPickerViewModel CreateThumbnailPickerViewModel() {
@@ -55,12 +54,14 @@ public class VideoMediaItemFactoryCore : BaseMediaItemFactoryCore<VideoMediaItem
 	}
 
 	public override DefaultExecutionProgramObjectModel CreateExecutionProgramObjectModel() {
-		return new DefaultExecutionProgramObjectModel() {
-			MediaType = this.MediaType
-		};
+		var model = this._serviceProvider.GetRequiredService<DefaultExecutionProgramObjectModel>();
+		model.MediaType = this.MediaType;
+		return model;
 	}
 
 	public override DefaultExecutionProgramConfigViewModel CreateExecutionProgramConfigViewModel(DefaultExecutionProgramObjectModel model) {
-		return new DefaultExecutionProgramConfigViewModel(model, this._serviceProvider.GetRequiredService<IMediaItemTypeService>(), this._serviceProvider.GetRequiredService<ExecutionConfigModel>());
+		var vm = this._serviceProvider.GetRequiredService<DefaultExecutionProgramConfigViewModel>();
+		vm.Initialize(model);
+		return vm;
 	}
 }

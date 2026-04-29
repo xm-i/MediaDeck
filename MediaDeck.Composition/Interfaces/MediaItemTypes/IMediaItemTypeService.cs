@@ -13,7 +13,7 @@ public interface IMediaItemTypeService {
 	/// <summary>
 	/// データベースレコードからメディアアイテムモデルを作成します。
 	/// </summary>
-	public IMediaItemModel CreateMediaItemModelFromRecord(MediaItem MediaItem, IServiceProvider scopedServiceProvider);
+	public IMediaItemModel CreateMediaItemModelFromRecord(MediaItem MediaItem);
 
 	/// <summary>
 	/// メディアアイテムモデルからビューモデルを作成します。

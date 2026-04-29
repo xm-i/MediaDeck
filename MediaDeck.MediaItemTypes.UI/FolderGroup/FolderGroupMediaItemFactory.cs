@@ -10,19 +10,20 @@ using MediaDeck.MediaItemTypes.UI.FolderGroup.Views;
 
 namespace MediaDeck.MediaItemTypes.UI.FolderGroup;
 
-[Inject(InjectServiceLifetime.Singleton, typeof(IMediaItemFactory))]
+[Inject(InjectServiceLifetime.Scoped, typeof(IMediaItemFactory))]
+[Inject(InjectServiceLifetime.Scoped, typeof(IMediaItemFactoryOf<FolderGroupMediaItemViewModel>))]
 public class FolderGroupMediaItemFactory :
 	FolderGroupMediaItemFactoryCore,
-	IMediaItemFactory<FolderGroupMediaItemOperator, FolderGroupMediaItemModel, FolderGroupExecutionProgramObjectModel, FolderGroupMediaItemViewModel, FolderGroupExecutionProgramConfigViewModel, FolderGroupDetailViewerPreviewControlView, FolderGroupThumbnailPickerViewModel, FolderGroupThumbnailPickerView, FolderGroupExecutionConfigView> {
+	IMediaItemFactory<FolderGroupMediaItemOperator, FolderGroupMediaItemModel, FolderGroupExecutionProgramObjectModel, FolderGroupMediaItemViewModel, FolderGroupExecutionProgramConfigViewModel, FolderGroupDetailViewerPreviewControlView, FolderGroupThumbnailPickerViewModel, FolderGroupThumbnailPickerView, FolderGroupExecutionConfigView>,
+	IMediaItemFactoryOf<FolderGroupMediaItemViewModel> {
 	private FolderGroupDetailViewerPreviewControlView? _detailViewerPreviewControlView;
 
 	public FolderGroupMediaItemFactory(
 		FolderGroupMediaItemOperator fileOperator,
 		ConfigModel config,
 		ITagsManager tagsManager,
-		IMediaItemTypeProvider mediaItemTypeProvider,
 		IServiceProvider serviceProvider)
-		: base(fileOperator, config, tagsManager, mediaItemTypeProvider, serviceProvider) {
+		: base(fileOperator, config, tagsManager, serviceProvider) {
 	}
 
 	/// <inheritdoc />

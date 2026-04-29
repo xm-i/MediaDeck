@@ -13,18 +13,19 @@ using MediaDeck.MediaItemTypes.UI.Pdf.Views;
 
 namespace MediaDeck.MediaItemTypes.UI.Pdf;
 
-[Inject(InjectServiceLifetime.Singleton, typeof(IMediaItemFactory))]
+[Inject(InjectServiceLifetime.Scoped, typeof(IMediaItemFactory))]
+[Inject(InjectServiceLifetime.Scoped, typeof(IMediaItemFactoryOf<PdfMediaItemViewModel>))]
 public class PdfMediaItemFactory : PdfMediaItemFactoryCore,
-	IMediaItemFactory<PdfMediaItemOperator, PdfMediaItemModel, DefaultExecutionProgramObjectModel, PdfMediaItemViewModel, DefaultExecutionProgramConfigViewModel, PdfDetailViewerPreviewControlView, PdfThumbnailPickerViewModel, PdfThumbnailPickerView, DefaultExecutionConfigView> {
+	IMediaItemFactory<PdfMediaItemOperator, PdfMediaItemModel, DefaultExecutionProgramObjectModel, PdfMediaItemViewModel, DefaultExecutionProgramConfigViewModel, PdfDetailViewerPreviewControlView, PdfThumbnailPickerViewModel, PdfThumbnailPickerView, DefaultExecutionConfigView>,
+	IMediaItemFactoryOf<PdfMediaItemViewModel> {
 	private PdfDetailViewerPreviewControlView? _pdfDetailViewerPreviewControlView;
 
 	public PdfMediaItemFactory(
 		PdfMediaItemOperator PdfMediaItemOperator,
 		ConfigModel config,
 		ITagsManager tagsManager,
-		IMediaItemTypeProvider mediaItemTypeProvider,
 		IServiceProvider serviceProvider)
-		: base(PdfMediaItemOperator, config, tagsManager, mediaItemTypeProvider, serviceProvider) {
+		: base(PdfMediaItemOperator, config, tagsManager, serviceProvider) {
 	}
 
 	public PdfDetailViewerPreviewControlView CreateDetailViewerPreviewControlView(PdfMediaItemViewModel fileViewModel) {

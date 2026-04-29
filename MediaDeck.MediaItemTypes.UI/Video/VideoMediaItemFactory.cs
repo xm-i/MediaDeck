@@ -13,18 +13,19 @@ using MediaDeck.MediaItemTypes.Video.ViewModels;
 
 namespace MediaDeck.MediaItemTypes.UI.Video;
 
-[Inject(InjectServiceLifetime.Singleton, typeof(IMediaItemFactory))]
+[Inject(InjectServiceLifetime.Scoped, typeof(IMediaItemFactory))]
+[Inject(InjectServiceLifetime.Scoped, typeof(IMediaItemFactoryOf<VideoMediaItemViewModel>))]
 public class VideoMediaItemFactory : VideoMediaItemFactoryCore,
-	IMediaItemFactory<VideoMediaItemOperator, VideoMediaItemModel, DefaultExecutionProgramObjectModel, VideoMediaItemViewModel, DefaultExecutionProgramConfigViewModel, VideoDetailViewerPreviewControlView, VideoThumbnailPickerViewModel, VideoThumbnailPickerView, DefaultExecutionConfigView> {
+	IMediaItemFactory<VideoMediaItemOperator, VideoMediaItemModel, DefaultExecutionProgramObjectModel, VideoMediaItemViewModel, DefaultExecutionProgramConfigViewModel, VideoDetailViewerPreviewControlView, VideoThumbnailPickerViewModel, VideoThumbnailPickerView, DefaultExecutionConfigView>,
+	IMediaItemFactoryOf<VideoMediaItemViewModel> {
 	private VideoDetailViewerPreviewControlView? _videoDetailViewerPreviewControlView;
 
 	public VideoMediaItemFactory(
 		VideoMediaItemOperator VideoMediaItemOperator,
 		ConfigModel config,
 		ITagsManager tagsManager,
-		IMediaItemTypeProvider mediaItemTypeProvider,
 		IServiceProvider serviceProvider)
-		: base(VideoMediaItemOperator, config, tagsManager, mediaItemTypeProvider, serviceProvider) {
+		: base(VideoMediaItemOperator, config, tagsManager, serviceProvider) {
 
 		FlyleafLib.Engine.Start(new FlyleafLib.EngineConfig() {
 #if DEBUG

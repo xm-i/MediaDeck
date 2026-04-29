@@ -10,7 +10,7 @@ namespace MediaDeck.Core.Services;
 /// <summary>
 /// メディアアイテムタイプに関連する操作を提供するサービス実装クラス
 /// </summary>
-[Inject(InjectServiceLifetime.Singleton, typeof(IMediaItemTypeService))]
+[Inject(InjectServiceLifetime.Scoped, typeof(IMediaItemTypeService))]
 public class MediaItemTypeService(IEnumerable<IMediaItemFactory> mediaItemFactories, IEnumerable<IMediaItemTypeProvider> mediaItemTypeProviders) : IMediaItemTypeService {
 	private readonly IMediaItemFactory[] _mediaItemFactories = mediaItemFactories.ToArray();
 	private readonly IMediaItemFactory _unknownMediaItemFactory = mediaItemFactories.First(x => x.MediaType == MediaType.Unknown);
@@ -18,8 +18,8 @@ public class MediaItemTypeService(IEnumerable<IMediaItemFactory> mediaItemFactor
 	private readonly IMediaItemTypeProvider _unknownMediaItemProvider = mediaItemTypeProviders.First(x => x.MediaType == MediaType.Unknown);
 
 	/// <inheritdoc />
-	public IMediaItemModel CreateMediaItemModelFromRecord(MediaItem MediaItem, IServiceProvider scopedServiceProvider) {
-		return this.GetMediaItemFactory(MediaItem).CreateMediaItemModelFromRecord(MediaItem, scopedServiceProvider);
+	public IMediaItemModel CreateMediaItemModelFromRecord(MediaItem MediaItem) {
+		return this.GetMediaItemFactory(MediaItem).CreateMediaItemModelFromRecord(MediaItem);
 	}
 
 	/// <inheritdoc />

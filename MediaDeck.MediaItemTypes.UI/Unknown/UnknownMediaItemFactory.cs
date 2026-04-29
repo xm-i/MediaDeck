@@ -13,18 +13,19 @@ using MediaDeck.MediaItemTypes.Unknown.ViewModels;
 
 namespace MediaDeck.MediaItemTypes.UI.Unknown;
 
-[Inject(InjectServiceLifetime.Singleton, typeof(IMediaItemFactory))]
+[Inject(InjectServiceLifetime.Scoped, typeof(IMediaItemFactory))]
+[Inject(InjectServiceLifetime.Scoped, typeof(IMediaItemFactoryOf<UnknownMediaItemViewModel>))]
 public class UnknownMediaItemFactory : UnknownMediaItemFactoryCore,
-	IMediaItemFactory<UnknownMediaItemOperator, UnknownMediaItemModel, DefaultExecutionProgramObjectModel, UnknownMediaItemViewModel, DefaultExecutionProgramConfigViewModel, UnknownDetailViewerPreviewControlView, UnknownThumbnailPickerViewModel, UnknownThumbnailPickerView, DefaultExecutionConfigView> {
+	IMediaItemFactory<UnknownMediaItemOperator, UnknownMediaItemModel, DefaultExecutionProgramObjectModel, UnknownMediaItemViewModel, DefaultExecutionProgramConfigViewModel, UnknownDetailViewerPreviewControlView, UnknownThumbnailPickerViewModel, UnknownThumbnailPickerView, DefaultExecutionConfigView>,
+	IMediaItemFactoryOf<UnknownMediaItemViewModel> {
 	private UnknownDetailViewerPreviewControlView? _unknownDetailViewerPreviewControlView;
 
 	public UnknownMediaItemFactory(
 		UnknownMediaItemOperator UnknownMediaItemOperator,
 		ConfigModel config,
 		ITagsManager tagsManager,
-		IMediaItemTypeProvider mediaItemTypeProvider,
 		IServiceProvider serviceProvider)
-		: base(UnknownMediaItemOperator, config, tagsManager, mediaItemTypeProvider, serviceProvider) {
+		: base(UnknownMediaItemOperator, config, tagsManager, serviceProvider) {
 	}
 
 	public UnknownDetailViewerPreviewControlView CreateDetailViewerPreviewControlView(UnknownMediaItemViewModel fileViewModel) {

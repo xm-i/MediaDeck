@@ -4,4 +4,5 @@ using MediaDeck.MediaItemTypes.Base.Models;
 
 namespace MediaDeck.MediaItemTypes.Pdf.Models;
 
-public class PdfMediaItemModel(long id, string filePath, PdfMediaItemOperator fileOperator, IMediaItemTypeProvider mediaItemTypeProvider, IServiceProvider scopedServiceProvider) : BaseMediaItemModel(id, filePath, fileOperator, MediaType.Pdf, mediaItemTypeProvider, scopedServiceProvider);
+[Inject(InjectServiceLifetime.Transient)]
+public class PdfMediaItemModel(PdfMediaItemOperator fileOperator, IMediaItemTypeProvider mediaItemTypeProvider, IServiceProvider scopedServiceProvider) : BaseMediaItemModel(fileOperator, MediaType.Pdf, mediaItemTypeProvider, scopedServiceProvider);

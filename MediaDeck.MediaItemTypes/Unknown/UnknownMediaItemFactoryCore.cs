@@ -1,5 +1,4 @@
 using MediaDeck.Composition.Enum;
-using MediaDeck.Composition.Interfaces.MediaItemTypes;
 using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Database.Tables;
@@ -15,18 +14,15 @@ namespace MediaDeck.MediaItemTypes.Unknown;
 public class UnknownMediaItemFactoryCore : BaseMediaItemFactoryCore<UnknownMediaItemOperator, UnknownMediaItemModel, DefaultExecutionProgramObjectModel, UnknownMediaItemViewModel, DefaultExecutionProgramConfigViewModel, UnknownThumbnailPickerViewModel> {
 	private readonly UnknownMediaItemOperator _UnknownMediaItemOperator;
 	private readonly IServiceProvider _serviceProvider;
-	private readonly IMediaItemTypeProvider _mediaItemTypeProvider;
 
 	public UnknownMediaItemFactoryCore(
 		UnknownMediaItemOperator UnknownMediaItemOperator,
 		ConfigModel config,
 		ITagsManager tagsManager,
-		IMediaItemTypeProvider mediaItemTypeProvider,
 		IServiceProvider serviceProvider)
 		: base(config, tagsManager, MediaType.Unknown) {
 		this._UnknownMediaItemOperator = UnknownMediaItemOperator;
 		this._serviceProvider = serviceProvider;
-		this._mediaItemTypeProvider = mediaItemTypeProvider;
 	}
 
 	public override UnknownMediaItemOperator CreateMediaItemOperator() {
@@ -39,14 +35,17 @@ public class UnknownMediaItemFactoryCore : BaseMediaItemFactoryCore<UnknownMedia
 		}
 	}
 
-	public override UnknownMediaItemModel CreateMediaItemModelFromRecord(MediaItem MediaItem, IServiceProvider scopedServiceProvider) {
-		var ifm = new UnknownMediaItemModel(MediaItem.MediaItemId, MediaItem.FilePath, this.CreateMediaItemOperator(), this._mediaItemTypeProvider, scopedServiceProvider);
+	public override UnknownMediaItemModel CreateMediaItemModelFromRecord(MediaItem MediaItem) {
+		var ifm = this._serviceProvider.GetRequiredService<UnknownMediaItemModel>();
+		ifm.Initialize(MediaItem.MediaItemId, MediaItem.FilePath);
 		this.SetModelProperties(ifm, MediaItem);
 		return ifm;
 	}
 
 	public override UnknownMediaItemViewModel CreateMediaItemViewModel(UnknownMediaItemModel fileModel) {
-		return new UnknownMediaItemViewModel(fileModel, this);
+		var vm = this._serviceProvider.GetRequiredService<UnknownMediaItemViewModel>();
+		vm.Initialize(fileModel);
+		return vm;
 	}
 
 	public override UnknownThumbnailPickerViewModel CreateThumbnailPickerViewModel() {
@@ -54,12 +53,14 @@ public class UnknownMediaItemFactoryCore : BaseMediaItemFactoryCore<UnknownMedia
 	}
 
 	public override DefaultExecutionProgramObjectModel CreateExecutionProgramObjectModel() {
-		return new DefaultExecutionProgramObjectModel() {
-			MediaType = this.MediaType
-		};
+		var model = this._serviceProvider.GetRequiredService<DefaultExecutionProgramObjectModel>();
+		model.MediaType = this.MediaType;
+		return model;
 	}
 
 	public override DefaultExecutionProgramConfigViewModel CreateExecutionProgramConfigViewModel(DefaultExecutionProgramObjectModel model) {
-		return new DefaultExecutionProgramConfigViewModel(model, this._serviceProvider.GetRequiredService<IMediaItemTypeService>(), this._serviceProvider.GetRequiredService<ExecutionConfigModel>());
+		var vm = this._serviceProvider.GetRequiredService<DefaultExecutionProgramConfigViewModel>();
+		vm.Initialize(model);
+		return vm;
 	}
 }

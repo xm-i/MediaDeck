@@ -13,18 +13,19 @@ using MediaDeck.MediaItemTypes.UI.Base.Views;
 
 namespace MediaDeck.MediaItemTypes.UI.Archive;
 
-[Inject(InjectServiceLifetime.Singleton, typeof(IMediaItemFactory))]
+[Inject(InjectServiceLifetime.Scoped, typeof(IMediaItemFactory))]
+[Inject(InjectServiceLifetime.Scoped, typeof(IMediaItemFactoryOf<ArchiveMediaItemViewModel>))]
 public class ArchiveMediaItemFactory :
 	ArchiveMediaItemFactoryCore,
-	IMediaItemFactory<ArchiveMediaItemOperator, ArchiveMediaItemModel, DefaultExecutionProgramObjectModel, ArchiveMediaItemViewModel, DefaultExecutionProgramConfigViewModel, ArchiveDetailViewerPreviewControlView, ArchiveThumbnailPickerViewModel, ArchiveThumbnailPickerView, DefaultExecutionConfigView> {
+	IMediaItemFactory<ArchiveMediaItemOperator, ArchiveMediaItemModel, DefaultExecutionProgramObjectModel, ArchiveMediaItemViewModel, DefaultExecutionProgramConfigViewModel, ArchiveDetailViewerPreviewControlView, ArchiveThumbnailPickerViewModel, ArchiveThumbnailPickerView, DefaultExecutionConfigView>,
+	IMediaItemFactoryOf<ArchiveMediaItemViewModel> {
 	private ArchiveDetailViewerPreviewControlView? _archiveDetailViewerPreviewControlView;
 
 	public ArchiveMediaItemFactory(
 		ArchiveMediaItemOperator ArchiveMediaItemOperator,
 		ConfigModel config,
 		ITagsManager tagsManager,
-		IMediaItemTypeProvider mediaItemTypeProvider,
-		IServiceProvider serviceProvider) : base(ArchiveMediaItemOperator, config, tagsManager, mediaItemTypeProvider, serviceProvider) {
+		IServiceProvider serviceProvider) : base(ArchiveMediaItemOperator, config, tagsManager, serviceProvider) {
 	}
 
 

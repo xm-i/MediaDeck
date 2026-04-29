@@ -4,4 +4,5 @@ using MediaDeck.MediaItemTypes.Base.Models;
 
 namespace MediaDeck.MediaItemTypes.Unknown.Models;
 
-public class UnknownMediaItemModel(long id, string filePath, UnknownMediaItemOperator fileOperator, IMediaItemTypeProvider mediaItemTypeProvider, IServiceProvider scopedServiceProvider) : BaseMediaItemModel(id, filePath, fileOperator, MediaType.Unknown, mediaItemTypeProvider, scopedServiceProvider);
+[Inject(InjectServiceLifetime.Transient)]
+public class UnknownMediaItemModel(UnknownMediaItemOperator fileOperator, IMediaItemTypeProvider mediaItemTypeProvider, IServiceProvider scopedServiceProvider) : BaseMediaItemModel(fileOperator, MediaType.Unknown, mediaItemTypeProvider, scopedServiceProvider);

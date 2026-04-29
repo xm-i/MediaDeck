@@ -95,7 +95,7 @@ public class DuplicateDetectorViewModel : ViewModelBase {
 		get;
 	} = new();
 
-	public DuplicateDetectorViewModel(DuplicateFileDetectorService detector, IMediaItemTypeService MediaItemTypeService, IServiceProvider scopedServiceProvider) {
+	public DuplicateDetectorViewModel(DuplicateFileDetectorService detector, IMediaItemTypeService MediaItemTypeService) {
 		this._detector = detector;
 		this._MediaItemTypeService = MediaItemTypeService;
 
@@ -111,7 +111,7 @@ public class DuplicateDetectorViewModel : ViewModelBase {
 		this.SelectedGroup
 			.Subscribe(g => {
 				this.SelectedGroupFiles.Value = g?.Files
-					.Select(f => this._MediaItemTypeService.CreateMediaItemViewModel(this._MediaItemTypeService.CreateMediaItemModelFromRecord(f, scopedServiceProvider)))
+					.Select(f => this._MediaItemTypeService.CreateMediaItemViewModel(this._MediaItemTypeService.CreateMediaItemModelFromRecord(f)))
 					.ToArray();
 			})
 			.AddTo(this.CompositeDisposable);
