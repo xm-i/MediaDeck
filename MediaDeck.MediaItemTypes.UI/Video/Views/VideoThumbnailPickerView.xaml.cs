@@ -1,12 +1,11 @@
 using FlyleafLib.MediaPlayer;
-using MediaDeck.Composition.Interfaces.MediaItemTypes.Views;
 using MediaDeck.MediaItemTypes.UI.Base.Views;
 using MediaDeck.MediaItemTypes.Video.ViewModels;
 using Microsoft.UI.Xaml.Controls;
 
 namespace MediaDeck.MediaItemTypes.UI.Video.Views;
 
-public sealed partial class VideoThumbnailPickerView : VideoThumbnailPickerViewUserControl, IThumbnailPickerView {
+public sealed partial class VideoThumbnailPickerView : VideoThumbnailPickerViewUserControl {
 	private readonly SymbolIcon _iconPlay = new(Symbol.Play);
 	private readonly SymbolIcon _iconPause = new(Symbol.Pause);
 	private readonly CompositeDisposable _disposables = [];

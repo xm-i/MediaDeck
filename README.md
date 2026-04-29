@@ -42,7 +42,6 @@ MediaDeck/
 ├── MediaDeck.MediaItemTypes/   # メディアタイプ別の個別処理実装
 ├── MediaDeck.Database/         # データベース層 (EF Core, SQLite)
 ├── MediaDeck.Composition/      # システム全体の共通設定・DI定義
-├── MediaDeck.Composition.UI/   # UIレイヤー用のDI定義と共通コンポーネント
 ├── MediaDeck.Common/           # 共通ユーティリティ・基底クラス類
 └── lib/                        # 外部ライブラリ・サブモジュール
 ```

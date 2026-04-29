@@ -1,7 +1,6 @@
 using FlyleafLib.MediaPlayer;
 
 using MediaDeck.Composition.Interfaces.MediaItemTypes.ViewModels;
-using MediaDeck.Composition.Interfaces.MediaItemTypes.Views;
 using MediaDeck.MediaItemTypes.UI.Base.Views;
 
 using Microsoft.UI.Xaml;
@@ -9,7 +8,7 @@ using Microsoft.UI.Xaml.Controls;
 
 namespace MediaDeck.MediaItemTypes.UI.Video.Views;
 
-public sealed partial class VideoDetailViewerPreviewControlView : VideoDetailViewerPreviewControlViewUserControl, IDetailViewerPreviewControlView {
+public sealed partial class VideoDetailViewerPreviewControlView : VideoDetailViewerPreviewControlViewUserControl {
 	private readonly SymbolIcon _iconPlay = new(Symbol.Play);
 	private readonly SymbolIcon _iconPause = new(Symbol.Pause);
 	public Player Player {

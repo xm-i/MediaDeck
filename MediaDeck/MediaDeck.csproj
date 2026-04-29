@@ -57,7 +57,6 @@
   <ItemGroup>
     <ProjectReference Include="..\lib\AutoDiAttributes\AutoDiAttributes.Generator\AutoDiAttributes.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     <ProjectReference Include="..\MediaDeck.Composition\MediaDeck.Composition.csproj" />
-    <ProjectReference Include="..\MediaDeck.Composition.UI\MediaDeck.Composition.UI.csproj" />
     <ProjectReference Include="..\MediaDeck.Database\MediaDeck.Database.csproj" />
     <ProjectReference Include="..\MediaDeck.MediaItemTypes.UI\MediaDeck.MediaItemTypes.UI.csproj" />
     <ProjectReference Include="..\MediaDeck.Store\MediaDeck.Store.csproj" />
