@@ -34,8 +34,15 @@
 							CornerRadius="4"
 							Padding="16,12"
 							Margin="0,0,0,2" >
-							<Grid RowDefinitions="Auto,Auto"
-								ColumnDefinitions="*,Auto" >
+							<Grid>
+								<Grid.RowDefinitions>
+									<RowDefinition Height="Auto" />
+									<RowDefinition Height="Auto" />
+								</Grid.RowDefinitions>
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="*" />
+									<ColumnDefinition Width="Auto" />
+								</Grid.ColumnDefinitions>
 								<!-- 上段: メディアタイプ選択 -->
 								<StackPanel Grid.Row="0"
 									Grid.Column="0"
@@ -63,11 +70,12 @@
 										Foreground="{ThemeResource SystemFillColorCriticalBrush}" />
 								</Button>
 
-								<!-- 下段: 動的な設定UI (デフォルトはパスと引数) -->
-								<ContentPresenter Grid.Row="1"
+								<!-- 下段: 動的な設定UI -->
+								<ContentControl Grid.Row="1"
 									Grid.Column="0"
 									Grid.ColumnSpan="2"
-									Content="{x:Bind ConfigView.Value, Mode=OneWay}" />
+									Content="{x:Bind}"
+									ContentTemplateSelector="{StaticResource MediaItemExecutionConfigTplSel}" />
 							</Grid>
 						</Border>
 					</DataTemplate>
@@ -75,10 +83,14 @@
 			</ItemsControl>
 
 			<!-- 追加セクション -->
-			<Grid ColumnDefinitions="*,Auto"
+			<Grid
 				Margin="0,8,0,0"
 				ColumnSpacing="8"
 				VerticalAlignment="Bottom" >
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="*" />
+					<ColumnDefinition Width="Auto" />
+				</Grid.ColumnDefinitions>
 				<ComboBox Grid.Column="0"
 					HorizontalAlignment="Stretch"
 					Header="追加するメディアタイプ"

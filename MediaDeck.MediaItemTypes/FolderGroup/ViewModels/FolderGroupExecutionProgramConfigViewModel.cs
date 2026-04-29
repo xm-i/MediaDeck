@@ -21,8 +21,8 @@ public class FolderGroupExecutionProgramConfigViewModel : DefaultExecutionProgra
 		private set;
 	} = null!;
 
-	public FolderGroupExecutionProgramConfigViewModel(IMediaItemTypeService mediaItemTypeService, ExecutionConfigModel executionConfig)
-		: base(mediaItemTypeService, executionConfig) {
+	public FolderGroupExecutionProgramConfigViewModel(ExecutionConfigModel executionConfig)
+		: base(executionConfig) {
 	}
 
 	public void Initialize(FolderGroupExecutionProgramObjectModel model) {

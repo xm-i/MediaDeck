@@ -6,5 +6,8 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	mc:Ignorable="d"
 	Title="Thumbnail Picker" >
-	<ContentPresenter Content="{x:Bind ViewModel.ThumbnailPickerView.Value, Mode=OneWay}" />
+	<ContentControl Content="{x:Bind ViewModel.ThumbnailPickerViewModel.Value, Mode=OneWay}"
+		ContentTemplateSelector="{StaticResource MediaItemThumbnailPickerTplSel}"
+		HorizontalContentAlignment="Stretch"
+		VerticalContentAlignment="Stretch" />
 </Window>

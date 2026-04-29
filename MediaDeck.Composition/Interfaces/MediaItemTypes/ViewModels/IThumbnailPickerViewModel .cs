@@ -1,6 +1,12 @@
+using MediaDeck.Composition.Enum;
+
 namespace MediaDeck.Composition.Interfaces.MediaItemTypes.ViewModels;
 
 public interface IThumbnailPickerViewModel {
+	public MediaType MediaType {
+		get;
+	}
+
 	public BindableReactiveProperty<byte[]?> OriginalThumbnail {
 		get;
 	}

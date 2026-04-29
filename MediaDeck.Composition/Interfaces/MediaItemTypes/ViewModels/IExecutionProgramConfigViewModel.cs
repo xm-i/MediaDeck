@@ -1,5 +1,4 @@
 using MediaDeck.Composition.Enum;
-using MediaDeck.Composition.Interfaces.MediaItemTypes.Views;
 
 namespace MediaDeck.Composition.Interfaces.MediaItemTypes.ViewModels;
 
@@ -11,13 +10,6 @@ public interface IExecutionProgramConfigViewModel {
 	/// メディアタイプ
 	/// </summary>
 	public MediaType MediaType {
-		get;
-	}
-
-	/// <summary>
-	/// メディアタイプ固有の実行設定ビュー
-	/// </summary>
-	public BindableReactiveProperty<IExecutionConfigView?> ConfigView {
 		get;
 	}
 

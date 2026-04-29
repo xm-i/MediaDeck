@@ -1,7 +1,6 @@
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.Models;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.ViewModels;
-using MediaDeck.Composition.Interfaces.MediaItemTypes.Views;
 using MediaDeck.Database.Tables;
 
 namespace MediaDeck.Composition.Interfaces.MediaItemTypes;
@@ -21,19 +20,9 @@ public interface IMediaItemTypeService {
 	public IMediaItemViewModel CreateMediaItemViewModel(IMediaItemModel fileModel);
 
 	/// <summary>
-	/// ビューモデルに対応する詳細プレビューコントロールビューを作成します。
-	/// </summary>
-	public IDetailViewerPreviewControlView CreateDetailViewerPreviewControlView(IMediaItemViewModel fileViewModel);
-
-	/// <summary>
 	/// ビューモデルに対応するサムネイル選択ビューモデルを作成します。
 	/// </summary>
 	public IThumbnailPickerViewModel CreateThumbnailPickerViewModel(IMediaItemViewModel fileViewModel);
-
-	/// <summary>
-	/// ビューモデルに対応するサムネイル選択ビューを作成します。
-	/// </summary>
-	public IThumbnailPickerView CreateThumbnailPickerView(IMediaItemViewModel fileViewModel);
 
 	/// <summary>
 	/// 全てのメディアアイテムタイプに対するオペレーターを作成します。
@@ -88,8 +77,5 @@ public interface IMediaItemTypeService {
 	/// <returns>実行プログラム設定ViewModel</returns>
 	public IExecutionProgramConfigViewModel CreateExecutionConfigViewModel(IExecutionProgramObjectModel model);
 
-	/// <summary>
-	/// ビューモデルに対応する実行設定UIを作成します。
-	/// </summary>
-	public IExecutionConfigView CreateExecutionConfigView(IExecutionProgramConfigViewModel viewModel);
+
 }

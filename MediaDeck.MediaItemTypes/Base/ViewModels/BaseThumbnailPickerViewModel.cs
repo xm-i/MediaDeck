@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using ImageMagick;
 
 using MediaDeck.Common.Base;
+using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.ViewModels;
 using MediaDeck.MediaItemTypes.Base.Models;
 
@@ -24,6 +25,11 @@ public abstract class BaseThumbnailPickerViewModel<TThumbnailPickerModel> : View
 
 	protected IMediaItemViewModel? targetFileViewModel;
 	protected TThumbnailPickerModel thumbnailPickerModel;
+
+	public MediaType MediaType {
+		get;
+		private set;
+	} = MediaType.Unknown;
 
 	public BindableReactiveProperty<byte[]?> OriginalThumbnail {
 		get;
@@ -81,6 +87,7 @@ public abstract class BaseThumbnailPickerViewModel<TThumbnailPickerModel> : View
 
 	public virtual async Task LoadAsync(IMediaItemViewModel fileViewModel) {
 		this.targetFileViewModel = fileViewModel;
+		this.MediaType = fileViewModel.MediaType;
 		this.CandidateThumbnail.Value = null;
 		this.OriginalThumbnail.Value = await this.thumbnailPickerModel.LoadThumbnailAsync(fileViewModel.FileModel);
 	}

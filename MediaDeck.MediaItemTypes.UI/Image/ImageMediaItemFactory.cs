@@ -8,7 +8,6 @@ using MediaDeck.MediaItemTypes.Base.ViewModels;
 using MediaDeck.MediaItemTypes.Image;
 using MediaDeck.MediaItemTypes.Image.Models;
 using MediaDeck.MediaItemTypes.Image.ViewModels;
-using MediaDeck.MediaItemTypes.UI.Base.Views;
 using MediaDeck.MediaItemTypes.UI.Image.Views;
 
 namespace MediaDeck.MediaItemTypes.UI.Image;
@@ -16,10 +15,8 @@ namespace MediaDeck.MediaItemTypes.UI.Image;
 [Inject(InjectServiceLifetime.Scoped, typeof(IMediaItemFactory))]
 [Inject(InjectServiceLifetime.Scoped, typeof(IMediaItemFactoryOf<ImageMediaItemViewModel>))]
 public class ImageMediaItemFactory : ImageMediaItemFactoryCore,
-	IMediaItemFactory<ImageMediaItemOperator, ImageMediaItemModel, DefaultExecutionProgramObjectModel, ImageMediaItemViewModel, DefaultExecutionProgramConfigViewModel, ImageDetailViewerPreviewControlView, ImageThumbnailPickerViewModel, ImageThumbnailPickerView, DefaultExecutionConfigView>,
+	IMediaItemFactory<ImageMediaItemOperator, ImageMediaItemModel, DefaultExecutionProgramObjectModel, ImageMediaItemViewModel, DefaultExecutionProgramConfigViewModel, ImageThumbnailPickerViewModel>,
 	IMediaItemFactoryOf<ImageMediaItemViewModel> {
-	private ImageDetailViewerPreviewControlView? _imageDetailViewerPreviewControlView;
-
 	public ImageMediaItemFactory(
 		ImageMediaItemOperator ImageMediaItemOperator,
 		ConfigModel config,
@@ -28,39 +25,11 @@ public class ImageMediaItemFactory : ImageMediaItemFactoryCore,
 		: base(ImageMediaItemOperator, config, tagsManager, serviceProvider) {
 	}
 
-	public ImageDetailViewerPreviewControlView CreateDetailViewerPreviewControlView(ImageMediaItemViewModel fileViewModel) {
-		return this._imageDetailViewerPreviewControlView ??= new ImageDetailViewerPreviewControlView();
-	}
-
-
 	public IThumbnailControlView CreateThumbnailControlView(ImageMediaItemViewModel fileViewModel) {
 		return new ImageThumbnailControlView { DataContext = fileViewModel };
 	}
 
-	public ImageThumbnailPickerView CreateThumbnailPickerView() {
-		return new ImageThumbnailPickerView();
-	}
-
-
-	public DefaultExecutionConfigView CreateExecutionConfigView(DefaultExecutionProgramConfigViewModel viewModel) {
-		return new DefaultExecutionConfigView() {
-			ViewModel = viewModel
-		};
-	}
-
-	public IDetailViewerPreviewControlView CreateDetailViewerPreviewControlView(IMediaItemViewModel fileViewModel) {
-		return this.CreateDetailViewerPreviewControlView((ImageMediaItemViewModel)fileViewModel);
-	}
-
 	public IThumbnailControlView CreateThumbnailControlView(IMediaItemViewModel fileViewModel) {
 		return this.CreateThumbnailControlView((ImageMediaItemViewModel)fileViewModel);
-	}
-
-	IThumbnailPickerView IMediaItemFactory.CreateThumbnailPickerView() {
-		return this.CreateThumbnailPickerView();
-	}
-
-	public IExecutionConfigView CreateExecutionConfigView(IExecutionProgramConfigViewModel viewModel) {
-		return this.CreateExecutionConfigView((DefaultExecutionProgramConfigViewModel)viewModel);
 	}
 }

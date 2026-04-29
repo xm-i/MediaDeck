@@ -2,7 +2,6 @@ using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.MediaItemTypes;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.Models;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.ViewModels;
-using MediaDeck.Composition.Interfaces.MediaItemTypes.Views;
 using MediaDeck.Database.Tables;
 
 namespace MediaDeck.Core.Services;
@@ -28,18 +27,8 @@ public class MediaItemTypeService(IEnumerable<IMediaItemFactory> mediaItemFactor
 	}
 
 	/// <inheritdoc />
-	public IDetailViewerPreviewControlView CreateDetailViewerPreviewControlView(IMediaItemViewModel fileViewModel) {
-		return this.GetMediaItemFactory(fileViewModel).CreateDetailViewerPreviewControlView(fileViewModel);
-	}
-
-	/// <inheritdoc />
 	public IThumbnailPickerViewModel CreateThumbnailPickerViewModel(IMediaItemViewModel fileViewModel) {
 		return this.GetMediaItemFactory(fileViewModel).CreateThumbnailPickerViewModel();
-	}
-
-	/// <inheritdoc />
-	public IThumbnailPickerView CreateThumbnailPickerView(IMediaItemViewModel fileViewModel) {
-		return this.GetMediaItemFactory(fileViewModel).CreateThumbnailPickerView();
 	}
 
 	/// <inheritdoc />
@@ -100,11 +89,6 @@ public class MediaItemTypeService(IEnumerable<IMediaItemFactory> mediaItemFactor
 		return mediaItemFactory.CreateExecutionProgramConfigViewModel(model);
 	}
 
-	/// <inheritdoc />
-	public IExecutionConfigView CreateExecutionConfigView(IExecutionProgramConfigViewModel viewModel) {
-		var mediaItemFactory = this._mediaItemFactories.First(x => x.MediaType == viewModel.MediaType);
-		return mediaItemFactory.CreateExecutionConfigView(viewModel);
-	}
 
 	private IMediaItemFactory GetMediaItemFactory(IMediaItemModel fileModel) {
 		return this._mediaItemFactories.FirstOrDefault(x => x.MediaType == fileModel.MediaType) ?? this._unknownMediaItemFactory;

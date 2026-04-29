@@ -5,6 +5,7 @@
 	xmlns:converters="using:MediaDeck.Views.Resources.Converters"
 	xmlns:selectors="using:MediaDeck.Views.Resources"
 	xmlns:archiveViews="using:MediaDeck.MediaItemTypes.UI.Archive.Views"
+	xmlns:baseViews="using:MediaDeck.MediaItemTypes.UI.Base.Views"
 	xmlns:folderGroupViews="using:MediaDeck.MediaItemTypes.UI.FolderGroup.Views"
 	xmlns:imageViews="using:MediaDeck.MediaItemTypes.UI.Image.Views"
 	xmlns:pdfViews="using:MediaDeck.MediaItemTypes.UI.Pdf.Views"
@@ -48,6 +49,32 @@
 		<unknownViews:UnknownDetailViewerPreviewControlView />
 	</DataTemplate>
 
+	<DataTemplate x:Key="ImageThumbnailPickerTpl" >
+		<imageViews:ImageThumbnailPickerView />
+	</DataTemplate>
+	<DataTemplate x:Key="VideoThumbnailPickerTpl" >
+		<videoViews:VideoThumbnailPickerView />
+	</DataTemplate>
+	<DataTemplate x:Key="PdfThumbnailPickerTpl" >
+		<pdfViews:PdfThumbnailPickerView />
+	</DataTemplate>
+	<DataTemplate x:Key="ArchiveThumbnailPickerTpl" >
+		<archiveViews:ArchiveThumbnailPickerView />
+	</DataTemplate>
+	<DataTemplate x:Key="FolderGroupThumbnailPickerTpl" >
+		<folderGroupViews:FolderGroupThumbnailPickerView />
+	</DataTemplate>
+	<DataTemplate x:Key="UnknownThumbnailPickerTpl" >
+		<unknownViews:UnknownThumbnailPickerView />
+	</DataTemplate>
+
+	<DataTemplate x:Key="DefaultExecutionConfigTpl" >
+		<baseViews:DefaultExecutionConfigView />
+	</DataTemplate>
+	<DataTemplate x:Key="FolderGroupExecutionConfigTpl" >
+		<folderGroupViews:FolderGroupExecutionConfigView />
+	</DataTemplate>
+
 	<selectors:MediaItemDetailTemplateSelector
 		x:Key="MediaItemDetailTplSel"
 		Image="{StaticResource ImageDetailTpl}"
@@ -56,4 +83,22 @@
 		Archive="{StaticResource ArchiveDetailTpl}"
 		FolderGroup="{StaticResource FolderGroupDetailTpl}"
 		Unknown="{StaticResource UnknownDetailTpl}" />
+
+	<selectors:MediaItemThumbnailPickerTemplateSelector
+		x:Key="MediaItemThumbnailPickerTplSel"
+		Image="{StaticResource ImageThumbnailPickerTpl}"
+		Video="{StaticResource VideoThumbnailPickerTpl}"
+		Pdf="{StaticResource PdfThumbnailPickerTpl}"
+		Archive="{StaticResource ArchiveThumbnailPickerTpl}"
+		FolderGroup="{StaticResource FolderGroupThumbnailPickerTpl}"
+		Unknown="{StaticResource UnknownThumbnailPickerTpl}" />
+
+	<selectors:MediaItemExecutionConfigTemplateSelector
+		x:Key="MediaItemExecutionConfigTplSel"
+		Image="{StaticResource DefaultExecutionConfigTpl}"
+		Video="{StaticResource DefaultExecutionConfigTpl}"
+		Pdf="{StaticResource DefaultExecutionConfigTpl}"
+		Archive="{StaticResource DefaultExecutionConfigTpl}"
+		FolderGroup="{StaticResource FolderGroupExecutionConfigTpl}"
+		Unknown="{StaticResource DefaultExecutionConfigTpl}" />
 </ResourceDictionary>
