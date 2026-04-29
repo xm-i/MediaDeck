@@ -1,6 +1,8 @@
 using MediaDeck.Common.Base;
 using MediaDeck.Common.Utilities;
+using MediaDeck.Composition.Enum;
 using MediaDeck.Database;
+using MediaDeck.Database.Tables;
 
 using Microsoft.Extensions.Logging;
 
@@ -130,7 +132,7 @@ public class FileHashUpdatorService : ServiceBase, IFileHashUpdatorService {
 				string? filePath;
 				await using (var db = await this._dbFactory.CreateDbContextAsync(ct).ConfigureAwait(false)) {
 					var MediaItem = await db.MediaItems.FindAsync([MediaItemId], cancellationToken: ct).ConfigureAwait(false);
-					if (MediaItem == null || !MediaItem.IsExists) {
+					if (MediaItem == null || !MediaItem.IsExists || MediaItem.ItemType == ItemType.FolderGroup) {
 						continue;
 					}
 					filePath = MediaItem.FilePath;
