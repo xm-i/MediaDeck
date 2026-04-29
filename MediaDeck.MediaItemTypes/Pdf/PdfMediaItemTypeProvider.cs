@@ -6,6 +6,7 @@ using MediaDeck.MediaItemTypes.Base;
 
 namespace MediaDeck.MediaItemTypes.Pdf;
 
+[Inject(InjectServiceLifetime.Singleton)]
 [Inject(InjectServiceLifetime.Singleton, typeof(IMediaItemTypeProvider))]
 public class PdfMediaItemTypeProvider : BaseMediaItemTypeProvider {
 

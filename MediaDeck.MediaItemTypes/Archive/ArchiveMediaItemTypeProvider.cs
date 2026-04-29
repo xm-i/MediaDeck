@@ -6,6 +6,7 @@ using MediaDeck.MediaItemTypes.Base;
 
 namespace MediaDeck.MediaItemTypes.Archive;
 
+[Inject(InjectServiceLifetime.Singleton)]
 [Inject(InjectServiceLifetime.Singleton, typeof(IMediaItemTypeProvider))]
 public class ArchiveMediaItemTypeProvider : BaseMediaItemTypeProvider {
 

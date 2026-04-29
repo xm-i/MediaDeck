@@ -6,6 +6,7 @@ using MediaDeck.MediaItemTypes.Base;
 
 namespace MediaDeck.MediaItemTypes.Unknown;
 
+[Inject(InjectServiceLifetime.Singleton)]
 [Inject(InjectServiceLifetime.Singleton, typeof(IMediaItemTypeProvider))]
 public class UnknownMediaItemTypeProvider : BaseMediaItemTypeProvider {
 

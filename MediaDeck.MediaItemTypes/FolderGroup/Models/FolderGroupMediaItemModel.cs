@@ -1,5 +1,4 @@
 using MediaDeck.Composition.Enum;
-using MediaDeck.Composition.Interfaces.MediaItemTypes;
 using MediaDeck.MediaItemTypes.Base.Models;
 
 namespace MediaDeck.MediaItemTypes.FolderGroup.Models;
@@ -8,4 +7,4 @@ namespace MediaDeck.MediaItemTypes.FolderGroup.Models;
 /// フォルダグループのメディアアイテムモデル
 /// </summary>
 [Inject(InjectServiceLifetime.Transient)]
-public class FolderGroupMediaItemModel(FolderGroupMediaItemOperator fileOperator, IMediaItemTypeProvider mediaItemTypeProvider, IServiceProvider scopedServiceProvider) : BaseMediaItemModel(fileOperator, MediaType.FolderGroup, mediaItemTypeProvider, scopedServiceProvider);
+public class FolderGroupMediaItemModel(FolderGroupMediaItemOperator fileOperator, FolderGroupMediaItemTypeProvider mediaItemTypeProvider, IServiceProvider scopedServiceProvider) : BaseMediaItemModel(fileOperator, MediaType.FolderGroup, mediaItemTypeProvider, scopedServiceProvider);

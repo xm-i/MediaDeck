@@ -14,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace MediaDeck.MediaItemTypes.FolderGroup;
 
+[Inject(InjectServiceLifetime.Singleton)]
 [Inject(InjectServiceLifetime.Singleton, typeof(IMediaItemTypeProvider))]
 public class FolderGroupMediaItemTypeProvider : BaseMediaItemTypeProvider {
 	private readonly IServiceProvider _serviceProvider;

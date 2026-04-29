@@ -6,6 +6,7 @@ using MediaDeck.MediaItemTypes.Base;
 
 namespace MediaDeck.MediaItemTypes.Video;
 
+[Inject(InjectServiceLifetime.Singleton)]
 [Inject(InjectServiceLifetime.Singleton, typeof(IMediaItemTypeProvider))]
 public class VideoMediaItemTypeProvider : BaseMediaItemTypeProvider {
 
