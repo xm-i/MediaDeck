@@ -14,55 +14,55 @@ public class FilterSelector : ModelBase {
 	/// コンストラクタ
 	/// </summary>
 	public FilterSelector(TabStateModel tabState, SearchDefinitionsStateModel searchDefinitions, ISearchConditionNotificationDispatcher dispatcher) {
+		this._searchConditionNotificationDispatcher = dispatcher;
 		this.FilteringConditions.AddRange(searchDefinitions.FilteringConditions.Select(x => new FilteringCondition(x).AddTo(this.CompositeDisposable)));
 
-		this.CurrentFilteringCondition.Value = this.FilteringConditions.FirstOrDefault(x => x.FilterObject.Id == tabState.SearchState.CurrentFilteringCondition.Value);
+		this.CurrentFilteringConditions.Value = this.FilteringConditions
+			.Where(x => tabState.SearchState.CurrentFilteringConditions.Value.Contains(x.FilterObject))
+			.ToArray();
 
-		IDisposable? beforeCurrent = null;
-		this.CurrentFilteringCondition
-			.Subscribe(x => {
-				// フィルター条件変更を内部 Subject に通知し、Dispatcher 経由で検索発火を依頼する
-				this._onUpdateFilteringChanged.OnNext(Unit.Default);
+		this._innerSubscriptions.AddTo(this.CompositeDisposable);
+		this.RebuildInnerSubscriptions(this.CurrentFilteringConditions.Value);
+
+		this.CurrentFilteringConditions
+			.Subscribe(selected => {
+				var conditions = selected ?? [];
+				this.RebuildInnerSubscriptions(conditions);
+				tabState.SearchState.CurrentFilteringConditions.Value = conditions.Select(x => x.FilterObject).ToArray();
 				dispatcher.FilterChanged.OnNext(Unit.Default);
-				beforeCurrent?.Dispose();
-				beforeCurrent = x?.OnUpdateFilteringConditions
-					.Subscribe(_ => {
-						this._onUpdateFilteringChanged.OnNext(Unit.Default);
-						dispatcher.FilterChanged.OnNext(Unit.Default);
-					});
-				tabState.SearchState.CurrentFilteringCondition.Value = x?.FilterObject.Id;
 			})
 			.AddTo(this.CompositeDisposable);
 
 		searchDefinitions.FilteringConditions.ObserveChanged()
-			.Subscribe(x => {
+			.Subscribe(_ => {
+				var previousIdList = this.CurrentFilteringConditions.Value.Select(x => x.FilterObject.Id).ToHashSet();
 				this.FilteringConditions.Clear();
 				this.FilteringConditions.AddRange(searchDefinitions.FilteringConditions.Select(x => new FilteringCondition(x).AddTo(this.CompositeDisposable)));
-				this.CurrentFilteringCondition.Value = this.FilteringConditions.FirstOrDefault(x => x.DisplayName == this.CurrentFilteringCondition.Value?.DisplayName);
+				this.CurrentFilteringConditions.Value = this.FilteringConditions.Where(x => previousIdList.Contains(x.FilterObject.Id)).ToArray();
 			})
 			.AddTo(this.CompositeDisposable);
 	}
 
-	/// <summary>
-	/// フィルター条件変更通知Subject
-	/// </summary>
-	private readonly Subject<Unit> _onUpdateFilteringChanged = new();
+	private readonly CompositeDisposable _innerSubscriptions = [];
+	private readonly ISearchConditionNotificationDispatcher _searchConditionNotificationDispatcher;
 
-	/// <summary>
-	/// フィルター条件変更通知
-	/// </summary>
-	public Observable<Unit> OnFilteringConditionChanged {
-		get {
-			return this._onUpdateFilteringChanged.AsObservable();
+	private void RebuildInnerSubscriptions(IReadOnlyCollection<FilteringCondition> selected) {
+		this._innerSubscriptions.Clear();
+		foreach (var condition in selected) {
+			condition.OnUpdateFilteringConditions
+				.Subscribe(_ => {
+					this._searchConditionNotificationDispatcher.FilterChanged.OnNext(Unit.Default);
+				})
+				.AddTo(this._innerSubscriptions);
 		}
 	}
 
 	/// <summary>
-	/// カレント条件
+	/// 選択中のフィルター条件（複数選択：AND条件として適用される）
 	/// </summary>
-	public ReactiveProperty<FilteringCondition?> CurrentFilteringCondition {
+	public ReactiveProperty<FilteringCondition[]> CurrentFilteringConditions {
 		get;
-	} = new();
+	} = new([]);
 
 	/// <summary>
 	/// フィルター条件リスト
@@ -72,12 +72,15 @@ public class FilterSelector : ModelBase {
 	} = [];
 
 	/// <summary>
-	/// フィルターマネージャーで選択したフィルターを引数に渡されたクエリに適用して返却する。
+	/// フィルターマネージャーで選択したフィルターを引数に渡されたクエリに対しAND条件で適用して返却する。
 	/// </summary>
 	/// <param name="query">絞り込みクエリを適用するクエリ</param>
 	/// <returns>フィルター適用後クエリ</returns>
 	public IQueryable<MediaItem> SetFilterConditions(IQueryable<MediaItem> query) {
-		return this.CurrentFilteringCondition.Value?.SetFilterConditions(query) ?? query;
+		foreach (var condition in this.CurrentFilteringConditions.Value ?? []) {
+			query = condition.SetFilterConditions(query);
+		}
+		return query;
 	}
 
 }

@@ -6,7 +6,6 @@
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:filtersVm="using:MediaDeck.ViewModels.Panes.FilterPanes"
-	xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
 	mc:Ignorable="d" >
 
 	<Grid>
@@ -47,23 +46,18 @@
 		<!-- Content -->
 		<Border Grid.Row="1"
 			Background="{ThemeResource LayerFillColorDefaultBrush}" >
-			<ListBox x:Name="FilteringCondisionListBox"
+			<ListView x:Name="FilteringCondisionListBox"
 				Padding="8"
+				SelectionMode="Multiple"
 				ItemsSource="{x:Bind ViewModel.FilteringConditions, Mode=OneWay}"
-				SelectedItem="{x:Bind ViewModel.CurrentCondition.Value, Mode=OneWay}" >
-				<interactivity:Interaction.Behaviors>
-					<interactivity:EventTriggerBehavior EventName="SelectionChanged" >
-						<interactivity:InvokeCommandAction Command="{x:Bind ViewModel.ChangeFilteringConditionSelectionCommand}"
-							CommandParameter="{Binding SelectedItem,ElementName=FilteringCondisionListBox}" />
-					</interactivity:EventTriggerBehavior>
-				</interactivity:Interaction.Behaviors>
+				SelectionChanged="FilteringCondisionListBox_SelectionChanged" >
 				<ItemsControl.ItemTemplate>
 					<DataTemplate x:DataType="filtersVm:FilteringConditionViewModel" >
 						<TextBlock Text="{x:Bind DisplayName.Value, Mode=OneWay, TargetNullValue=NoName}"
 							Padding="4,6" />
 					</DataTemplate>
 				</ItemsControl.ItemTemplate>
-			</ListBox>
+			</ListView>
 		</Border>
 	</Grid>
 </local:FilterSelectorUserControl>
