@@ -199,7 +199,7 @@ public class MediaItemTypeServiceTest {
 			".mp4" => ItemType.Video,
 			_ => ItemType.Unknown
 		};
-		return new MediaItem { DirectoryPath = Path.GetDirectoryName(filePath) ?? string.Empty, FilePath = filePath, Description = string.Empty, MediaItemTags = new List<MediaItemTag>(), ItemType = itemType };
+		return new MediaItem { DirectoryPath = Path.GetDirectoryName(filePath) ?? string.Empty, FilePath = filePath, Description = string.Empty, MediaItemTags = new List<MediaItemTag>(), ItemType = itemType, IsUnderFolderGroup = false };
 	}
 
 	private sealed class TestMediaItemFactory : IMediaItemFactory {

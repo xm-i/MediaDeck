@@ -43,7 +43,7 @@ public static class R3Ex {
 	}
 	public static ReactiveProperty<TResult> ToTwoWayReactiveProperty<TProperty, TResult>(this ReactiveProperty<TProperty> source, Func<TProperty, TResult> convert, Func<TResult, TProperty> convertBack, TResult initialValue = default!, CompositeDisposable? disposables = null) {
 		var resultRp = new ReactiveProperty<TResult>(initialValue);
-		var d1 = source.Pairwise().Where(x => !SequenceEqualAwareEquals(x.Previous, x.Current)).Select(x => x.Current).Subscribe(x => {
+		var d1 = source.Subscribe(x => {
 			var converted = convert(x);
 			if (!SequenceEqualAwareEquals(resultRp.Value, converted)) {
 				resultRp.Value = converted;

@@ -1,6 +1,5 @@
 using MediaDeck.Common.Base;
 using MediaDeck.Common.Utilities;
-using MediaDeck.Composition.Enum;
 using MediaDeck.Database;
 using MediaDeck.Database.Tables;
 

@@ -52,7 +52,8 @@ public class FileChangeTrackerTests {
 					DirectoryPath = "/test/path",
 					Description = $"Test file {i}",
 					PreHash = $"hash{i}",
-					FileSize = i * 1000
+					FileSize = i * 1000,
+					IsUnderFolderGroup = false
 				});
 			}
 			await db.SaveChangesAsync();
