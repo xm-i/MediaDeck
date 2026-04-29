@@ -10,5 +10,5 @@ public sealed partial class FolderGroupDetailViewerPreviewControlView : FolderGr
 	}
 }
 
-public class FolderGroupDetailViewerPreviewControlViewUserControl : UserControlBase<IDetailViewerViewModel> {
+public class FolderGroupDetailViewerPreviewControlViewUserControl : UserControlBase<IMediaItemViewModel> {
 }

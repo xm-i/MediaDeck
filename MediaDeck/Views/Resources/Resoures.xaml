@@ -2,7 +2,14 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:ctConverters="using:CommunityToolkit.WinUI.Converters"
-	xmlns:converters="using:MediaDeck.Views.Resources.Converters" >
+	xmlns:converters="using:MediaDeck.Views.Resources.Converters"
+	xmlns:selectors="using:MediaDeck.Views.Resources"
+	xmlns:archiveViews="using:MediaDeck.MediaItemTypes.UI.Archive.Views"
+	xmlns:folderGroupViews="using:MediaDeck.MediaItemTypes.UI.FolderGroup.Views"
+	xmlns:imageViews="using:MediaDeck.MediaItemTypes.UI.Image.Views"
+	xmlns:pdfViews="using:MediaDeck.MediaItemTypes.UI.Pdf.Views"
+	xmlns:unknownViews="using:MediaDeck.MediaItemTypes.UI.Unknown.Views"
+	xmlns:videoViews="using:MediaDeck.MediaItemTypes.UI.Video.Views" >
 	<ctConverters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
 	<converters:StringNotEmptyToVisibilityConverter x:Key="StringNotEmptyToVisibilityConverter" />
 	<converters:LongToDoubleConverter x:Key="LongToDoubleConverter" />
@@ -21,4 +28,32 @@
 	<converters:TagListConverter x:Key="TagListConverter" />
 	<converters:FileChangeFilterToDisplayNameConverter x:Key="FileChangeFilterToDisplayNameConverter" />
 	<converters:GpsLocationToLocationConverter x:Key="GpsLocationToLocationConverter" />
+
+	<DataTemplate x:Key="ImageDetailTpl" >
+		<imageViews:ImageDetailViewerPreviewControlView />
+	</DataTemplate>
+	<DataTemplate x:Key="VideoDetailTpl" >
+		<videoViews:VideoDetailViewerPreviewControlView />
+	</DataTemplate>
+	<DataTemplate x:Key="PdfDetailTpl" >
+		<pdfViews:PdfDetailViewerPreviewControlView />
+	</DataTemplate>
+	<DataTemplate x:Key="ArchiveDetailTpl" >
+		<archiveViews:ArchiveDetailViewerPreviewControlView />
+	</DataTemplate>
+	<DataTemplate x:Key="FolderGroupDetailTpl" >
+		<folderGroupViews:FolderGroupDetailViewerPreviewControlView />
+	</DataTemplate>
+	<DataTemplate x:Key="UnknownDetailTpl" >
+		<unknownViews:UnknownDetailViewerPreviewControlView />
+	</DataTemplate>
+
+	<selectors:MediaItemDetailTemplateSelector
+		x:Key="MediaItemDetailTplSel"
+		Image="{StaticResource ImageDetailTpl}"
+		Video="{StaticResource VideoDetailTpl}"
+		Pdf="{StaticResource PdfDetailTpl}"
+		Archive="{StaticResource ArchiveDetailTpl}"
+		FolderGroup="{StaticResource FolderGroupDetailTpl}"
+		Unknown="{StaticResource UnknownDetailTpl}" />
 </ResourceDictionary>

@@ -39,7 +39,8 @@
 				VerticalAlignment="Stretch"
 				HorizontalContentAlignment="Stretch"
 				VerticalContentAlignment="Stretch"
-				Content="{x:Bind ViewModel.DetailViewerViewModel.DetailViewerPreviewControlView.Value, Mode=OneWay}" />
+				Content="{x:Bind ViewModel.DetailViewerViewModel.SelectedFile.Value, Mode=OneWay}"
+				ContentTemplateSelector="{StaticResource MediaItemDetailTplSel}" />
 		</Grid>
 		<ListView x:Name="List"
 			Margin="10"

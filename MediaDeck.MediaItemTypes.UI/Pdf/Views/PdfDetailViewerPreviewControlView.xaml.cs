@@ -10,5 +10,5 @@ public sealed partial class PdfDetailViewerPreviewControlView : PdfDetailViewerP
 	}
 }
 
-public class PdfDetailViewerPreviewControlViewUserControl : UserControlBase<IDetailViewerViewModel> {
+public class PdfDetailViewerPreviewControlViewUserControl : UserControlBase<IMediaItemViewModel> {
 }

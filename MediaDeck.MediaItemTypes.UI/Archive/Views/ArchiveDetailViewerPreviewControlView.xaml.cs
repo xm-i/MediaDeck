@@ -10,5 +10,5 @@ public sealed partial class ArchiveDetailViewerPreviewControlView : ArchiveDetai
 	}
 }
 
-public class ArchiveDetailViewerPreviewControlViewUserControl : UserControlBase<IDetailViewerViewModel> {
+public class ArchiveDetailViewerPreviewControlViewUserControl : UserControlBase<IMediaItemViewModel> {
 }

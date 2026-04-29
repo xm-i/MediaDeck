@@ -1,8 +1,11 @@
+using System.ComponentModel;
+
 using Microsoft.UI.Xaml.Controls;
 
 namespace MediaDeck.MediaItemTypes.UI.Base.Views;
 
-public abstract class UserControlBase<T> : UserControl where T : class {
+public abstract class UserControlBase<T> : UserControl, INotifyPropertyChanged where T : class {
+	public event PropertyChangedEventHandler? PropertyChanged;
 	public T? ViewModel {
 		get;
 		set;
@@ -25,6 +28,6 @@ public abstract class UserControlBase<T> : UserControl where T : class {
 	/// <param name="oldViewModel">変更前の ViewModel。</param>
 	/// <param name="newViewModel">変更後の ViewModel。</param>
 	protected virtual void OnViewModelChanged(T? oldViewModel, T? newViewModel) {
-		// 派生クラスでのオーバーライド用のフックメソッド
+		this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.ViewModel)));
 	}
 }

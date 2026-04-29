@@ -528,6 +528,10 @@ public class MediaItemTypeServiceTest {
 			get;
 		} = new();
 
+		public ReactiveCommand PickThumbnailFromFileCommand {
+			get;
+		} = new();
+
 		public ReactiveCommand SaveCommand {
 			get;
 		} = new();
