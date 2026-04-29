@@ -207,6 +207,14 @@ public class MediaItem {
 	}
 
 	/// <summary>
+	/// フォルダグループ配下のファイルか
+	/// </summary>
+	public bool IsUnderFolderGroup {
+		get;
+		set;
+	}
+
+	/// <summary>
 	/// タグリスト
 	/// </summary>
 	public virtual ICollection<MediaItemTag> MediaItemTags {

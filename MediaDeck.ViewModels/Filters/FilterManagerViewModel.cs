@@ -83,7 +83,8 @@ public class FilterManagerViewModel : ViewModelBase {
 			new MediaTypeFilterCreatorViewModel(this.CurrentCondition),
 			new RateFilterCreatorViewModel(this.CurrentCondition),
 			new ResolutionFilterCreatorViewModel(this.CurrentCondition),
-			new TagFilterCreatorViewModel(this.CurrentCondition)
+			new TagFilterCreatorViewModel(this.CurrentCondition),
+			new FolderGroupFilterCreatorViewModel(this.CurrentCondition)
 		];
 		this.SelectedFilterCreatorViewModel.Value = this.FilterCreatorViewModels.First();
 	}

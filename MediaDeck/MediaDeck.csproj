@@ -53,7 +53,7 @@
     <PackageReference Include="System.Reactive" />
     <Manifest Include="$(ApplicationManifest)" />
   </ItemGroup>
-
+  
   <ItemGroup>
     <ProjectReference Include="..\lib\AutoDiAttributes\AutoDiAttributes.Generator\AutoDiAttributes.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     <ProjectReference Include="..\MediaDeck.Composition\MediaDeck.Composition.csproj" />

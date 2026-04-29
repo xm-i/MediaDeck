@@ -38,6 +38,9 @@ public sealed partial class FilterManagerView {
 			case TagFilterCreatorViewModel:
 				this.ContentFrame.Navigate(typeof(TagFilter));
 				break;
+			case FolderGroupFilterCreatorViewModel:
+				this.ContentFrame.Navigate(typeof(FolderGroupFilter));
+				break;
 		}
 	}
 }

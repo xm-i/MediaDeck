@@ -42,6 +42,8 @@ public static class FilterItemFactory {
 				throw new InvalidOperationException();
 			case TagFilterItemObject tf:
 				return new FilterItem(x => x.MediaItemTags.Select(mft => mft.Tag.TagName).Contains(tf.TagName) == (tf.SearchType == SearchTypeInclude.Include));
+			case FolderGroupFilterItemObject fgf:
+				return new FilterItem(x => x.IsUnderFolderGroup == (fgf.SearchType == SearchTypeInclude.Include));
 			default:
 				throw new ArgumentException("undefined filter", nameof(filterItemObject));
 		}
