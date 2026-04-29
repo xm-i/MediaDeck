@@ -1,4 +1,5 @@
 using MediaDeck.Composition.Enum;
+using MediaDeck.Composition.Interfaces.MediaItemTypes;
 using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Database.Tables;
@@ -12,11 +13,16 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace MediaDeck.MediaItemTypes.Pdf;
 
-public class PdfMediaItemFactoryCore : BaseMediaItemFactoryCore<PdfMediaItemOperator, PdfMediaItemModel, DefaultExecutionProgramObjectModel, PdfMediaItemViewModel, DefaultExecutionProgramConfigViewModel, PdfThumbnailPickerViewModel> {
+[Inject(InjectServiceLifetime.Scoped, typeof(IMediaItemFactory))]
+[Inject(InjectServiceLifetime.Scoped, typeof(IMediaItemFactoryOf<PdfMediaItemViewModel>))]
+public class PdfMediaItemFactory :
+	BaseMediaItemFactory<PdfMediaItemOperator, PdfMediaItemModel, DefaultExecutionProgramObjectModel, PdfMediaItemViewModel, DefaultExecutionProgramConfigViewModel, PdfThumbnailPickerViewModel>,
+	IMediaItemFactory<PdfMediaItemOperator, PdfMediaItemModel, DefaultExecutionProgramObjectModel, PdfMediaItemViewModel, DefaultExecutionProgramConfigViewModel, PdfThumbnailPickerViewModel>,
+	IMediaItemFactoryOf<PdfMediaItemViewModel> {
 	private readonly PdfMediaItemOperator _PdfMediaItemOperator;
 	private readonly IServiceProvider _serviceProvider;
 
-	public PdfMediaItemFactoryCore(
+	public PdfMediaItemFactory(
 		PdfMediaItemOperator PdfMediaItemOperator,
 		ConfigModel config,
 		ITagsManager tagsManager,

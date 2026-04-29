@@ -1,6 +1,5 @@
 using MediaDeck.Common.Extensions;
 using MediaDeck.Composition.Enum;
-using MediaDeck.Composition.Interfaces.MediaItemTypes;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.ViewModels;
 using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.MediaItemTypes.Base.ViewModels;

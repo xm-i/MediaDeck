@@ -5,6 +5,8 @@ using CommunityToolkit.Mvvm.DependencyInjection;
 
 using FFMpegCore;
 
+using FlyleafLib;
+
 using MediaDeck.Composition.Constants;
 using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Core.Stores.Config;
@@ -130,5 +132,16 @@ public partial class App {
 
 		var tagsManager = Ioc.Default.GetRequiredService<ITagsManager>();
 		await tagsManager.InitializeAsync();
+
+
+		FlyleafLib.Engine.Start(new FlyleafLib.EngineConfig() {
+#if DEBUG
+			LogOutput = ":debug",
+			LogLevel = FlyleafLib.LogLevel.Debug,
+			FFmpegLogLevel = Flyleaf.FFmpeg.LogLevel.Warn,
+#endif
+			UIRefresh = false,
+			FFmpegPath = this._configStore.Config.PathConfig.FFMpegFolderPath.Value,
+		});
 	}
 }

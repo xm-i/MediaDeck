@@ -6,7 +6,7 @@ using Microsoft.UI.Xaml.Controls;
 
 namespace MediaDeck.Views.Resources;
 
-public sealed class MediaItemThumbnailPickerTemplateSelector : DataTemplateSelector {
+public sealed class MediaItemThumbnailControlTemplateSelector : DataTemplateSelector {
 	public DataTemplate? Image {
 		get;
 		set;
@@ -42,7 +42,7 @@ public sealed class MediaItemThumbnailPickerTemplateSelector : DataTemplateSelec
 	}
 
 	protected override DataTemplate SelectTemplateCore(object item, DependencyObject container) {
-		if (item is not IThumbnailPickerViewModel vm) {
+		if (item is not IMediaItemViewModel vm) {
 			return this.Unknown ?? new DataTemplate();
 		}
 
@@ -52,7 +52,7 @@ public sealed class MediaItemThumbnailPickerTemplateSelector : DataTemplateSelec
 			MediaType.Pdf => this.Pdf,
 			MediaType.Archive => this.Archive,
 			MediaType.FolderGroup => this.FolderGroup,
-			_ => this.Unknown
-		} ?? this.Unknown ?? new DataTemplate();
+			_ => this.Unknown,
+		} ?? new DataTemplate();
 	}
 }

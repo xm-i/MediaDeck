@@ -1,6 +1,5 @@
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.Models;
-using MediaDeck.Composition.Interfaces.MediaItemTypes.Views;
 using MediaDeck.Composition.Interfaces.Primitives;
 using MediaDeck.Composition.Objects;
 
@@ -16,10 +15,6 @@ public interface IMediaItemViewModel {
 	}
 
 	public BindableReactiveProperty<string> ThumbnailFilePath {
-		get;
-	}
-
-	public IThumbnailControlView ThumbnailControlView {
 		get;
 	}
 

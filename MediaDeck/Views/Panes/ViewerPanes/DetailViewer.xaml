@@ -60,7 +60,8 @@
 				<DataTemplate x:DataType="vmIf:IMediaItemViewModel" >
 					<Grid DoubleTapped="File_DoubleTapped" >
 						<ContentControl
-							Content="{x:Bind ThumbnailControlView, Mode=OneWay}"
+							Content="{x:Bind}"
+							ContentTemplateSelector="{StaticResource MediaItemThumbnailControlTplSel}"
 							Height="{Binding DataContext.ItemSize.Value, Mode=OneWay, ElementName=List}"
 							HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
 						<Grid Opacity="0.7"

@@ -3,18 +3,15 @@ using System.Threading.Tasks;
 using MediaDeck.Common.Base;
 using MediaDeck.Composition.Constants;
 using MediaDeck.Composition.Enum;
-using MediaDeck.Composition.Interfaces.MediaItemTypes;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.Models;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.ViewModels;
-using MediaDeck.Composition.Interfaces.MediaItemTypes.Views;
 using MediaDeck.Composition.Interfaces.Primitives;
 using MediaDeck.Composition.Objects;
 
 namespace MediaDeck.MediaItemTypes.Base.ViewModels;
 
 public abstract class BaseMediaItemViewModel : ViewModelBase, IMediaItemViewModel {
-	protected BaseMediaItemViewModel(IMediaItemFactory mediaItemFactory, MediaType mediaType) : base() {
-		this._mediaItemFactory = mediaItemFactory;
+	protected BaseMediaItemViewModel(MediaType mediaType) : base() {
 		this.MediaType = mediaType;
 	}
 
@@ -33,7 +30,6 @@ public abstract class BaseMediaItemViewModel : ViewModelBase, IMediaItemViewMode
 	}
 
 	private long _thumbnailRefreshTicks = 0;
-	private readonly IMediaItemFactory _mediaItemFactory;
 
 	private IMediaItemModel? _fileModel;
 	public IMediaItemModel FileModel {
@@ -53,12 +49,6 @@ public abstract class BaseMediaItemViewModel : ViewModelBase, IMediaItemViewMode
 	public BindableReactiveProperty<string> ThumbnailFilePath {
 		get {
 			return this._thumbnailFilePath ?? throw this.CreateNotInitializedException();
-		}
-	}
-
-	public IThumbnailControlView ThumbnailControlView {
-		get {
-			return this._mediaItemFactory.CreateThumbnailControlView(this);
 		}
 	}
 

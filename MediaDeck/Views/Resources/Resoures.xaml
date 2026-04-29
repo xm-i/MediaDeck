@@ -4,6 +4,7 @@
 	xmlns:ctConverters="using:CommunityToolkit.WinUI.Converters"
 	xmlns:converters="using:MediaDeck.Views.Resources.Converters"
 	xmlns:selectors="using:MediaDeck.Views.Resources"
+	xmlns:vmIf="using:MediaDeck.Composition.Interfaces.MediaItemTypes.ViewModels"
 	xmlns:archiveViews="using:MediaDeck.MediaItemTypes.UI.Archive.Views"
 	xmlns:baseViews="using:MediaDeck.MediaItemTypes.UI.Base.Views"
 	xmlns:folderGroupViews="using:MediaDeck.MediaItemTypes.UI.FolderGroup.Views"
@@ -92,6 +93,34 @@
 		Archive="{StaticResource ArchiveThumbnailPickerTpl}"
 		FolderGroup="{StaticResource FolderGroupThumbnailPickerTpl}"
 		Unknown="{StaticResource UnknownThumbnailPickerTpl}" />
+
+	<DataTemplate x:Key="ImageThumbnailControlTpl" >
+		<imageViews:ImageThumbnailControlView />
+	</DataTemplate>
+	<DataTemplate x:Key="VideoThumbnailControlTpl" >
+		<videoViews:VideoThumbnailControlView />
+	</DataTemplate>
+	<DataTemplate x:Key="PdfThumbnailControlTpl" >
+		<pdfViews:PdfThumbnailControlView />
+	</DataTemplate>
+	<DataTemplate x:Key="ArchiveThumbnailControlTpl" >
+		<archiveViews:ArchiveThumbnailControlView />
+	</DataTemplate>
+	<DataTemplate x:Key="FolderGroupThumbnailControlTpl" >
+		<folderGroupViews:FolderGroupThumbnailControlView />
+	</DataTemplate>
+	<DataTemplate x:Key="UnknownThumbnailControlTpl" >
+		<unknownViews:UnknownThumbnailControlView />
+	</DataTemplate>
+
+	<selectors:MediaItemThumbnailControlTemplateSelector
+		x:Key="MediaItemThumbnailControlTplSel"
+		Image="{StaticResource ImageThumbnailControlTpl}"
+		Video="{StaticResource VideoThumbnailControlTpl}"
+		Pdf="{StaticResource PdfThumbnailControlTpl}"
+		Archive="{StaticResource ArchiveThumbnailControlTpl}"
+		FolderGroup="{StaticResource FolderGroupThumbnailControlTpl}"
+		Unknown="{StaticResource UnknownThumbnailControlTpl}" />
 
 	<selectors:MediaItemExecutionConfigTemplateSelector
 		x:Key="MediaItemExecutionConfigTplSel"

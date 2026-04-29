@@ -3,7 +3,6 @@ using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.MediaItemTypes;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.Models;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.ViewModels;
-using MediaDeck.Composition.Interfaces.MediaItemTypes.Views;
 using MediaDeck.Composition.Interfaces.Primitives;
 using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Composition.Objects;
@@ -96,19 +95,6 @@ public class MediaItemTypeServiceTest {
 	}
 
 	/// <summary>
-	/// 未登録のメディアタイプを持つビューモデルではUnknown用プレビューが生成されることを確認する。
-	/// </summary>
-	[Fact]
-	public void CreateDetailViewerPreviewControlView_FallsBackToUnknownWhenMediaTypeIsNotRegistered() {
-		var fileViewModel = new TestFileViewModel(new TestFileModel(MediaType.Pdf, @"C:\media\sample.pdf", "input"), "input");
-
-		var result = this._service.CreateDetailViewerPreviewControlView(fileViewModel);
-
-		var testView = result.ShouldBeOfType<TestDetailViewerPreviewControlView>();
-		testView.CreatedBy.ShouldBe("unknown");
-	}
-
-	/// <summary>
 	/// サムネイル関連のファクトリが対応するファイルタイプを使用することを確認する。
 	/// </summary>
 	[Fact]
@@ -116,12 +102,9 @@ public class MediaItemTypeServiceTest {
 		var fileViewModel = new TestFileViewModel(new TestFileModel(MediaType.Video, @"C:\media\sample.mp4", "input"), "input");
 
 		var thumbnailPickerViewModel = this._service.CreateThumbnailPickerViewModel(fileViewModel);
-		var thumbnailPickerView = this._service.CreateThumbnailPickerView(fileViewModel);
 
 		var testPickerVm = thumbnailPickerViewModel.ShouldBeOfType<TestThumbnailPickerViewModel>();
 		testPickerVm.CreatedBy.ShouldBe("video");
-		var testPickerView = thumbnailPickerView.ShouldBeOfType<TestThumbnailPickerView>();
-		testPickerView.CreatedBy.ShouldBe("video");
 	}
 
 	/// <summary>
@@ -234,24 +217,12 @@ public class MediaItemTypeServiceTest {
 			return new TestFileModel(this.MediaType, MediaItem.FilePath, this.CreatedBy);
 		}
 
-		public IDetailViewerPreviewControlView CreateDetailViewerPreviewControlView(IMediaItemViewModel fileViewModel) {
-			return new TestDetailViewerPreviewControlView(this.CreatedBy) { DataContext = fileViewModel };
-		}
-
-		public IThumbnailControlView CreateThumbnailControlView(IMediaItemViewModel fileViewModel) {
-			return new TestThumbnailControlView(this.CreatedBy) { DataContext = fileViewModel };
-		}
-
 		public IMediaItemViewModel CreateMediaItemViewModel(IMediaItemModel fileModel) {
 			return new TestFileViewModel(fileModel, this.CreatedBy);
 		}
 
 		public IThumbnailPickerViewModel CreateThumbnailPickerViewModel() {
 			return new TestThumbnailPickerViewModel(this.CreatedBy);
-		}
-
-		public IThumbnailPickerView CreateThumbnailPickerView() {
-			return new TestThumbnailPickerView(this.CreatedBy);
 		}
 
 		public IExecutionProgramObjectModel CreateExecutionProgramObjectModel() {
@@ -262,9 +233,6 @@ public class MediaItemTypeServiceTest {
 			return null!;
 		}
 
-		public IExecutionConfigView CreateExecutionConfigView(IExecutionProgramConfigViewModel viewModel) {
-			return null!;
-		}
 	}
 
 	private sealed class TestMediaItemTypeProvider : IMediaItemTypeProvider {
@@ -447,12 +415,6 @@ public class MediaItemTypeServiceTest {
 			get;
 		}
 
-		public IThumbnailControlView ThumbnailControlView {
-			get {
-				return new TestThumbnailControlView(this.CreatedBy) { DataContext = this };
-			}
-		}
-
 		public bool Exists {
 			get;
 		}
@@ -478,36 +440,6 @@ public class MediaItemTypeServiceTest {
 		}
 
 		public void RefreshThumbnail() {
-		}
-	}
-
-	private sealed class TestDetailViewerPreviewControlView : IDetailViewerPreviewControlView {
-		public TestDetailViewerPreviewControlView(string createdBy) {
-			this.CreatedBy = createdBy;
-		}
-
-		public object DataContext {
-			get;
-			set;
-		} = null!;
-
-		public string CreatedBy {
-			get;
-		}
-	}
-
-	private sealed class TestThumbnailControlView : IThumbnailControlView {
-		public TestThumbnailControlView(string createdBy) {
-			this.CreatedBy = createdBy;
-		}
-
-		public object DataContext {
-			get;
-			set;
-		} = null!;
-
-		public string CreatedBy {
-			get;
 		}
 	}
 
@@ -540,6 +472,10 @@ public class MediaItemTypeServiceTest {
 			get;
 		}
 
+		public MediaType MediaType {
+			get;
+		} = MediaType.Unknown;
+
 		public void RecreateThumbnail() {
 		}
 
@@ -549,21 +485,6 @@ public class MediaItemTypeServiceTest {
 
 		public Task LoadAsync(IMediaItemViewModel fileViewModel) {
 			return Task.CompletedTask;
-		}
-	}
-
-	private sealed class TestThumbnailPickerView : IThumbnailPickerView {
-		public TestThumbnailPickerView(string createdBy) {
-			this.CreatedBy = createdBy;
-		}
-
-		public object DataContext {
-			get;
-			set;
-		} = null!;
-
-		public string CreatedBy {
-			get;
 		}
 	}
 

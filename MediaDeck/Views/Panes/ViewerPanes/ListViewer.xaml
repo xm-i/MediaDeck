@@ -110,7 +110,8 @@
 							<ColumnDefinition Width="60" />
 						</Grid.ColumnDefinitions>
 						<ContentControl Grid.Column="0" Margin="4"
-							Content="{x:Bind ThumbnailControlView, Mode=OneWay}"
+							Content="{x:Bind}"
+							ContentTemplateSelector="{StaticResource MediaItemThumbnailControlTplSel}"
 							Height="{Binding DataContext.ItemSize.Value, Mode=OneWay, ElementName=List}"
 							Width="{Binding DataContext.ItemSize.Value, Mode=OneWay, ElementName=List}"
 							HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
