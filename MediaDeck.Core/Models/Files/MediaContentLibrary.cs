@@ -42,8 +42,11 @@ public class MediaContentLibrary : ModelBase {
 		// Dispatcher の統合ストリームを監視する。
 		// Switch により、新しい検索リクエストが来たら前の検索タスクを自動キャンセルする。
 		dispatcher.SearchRequested
-			.ObserveOnThreadPool()
-			.SubscribeAwait(async (_, cts) => await this.SearchAsync(cts).ConfigureAwait(false), AwaitOperation.Drop, false)
+			.SubscribeAwait(async (_, ct) => {
+				await Task.Run(async () => {
+					await this.SearchAsync(ct).ConfigureAwait(false);
+				}, ct).ConfigureAwait(false);
+			}, AwaitOperation.Switch, false)
 			.AddTo(this.CompositeDisposable);
 	}
 
