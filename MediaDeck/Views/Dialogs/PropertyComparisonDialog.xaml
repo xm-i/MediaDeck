@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentDialog
+	x:Class="MediaDeck.Views.Dialogs.PropertyComparisonDialog"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	mc:Ignorable="d"
+	Title="プロパティ比較条件"
+	PrimaryButtonText="OK"
+	CloseButtonText="キャンセル"
+	DefaultButton="Primary">
+
+	<StackPanel Margin="0,8" Spacing="8" MinWidth="320">
+		<TextBlock x:Name="PropertyNameText" FontWeight="SemiBold" />
+		<ComboBox x:Name="OperatorComboBox"
+				  Header="演算子"
+				  HorizontalAlignment="Stretch"
+				  DisplayMemberPath="DisplayString" />
+		<TextBox x:Name="ValueTextBox"
+				 Header="値"
+				 PlaceholderText="比較する値を入力"
+				 Loaded="ValueTextBox_Loaded" />
+		<TextBlock x:Name="ErrorText"
+				   Foreground="{ThemeResource SystemFillColorCriticalBrush}"
+				   Visibility="Collapsed" />
+	</StackPanel>
+</ContentDialog>

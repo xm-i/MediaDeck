@@ -30,6 +30,10 @@ public class SearchConditionManager : ModelBase {
 		// 候補リストを初期化する
 		this.SearchConditionCandidates.AddRange(tagsManager.Tags.Select(x => new TagSearchCondition(tagsManager) { TagId = x.TagId } as ISearchCondition));
 		this.SearchConditionCandidates.AddRange(folderRepository.GetAllFolders().Select(x => new FolderSearchCondition { FolderPath = x.FolderPath } as ISearchCondition));
+
+		// MediaItem の各プロパティに対する prop. サジェストスタブを登録する
+		this.SearchConditionCandidates.AddRange(
+			MediaItemPropertyCatalog.Descriptors.Select(d => new PropertySearchCondition { PropertyName = d.Name } as ISearchCondition));
 	}
 
 	/// <summary>現在の検索ワード（トークン）条件リスト</summary>

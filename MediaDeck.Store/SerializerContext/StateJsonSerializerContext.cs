@@ -30,6 +30,7 @@ namespace MediaDeck.Stores.SerializerContext;
 [JsonSerializable(typeof(TagFilterItemObjectForJson))]
 [JsonSerializable(typeof(ResolutionFilterItemObjectForJson))]
 [JsonSerializable(typeof(FolderGroupFilterItemObjectForJson))]
+[JsonSerializable(typeof(PropertySearchConditionForJson))]
 [JsonSerializable(typeof(TagAliasModelForJson))]
 [JsonSerializable(typeof(TagCategoryModelForJson))]
 public partial class StateJsonSerializerContext : JsonSerializerContext {
