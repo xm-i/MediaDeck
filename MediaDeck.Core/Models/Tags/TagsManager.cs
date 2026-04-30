@@ -1,7 +1,7 @@
+using MediaDeck.Composition.Database;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.Models;
 using MediaDeck.Composition.Interfaces.Tags;
-using MediaDeck.Database;
-using MediaDeck.Database.Tables;
+using MediaDeck.Composition.Tables;
 
 namespace MediaDeck.Core.Models.Tags;
 

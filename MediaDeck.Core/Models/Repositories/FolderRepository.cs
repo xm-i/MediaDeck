@@ -1,11 +1,11 @@
 using MediaDeck.Common.Extensions;
+using MediaDeck.Composition.Database;
 using MediaDeck.Composition.Interfaces.Notifications;
 using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Core.Models.Files.SearchConditions;
 using MediaDeck.Core.Models.NotificationDispatcher;
 using MediaDeck.Core.Models.Repositories.Objects;
 using MediaDeck.Core.Primitives;
-using MediaDeck.Database;
 
 namespace MediaDeck.Core.Models.Repositories;
 

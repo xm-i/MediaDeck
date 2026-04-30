@@ -1,16 +1,13 @@
 using System.IO;
 using System.IO.Compression;
 using System.Threading.Tasks;
-
 using ImageMagick;
-
+using MediaDeck.Composition.Database;
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.MediaItemTypes;
-using MediaDeck.Database;
-using MediaDeck.Database.Tables;
+using MediaDeck.Composition.Tables;
 using MediaDeck.MediaItemTypes.Base.Models;
 using MediaDeck.MediaItemTypes.Image.Utils;
-
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 

@@ -79,5 +79,5 @@ public interface ITagModel {
 		set;
 	}
 
-	public void Initialize(MediaDeck.Database.Tables.Tag tag, ITagCategoryModel category, ITagModelFactory factory);
+	public void Initialize(MediaDeck.Composition.Tables.Tag tag, ITagCategoryModel category, ITagModelFactory factory);
 }

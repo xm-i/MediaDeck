@@ -1,8 +1,8 @@
+using MediaDeck.Composition.Database;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.Models;
 using MediaDeck.Composition.Objects;
+using MediaDeck.Composition.Tables;
 using MediaDeck.Core.Models.NotificationDispatcher;
-using MediaDeck.Database;
-using MediaDeck.Database.Tables;
 
 namespace MediaDeck.Core.Models.Files;
 

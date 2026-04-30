@@ -1,11 +1,9 @@
 using System.IO;
 using System.Threading.Tasks;
-
+using MediaDeck.Composition.Database;
 using MediaDeck.Composition.Enum;
-using MediaDeck.Database;
-using MediaDeck.Database.Tables;
+using MediaDeck.Composition.Tables;
 using MediaDeck.MediaItemTypes.Base.Models;
-
 using Microsoft.Extensions.Logging;
 
 namespace MediaDeck.MediaItemTypes.Pdf.Models;

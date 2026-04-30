@@ -7,7 +7,7 @@ using MediaDeck.Composition.Interfaces.MediaItemTypes.ViewModels;
 using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Composition.Objects;
 using MediaDeck.Composition.Stores.Config.Model;
-using MediaDeck.Database.Tables;
+using MediaDeck.Composition.Tables;
 
 namespace MediaDeck.MediaItemTypes.Base;
 

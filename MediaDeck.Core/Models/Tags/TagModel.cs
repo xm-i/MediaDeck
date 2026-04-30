@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using MediaDeck.Common.Utilities;
 using MediaDeck.Composition.Interfaces.Tags;
-using MediaDeck.Database.Tables;
+using MediaDeck.Composition.Tables;
 
 namespace MediaDeck.Core.Models.Tags;
 

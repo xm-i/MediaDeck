@@ -1,4 +1,4 @@
-namespace MediaDeck.Database.Tables;
+namespace MediaDeck.Composition.Tables;
 
 public class PositionAddress {
 	/// <summary>

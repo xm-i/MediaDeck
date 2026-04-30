@@ -2,7 +2,7 @@ using System.Linq.Expressions;
 
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.Files;
-using MediaDeck.Database.Tables;
+using MediaDeck.Composition.Tables;
 
 using R3.JsonConfig.Attributes;
 

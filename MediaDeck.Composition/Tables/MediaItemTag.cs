@@ -1,9 +1,9 @@
-namespace MediaDeck.Database.Tables;
+namespace MediaDeck.Composition.Tables;
 
 /// <summary>
-/// 画像ファイルテーブル
+/// メディアアイテム・タグ中間テーブル
 /// </summary>
-public class ImageFile {
+public class MediaItemTag {
 	/// <summary>
 	/// メディアアイテムID
 	/// </summary>
@@ -23,10 +23,20 @@ public class ImageFile {
 	}
 
 	/// <summary>
-	/// 画像の方向
+	/// タグID
 	/// </summary>
-	public int? Orientation {
+	public int TagId {
 		get;
+		set;
+	}
+
+	/// <summary>
+	/// タグ
+	/// </summary>
+	public Tag Tag {
+		get {
+			return field ?? throw new InvalidOperationException();
+		}
 		set;
 	}
 }

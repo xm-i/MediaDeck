@@ -1,12 +1,12 @@
 using System.Runtime.CompilerServices;
+using MediaDeck.Composition.Database;
 using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Interfaces.MediaItemTypes;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.Models;
+using MediaDeck.Composition.Tables;
 using MediaDeck.Core.Models.Files.Filter;
 using MediaDeck.Core.Models.Files.SearchConditions;
 using MediaDeck.Core.Models.Files.Sort;
-using MediaDeck.Database;
-using MediaDeck.Database.Tables;
 
 
 namespace MediaDeck.Core.Models.Files.Loaders;

@@ -6,10 +6,10 @@ using CommunityToolkit.Mvvm.DependencyInjection;
 using FFMpegCore;
 
 using MediaDeck.Composition.Constants;
+using MediaDeck.Composition.Database;
 using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Core.Stores.Config;
 using MediaDeck.Core.Stores.State;
-using MediaDeck.Database;
 using MediaDeck.Views;
 
 using Microsoft.Data.Sqlite;

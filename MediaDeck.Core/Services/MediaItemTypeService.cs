@@ -2,7 +2,7 @@ using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.MediaItemTypes;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.Models;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.ViewModels;
-using MediaDeck.Database.Tables;
+using MediaDeck.Composition.Tables;
 
 namespace MediaDeck.Core.Services;
 

@@ -1,18 +1,26 @@
-namespace MediaDeck.Database.Tables.Metadata;
+namespace MediaDeck.Composition.Tables;
 
-public class VideoMetadataValue {
+public class PositionNameDetail {
 	/// <summary>
-	/// メディアアイテムID
+	/// 緯度
 	/// </summary>
-	public long MediaItemId {
+	public double Latitude {
 		get;
 		set;
 	}
 
 	/// <summary>
-	/// メディアアイテム
+	/// 経度
 	/// </summary>
-	public VideoFile VideoFile {
+	public double Longitude {
+		get;
+		set;
+	}
+
+	/// <summary>
+	/// 名前の種類
+	/// </summary>
+	public string Desc {
 		get {
 			return field ?? throw new InvalidOperationException();
 		}
@@ -20,9 +28,9 @@ public class VideoMetadataValue {
 	}
 
 	/// <summary>
-	/// キー
+	/// 名前
 	/// </summary>
-	public string Key {
+	public string Name {
 		get {
 			return field ?? throw new InvalidOperationException();
 		}
@@ -30,9 +38,9 @@ public class VideoMetadataValue {
 	}
 
 	/// <summary>
-	/// 値
+	/// 位置情報
 	/// </summary>
-	public string Value {
+	public Position Position {
 		get {
 			return field ?? throw new InvalidOperationException();
 		}

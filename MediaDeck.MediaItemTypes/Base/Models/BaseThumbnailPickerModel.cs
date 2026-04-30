@@ -1,8 +1,8 @@
 using System.IO;
 using System.Threading.Tasks;
 
+using MediaDeck.Composition.Database;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.Models;
-using MediaDeck.Database;
 
 using Microsoft.Extensions.Logging;
 

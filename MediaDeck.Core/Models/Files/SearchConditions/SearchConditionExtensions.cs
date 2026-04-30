@@ -1,5 +1,5 @@
 using MediaDeck.Composition.Interfaces.Files;
-using MediaDeck.Database.Tables;
+using MediaDeck.Composition.Tables;
 
 namespace MediaDeck.Core.Models.Files.SearchConditions;
 

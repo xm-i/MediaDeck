@@ -1,5 +1,5 @@
 using MediaDeck.Common.Base;
-using MediaDeck.Database;
+using MediaDeck.Composition.Database;
 
 namespace MediaDeck.Core.Services.DuplicateFileDetector;
 

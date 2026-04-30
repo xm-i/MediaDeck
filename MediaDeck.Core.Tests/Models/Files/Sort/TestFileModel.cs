@@ -3,7 +3,7 @@ using MediaDeck.Composition.Interfaces.MediaItemTypes.Models;
 using MediaDeck.Composition.Interfaces.Primitives;
 using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Composition.Objects;
-using MediaDeck.Database.Tables;
+using MediaDeck.Composition.Tables;
 using R3;
 
 namespace MediaDeck.Core.Tests.Models.Files.Sort;

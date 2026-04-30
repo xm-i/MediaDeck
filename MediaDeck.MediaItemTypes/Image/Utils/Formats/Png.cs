@@ -23,8 +23,8 @@ public class Png : ImageBase {
 		this.Height = d.GetUInt16(PngDirectory.TagImageHeight);
 	}
 
-	public Database.Tables.Metadata.Png CreateMetadataRecord() {
-		var metadata = new Database.Tables.Metadata.Png();
+	public Composition.Tables.Metadata.Png CreateMetadataRecord() {
+		var metadata = new Composition.Tables.Metadata.Png();
 
 		var p = this._reader.FirstOrDefault(x => x is PngDirectory);
 		var pc = this._reader.FirstOrDefault(x => x is PngChromaticitiesDirectory);

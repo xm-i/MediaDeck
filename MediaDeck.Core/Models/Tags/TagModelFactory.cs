@@ -1,5 +1,5 @@
 using MediaDeck.Composition.Interfaces.Tags;
-using MediaDeck.Database.Tables;
+using MediaDeck.Composition.Tables;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MediaDeck.Core.Models.Tags;

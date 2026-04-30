@@ -23,8 +23,8 @@ public class Bmp : ImageBase {
 		this.Height = d.GetUInt16(BmpHeaderDirectory.TagImageHeight);
 	}
 
-	public Database.Tables.Metadata.Bmp CreateMetadataRecord() {
-		var metadata = new Database.Tables.Metadata.Bmp();
+	public Composition.Tables.Metadata.Bmp CreateMetadataRecord() {
+		var metadata = new Composition.Tables.Metadata.Bmp();
 
 		var b = this._reader.FirstOrDefault(x => x is BmpHeaderDirectory);
 

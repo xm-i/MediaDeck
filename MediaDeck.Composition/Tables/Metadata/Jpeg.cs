@@ -1,4 +1,4 @@
-namespace MediaDeck.Database.Tables.Metadata;
+namespace MediaDeck.Composition.Tables.Metadata;
 
 /// <summary>
 /// Jpegメタデータテーブル

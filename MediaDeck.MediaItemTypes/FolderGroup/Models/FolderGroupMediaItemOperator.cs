@@ -1,9 +1,9 @@
 using System.IO;
 using System.Threading.Tasks;
+using MediaDeck.Composition.Database;
 using MediaDeck.Composition.Enum;
-using MediaDeck.Database;
-using MediaDeck.Database.Tables;
-using MediaDeck.Database.Tables.Metadata;
+using MediaDeck.Composition.Tables;
+using MediaDeck.Composition.Tables.Metadata;
 using MediaDeck.MediaItemTypes.Base.Models;
 
 namespace MediaDeck.MediaItemTypes.FolderGroup.Models;

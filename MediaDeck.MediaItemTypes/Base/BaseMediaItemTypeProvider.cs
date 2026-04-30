@@ -5,7 +5,7 @@ using MediaDeck.Common.Utilities;
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.MediaItemTypes;
 using MediaDeck.Composition.Stores.Config.Model;
-using MediaDeck.Database.Tables;
+using MediaDeck.Composition.Tables;
 using MediaDeck.MediaItemTypes.Base.Models;
 
 namespace MediaDeck.MediaItemTypes.Base;

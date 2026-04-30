@@ -23,8 +23,8 @@ public class Gif : ImageBase {
 		this.Height = d.GetUInt16(GifHeaderDirectory.TagImageHeight);
 	}
 
-	public Database.Tables.Metadata.Gif CreateMetadataRecord() {
-		var metadata = new Database.Tables.Metadata.Gif();
+	public Composition.Tables.Metadata.Gif CreateMetadataRecord() {
+		var metadata = new Composition.Tables.Metadata.Gif();
 
 		var h = this._reader.FirstOrDefault(x => x is GifHeaderDirectory);
 

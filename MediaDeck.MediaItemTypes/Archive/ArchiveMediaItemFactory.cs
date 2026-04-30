@@ -3,7 +3,7 @@ using MediaDeck.Composition.Interfaces.MediaItemTypes;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.ViewModels;
 using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Composition.Stores.Config.Model;
-using MediaDeck.Database.Tables;
+using MediaDeck.Composition.Tables;
 using MediaDeck.MediaItemTypes.Archive.Models;
 using MediaDeck.MediaItemTypes.Archive.ViewModels;
 using MediaDeck.MediaItemTypes.Base;

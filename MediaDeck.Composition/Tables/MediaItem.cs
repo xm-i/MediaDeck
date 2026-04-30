@@ -1,6 +1,6 @@
-using MediaDeck.Database.Tables.Metadata;
+using MediaDeck.Composition.Tables.Metadata;
 
-namespace MediaDeck.Database.Tables;
+namespace MediaDeck.Composition.Tables;
 
 /// <summary>
 /// メディアアイテムテーブル

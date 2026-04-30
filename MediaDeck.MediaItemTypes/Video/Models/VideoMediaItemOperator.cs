@@ -3,12 +3,12 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using FFMpegCore;
+using MediaDeck.Composition.Database;
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.Models;
 using MediaDeck.Composition.Stores.Config.Model;
-using MediaDeck.Database;
-using MediaDeck.Database.Tables;
-using MediaDeck.Database.Tables.Metadata;
+using MediaDeck.Composition.Tables;
+using MediaDeck.Composition.Tables.Metadata;
 using MediaDeck.MediaItemTypes.Base.Models;
 using Microsoft.Extensions.Logging;
 

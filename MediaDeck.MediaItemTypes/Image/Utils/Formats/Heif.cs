@@ -43,8 +43,8 @@ public class Heif : ImageBase {
 		}
 	}
 
-	public Database.Tables.Metadata.Heif CreateMetadataRecord() {
-		var metadata = new Database.Tables.Metadata.Heif();
+	public Composition.Tables.Metadata.Heif CreateMetadataRecord() {
+		var metadata = new Composition.Tables.Metadata.Heif();
 		var gps = this._reader.FirstOrDefault(x => x is GpsDirectory);
 		var ifd0 = this._reader.FirstOrDefault(x => x is ExifDirectoryBase);
 		var subIfd = this._reader.FirstOrDefault(x => x is ExifSubIfdDirectory);

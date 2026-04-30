@@ -43,8 +43,8 @@ public class Jpeg : ImageBase {
 		}
 	}
 
-	public Database.Tables.Metadata.Jpeg CreateMetadataRecord() {
-		var metadata = new Database.Tables.Metadata.Jpeg();
+	public Composition.Tables.Metadata.Jpeg CreateMetadataRecord() {
+		var metadata = new Composition.Tables.Metadata.Jpeg();
 
 		var gps = this._reader.FirstOrDefault(x => x is GpsDirectory);
 		var ifd0 = this._reader.FirstOrDefault(x => x is ExifDirectoryBase);

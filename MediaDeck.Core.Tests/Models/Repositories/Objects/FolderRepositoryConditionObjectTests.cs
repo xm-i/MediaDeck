@@ -1,5 +1,5 @@
+using MediaDeck.Composition.Tables;
 using MediaDeck.Core.Models.Repositories.Objects;
-using MediaDeck.Database.Tables;
 using Shouldly;
 
 namespace MediaDeck.Core.Tests.Models.Repositories.Objects;

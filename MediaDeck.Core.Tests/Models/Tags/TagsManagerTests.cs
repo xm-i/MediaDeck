@@ -1,8 +1,8 @@
+using MediaDeck.Composition.Database;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.Models;
 using MediaDeck.Composition.Interfaces.Tags;
+using MediaDeck.Composition.Tables;
 using MediaDeck.Core.Models.Tags;
-using MediaDeck.Database;
-using MediaDeck.Database.Tables;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using R3;

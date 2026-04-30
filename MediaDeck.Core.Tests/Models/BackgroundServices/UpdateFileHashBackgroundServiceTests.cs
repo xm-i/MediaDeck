@@ -1,17 +1,12 @@
 using System.Diagnostics;
 using System.Reflection;
-
+using MediaDeck.Composition.Database;
+using MediaDeck.Composition.Tables;
 using MediaDeck.Core.Services.FileHashUpdator;
-using MediaDeck.Database;
-using MediaDeck.Database.Tables;
-
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-
 using Moq;
-
 using R3;
-
 using Shouldly;
 
 namespace MediaDeck.Core.Tests.Models.BackgroundServices;

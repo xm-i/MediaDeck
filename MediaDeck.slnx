@@ -58,10 +58,6 @@
     <BuildType Solution="Debug-Unpackaged|*" Project="Debug" />
     <BuildType Solution="Release-Unpackaged|*" Project="Release" />
   </Project>
-  <Project Path="MediaDeck.Database/MediaDeck.Database.csproj">
-    <BuildType Solution="Debug-Unpackaged|*" Project="Debug" />
-    <BuildType Solution="Release-Unpackaged|*" Project="Release" />
-  </Project>
   <Project Path="MediaDeck.MediaItemTypes.UI/MediaDeck.MediaItemTypes.UI.csproj">
     <BuildType Solution="Debug-Unpackaged|*" Project="Debug" />
     <BuildType Solution="Release-Unpackaged|*" Project="Release" />

@@ -1,6 +1,6 @@
 using System.Linq.Expressions;
 
-using MediaDeck.Database.Tables;
+using MediaDeck.Composition.Tables;
 
 namespace MediaDeck.Core.Models.Repositories.Objects;
 

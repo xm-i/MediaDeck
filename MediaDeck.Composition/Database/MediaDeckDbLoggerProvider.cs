@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Logging;
 
-namespace MediaDeck.Database;
+namespace MediaDeck.Composition.Database;
 
 /// <summary>
 /// ログ出力クラス

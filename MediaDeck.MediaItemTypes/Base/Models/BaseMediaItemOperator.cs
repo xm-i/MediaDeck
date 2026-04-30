@@ -1,10 +1,9 @@
 using System.IO;
 using System.Threading.Tasks;
-
+using MediaDeck.Composition.Database;
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.Models;
-using MediaDeck.Database;
-using MediaDeck.Database.Tables;
+using MediaDeck.Composition.Tables;
 
 namespace MediaDeck.MediaItemTypes.Base.Models;
 

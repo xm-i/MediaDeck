@@ -1,7 +1,7 @@
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.Files;
+using MediaDeck.Composition.Tables;
 using MediaDeck.Core.Models.Files.Filter.FilterItemObjects;
-using MediaDeck.Database.Tables;
 
 namespace MediaDeck.Core.Models.Files.Filter;
 

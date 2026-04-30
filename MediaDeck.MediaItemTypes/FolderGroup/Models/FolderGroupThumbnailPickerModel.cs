@@ -1,13 +1,11 @@
 using System.IO;
 using System.Threading.Tasks;
-
+using MediaDeck.Composition.Database;
 using MediaDeck.Composition.Interfaces.MediaItemTypes;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.Models;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.ViewModels;
-using MediaDeck.Database;
-using MediaDeck.Database.Tables;
+using MediaDeck.Composition.Tables;
 using MediaDeck.MediaItemTypes.Base.Models;
-
 using Microsoft.Extensions.Logging;
 
 namespace MediaDeck.MediaItemTypes.FolderGroup.Models;

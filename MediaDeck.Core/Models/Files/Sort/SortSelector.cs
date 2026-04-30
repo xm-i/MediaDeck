@@ -4,7 +4,7 @@ using MediaDeck.Common.Extensions;
 using MediaDeck.Composition.Interfaces.Notifications;
 using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Composition.Stores.State.Model.Objects;
-using MediaDeck.Database.Tables;
+using MediaDeck.Composition.Tables;
 
 namespace MediaDeck.Core.Models.Files.Sort;
 

@@ -1,8 +1,7 @@
 using MediaDeck.Common.Base;
 using MediaDeck.Common.Utilities;
-using MediaDeck.Database;
-using MediaDeck.Database.Tables;
-
+using MediaDeck.Composition.Database;
+using MediaDeck.Composition.Tables;
 using Microsoft.Extensions.Logging;
 
 namespace MediaDeck.Core.Services.FileHashUpdator;

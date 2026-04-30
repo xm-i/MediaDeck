@@ -1,5 +1,5 @@
 using MediaDeck.Composition.Enum;
-using MediaDeck.Database.Tables;
+using MediaDeck.Composition.Tables;
 
 namespace MediaDeck.Composition.Interfaces.MediaItemTypes;
 

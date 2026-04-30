@@ -1,9 +1,6 @@
-namespace MediaDeck.Database.Tables;
+namespace MediaDeck.Composition.Tables.Metadata;
 
-/// <summary>
-/// メディアアイテム・タグ中間テーブル
-/// </summary>
-public class MediaItemTag {
+public class VideoMetadataValue {
 	/// <summary>
 	/// メディアアイテムID
 	/// </summary>
@@ -15,7 +12,7 @@ public class MediaItemTag {
 	/// <summary>
 	/// メディアアイテム
 	/// </summary>
-	public MediaItem MediaItem {
+	public VideoFile VideoFile {
 		get {
 			return field ?? throw new InvalidOperationException();
 		}
@@ -23,17 +20,19 @@ public class MediaItemTag {
 	}
 
 	/// <summary>
-	/// タグID
+	/// キー
 	/// </summary>
-	public int TagId {
-		get;
+	public string Key {
+		get {
+			return field ?? throw new InvalidOperationException();
+		}
 		set;
 	}
 
 	/// <summary>
-	/// タグ
+	/// 値
 	/// </summary>
-	public Tag Tag {
+	public string Value {
 		get {
 			return field ?? throw new InvalidOperationException();
 		}

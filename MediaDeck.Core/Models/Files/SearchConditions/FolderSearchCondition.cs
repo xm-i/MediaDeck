@@ -1,6 +1,6 @@
 using System.Linq.Expressions;
 using MediaDeck.Composition.Interfaces.Notifications;
-using MediaDeck.Database.Tables;
+using MediaDeck.Composition.Tables;
 using R3.JsonConfig.Attributes;
 
 namespace MediaDeck.Core.Models.Files.SearchConditions;

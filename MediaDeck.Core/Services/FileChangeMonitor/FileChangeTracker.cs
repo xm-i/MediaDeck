@@ -1,6 +1,6 @@
 using MediaDeck.Common.Extensions;
 using MediaDeck.Common.Utilities;
-using MediaDeck.Database;
+using MediaDeck.Composition.Database;
 
 using Microsoft.Extensions.Logging;
 

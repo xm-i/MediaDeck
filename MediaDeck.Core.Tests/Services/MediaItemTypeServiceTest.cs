@@ -6,8 +6,8 @@ using MediaDeck.Composition.Interfaces.MediaItemTypes.ViewModels;
 using MediaDeck.Composition.Interfaces.Primitives;
 using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Composition.Objects;
+using MediaDeck.Composition.Tables;
 using MediaDeck.Core.Services;
-using MediaDeck.Database.Tables;
 using R3;
 using Shouldly;
 

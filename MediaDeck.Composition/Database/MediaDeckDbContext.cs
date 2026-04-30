@@ -1,9 +1,9 @@
-using MediaDeck.Database.Tables;
-using MediaDeck.Database.Tables.Metadata;
+using MediaDeck.Composition.Tables;
+using MediaDeck.Composition.Tables.Metadata;
 
 using Microsoft.EntityFrameworkCore;
 
-namespace MediaDeck.Database;
+namespace MediaDeck.Composition.Database;
 
 /// <summary>
 /// コンストラクタ
