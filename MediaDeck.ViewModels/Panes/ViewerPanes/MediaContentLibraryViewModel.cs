@@ -1,5 +1,4 @@
 using MediaDeck.Common.Base;
-using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Interfaces.MediaItemTypes;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.ViewModels;
 using MediaDeck.Composition.Interfaces.Notifications;
@@ -9,41 +8,30 @@ namespace MediaDeck.ViewModels.Panes.ViewerPanes;
 
 [Inject(InjectServiceLifetime.Scoped)]
 public class MediaContentLibraryViewModel : ViewModelBase {
-	public MediaContentLibraryViewModel(MediaContentLibrary mediaContentLibrary, ISearchConditionNotificationDispatcher searchConditionNotificationDispatcher, IMediaItemTypeService MediaItemTypeService) {
-		this._mediaContentLibrary = mediaContentLibrary;
-		var synchronizationContext = SynchronizationContext.Current;
+	public MediaContentLibraryViewModel(MediaContentLibrary mediaContentLibrary, SearchConditionManagerViewModel searchConditionManagerViewModel, IMediaItemTypeService MediaItemTypeService) {
+		this.SearchConditionManagerViewModel = searchConditionManagerViewModel;
 		this.Files = mediaContentLibrary.Files.CreateView(MediaItemTypeService.CreateMediaItemViewModel).ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
-
-		this.SearchConditions =
-			mediaContentLibrary
-				.SearchConditions
-				.ToWritableNotifyCollectionChanged(x => new SearchConditionViewModel(x).AddTo(this.CompositeDisposable),
-					(SearchConditionViewModel scvm, ISearchCondition sc, ref bool setValue) => scvm.SearchCondition,
-					SynchronizationContextCollectionEventDispatcher.Current);
-
-		this.SearchConditionCandidates = this._mediaContentLibrary.SearchConditionCandidates.CreateView(x => new SearchConditionViewModel(x).AddTo(this.CompositeDisposable));
-		this.FilteredSearchConditionCandidates = this.SearchConditionCandidates.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
 		this.SearchElapsedMilliseconds = mediaContentLibrary.SearchElapsedMilliseconds.ObserveOnCurrentSynchronizationContext().ToBindableReactiveProperty().AddTo(this.CompositeDisposable);
-
-		this.SearchConditionNotificationDispatcher = searchConditionNotificationDispatcher;
 	}
 
-	private readonly MediaContentLibrary _mediaContentLibrary;
+	public SearchConditionManagerViewModel SearchConditionManagerViewModel {
+		get;
+	}
 
 	public NotifyCollectionChangedSynchronizedViewList<IMediaItemViewModel> Files {
 		get;
 	}
 
 	public INotifyCollectionChangedSynchronizedViewList<SearchConditionViewModel> SearchConditions {
-		get;
-	}
-
-	public ISynchronizedView<ISearchCondition, SearchConditionViewModel> SearchConditionCandidates {
-		get;
+		get {
+			return this.SearchConditionManagerViewModel.SearchConditions;
+		}
 	}
 
 	public INotifyCollectionChangedSynchronizedViewList<SearchConditionViewModel> FilteredSearchConditionCandidates {
-		get;
+		get {
+			return this.SearchConditionManagerViewModel.FilteredSearchConditionCandidates;
+		}
 	}
 
 	public BindableReactiveProperty<IMediaItemViewModel> SelectedFile {
@@ -59,17 +47,16 @@ public class MediaContentLibraryViewModel : ViewModelBase {
 	}
 
 	public ISearchConditionNotificationDispatcher SearchConditionNotificationDispatcher {
-		get;
+		get {
+			return this.SearchConditionManagerViewModel.SearchConditionNotificationDispatcher;
+		}
 	}
 
 	public void RefreshSearchTokenCandidates(string word) {
-		this.SearchConditionCandidates.AttachFilter(x => {
-			return x.IsMatchForSuggest(word);
-		});
+		this.SearchConditionManagerViewModel.RefreshSearchTokenCandidates(word);
 	}
 
-	/// <summary>手動リロードを実行する（Dispatcher 経由で検索を発火する）。</summary>
 	public void Reload() {
-		this.SearchConditionNotificationDispatcher.ReloadRequested.OnNext(Unit.Default);
+		this.SearchConditionManagerViewModel.Reload();
 	}
 }

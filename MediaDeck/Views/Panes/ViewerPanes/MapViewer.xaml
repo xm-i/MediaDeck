@@ -5,8 +5,6 @@
 	xmlns:local="using:MediaDeck.Views.Panes.ViewerPanes"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-	xmlns:controls="using:CommunityToolkit.WinUI.Controls"
-	xmlns:viewerpanes="using:MediaDeck.ViewModels.Panes.ViewerPanes"
 	xmlns:map="using:MapControl"
 	xmlns:maps="using:MediaDeck.Core.Models.Maps"
 	mc:Ignorable="d" >
@@ -16,24 +14,7 @@
 			<RowDefinition Height="auto" />
 			<RowDefinition Height="*" />
 		</Grid.RowDefinitions>
-		<controls:TokenizingTextBox Grid.Row="0"
-			RelativePanel.AlignVerticalCenterWithPanel="True"
-			ItemsSource="{x:Bind ViewModel.MediaContentLibraryViewModel.SearchConditions ,Mode=OneWay}"
-			SuggestedItemsSource="{x:Bind ViewModel.MediaContentLibraryViewModel.FilteredSearchConditionCandidates,Mode=OneWay}"
-			TextChanged="TokenizingTextBox_TextChanged"
-			TokenItemAdding="TokenizingTextBox_TokenItemAdding"
-			TokenItemRemoving="TokenizingTextBox_TokenItemRemoving" >
-			<controls:TokenizingTextBox.TokenItemTemplate>
-				<DataTemplate x:DataType="viewerpanes:SearchConditionViewModel" >
-					<TextBlock Text="{x:Bind DisplayText}" />
-				</DataTemplate>
-			</controls:TokenizingTextBox.TokenItemTemplate>
-			<controls:TokenizingTextBox.SuggestedItemTemplate>
-				<DataTemplate x:DataType="viewerpanes:SearchConditionViewModel" >
-					<TextBlock Text="{x:Bind DisplayText}" />
-				</DataTemplate>
-			</controls:TokenizingTextBox.SuggestedItemTemplate>
-		</controls:TokenizingTextBox>
+		<local:SearchConditionManagerView Grid.Row="0" ViewModel="{x:Bind ViewModel.SearchConditionManagerViewModel, Mode=OneWay}" />
 		<map:Map x:Name="Map"
 			Center="{x:Bind Center.Value, Mode=OneWay, Converter={StaticResource GpsLocationToLocationConverter}}"
 			MinZoomLevel="2"

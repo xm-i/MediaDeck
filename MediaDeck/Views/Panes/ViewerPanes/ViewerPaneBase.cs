@@ -1,10 +1,8 @@
 using System.IO;
 using CommunityToolkit.Mvvm.DependencyInjection;
-using CommunityToolkit.WinUI.Controls;
 using MediaDeck.Common.Utilities;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.ViewModels;
 using MediaDeck.Composition.Interfaces.Services;
-using MediaDeck.Core.Models.Files.SearchConditions;
 using MediaDeck.ViewModels.Panes.ViewerPanes;
 using MediaDeck.Views.Thumbnails;
 using Microsoft.UI.Input;
@@ -100,7 +98,7 @@ public class ViewerPaneBase : UserControlBase<ViewerSelectorViewModel> {
 				var result = await dialog.ShowAsync();
 				if (result == ContentDialogResult.Primary) {
 					await this.ViewModel.SelectedViewerPane.Value.RemoveFilesAsync(targetFiles);
-					this.ViewModel.MediaContentLibraryViewModel.Reload();
+					this.ViewModel.SearchConditionManagerViewModel.Reload();
 				}
 				break;
 			case "OpenFolder":
@@ -108,25 +106,6 @@ public class ViewerPaneBase : UserControlBase<ViewerSelectorViewModel> {
 					ShellUtility.ShowInExplorer(fvm.FilePath);
 				}
 				break;
-		}
-	}
-
-	protected void TokenizingTextBox_TokenItemAdding(TokenizingTextBox sender, TokenItemAddingEventArgs args) {
-		args.Cancel = true;
-		this.ViewModel?.MediaContentLibraryViewModel.SearchConditionNotificationDispatcher.AddRequest.OnNext(new WordSearchCondition { Word = args.TokenText });
-	}
-
-	protected void TokenizingTextBox_TokenItemRemoving(TokenizingTextBox sender, TokenItemRemovingEventArgs args) {
-		args.Cancel = true;
-		if (args.Item is not SearchConditionViewModel { } condition) {
-			return;
-		}
-		this.ViewModel?.MediaContentLibraryViewModel.SearchConditionNotificationDispatcher.RemoveRequest.OnNext(condition.SearchCondition);
-	}
-
-	protected void TokenizingTextBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args) {
-		if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput) {
-			this.ViewModel?.MediaContentLibraryViewModel.RefreshSearchTokenCandidates(sender.Text);
 		}
 	}
 

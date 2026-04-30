@@ -17,7 +17,8 @@ public class SearchConditionNotificationDispatcher : ISearchConditionNotificatio
 		var searchConditionChanged = Observable.Merge(
 			this.AddRequest.Select(_ => Unit.Default),
 			this.RemoveRequest.Select(_ => Unit.Default),
-			this.UpdateRequest.Select(_ => Unit.Default))
+			this.UpdateRequest.Select(_ => Unit.Default),
+			this.SearchConditionChanged)
 			.Debounce(TimeSpan.FromMilliseconds(300));
 
 		// ソート・フィルターは即時
@@ -44,6 +45,9 @@ public class SearchConditionNotificationDispatcher : ISearchConditionNotificatio
 
 	/// <summary>検索条件リストの更新リクエスト</summary>
 	public Subject<Action<ObservableList<ISearchCondition>>> UpdateRequest { get; } = new();
+
+	/// <summary>検索条件リストの更新通知</summary>
+	public Subject<Unit> SearchConditionChanged { get; } = new();
 
 	// ─── ソート・フィルター系 ──────────────────────────────────────────────────
 

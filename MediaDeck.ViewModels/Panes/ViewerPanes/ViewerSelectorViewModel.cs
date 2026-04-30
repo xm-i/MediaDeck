@@ -9,12 +9,14 @@ public class ViewerSelectorViewModel : ViewModelBase {
 	public ViewerSelectorViewModel(
 		TabStateModel tabState,
 		MediaContentLibraryViewModel mediaContentLibraryViewModel,
+		SearchConditionManagerViewModel searchConditionManagerViewModel,
 		WrapViewerViewModel wrapViewerViewModel,
 		ListViewerViewModel listViewerViewModel,
 		DetailViewerViewModel detailViewerViewModel,
 		MapViewerViewModel mapViewerViewModel,
 		SortSelectorViewModel sortSelectorViewModel) {
 		this.MediaContentLibraryViewModel = mediaContentLibraryViewModel;
+		this.SearchConditionManagerViewModel = searchConditionManagerViewModel;
 		this.ViewerPaneViewModels = [
 			wrapViewerViewModel,
 			listViewerViewModel,
@@ -37,10 +39,14 @@ public class ViewerSelectorViewModel : ViewModelBase {
 			})
 			.AddTo(this.CompositeDisposable);
 
-		this.RefreshCommand.Subscribe(x => this.MediaContentLibraryViewModel.Reload()).AddTo(this.CompositeDisposable);
+		this.RefreshCommand.Subscribe(x => this.SearchConditionManagerViewModel.Reload()).AddTo(this.CompositeDisposable);
 	}
 
 	public MediaContentLibraryViewModel MediaContentLibraryViewModel {
+		get;
+	}
+
+	public SearchConditionManagerViewModel SearchConditionManagerViewModel {
 		get;
 	}
 

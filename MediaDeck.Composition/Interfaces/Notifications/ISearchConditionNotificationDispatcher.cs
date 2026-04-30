@@ -21,6 +21,11 @@ public interface ISearchConditionNotificationDispatcher : IDisposable {
 		get;
 	}
 
+	/// <summary>検索条件リストの更新通知</summary>
+	public Subject<Unit> SearchConditionChanged {
+		get;
+	}
+
 	/// <summary>ソート条件変更通知</summary>
 	public Subject<Unit> SortChanged {
 		get;
