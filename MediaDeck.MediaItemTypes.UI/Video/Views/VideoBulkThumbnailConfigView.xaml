@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<local:VideoBulkThumbnailConfigViewUserControl
+	x:Class="MediaDeck.MediaItemTypes.UI.Video.Views.VideoBulkThumbnailConfigView"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:local="using:MediaDeck.MediaItemTypes.UI.Video.Views"
+	xmlns:vm="using:MediaDeck.MediaItemTypes.Video.ViewModels"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	mc:Ignorable="d" >
+	<StackPanel Padding="12" Spacing="12" >
+		<TextBlock Text="動画 (Video)" FontWeight="SemiBold" />
+		<TextBlock Text="サムネイル抽出位置の指定方法を選択してください。" TextWrapping="Wrap" />
+		<ComboBox Header="抽出方法"
+			SelectedIndex="{x:Bind ModeIndex, Mode=TwoWay}" >
+			<ComboBoxItem Content="開始からの秒数指定" />
+			<ComboBoxItem Content="全体長の % 指定" />
+		</ComboBox>
+		<NumberBox Header="位置 (秒)"
+			Minimum="0" SpinButtonPlacementMode="Inline"
+			Visibility="{x:Bind SecondsVisibility, Mode=OneWay}"
+			Value="{x:Bind ViewModel.Seconds.Value, Mode=TwoWay}" />
+		<NumberBox Header="位置 (%)"
+			Minimum="0" Maximum="100" SpinButtonPlacementMode="Inline"
+			Visibility="{x:Bind PercentageVisibility, Mode=OneWay}"
+			Value="{x:Bind ViewModel.Percentage.Value, Mode=TwoWay}" />
+	</StackPanel>
+</local:VideoBulkThumbnailConfigViewUserControl>

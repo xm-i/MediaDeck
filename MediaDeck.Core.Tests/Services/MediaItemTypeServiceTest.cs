@@ -233,6 +233,23 @@ public class MediaItemTypeServiceTest {
 			return null!;
 		}
 
+		public IBulkThumbnailConfigViewModel CreateBulkThumbnailConfigViewModel() {
+			return new TestBulkThumbnailConfigViewModel(this.MediaType);
+		}
+	}
+
+	private sealed class TestBulkThumbnailConfigViewModel : IBulkThumbnailConfigViewModel {
+		public TestBulkThumbnailConfigViewModel(MediaType mediaType) {
+			this.MediaType = mediaType;
+		}
+
+		public MediaType MediaType {
+			get;
+		}
+
+		public Task ApplyToAsync(IMediaItemViewModel target, CancellationToken cancellationToken) {
+			return Task.CompletedTask;
+		}
 	}
 
 	private sealed class TestMediaItemTypeProvider : IMediaItemTypeProvider {

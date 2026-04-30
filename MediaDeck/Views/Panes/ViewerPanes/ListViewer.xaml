@@ -52,6 +52,7 @@
 			SelectedItem="{x:Bind ViewModel.MediaContentLibraryViewModel.SelectedFile.Value, Mode=TwoWay}"
 			SelectionMode="Extended"
 			SelectionChanged="List_SelectionChanged"
+			RightTapped="List_RightTapped"
 			ScrollViewer.VerticalScrollMode="Auto"
 			ScrollViewer.VerticalScrollBarVisibility="Auto" >
 			<ListBox.ItemContainerStyle>
@@ -73,6 +74,19 @@
 					<ItemsStackPanel />
 				</ItemsPanelTemplate>
 			</ListBox.ItemsPanel>
+			<ListBox.Resources>
+				<MenuFlyout x:Key="FileContextMenu" >
+					<MenuFlyoutItem Text="Recreate Thumbnail"
+						Click="MenuFlyoutItem_Click"
+						Tag="RecreateThumbnail" />
+					<MenuFlyoutItem Text="Remove File"
+						Click="MenuFlyoutItem_Click"
+						Tag="RemoveFile" />
+					<MenuFlyoutItem Text="Open Folder"
+						Click="MenuFlyoutItem_Click"
+						Tag="OpenFolder" />
+				</MenuFlyout>
+			</ListBox.Resources>
 			<ListBox.ItemTemplate>
 				<DataTemplate x:DataType="vmIf:IMediaItemViewModel" >
 					<Grid DoubleTapped="File_DoubleTapped"

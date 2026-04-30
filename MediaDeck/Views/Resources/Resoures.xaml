@@ -130,4 +130,32 @@
 		Archive="{StaticResource DefaultExecutionConfigTpl}"
 		FolderGroup="{StaticResource FolderGroupExecutionConfigTpl}"
 		Unknown="{StaticResource DefaultExecutionConfigTpl}" />
+
+	<DataTemplate x:Key="ImageBulkThumbnailConfigTpl" >
+		<imageViews:ImageBulkThumbnailConfigView />
+	</DataTemplate>
+	<DataTemplate x:Key="VideoBulkThumbnailConfigTpl" >
+		<videoViews:VideoBulkThumbnailConfigView />
+	</DataTemplate>
+	<DataTemplate x:Key="PdfBulkThumbnailConfigTpl" >
+		<pdfViews:PdfBulkThumbnailConfigView />
+	</DataTemplate>
+	<DataTemplate x:Key="ArchiveBulkThumbnailConfigTpl" >
+		<archiveViews:ArchiveBulkThumbnailConfigView />
+	</DataTemplate>
+	<DataTemplate x:Key="FolderGroupBulkThumbnailConfigTpl" >
+		<folderGroupViews:FolderGroupBulkThumbnailConfigView />
+	</DataTemplate>
+	<DataTemplate x:Key="UnknownBulkThumbnailConfigTpl" >
+		<unknownViews:UnknownBulkThumbnailConfigView />
+	</DataTemplate>
+
+	<selectors:BulkThumbnailConfigTemplateSelector
+		x:Key="BulkThumbnailConfigTplSel"
+		Image="{StaticResource ImageBulkThumbnailConfigTpl}"
+		Video="{StaticResource VideoBulkThumbnailConfigTpl}"
+		Pdf="{StaticResource PdfBulkThumbnailConfigTpl}"
+		Archive="{StaticResource ArchiveBulkThumbnailConfigTpl}"
+		FolderGroup="{StaticResource FolderGroupBulkThumbnailConfigTpl}"
+		Unknown="{StaticResource UnknownBulkThumbnailConfigTpl}" />
 </ResourceDictionary>

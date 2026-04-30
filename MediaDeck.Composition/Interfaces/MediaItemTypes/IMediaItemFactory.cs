@@ -57,4 +57,9 @@ public interface IMediaItemFactory {
 	/// <param name="model">元となるモデルオブジェクト</param>
 	/// <returns>ViewModel。</returns>
 	public IExecutionProgramConfigViewModel CreateExecutionProgramConfigViewModel(IExecutionProgramObjectModel model);
+
+	/// <summary>
+	/// このメディアタイプ用の一括サムネイル再生成設定 ViewModel を作成する。
+	/// </summary>
+	public IBulkThumbnailConfigViewModel CreateBulkThumbnailConfigViewModel();
 }

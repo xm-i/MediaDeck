@@ -76,13 +76,21 @@ public class ViewerPaneBase : UserControlBase<ViewerSelectorViewModel> {
 		}
 		switch (selectedItem.Tag.ToString()) {
 			case "RecreateThumbnail":
-				var window = Ioc.Default.GetRequiredService<ThumbnailPickerWindow>();
-				window.ViewModel.FileViewModel.Value = fvm;
-				this._windowService.ActivateCenteredOnMainWindow(window);
-				break;
-			case "RemoveFile":
 				var selectedFiles = this.ViewModel.MediaContentLibraryViewModel.SelectedFiles.Value;
 				var targetFiles = selectedFiles is { Length: > 0 } && selectedFiles.Contains(fvm) ? selectedFiles : [fvm];
+				if (targetFiles.Length > 1) {
+					var bulkWindow = Ioc.Default.GetRequiredService<BulkThumbnailRegenerationWindow>();
+					bulkWindow.ViewModel.Initialize(targetFiles);
+					this._windowService.ActivateCenteredOnMainWindow(bulkWindow);
+				} else {
+					var window = Ioc.Default.GetRequiredService<ThumbnailPickerWindow>();
+					window.ViewModel.FileViewModel.Value = fvm;
+					this._windowService.ActivateCenteredOnMainWindow(window);
+				}
+				break;
+			case "RemoveFile":
+				selectedFiles = this.ViewModel.MediaContentLibraryViewModel.SelectedFiles.Value;
+				targetFiles = selectedFiles is { Length: > 0 } && selectedFiles.Contains(fvm) ? selectedFiles : [fvm];
 				var message = targetFiles.Length == 1 ? "Remove file from MediaDeck database?" : $"Remove {targetFiles.Length} files from MediaDeck database?";
 
 				var dialog = new ContentDialog {

@@ -1,5 +1,6 @@
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.MediaItemTypes;
+using MediaDeck.Composition.Interfaces.MediaItemTypes.ViewModels;
 using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Database.Tables;
@@ -68,5 +69,9 @@ public class UnknownMediaItemFactory :
 		var vm = this._serviceProvider.GetRequiredService<DefaultExecutionProgramConfigViewModel>();
 		vm.Initialize(model);
 		return vm;
+	}
+
+	public override IBulkThumbnailConfigViewModel CreateBulkThumbnailConfigViewModel() {
+		return this._serviceProvider.GetRequiredService<UnknownBulkThumbnailConfigViewModel>();
 	}
 }

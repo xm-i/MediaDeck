@@ -77,5 +77,10 @@ public interface IMediaItemTypeService {
 	/// <returns>実行プログラム設定ViewModel</returns>
 	public IExecutionProgramConfigViewModel CreateExecutionConfigViewModel(IExecutionProgramObjectModel model);
 
+	/// <summary>
+	/// 指定したメディアタイプの一括サムネイル再生成設定ViewModelを作成します。
+	/// </summary>
+	public IBulkThumbnailConfigViewModel CreateBulkThumbnailConfigViewModel(MediaType mediaType);
+
 
 }

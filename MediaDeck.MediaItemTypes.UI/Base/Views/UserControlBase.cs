@@ -30,4 +30,11 @@ public abstract class UserControlBase<T> : UserControl, INotifyPropertyChanged w
 	protected virtual void OnViewModelChanged(T? oldViewModel, T? newViewModel) {
 		this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.ViewModel)));
 	}
+
+	/// <summary>
+	/// 派生クラスから任意のプロパティ変更通知を発火します。
+	/// </summary>
+	protected void RaisePropertyChanged(string propertyName) {
+		this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+	}
 }

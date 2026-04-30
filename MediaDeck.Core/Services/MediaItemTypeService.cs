@@ -89,6 +89,11 @@ public class MediaItemTypeService(IEnumerable<IMediaItemFactory> mediaItemFactor
 		return mediaItemFactory.CreateExecutionProgramConfigViewModel(model);
 	}
 
+	/// <inheritdoc />
+	public IBulkThumbnailConfigViewModel CreateBulkThumbnailConfigViewModel(MediaType mediaType) {
+		return this.GetMediaItemFactory(mediaType).CreateBulkThumbnailConfigViewModel();
+	}
+
 
 	private IMediaItemFactory GetMediaItemFactory(IMediaItemModel fileModel) {
 		return this._mediaItemFactories.FirstOrDefault(x => x.MediaType == fileModel.MediaType) ?? this._unknownMediaItemFactory;

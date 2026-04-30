@@ -47,6 +47,9 @@ public abstract class BaseMediaItemFactory<TFileOperator, TFileModel, TExecution
 	/// <inheritdoc />
 	public abstract TExecutionProgramConfigViewModel CreateExecutionProgramConfigViewModel(TExecutionProgramObjectModel model);
 
+	/// <inheritdoc />
+	public abstract IBulkThumbnailConfigViewModel CreateBulkThumbnailConfigViewModel();
+
 
 	protected void SetModelProperties(TFileModel fileModel, MediaItem MediaItem) {
 		if (MediaItem.ThumbnailFileName != null) {
