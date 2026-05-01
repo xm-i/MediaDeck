@@ -8,14 +8,17 @@ using FFMpegCore;
 using MediaDeck.Composition.Constants;
 using MediaDeck.Composition.Database;
 using MediaDeck.Composition.Interfaces.Tags;
+using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Core.Stores.Config;
 using MediaDeck.Core.Stores.State;
-using MediaDeck.Views;
+using MediaDeck.Services;
 
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
+using Microsoft.Windows.AppLifecycle;
 
 using Serilog;
 using Serilog.Events;
@@ -23,9 +26,9 @@ using Serilog.Events;
 namespace MediaDeck;
 
 public partial class App {
-	private Window? _window;
 	private readonly IConfigStore _configStore;
 	private readonly IStateStore _stateStore;
+	private DispatcherQueue? _dispatcherQueue;
 
 
 	/// <summary>
@@ -52,19 +55,27 @@ public partial class App {
 	/// </summary>
 	/// <param name="args">Details about the launch request and process.</param>
 	protected override async void OnLaunched(LaunchActivatedEventArgs args) {
-		await this.InitializeAsync();
-		this._window = Ioc.Default.GetRequiredService<MainWindow>();
+		this._dispatcherQueue = DispatcherQueue.GetForCurrentThread();
 
-		this._window.Closed += (_, _) => {
-			this._stateStore.Save();
-			this._configStore.Save();
-			Current.Exit();
-		};
+		await this.InitializeAsync();
+
+		var windowManager = Ioc.Default.GetRequiredService<IWindowManager>();
+		windowManager.RestoreWindows();
+
 		var logger = LoggerFactory.CreateLogger<App>();
 		AppDomain.CurrentDomain.UnhandledException += (_, e) => {
 			logger.LogError(e.ExceptionObject as Exception, "UnhandledException");
 		};
-		this._window.Activate();
+	}
+
+	/// <summary>
+	/// 他プロセスからのリダイレクトアクティベーションを処理する。
+	/// バックグラウンドスレッドから呼ばれるため、UIスレッドにディスパッチする。
+	/// </summary>
+	public void HandleRedirectedActivation(AppActivationArguments args) {
+		this._dispatcherQueue?.TryEnqueue(() => {
+			this._stateStore.RootState.Windows.Add(new WindowStateModel());
+		});
 	}
 
 	private static void BuildConfigureServices() {

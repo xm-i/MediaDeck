@@ -22,6 +22,7 @@ public class StateStore : DisposableBase, IStateStore {
 	private readonly ILogger<StateStore> _logger;
 	private readonly AppNotificationDispatcher _notificationDispatcher;
 	private readonly IAppPathProvider _pathProvider;
+
 	public IServiceProvider ScopedService {
 		get;
 	}
@@ -57,16 +58,6 @@ public class StateStore : DisposableBase, IStateStore {
 				TypeInfoResolver = StateJsonSerializerContext.Default.WithAddedModifier(global::R3.JsonConfig.ForJsonConverterRegistry.ApplyPolymorphism)
 			};
 		}
-	}
-
-	public void RegisterTab(TabStateModel tabState) {
-		if (!this.RootState.Tabs.Contains(tabState)) {
-			this.RootState.Tabs.Add(tabState);
-		}
-	}
-
-	public void UnregisterTab(TabStateModel tabState) {
-		this.RootState.Tabs.Remove(tabState);
 	}
 
 	/// <summary>

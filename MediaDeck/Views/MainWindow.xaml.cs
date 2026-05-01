@@ -6,7 +6,7 @@ using Microsoft.UI.Xaml.Controls;
 
 namespace MediaDeck.Views;
 
-[Inject(InjectServiceLifetime.Singleton)]
+[Inject(InjectServiceLifetime.Transient)]
 public sealed partial class MainWindow {
 	private readonly MainWindowViewModel _viewModel;
 

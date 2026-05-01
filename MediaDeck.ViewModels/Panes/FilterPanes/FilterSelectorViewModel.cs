@@ -50,7 +50,6 @@ public class FilterSelectorViewModel : ViewModelBase {
 	} = new();
 
 	protected override void Dispose(bool disposing) {
-		this._stateStore.Save();
 		base.Dispose(disposing);
 	}
 }

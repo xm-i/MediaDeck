@@ -19,6 +19,8 @@
     <DefineConstants Condition="'$(Configuration)' == 'Debug-Unpackaged'">$(DefineConstants);DEBUG</DefineConstants>
     <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DefineConstants>$(DefineConstants);DISABLE_XAML_GENERATED_MAIN</DefineConstants>
+    <DisableWinUISdkGeneratedMain>true</DisableWinUISdkGeneratedMain>
   </PropertyGroup>
   
   <PropertyGroup Condition="'$(Packaged)' != 'true'">

@@ -3,7 +3,7 @@ using R3.JsonConfig.Attributes;
 namespace MediaDeck.Composition.Stores.State.Model;
 
 /// <summary>
-/// 状態保存/復元のルートモデル（AppState + タブ状態の配列）
+/// 状態保存/復元のルートモデル（AppState + ウィンドウ状態の配列）
 /// </summary>
 [Inject(InjectServiceLifetime.Transient)]
 [GenerateR3JsonConfigDto]
@@ -17,28 +17,14 @@ public class RootStateModel {
 	}
 
 	/// <summary>
-	/// タブごとの状態リスト
+	/// ウィンドウごとの状態リスト
 	/// </summary>
 	[JsonConfigCreateScope]
-	public ObservableList<TabStateModel> Tabs {
+	public ObservableList<WindowStateModel> Windows {
 		get;
 	} = [];
 
-	/// <summary>
-	/// アクティブだったタブのインデックス
-	/// </summary>
-	public int ActiveTabIndex {
-		get;
-		set;
-	}
-
 	public RootStateModel(AppStateModel appState) {
 		this.AppState = appState;
-	}
-
-	public RootStateModel(AppStateModel appState, ObservableList<TabStateModel> tabs, int activeTabIndex) {
-		this.AppState = appState;
-		this.Tabs = tabs;
-		this.ActiveTabIndex = activeTabIndex;
 	}
 }

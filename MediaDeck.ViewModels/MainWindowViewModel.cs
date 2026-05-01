@@ -1,4 +1,5 @@
 using MediaDeck.Common.Base;
+using MediaDeck.Composition.Objects;
 using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Core.Stores.State;
 using MediaDeck.ViewModels.Tools;
@@ -7,22 +8,25 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace MediaDeck.ViewModels;
 
-[Inject(InjectServiceLifetime.Singleton)]
+[Inject(InjectServiceLifetime.Scoped)]
 public class MainWindowViewModel : ViewModelBase {
 	private readonly IServiceProvider _rootServiceProvider;
-	private readonly IStateStore _stateStore;
+	private readonly WindowStateModel _windowState;
 
 
 	public MainWindowViewModel(
 		IServiceProvider serviceProvider,
 		IStateStore stateStore,
+		WindowStateProvider windowStateProvider,
 		BackgroundTasksViewModel backgroundTasksViewModel,
 		NavigationMenuViewModel navigationMenuViewModel) {
 		this._rootServiceProvider = serviceProvider;
-		this._stateStore = stateStore;
 		this.NavigationMenuViewModel = navigationMenuViewModel;
 
-		this.Tabs = stateStore.RootState.Tabs.ToWritableNotifyCollectionChanged(
+		// 自身のウィンドウの状態を取得（WindowManagerによってセット済み）
+		this._windowState = windowStateProvider.State ?? throw new InvalidOperationException("WindowStateModel was not provided to the scope.");
+
+		this.Tabs = this._windowState.Tabs.ToWritableNotifyCollectionChanged(
 			tabState => new TabContext(tabState),
 			(TabContext tabContext, TabStateModel tabState, ref bool setValue) => {
 				setValue = true;
@@ -37,7 +41,7 @@ public class MainWindowViewModel : ViewModelBase {
 			if (!this.Tabs.Any()) {
 				this.AddTab();
 			} else {
-				var idx = Math.Clamp(stateStore.RootState.ActiveTabIndex, 0, ((IReadOnlyList<TabContext>)this.Tabs).Count - 1);
+				var idx = Math.Clamp(this._windowState.ActiveTabIndex, 0, ((IReadOnlyList<TabContext>)this.Tabs).Count - 1);
 				this.SelectedTab.Value = this.Tabs.ElementAt(idx);
 			}
 		}).AddTo(this.CompositeDisposable);
@@ -86,7 +90,8 @@ public class MainWindowViewModel : ViewModelBase {
 		var scope = this._rootServiceProvider.CreateScope();
 		var tabState = scope.ServiceProvider.GetRequiredService<TabStateModel>();
 
-		this._stateStore.RegisterTab(tabState);
+		// 自身のウィンドウの状態リストに追加
+		this._windowState.Tabs.Add(tabState);
 
 		// CreateView は同期的であるため、すぐに追加後のタブを取得できる
 		var createdTabContext = this.Tabs.FirstOrDefault(x => x.TabState == tabState);
@@ -100,7 +105,7 @@ public class MainWindowViewModel : ViewModelBase {
 	/// </summary>
 	public void CloseTab(TabContext tab) {
 		tab.Dispose();
-		this._stateStore.UnregisterTab(tab.TabState);
+		this._windowState.Tabs.Remove(tab.TabState);
 
 		if (this.SelectedTab.Value == tab) {
 			this.SelectedTab.Value = this.Tabs.LastOrDefault();
@@ -116,7 +121,7 @@ public class MainWindowViewModel : ViewModelBase {
 		if (disposing) {
 			// アクティブタブインデックスを保存
 			var selected = this.SelectedTab.Value;
-			this._stateStore.RootState.ActiveTabIndex = selected is not null
+			this._windowState.ActiveTabIndex = selected is not null
 				? this.Tabs.IndexOf(selected)
 				: 0;
 
