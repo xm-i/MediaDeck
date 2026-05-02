@@ -36,12 +36,6 @@ public class UnknownMediaItemFactory :
 		return this._UnknownMediaItemOperator;
 	}
 
-	public override ItemType ItemType {
-		get {
-			return ItemType.Unknown;
-		}
-	}
-
 	public override UnknownMediaItemModel CreateMediaItemModelFromRecord(MediaItem MediaItem) {
 		var ifm = this._serviceProvider.GetRequiredService<UnknownMediaItemModel>();
 		ifm.Initialize(MediaItem.MediaItemId, MediaItem.FilePath);

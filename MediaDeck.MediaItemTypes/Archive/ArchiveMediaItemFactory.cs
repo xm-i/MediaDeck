@@ -37,12 +37,6 @@ public class ArchiveMediaItemFactory :
 		return this._ArchiveMediaItemOperator;
 	}
 
-	public override ItemType ItemType {
-		get {
-			return ItemType.Archive;
-		}
-	}
-
 	public override ArchiveMediaItemModel CreateMediaItemModelFromRecord(MediaItem MediaItem) {
 		var ifm = this._serviceProvider.GetRequiredService<ArchiveMediaItemModel>();
 		ifm.Initialize(MediaItem.MediaItemId, MediaItem.FilePath);

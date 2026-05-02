@@ -47,7 +47,7 @@ public partial class FolderGroupMediaItemOperator : BaseMediaItemOperator {
 		var directoryPath = directoryInfo.Parent?.FullName ?? filePath;
 		var isUnderFolderGroup = await this.GetIsUnderFolderGroup(db, directoryPath);
 		var mediaItem = new MediaItem {
-			ItemType = ItemType.FolderGroup,
+			MediaType = MediaType.FolderGroup,
 			DirectoryPath = directoryPath,
 			FilePath = filePath,
 			ThumbnailFileName = thumbRelativePath,

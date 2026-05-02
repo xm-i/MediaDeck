@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Reflection;
 using MediaDeck.Composition.Database;
+using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Tables;
 using MediaDeck.Core.Services.FileHashUpdator;
 using Microsoft.EntityFrameworkCore;
@@ -111,8 +112,8 @@ public class UpdateFileHashBackgroundServiceTests : IDisposable {
 		// Arrange
 		using (var context = new MediaDeckDbContext(this._options)) {
 			// 同じPreHashを持つレコードを2つ作成
-			context.MediaItems.Add(new MediaItem { ItemType = ItemType.Image, FilePath = "dummy1.jpg", DirectoryPath = "dir", IsExists = true, PreHash = "samehash", Description = string.Empty, IsUnderFolderGroup = false });
-			context.MediaItems.Add(new MediaItem { ItemType = ItemType.Image, FilePath = "dummy2.jpg", DirectoryPath = "dir", IsExists = true, PreHash = "samehash", Description = string.Empty, IsUnderFolderGroup = false });
+			context.MediaItems.Add(new MediaItem { MediaType = MediaType.Image, FilePath = "dummy1.jpg", DirectoryPath = "dir", IsExists = true, PreHash = "samehash", Description = string.Empty, IsUnderFolderGroup = false });
+			context.MediaItems.Add(new MediaItem { MediaType = MediaType.Image, FilePath = "dummy2.jpg", DirectoryPath = "dir", IsExists = true, PreHash = "samehash", Description = string.Empty, IsUnderFolderGroup = false });
 			await context.SaveChangesAsync();
 		}
 
@@ -164,7 +165,7 @@ public class UpdateFileHashBackgroundServiceTests : IDisposable {
 
 		long MediaItemId;
 		using (var context = new MediaDeckDbContext(this._options)) {
-			var MediaItem = new MediaItem { ItemType = ItemType.Image, FilePath = tempFile, DirectoryPath = "dir", IsExists = true, Description = string.Empty, IsUnderFolderGroup = false };
+			var MediaItem = new MediaItem { MediaType = MediaType.Image, FilePath = tempFile, DirectoryPath = "dir", IsExists = true, Description = string.Empty, IsUnderFolderGroup = false };
 			context.MediaItems.Add(MediaItem);
 			await context.SaveChangesAsync();
 			MediaItemId = MediaItem.MediaItemId;
@@ -196,7 +197,7 @@ public class UpdateFileHashBackgroundServiceTests : IDisposable {
 		// Arrange
 		long MediaItemId;
 		using (var context = new MediaDeckDbContext(this._options)) {
-			var MediaItem = new MediaItem { ItemType = ItemType.Image, FilePath = "dummy.txt", DirectoryPath = "dir", IsExists = false, Description = string.Empty, IsUnderFolderGroup = false };
+			var MediaItem = new MediaItem { MediaType = MediaType.Image, FilePath = "dummy.txt", DirectoryPath = "dir", IsExists = false, Description = string.Empty, IsUnderFolderGroup = false };
 			context.MediaItems.Add(MediaItem);
 			await context.SaveChangesAsync();
 			MediaItemId = MediaItem.MediaItemId;
@@ -227,7 +228,7 @@ public class UpdateFileHashBackgroundServiceTests : IDisposable {
 		// Arrange
 		long MediaItemId;
 		using (var context = new MediaDeckDbContext(this._options)) {
-			var MediaItem = new MediaItem { ItemType = ItemType.Image, FilePath = "not_found.txt", DirectoryPath = "dir", IsExists = true, Description = string.Empty, IsUnderFolderGroup = false };
+			var MediaItem = new MediaItem { MediaType = MediaType.Image, FilePath = "not_found.txt", DirectoryPath = "dir", IsExists = true, Description = string.Empty, IsUnderFolderGroup = false };
 			context.MediaItems.Add(MediaItem);
 			await context.SaveChangesAsync();
 			MediaItemId = MediaItem.MediaItemId;
@@ -265,7 +266,7 @@ public class UpdateFileHashBackgroundServiceTests : IDisposable {
 
 		long MediaItemId;
 		using (var context = new MediaDeckDbContext(this._options)) {
-			var MediaItem = new MediaItem { ItemType = ItemType.Image, FilePath = tempFile, DirectoryPath = "dir", IsExists = true, Description = string.Empty, IsUnderFolderGroup = false };
+			var MediaItem = new MediaItem { MediaType = MediaType.Image, FilePath = tempFile, DirectoryPath = "dir", IsExists = true, Description = string.Empty, IsUnderFolderGroup = false };
 			context.MediaItems.Add(MediaItem);
 			await context.SaveChangesAsync();
 			MediaItemId = MediaItem.MediaItemId;
@@ -298,8 +299,8 @@ public class UpdateFileHashBackgroundServiceTests : IDisposable {
 		// Arrange
 		long fileId1, fileId2;
 		using (var context = new MediaDeckDbContext(this._options)) {
-			var MediaItem1 = new MediaItem { ItemType = ItemType.Image, FilePath = "dummy1.txt", DirectoryPath = "dir", IsExists = true, PreHash = "dup_hash", Description = string.Empty, PreHashUpdatedTime = DateTime.Now, IsUnderFolderGroup = false };
-			var MediaItem2 = new MediaItem { ItemType = ItemType.Image, FilePath = "dummy2.txt", DirectoryPath = "dir", IsExists = true, PreHash = "dup_hash", Description = string.Empty, PreHashUpdatedTime = DateTime.Now, IsUnderFolderGroup = false };
+			var MediaItem1 = new MediaItem { MediaType = MediaType.Image, FilePath = "dummy1.txt", DirectoryPath = "dir", IsExists = true, PreHash = "dup_hash", Description = string.Empty, PreHashUpdatedTime = DateTime.Now, IsUnderFolderGroup = false };
+			var MediaItem2 = new MediaItem { MediaType = MediaType.Image, FilePath = "dummy2.txt", DirectoryPath = "dir", IsExists = true, PreHash = "dup_hash", Description = string.Empty, PreHashUpdatedTime = DateTime.Now, IsUnderFolderGroup = false };
 			context.MediaItems.Add(MediaItem1);
 			context.MediaItems.Add(MediaItem2);
 			await context.SaveChangesAsync();

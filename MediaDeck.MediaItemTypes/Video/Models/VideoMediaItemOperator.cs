@@ -67,7 +67,7 @@ public partial class VideoMediaItemOperator : BaseMediaItemOperator {
 		var isUnderFolderGroup = await this.GetIsUnderFolderGroup(db, directoryPath);
 
 		var mf = new MediaItem {
-			ItemType = ItemType.Video,
+			MediaType = MediaType.Video,
 			DirectoryPath = directoryPath,
 			FilePath = filePath,
 			ThumbnailFileName = thumbRelativePath,

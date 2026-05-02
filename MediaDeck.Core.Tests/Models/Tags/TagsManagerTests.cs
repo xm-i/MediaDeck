@@ -1,4 +1,5 @@
 using MediaDeck.Composition.Database;
+using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.Models;
 using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Composition.Tables;
@@ -135,7 +136,7 @@ public class TagsManagerTests {
 		fileModelMock.SetupGet(x => x.Id).Returns(100);
 		fileModelMock.SetupGet(x => x.Tags).Returns(fileTags);
 		await using (var dbSetup = await dbFactory.CreateDbContextAsync()) {
-			dbSetup.MediaItems.Add(new MediaItem { ItemType = ItemType.Image, MediaItemId = 100, FilePath = "test", DirectoryPath = "dir", Description = "", IsUnderFolderGroup = false });
+			dbSetup.MediaItems.Add(new MediaItem { MediaType = MediaType.Image, MediaItemId = 100, FilePath = "test", DirectoryPath = "dir", Description = "", IsUnderFolderGroup = false });
 			dbSetup.Tags.Add(new Tag { TagId = 99, TagName = "Tag99", Detail = "", TagCategory = null!, MediaItemTags = [], TagAliases = [] });
 			await dbSetup.SaveChangesAsync();
 		}
@@ -199,7 +200,7 @@ public class TagsManagerTests {
 		fileModelMock.SetupGet(x => x.Id).Returns(100);
 		fileModelMock.SetupGet(x => x.Tags).Returns(fileTags);
 		await using (var dbSetup = await dbFactory.CreateDbContextAsync()) {
-			dbSetup.MediaItems.Add(new MediaItem { ItemType = ItemType.Image, MediaItemId = 100, FilePath = "test2", DirectoryPath = "dir", Description = "", IsUnderFolderGroup = false });
+			dbSetup.MediaItems.Add(new MediaItem { MediaType = MediaType.Image, MediaItemId = 100, FilePath = "test2", DirectoryPath = "dir", Description = "", IsUnderFolderGroup = false });
 			dbSetup.Tags.Add(new Tag { TagId = 99, TagName = "Tag99", Detail = "", TagCategory = null!, MediaItemTags = [], TagAliases = [] });
 			dbSetup.MediaItemTags.Add(new MediaItemTag { MediaItemId = 100, TagId = 99 });
 			await dbSetup.SaveChangesAsync();

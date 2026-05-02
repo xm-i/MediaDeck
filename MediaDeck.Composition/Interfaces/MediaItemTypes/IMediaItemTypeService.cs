@@ -52,7 +52,7 @@ public interface IMediaItemTypeService {
 	/// <summary>
 	/// 指定したメディアタイプに対応するメディアアイテムタイププロバイダーを取得します。
 	/// </summary>
-	public IMediaItemTypeProvider GetMediaItemTypeProvider(ItemType mediaType);
+	public IMediaItemTypeProvider GetMediaItemTypeProvider(MediaType mediaType);
 	/// <summary>
 	/// パスがいずれかのメディアアイテムタイプの対象かどうかを取得します。
 	/// </summary>

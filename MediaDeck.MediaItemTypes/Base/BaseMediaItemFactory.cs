@@ -32,10 +32,6 @@ public abstract class BaseMediaItemFactory<TFileOperator, TFileModel, TExecution
 		get;
 	}
 
-	public abstract ItemType ItemType {
-		get;
-	}
-
 	public abstract TFileOperator CreateMediaItemOperator();
 	public abstract TFileModel CreateMediaItemModelFromRecord(MediaItem MediaItem);
 	public abstract TFileViewModel CreateMediaItemViewModel(TFileModel fileModel);

@@ -37,12 +37,6 @@ public class PdfMediaItemFactory :
 		return this._PdfMediaItemOperator;
 	}
 
-	public override ItemType ItemType {
-		get {
-			return ItemType.Pdf;
-		}
-	}
-
 	public override PdfMediaItemModel CreateMediaItemModelFromRecord(MediaItem MediaItem) {
 		var ifm = this._serviceProvider.GetRequiredService<PdfMediaItemModel>();
 		ifm.Initialize(MediaItem.MediaItemId, MediaItem.FilePath);

@@ -177,12 +177,12 @@ public class MediaItemTypeServiceTest {
 	/// <param name="filePath">ファイルパス。</param>
 	/// <returns>生成した <see cref="MediaItem" />。</returns>
 	private static MediaItem CreateMediaItem(string filePath) {
-		var itemType = Path.GetExtension(filePath).ToLowerInvariant() switch {
-			".jpg" => ItemType.Image,
-			".mp4" => ItemType.Video,
-			_ => ItemType.Unknown
+		var mediaType = Path.GetExtension(filePath).ToLowerInvariant() switch {
+			".jpg" => MediaType.Image,
+			".mp4" => MediaType.Video,
+			_ => MediaType.Unknown
 		};
-		return new MediaItem { DirectoryPath = Path.GetDirectoryName(filePath) ?? string.Empty, FilePath = filePath, Description = string.Empty, MediaItemTags = new List<MediaItemTag>(), ItemType = itemType, IsUnderFolderGroup = false };
+		return new MediaItem { DirectoryPath = Path.GetDirectoryName(filePath) ?? string.Empty, FilePath = filePath, Description = string.Empty, MediaItemTags = new List<MediaItemTag>(), MediaType = mediaType, IsUnderFolderGroup = false };
 	}
 
 	private sealed class TestMediaItemFactory : IMediaItemFactory {
@@ -193,16 +193,6 @@ public class MediaItemTypeServiceTest {
 
 		public MediaType MediaType {
 			get;
-		}
-
-		public ItemType ItemType {
-			get {
-				return this.MediaType switch {
-					MediaType.Image => ItemType.Image,
-					MediaType.Video => ItemType.Video,
-					_ => ItemType.Unknown
-				};
-			}
 		}
 
 		public string CreatedBy {

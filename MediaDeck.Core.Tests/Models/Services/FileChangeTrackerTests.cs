@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using MediaDeck.Composition.Database;
+using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Tables;
 using MediaDeck.Core.Services.FileChangeMonitor;
 using Microsoft.EntityFrameworkCore;
@@ -43,7 +44,7 @@ public class FileChangeTrackerTests {
 		using (var db = dbFactory.CreateDbContext()) {
 			for (int i = 0; i < testSize; i++) {
 				db.MediaItems.Add(new MediaItem {
-					ItemType = ItemType.Image,
+					MediaType = MediaType.Image,
 					MediaItemId = i + 1,
 					FilePath = $"/test/path/file{i}.txt",
 					DirectoryPath = "/test/path",

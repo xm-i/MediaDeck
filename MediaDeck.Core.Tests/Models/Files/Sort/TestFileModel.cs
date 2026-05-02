@@ -1,4 +1,3 @@
-using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.Models;
 using MediaDeck.Composition.Interfaces.Primitives;
 using MediaDeck.Composition.Interfaces.Tags;
@@ -20,9 +19,7 @@ public class TestFileModel : MediaItem, IMediaItemModel {
 	}
 
 	public Observable<Unit> Changed { get; } = Observable.Empty<Unit>();
-	public MediaType MediaType {
-		get; set;
-	}
+
 	public long Id {
 		get {
 			return this.MediaItemId;

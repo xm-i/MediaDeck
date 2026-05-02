@@ -65,7 +65,7 @@ public partial class ArchiveMediaItemOperator : BaseMediaItemOperator {
 		var directoryPath = Path.GetDirectoryName(filePath)!;
 		var isUnderFolderGroup = await this.GetIsUnderFolderGroup(db, directoryPath);
 		var mf = new MediaItem {
-			ItemType = ItemType.Archive,
+			MediaType = MediaType.Archive,
 			DirectoryPath = directoryPath,
 			FilePath = filePath,
 			ThumbnailFileName = thumbRelativePath,

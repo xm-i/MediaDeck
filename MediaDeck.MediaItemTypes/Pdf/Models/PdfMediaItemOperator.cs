@@ -52,7 +52,7 @@ public partial class PdfMediaItemOperator : BaseMediaItemOperator {
 		var isUnderFolderGroup = await this.GetIsUnderFolderGroup(db, directoryPath);
 
 		var mf = new MediaItem {
-			ItemType = ItemType.Pdf,
+			MediaType = MediaType.Pdf,
 			DirectoryPath = directoryPath,
 			FilePath = filePath,
 			ThumbnailFileName = thumbRelativePath,

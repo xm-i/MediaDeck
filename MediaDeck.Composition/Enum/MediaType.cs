@@ -10,35 +10,35 @@ public enum MediaType {
 	/// 画像
 	/// </summary>
 	[Description("Image")]
-	Image,
+	Image = 0,
 
 	/// <summary>
 	/// 動画
 	/// </summary>
 	[Description("Video")]
-	Video,
+	Video = 1,
 
 	/// <summary>
 	/// PDF
 	/// </summary>
 	[Description("Pdf")]
-	Pdf,
+	Pdf = 2,
 
 	/// <summary>
 	/// Archive
 	/// </summary>
 	[Description("Archive")]
-	Archive,
+	Archive = 3,
 
 	/// <summary>
 	/// フォルダグループ
 	/// </summary>
 	[Description("FolderGroup")]
-	FolderGroup,
+	FolderGroup = 4,
 
 	/// <summary>
 	/// Unknown
 	/// </summary>
 	[Description("Unknown")]
-	Unknown
+	Unknown = 99
 }

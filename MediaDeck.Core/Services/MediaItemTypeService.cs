@@ -58,12 +58,11 @@ public class MediaItemTypeService(IEnumerable<IMediaItemFactory> mediaItemFactor
 
 	/// <inheritdoc />
 	public IMediaItemFactory GetMediaItemFactory(MediaItem MediaItem) {
-		return this._mediaItemFactories.FirstOrDefault(x => x.ItemType == MediaItem.ItemType) ?? this._unknownMediaItemFactory;
+		return this._mediaItemFactories.FirstOrDefault(x => x.MediaType == MediaItem.MediaType) ?? this._unknownMediaItemFactory;
 	}
 
-	public IMediaItemTypeProvider GetMediaItemTypeProvider(ItemType mediaType) {
-		var factory = this._mediaItemFactories.FirstOrDefault(x => x.ItemType == mediaType);
-		return this._mediaItemTypeProviders.FirstOrDefault(x => x.MediaType == factory?.MediaType) ?? this._unknownMediaItemProvider;
+	public IMediaItemTypeProvider GetMediaItemTypeProvider(MediaType mediaType) {
+		return this._mediaItemTypeProviders.FirstOrDefault(x => x.MediaType == mediaType) ?? this._unknownMediaItemProvider;
 	}
 
 	/// <inheritdoc />

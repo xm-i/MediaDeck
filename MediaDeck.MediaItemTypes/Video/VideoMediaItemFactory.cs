@@ -37,12 +37,6 @@ public class VideoMediaItemFactory :
 		return this._VideoMediaItemOperator;
 	}
 
-	public override ItemType ItemType {
-		get {
-			return ItemType.Video;
-		}
-	}
-
 	public override VideoMediaItemModel CreateMediaItemModelFromRecord(MediaItem MediaItem) {
 		var ifm = this._serviceProvider.GetRequiredService<VideoMediaItemModel>();
 		ifm.Initialize(MediaItem.MediaItemId, MediaItem.FilePath);

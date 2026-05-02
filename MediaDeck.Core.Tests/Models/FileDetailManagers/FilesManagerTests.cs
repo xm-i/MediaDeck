@@ -1,4 +1,5 @@
 using MediaDeck.Composition.Database;
+using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.Models;
 using MediaDeck.Composition.Objects;
 using MediaDeck.Composition.Tables;
@@ -65,9 +66,9 @@ public class FilesManagerTests : IDisposable {
 	public async Task RemoveFilesAsync_WhenFilesExist_ShouldRemoveFilesAndNotify() {
 		// Arrange
 		await using (var context = await this._dbFactoryMock.Object.CreateDbContextAsync()) {
-			context.MediaItems.Add(new MediaItem { ItemType = ItemType.Image, MediaItemId = 1, FilePath = "path1.jpg", DirectoryPath = "dir", Description = "", IsUnderFolderGroup = false });
-			context.MediaItems.Add(new MediaItem { ItemType = ItemType.Image, MediaItemId = 2, FilePath = "path2.jpg", DirectoryPath = "dir", Description = "", IsUnderFolderGroup = false });
-			context.MediaItems.Add(new MediaItem { ItemType = ItemType.Image, MediaItemId = 3, FilePath = "path3.jpg", DirectoryPath = "dir", Description = "", IsUnderFolderGroup = false });
+			context.MediaItems.Add(new MediaItem { MediaType = MediaType.Image, MediaItemId = 1, FilePath = "path1.jpg", DirectoryPath = "dir", Description = "", IsUnderFolderGroup = false });
+			context.MediaItems.Add(new MediaItem { MediaType = MediaType.Image, MediaItemId = 2, FilePath = "path2.jpg", DirectoryPath = "dir", Description = "", IsUnderFolderGroup = false });
+			context.MediaItems.Add(new MediaItem { MediaType = MediaType.Image, MediaItemId = 3, FilePath = "path3.jpg", DirectoryPath = "dir", Description = "", IsUnderFolderGroup = false });
 			await context.SaveChangesAsync();
 		}
 
@@ -99,7 +100,7 @@ public class FilesManagerTests : IDisposable {
 	public async Task RemoveFilesAsync_WhenSingleFileExists_ShouldRemoveAndNotifySingleMessage() {
 		// Arrange
 		await using (var context = await this._dbFactoryMock.Object.CreateDbContextAsync()) {
-			context.MediaItems.Add(new MediaItem { ItemType = ItemType.Image, MediaItemId = 1, FilePath = "path1.jpg", DirectoryPath = "dir", Description = "", IsUnderFolderGroup = false });
+			context.MediaItems.Add(new MediaItem { MediaType = MediaType.Image, MediaItemId = 1, FilePath = "path1.jpg", DirectoryPath = "dir", Description = "", IsUnderFolderGroup = false });
 			await context.SaveChangesAsync();
 		}
 
@@ -128,7 +129,7 @@ public class FilesManagerTests : IDisposable {
 	public async Task RemoveFilesAsync_WhenFileNotFound_ShouldNotThrowAndNotNotify() {
 		// Arrange
 		await using (var context = await this._dbFactoryMock.Object.CreateDbContextAsync()) {
-			context.MediaItems.Add(new MediaItem { ItemType = ItemType.Image, MediaItemId = 1, FilePath = "path1.jpg", DirectoryPath = "dir", Description = "", IsUnderFolderGroup = false });
+			context.MediaItems.Add(new MediaItem { MediaType = MediaType.Image, MediaItemId = 1, FilePath = "path1.jpg", DirectoryPath = "dir", Description = "", IsUnderFolderGroup = false });
 			await context.SaveChangesAsync();
 		}
 
@@ -156,7 +157,7 @@ public class FilesManagerTests : IDisposable {
 	public async Task RemoveFilesAsync_WhenEmptyListProvided_ShouldNotThrowAndNotNotify() {
 		// Arrange
 		await using (var context = await this._dbFactoryMock.Object.CreateDbContextAsync()) {
-			context.MediaItems.Add(new MediaItem { ItemType = ItemType.Image, MediaItemId = 1, FilePath = "path1.jpg", DirectoryPath = "dir", Description = "", IsUnderFolderGroup = false });
+			context.MediaItems.Add(new MediaItem { MediaType = MediaType.Image, MediaItemId = 1, FilePath = "path1.jpg", DirectoryPath = "dir", Description = "", IsUnderFolderGroup = false });
 			await context.SaveChangesAsync();
 		}
 

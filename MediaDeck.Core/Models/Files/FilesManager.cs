@@ -1,7 +1,7 @@
 using MediaDeck.Composition.Database;
+using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.Models;
 using MediaDeck.Composition.Objects;
-using MediaDeck.Composition.Tables;
 using MediaDeck.Core.Models.NotificationDispatcher;
 
 namespace MediaDeck.Core.Models.Files;
@@ -44,7 +44,7 @@ public class FilesManager {
 
 		db.MediaItems.RemoveRange(targetFiles);
 
-		var folderGroups = targetFiles.Where(x => x.ItemType == ItemType.FolderGroup).Select(fg => fg.FilePath).ToArray();
+		var folderGroups = targetFiles.Where(x => x.MediaType == MediaType.FolderGroup).Select(fg => fg.FilePath).ToArray();
 		if (folderGroups.Any()) {
 			var targets = db.MediaItems.Where(x => folderGroups.Any(fg => fg == x.DirectoryPath || x.DirectoryPath.StartsWith(fg + Path.DirectorySeparatorChar))).ToArray();
 			foreach (var target in targets) {

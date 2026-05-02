@@ -37,10 +37,6 @@ public interface IMediaItemFactory {
 		get;
 	}
 
-	public ItemType ItemType {
-		get;
-	}
-
 	public IMediaItemOperator CreateMediaItemOperator();
 	public IMediaItemModel CreateMediaItemModelFromRecord(MediaItem MediaItem);
 	public IMediaItemViewModel CreateMediaItemViewModel(IMediaItemModel fileModel);

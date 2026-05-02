@@ -37,12 +37,6 @@ public class ImageMediaItemFactory :
 		return this._ImageMediaItemOperator;
 	}
 
-	public override ItemType ItemType {
-		get {
-			return ItemType.Image;
-		}
-	}
-
 	public override ImageMediaItemModel CreateMediaItemModelFromRecord(MediaItem MediaItem) {
 		var ifm = this._serviceProvider.GetRequiredService<ImageMediaItemModel>();
 		ifm.Initialize(MediaItem.MediaItemId, MediaItem.FilePath);

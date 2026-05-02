@@ -34,7 +34,7 @@ public class FileStatusUpdatorService {
 		this.CompletedCount.Value = 0;
 		foreach (var file in targetFiles) {
 			this.CompletedCount.Value++;
-			var mediaItemTypeProvider = this._mediaItemTypeService.GetMediaItemTypeProvider(file.ItemType);
+			var mediaItemTypeProvider = this._mediaItemTypeService.GetMediaItemTypeProvider(file.MediaType);
 			var pathStatus = mediaItemTypeProvider.GetPathStatus(file.FilePath);
 			if (
 				file.IsExists == pathStatus.Exists &&

@@ -35,12 +35,6 @@ public class FolderGroupMediaItemFactory :
 		return this._fileOperator;
 	}
 
-	public override ItemType ItemType {
-		get {
-			return ItemType.FolderGroup;
-		}
-	}
-
 	public override FolderGroupMediaItemModel CreateMediaItemModelFromRecord(MediaItem MediaItem) {
 		var model = this._serviceProvider.GetRequiredService<FolderGroupMediaItemModel>();
 		model.Initialize(MediaItem.MediaItemId, MediaItem.FilePath);

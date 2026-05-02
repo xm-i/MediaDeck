@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations.Schema;
+using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Tables.Metadata;
 
 namespace MediaDeck.Composition.Tables;
@@ -14,10 +16,7 @@ public class MediaItem {
 		set;
 	}
 
-	/// <summary>
-	/// アイテム種別
-	/// </summary>
-	public required ItemType ItemType {
+	public required MediaType MediaType {
 		get;
 		set;
 	}
