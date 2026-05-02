@@ -1,7 +1,8 @@
 using MediaDeck.Composition.Enum;
 using MediaDeck.Core.Models.Files.SearchConditions;
+using MediaDeck.Core.Stores.State;
 using MediaDeck.ViewModels.Dialogs;
-
+using MediaDeck.Views.Helpers;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
@@ -10,18 +11,30 @@ namespace MediaDeck.Views.Dialogs;
 /// <summary>
 /// <c>prop.&lt;Name&gt;</c> 検索候補が選択された際に表示される、比較演算子と値を入力するダイアログ。
 /// </summary>
+[Inject(InjectServiceLifetime.Transient)]
 public sealed partial class PropertyComparisonDialog : ContentDialog {
 
 	public PropertyComparisonDialogViewModel ViewModel {
 		get;
 	}
 
-	public PropertyComparisonDialog(MediaItemPropertyDescriptor descriptor) {
-		this.ViewModel = new PropertyComparisonDialogViewModel(descriptor);
+	private readonly CompositeDisposable _disposable = new();
+
+	public PropertyComparisonDialog(PropertyComparisonDialogViewModel viewModel, IStateStore stateStore) {
+		this.ViewModel = viewModel;
 		this.InitializeComponent();
 
+		ThemeHelper.BindTheme(this, stateStore, this._disposable);
+
 		this.PrimaryButtonClick += this.OnPrimaryButtonClick;
-		this.Closed += (_, _) => this.ViewModel.Dispose();
+		this.Closed += (_, _) => {
+			this.ViewModel.Dispose();
+			this._disposable.Dispose();
+		};
+	}
+
+	public void Initialize(MediaItemPropertyDescriptor descriptor) {
+		this.ViewModel.Initialize(descriptor);
 	}
 
 	/// <summary>確定後の比較演算子。</summary>

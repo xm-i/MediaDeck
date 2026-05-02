@@ -1,4 +1,7 @@
+using CommunityToolkit.Mvvm.DependencyInjection;
+using MediaDeck.Core.Stores.State;
 using MediaDeck.ViewModels.Tags;
+using MediaDeck.Views.Helpers;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
@@ -21,6 +24,8 @@ public sealed partial class TagManagerView {
 			CloseButtonText = "キャンセル",
 			DefaultButton = ContentDialogButton.Close
 		};
+		using var disposable = new CompositeDisposable();
+		ThemeHelper.BindTheme(dialog, Ioc.Default.GetRequiredService<IStateStore>(), disposable);
 		if (await dialog.ShowAsync() == ContentDialogResult.Primary) {
 			this.ViewModel.DeleteTagCategoryCommand.Execute(R3.Unit.Default);
 		}
@@ -37,6 +42,8 @@ public sealed partial class TagManagerView {
 			CloseButtonText = "キャンセル",
 			DefaultButton = ContentDialogButton.Close
 		};
+		using var disposable = new CompositeDisposable();
+		ThemeHelper.BindTheme(dialog, Ioc.Default.GetRequiredService<IStateStore>(), disposable);
 		if (await dialog.ShowAsync() == ContentDialogResult.Primary) {
 			this.ViewModel.DeleteTagCommand.Execute(R3.Unit.Default);
 		}

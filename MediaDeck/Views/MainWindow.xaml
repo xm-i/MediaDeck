@@ -16,7 +16,8 @@
 	<Window.SystemBackdrop>
 		<DesktopAcrylicBackdrop/>
 	</Window.SystemBackdrop>
-	<Grid Loaded="Window_Loaded" >
+	<Grid Loaded="Window_Loaded"
+		Background="Transparent" >
 		<Grid.RowDefinitions>
 			<RowDefinition Height="48" />
 			<RowDefinition Height="*" />

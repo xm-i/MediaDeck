@@ -2,8 +2,10 @@ using System.IO;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using MediaDeck.Common.Utilities;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.ViewModels;
+using MediaDeck.Core.Stores.State;
 using MediaDeck.Services;
 using MediaDeck.ViewModels.Panes.ViewerPanes;
+using MediaDeck.Views.Helpers;
 using MediaDeck.Views.Thumbnails;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
@@ -100,27 +102,30 @@ public class ViewerPaneBase : UserControlBase<ViewerSelectorViewModel> {
 					this._windowService.ActivateCenteredOnMainWindow(window, parent);
 				}
 				break;
-			case "RemoveFile":
-				selectedFiles = this.ViewModel.MediaContentLibraryViewModel.SelectedFiles.Value;
-				targetFiles = selectedFiles is { Length: > 0 } && selectedFiles.Contains(fvm) ? selectedFiles : [fvm];
-				var message = targetFiles.Length == 1 ? "Remove file from MediaDeck database?" : $"Remove {targetFiles.Length} files from MediaDeck database?";
+			case "RemoveFile": {
+					selectedFiles = this.ViewModel.MediaContentLibraryViewModel.SelectedFiles.Value;
+					targetFiles = selectedFiles is { Length: > 0 } && selectedFiles.Contains(fvm) ? selectedFiles : [fvm];
+					var message = targetFiles.Length == 1 ? "Remove file from MediaDeck database?" : $"Remove {targetFiles.Length} files from MediaDeck database?";
 
-				var dialog = new ContentDialog {
-					XamlRoot = this.XamlRoot,
-					Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
-					Title = message,
-					PrimaryButtonText = "Yes",
-					SecondaryButtonText = "No",
-					CloseButtonText = "Cancel",
-					DefaultButton = ContentDialogButton.Primary
-				};
+					var dialog = new ContentDialog {
+						XamlRoot = this.XamlRoot,
+						Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
+						Title = message,
+						PrimaryButtonText = "Yes",
+						SecondaryButtonText = "No",
+						CloseButtonText = "Cancel",
+						DefaultButton = ContentDialogButton.Primary
+					};
+					using var disposable = new CompositeDisposable();
+					ThemeHelper.BindTheme(dialog, Ioc.Default.GetRequiredService<IStateStore>(), disposable);
 
-				var result = await dialog.ShowAsync();
-				if (result == ContentDialogResult.Primary) {
-					await this.ViewModel.SelectedViewerPane.Value.RemoveFilesAsync(targetFiles);
-					this.ViewModel.SearchConditionManagerViewModel.Reload();
+					var result = await dialog.ShowAsync();
+					if (result == ContentDialogResult.Primary) {
+						await this.ViewModel.SelectedViewerPane.Value.RemoveFilesAsync(targetFiles);
+						this.ViewModel.SearchConditionManagerViewModel.Reload();
+					}
+					break;
 				}
-				break;
 			case "OpenFolder":
 				if (!string.IsNullOrEmpty(fvm.FilePath) && File.Exists(fvm.FilePath)) {
 					ShellUtility.ShowInExplorer(fvm.FilePath);

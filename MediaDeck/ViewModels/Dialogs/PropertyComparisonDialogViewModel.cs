@@ -7,19 +7,24 @@ using MediaDeck.Core.Primitives;
 
 namespace MediaDeck.ViewModels.Dialogs;
 
+[Inject(InjectServiceLifetime.Transient)]
 public class PropertyComparisonDialogViewModel : ViewModelBase {
-	public MediaItemPropertyDescriptor Descriptor {
+	public MediaItemPropertyDescriptor? Descriptor {
 		get;
+		private set;
 	}
 
 	public string PropertyNameText {
 		get;
-	}
+		private set;
+	} = string.Empty;
 
 	public IReadOnlyList<DisplayObject<SearchTypeComparison>> OperatorItems {
 		get;
-	}
-	public ReactiveProperty<DisplayObject<SearchTypeComparison>> SelectedOperator {
+		private set;
+	} = [];
+
+	public ReactiveProperty<DisplayObject<SearchTypeComparison>?> SelectedOperator {
 		get;
 	}
 
@@ -31,9 +36,18 @@ public class PropertyComparisonDialogViewModel : ViewModelBase {
 
 	public IReadOnlyList<DisplayObject<object>> EnumItems {
 		get;
+		private set;
+	} = [];
+
+	public PropertyComparisonDialogViewModel() {
+		this.SelectedOperator = new ReactiveProperty<DisplayObject<SearchTypeComparison>?>().AddTo(this.CompositeDisposable);
+		this.StringValue.AddTo(this.CompositeDisposable);
+		this.NumberValue.AddTo(this.CompositeDisposable);
+		this.DateTimeValue.AddTo(this.CompositeDisposable);
+		this.EnumValue.AddTo(this.CompositeDisposable);
 	}
 
-	public PropertyComparisonDialogViewModel(MediaItemPropertyDescriptor descriptor) {
+	public void Initialize(MediaItemPropertyDescriptor descriptor) {
 		this.Descriptor = descriptor;
 		this.PropertyNameText = $"prop.{descriptor.Name}  ({descriptor.ValueType.Name})";
 
@@ -41,11 +55,7 @@ public class PropertyComparisonDialogViewModel : ViewModelBase {
 			.Select(op => new DisplayObject<SearchTypeComparison>(GetOperatorLabel(op), op))
 			.ToList();
 
-		this.SelectedOperator = new ReactiveProperty<DisplayObject<SearchTypeComparison>?>(this.OperatorItems.FirstOrDefault()).AddTo(this.CompositeDisposable);
-		this.StringValue.AddTo(this.CompositeDisposable);
-		this.NumberValue.AddTo(this.CompositeDisposable);
-		this.DateTimeValue.AddTo(this.CompositeDisposable);
-		this.EnumValue.AddTo(this.CompositeDisposable);
+		this.SelectedOperator.Value = this.OperatorItems.FirstOrDefault();
 
 		if (descriptor.ValueType.IsEnum) {
 			this.EnumItems = Enum.GetValues(descriptor.ValueType)

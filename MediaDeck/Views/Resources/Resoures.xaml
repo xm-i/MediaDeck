@@ -13,6 +13,7 @@
 	xmlns:unknownViews="using:MediaDeck.MediaItemTypes.UI.Unknown.Views"
 	xmlns:videoViews="using:MediaDeck.MediaItemTypes.UI.Video.Views" >
 	<ctConverters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+	<converters:EqualityToBooleanConverter x:Key="EqualityToBooleanConverter" />
 	<converters:StringNotEmptyToVisibilityConverter x:Key="StringNotEmptyToVisibilityConverter" />
 	<converters:LongToDoubleConverter x:Key="LongToDoubleConverter" />
 	<converters:NullToBooleanConverter x:Key="NullToBooleanConverter" />

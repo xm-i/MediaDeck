@@ -1,20 +1,25 @@
+using System.Threading.Tasks;
+using CommunityToolkit.Mvvm.DependencyInjection;
+using MediaDeck.Core.Stores.State;
 using MediaDeck.ViewModels;
 using MediaDeck.Views.Dialogs;
-
+using MediaDeck.Views.Helpers;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
 namespace MediaDeck.Views;
 
 [Inject(InjectServiceLifetime.Transient)]
-public sealed partial class MainWindow {
+public sealed partial class MainWindow : Window {
 	private readonly MainWindowViewModel _viewModel;
+	private readonly CompositeDisposable _disposable = new();
 
-	private readonly System.Reactive.Disposables.CompositeDisposable _disposable = new();
-
-	public MainWindow(MainWindowViewModel viewModel) {
+	public MainWindow(MainWindowViewModel viewModel, IStateStore stateStore) {
 		this._viewModel = viewModel;
 		this.InitializeComponent();
+
+		// テーマのバインド
+		ThemeHelper.BindTheme(this, stateStore, this._disposable);
 
 		// カスタムタイトルバーの設定
 		this.ExtendsContentIntoTitleBar = true;
@@ -27,6 +32,8 @@ public sealed partial class MainWindow {
 		}).AddTo(this._disposable);
 
 		this.Closed += (s, e) => this._disposable.Dispose();
+
+		this._viewModel.WindowActivatedCommand.Execute(Unit.Default);
 	}
 
 	private void MainTabView_TabCloseRequested(TabView sender, TabViewTabCloseRequestedEventArgs args) {
@@ -63,10 +70,10 @@ public sealed partial class MainWindow {
 		}
 	}
 
-	private async System.Threading.Tasks.Task ShowRenameTabDialogAsync(TabContext tabContext) {
-		var dialog = new TabRenameDialog(tabContext.TabState.DisplayName.Value) {
-			XamlRoot = this.Content.XamlRoot
-		};
+	private async Task ShowRenameTabDialogAsync(TabContext tabContext) {
+		var dialog = Ioc.Default.GetRequiredService<TabRenameDialog>();
+		dialog.XamlRoot = this.Content.XamlRoot;
+		dialog.Initialize(tabContext.TabState.DisplayName.Value);
 
 		var result = await dialog.ShowAsync();
 		if (result == ContentDialogResult.Primary && !string.IsNullOrWhiteSpace(dialog.ResultText)) {

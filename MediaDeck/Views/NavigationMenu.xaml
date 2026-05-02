@@ -5,6 +5,7 @@
 	xmlns:local="using:MediaDeck.Views"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:enum="using:MediaDeck.Composition.Enum"
 	mc:Ignorable="d" >
 
 	<Grid>
@@ -31,28 +32,36 @@
 		</Grid.ColumnDefinitions>
 
 		<MenuBar Grid.Column="0" Style="{StaticResource TransparentMenuBarStyle}">
-			<MenuBarItem Title="Tools" >
-				<MenuFlyoutItem Text="Tag Manager"
+			<MenuBarItem Title="表示" >
+				<ToggleMenuFlyoutItem Text="既定 (Windowsの設定)"
+					IsChecked="{x:Bind ViewModel.CurrentTheme.Value, Mode=OneWay, Converter={StaticResource EqualityToBooleanConverter}, ConverterParameter=Default}"
+					Click="ThemeMenuFlyoutItem_Click" Tag="Default" />
+				<ToggleMenuFlyoutItem Text="ライト"
+					IsChecked="{x:Bind ViewModel.CurrentTheme.Value, Mode=OneWay, Converter={StaticResource EqualityToBooleanConverter}, ConverterParameter=Light}"
+					Click="ThemeMenuFlyoutItem_Click" Tag="Light" />
+				<ToggleMenuFlyoutItem Text="ダーク"
+					IsChecked="{x:Bind ViewModel.CurrentTheme.Value, Mode=OneWay, Converter={StaticResource EqualityToBooleanConverter}, ConverterParameter=Dark}"
+					Click="ThemeMenuFlyoutItem_Click" Tag="Dark" />
+			</MenuBarItem>
+			<MenuBarItem Title="ツール" >
+				<MenuFlyoutItem Text="タグ管理"
 					Click="MenuFlyoutItem_Click"
 					Tag="TagManager" />
-				<MenuFlyoutItem Text="Folder Manager"
+				<MenuFlyoutItem Text="フォルダ管理"
 					Click="MenuFlyoutItem_Click"
 					Tag="FolderManager" />
 				<MenuFlyoutSeparator />
-				<MenuFlyoutItem Text="Duplicate Detector"
+				<MenuFlyoutItem Text="重複ファイル検索"
 					Click="MenuFlyoutItem_Click"
 					Tag="DuplicateDetector" />
 				<MenuFlyoutSeparator />
-				<MenuFlyoutItem Text="Config"
+				<MenuFlyoutItem Text="設定"
 					Click="MenuFlyoutItem_Click"
 					Tag="Config" />
 				<MenuFlyoutSeparator />
-				<MenuFlyoutItem Text="Background Tasks"
+				<MenuFlyoutItem Text="バックグラウンドタスク"
 					Click="MenuFlyoutItem_Click"
 					Tag="BackgroundTasks" />
-			</MenuBarItem>
-			<MenuBarItem Title="BREAK">
-				<MenuFlyoutItem Click="MenuFlyoutItem_Click_1"/>
 			</MenuBarItem>
 		</MenuBar>
 
@@ -60,7 +69,7 @@
 			VerticalAlignment="Center"
 			Margin="8,0"
 			Padding="8,4"
-			ToolTipService.ToolTip="未処理のファイル変更があります"
+			ToolTipService.ToolTip="未処理のファイル変更があります。"
 			Click="SyncNotificationButton_Click"
 			Visibility="{x:Bind ViewModel.HasUnprocessedChanges.Value, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
 			Style="{ThemeResource AccentButtonStyle}" >

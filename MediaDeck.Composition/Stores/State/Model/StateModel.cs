@@ -1,3 +1,4 @@
+using MediaDeck.Composition.Enum;
 using R3.JsonConfig.Attributes;
 
 namespace MediaDeck.Composition.Stores.State.Model;
@@ -17,4 +18,12 @@ public class AppStateModel(FolderManagerStateModel folderManagerState, SearchDef
 		get;
 		set;
 	} = searchDefinitions;
+
+	/// <summary>
+	/// アプリケーションのテーマ
+	/// </summary>
+	public ReactiveProperty<AppTheme> Theme {
+		get;
+		set;
+	} = new(AppTheme.Default);
 }

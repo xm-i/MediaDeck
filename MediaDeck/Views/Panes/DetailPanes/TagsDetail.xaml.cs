@@ -1,14 +1,12 @@
 using System.Threading.Tasks;
-
+using CommunityToolkit.Mvvm.DependencyInjection;
 using MediaDeck.Core.Primitives;
 using MediaDeck.ViewModels.Panes.DetailPanes;
 using MediaDeck.ViewModels.Tags;
 using MediaDeck.Views.Tags;
-
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
-
 using Windows.System;
 
 namespace MediaDeck.Views.Panes.DetailPanes;
@@ -35,9 +33,8 @@ public sealed partial class TagsDetail {
 			return;
 		}
 
-		var tagsManager = this.ViewModel.GetTagsManager();
-		var newTagDialogViewModel = new NewTagDialogViewModel(tagsManager, this.ViewModel.TagModelFactory);
-		var dialog = new NewTagDialog(newTagDialogViewModel) { XamlRoot = this.XamlRoot };
+		var dialog = Ioc.Default.GetRequiredService<NewTagDialog>();
+		dialog.XamlRoot = this.XamlRoot;
 		dialog.ViewModel.TagName.Value = context.TagName;
 		dialog.ViewModel.SelectedCategory.Value = dialog.ViewModel.TagCategories.FirstOrDefault(x => x.Model == context.SelectedCategory);
 

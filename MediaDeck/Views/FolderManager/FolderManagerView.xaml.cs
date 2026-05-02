@@ -1,4 +1,7 @@
+using CommunityToolkit.Mvvm.DependencyInjection;
+using MediaDeck.Core.Stores.State;
 using MediaDeck.ViewModels.FolderManager;
+using MediaDeck.Views.Helpers;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Windows.Storage.Pickers;
@@ -46,6 +49,8 @@ public sealed partial class FolderManagerView {
 			CloseButtonText = "キャンセル",
 			DefaultButton = ContentDialogButton.Primary
 		};
+		using var disposable = new CompositeDisposable();
+		ThemeHelper.BindTheme(dialog, Ioc.Default.GetRequiredService<IStateStore>(), disposable);
 
 		var result = await dialog.ShowAsync();
 

@@ -8,15 +8,36 @@
 	xmlns:vm="using:MediaDeck.ViewModels.Thumbnails"
 	mc:Ignorable="d"
 	Title="サムネイル一括再生成" >
-	<Grid>
-		<Grid.ColumnDefinitions>
-			<ColumnDefinition Width="320" />
-			<ColumnDefinition Width="*" />
-		</Grid.ColumnDefinitions>
+	<Window.SystemBackdrop>
+		<DesktopAcrylicBackdrop/>
+	</Window.SystemBackdrop>
+	<Grid Background="Transparent"
+		Loaded="Window_Loaded" >
 		<Grid.RowDefinitions>
-			<RowDefinition Height="*" />
 			<RowDefinition Height="Auto" />
+			<RowDefinition Height="*" />
 		</Grid.RowDefinitions>
+
+		<!-- カスタムタイトルバー -->
+		<Grid x:Name="AppTitleBar" Grid.Row="0" Height="32"
+			Background="{ThemeResource TitleBarBackgroundBrush}"
+			Padding="12,0,0,0"
+			VerticalAlignment="Top" >
+			<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+				<Image Source="/Assets/Square44x44Logo.scale-200.png" Width="16" Height="16" Margin="4,0,8,0" />
+				<TextBlock Text="{x:Bind Title}" FontSize="12" VerticalAlignment="Center" />
+			</StackPanel>
+		</Grid>
+
+		<Grid Grid.Row="1" >
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="320" />
+				<ColumnDefinition Width="*" />
+			</Grid.ColumnDefinitions>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="*" />
+				<RowDefinition Height="Auto" />
+			</Grid.RowDefinitions>
 
 		<!-- 左ペイン: 対象アイテム一覧 -->
 		<Grid Grid.Column="0" Grid.Row="0" Padding="8" >
@@ -26,11 +47,11 @@
 			</Grid.RowDefinitions>
 			<StackPanel Grid.Row="0" Spacing="4" >
 				<TextBlock FontWeight="SemiBold" Text="対象ファイル" />
-				<TextBlock Foreground="Gray" >
+				<TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" >
 					<Run Text="メディアタイプ: " />
 					<Run Text="{x:Bind ViewModel.TargetMediaType.Value, Mode=OneWay}" />
 				</TextBlock>
-				<TextBlock Foreground="Gray" >
+				<TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" >
 					<Run Text="件数: " />
 					<Run Text="{x:Bind ViewModel.TotalCount.Value, Mode=OneWay}" />
 				</TextBlock>
@@ -94,5 +115,6 @@
 				<TextBlock Text="中断" />
 			</Button>
 		</Grid>
+	</Grid>
 	</Grid>
 </Window>

@@ -5,12 +5,33 @@
 	xmlns:services="using:MediaDeck.Core.Services.FileChangeMonitor"
 	xmlns:viewmodels="using:MediaDeck.ViewModels"
 		Title="ファイルの同期確認" >
-	<Grid>
+	<Window.SystemBackdrop>
+		<DesktopAcrylicBackdrop/>
+	</Window.SystemBackdrop>
+	<Grid Background="Transparent"
+		Loaded="Window_Loaded" >
 		<Grid.RowDefinitions>
 			<RowDefinition Height="Auto" />
 			<RowDefinition Height="*" />
-			<RowDefinition Height="Auto" />
 		</Grid.RowDefinitions>
+
+		<!-- カスタムタイトルバー -->
+		<Grid x:Name="AppTitleBar" Grid.Row="0" Height="32"
+			Background="{ThemeResource TitleBarBackgroundBrush}"
+			Padding="12,0,0,0"
+			VerticalAlignment="Top" >
+			<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+				<Image Source="/Assets/Square44x44Logo.scale-200.png" Width="16" Height="16" Margin="4,0,8,0" />
+				<TextBlock Text="{x:Bind Title}" FontSize="12" VerticalAlignment="Center" />
+			</StackPanel>
+		</Grid>
+
+		<Grid Grid.Row="1" >
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="*" />
+				<RowDefinition Height="Auto" />
+			</Grid.RowDefinitions>
 
 		<StackPanel Grid.Row="0"
 			Margin="16" >
@@ -24,11 +45,11 @@
 						Style="{ThemeResource TitleTextBlockStyle}" />
 					<TextBlock Text="外部でのファイル移動や削除が検出されました。"
 						Margin="0,4,0,0"
-						Foreground="Gray" />
+						Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
 				</StackPanel>
 				<TextBlock Grid.Column="1"
 					VerticalAlignment="Bottom"
-					Foreground="Gray" >
+					Foreground="{ThemeResource TextFillColorSecondaryBrush}" >
 					<Run Text="表示中:" />
 					<Run Text="{x:Bind ViewModel.FilteredCount.Value, Mode=OneWay}" />
 					<Run Text="件" />
@@ -57,7 +78,7 @@
 				<DataTemplate x:DataType="services:FileChangeItem" >
 					<Grid Padding="12"
 						BorderThickness="0,0,0,1"
-						BorderBrush="LightGray" >
+						BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}" >
 						<Grid.ColumnDefinitions>
 							<ColumnDefinition Width="*" />
 							<ColumnDefinition Width="Auto" />
@@ -73,12 +94,12 @@
 								Spacing="4"
 								Visibility="{Binding OldPath, Mode=OneWay, Converter={StaticResource StringNotEmptyToVisibilityConverter}}" >
 								<TextBlock Text="変更前："
-									Foreground="Gray"
+									Foreground="{ThemeResource TextFillColorSecondaryBrush}"
 									FontSize="12"
 									Width="60" />
 								<TextBlock Text="{x:Bind OldPath}"
 									TextWrapping="Wrap"
-									Foreground="Gray"
+									Foreground="{ThemeResource TextFillColorSecondaryBrush}"
 									FontSize="12" />
 							</StackPanel>
 
@@ -86,7 +107,7 @@
 								Spacing="4"
 								Visibility="{Binding NewPath, Mode=OneWay, Converter={StaticResource StringNotEmptyToVisibilityConverter}}" >
 								<TextBlock Text="変更後："
-									Foreground="Gray"
+									Foreground="{ThemeResource TextFillColorSecondaryBrush}"
 									FontSize="12"
 									Width="60" />
 								<TextBlock Text="{x:Bind NewPath}"
@@ -122,5 +143,6 @@
 			<Button Content="表示中をすべて無視"
 				Command="{x:Bind ViewModel.DiscardAllCommand}" />
 		</StackPanel>
+	</Grid>
 	</Grid>
 </Window>

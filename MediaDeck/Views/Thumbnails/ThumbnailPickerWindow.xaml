@@ -6,8 +6,30 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	mc:Ignorable="d"
 	Title="Thumbnail Picker" >
-	<ContentControl Content="{x:Bind ViewModel.ThumbnailPickerViewModel.Value, Mode=OneWay}"
-		ContentTemplateSelector="{StaticResource MediaItemThumbnailPickerTplSel}"
-		HorizontalContentAlignment="Stretch"
-		VerticalContentAlignment="Stretch" />
+	<Window.SystemBackdrop>
+		<DesktopAcrylicBackdrop/>
+	</Window.SystemBackdrop>
+	<Grid Background="Transparent"
+		Loaded="Window_Loaded" >
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="*" />
+		</Grid.RowDefinitions>
+
+		<!-- カスタムタイトルバー -->
+		<Grid x:Name="AppTitleBar" Grid.Row="0" Height="32"
+			Background="{ThemeResource TitleBarBackgroundBrush}"
+			Padding="12,0,0,0"
+			VerticalAlignment="Top" >
+			<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+				<Image Source="/Assets/Square44x44Logo.scale-200.png" Width="16" Height="16" Margin="4,0,8,0" />
+				<TextBlock Text="{x:Bind Title}" FontSize="12" VerticalAlignment="Center" />
+			</StackPanel>
+		</Grid>
+
+		<ContentControl Grid.Row="1" Content="{x:Bind ViewModel.ThumbnailPickerViewModel.Value, Mode=OneWay}"
+			ContentTemplateSelector="{StaticResource MediaItemThumbnailPickerTplSel}"
+			HorizontalContentAlignment="Stretch"
+			VerticalContentAlignment="Stretch" />
+	</Grid>
 </Window>

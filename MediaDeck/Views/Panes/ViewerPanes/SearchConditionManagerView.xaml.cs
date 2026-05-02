@@ -1,5 +1,5 @@
 using System.Threading.Tasks;
-
+using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.WinUI.Controls;
 using MediaDeck.Core.Models.Files.SearchConditions;
 using MediaDeck.ViewModels.Panes.ViewerPanes;
@@ -58,13 +58,13 @@ public sealed partial class SearchConditionManagerView {
 			}
 			return;
 		}
-		this.ViewModel?.SearchConditionNotificationDispatcher.SearchConditionChanged.OnNext(Unit.Default);
+		this.ViewModel?.SearchConditionNotificationDispatcher.SearchConditionChanged.OnNext(R3.Unit.Default);
 	}
 
 	private async Task<PropertySearchCondition?> ShowPropertyDialogAndAddAsync(MediaItemPropertyDescriptor descriptor) {
-		var dialog = new PropertyComparisonDialog(descriptor) {
-			XamlRoot = this.XamlRoot
-		};
+		var dialog = Ioc.Default.GetRequiredService<PropertyComparisonDialog>();
+		dialog.XamlRoot = this.XamlRoot;
+		dialog.Initialize(descriptor);
 		var result = await dialog.ShowAsync();
 		if (result != ContentDialogResult.Primary) {
 			return null;
