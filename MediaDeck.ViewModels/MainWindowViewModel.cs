@@ -1,4 +1,5 @@
 using MediaDeck.Common.Base;
+using MediaDeck.Common.Extensions;
 using MediaDeck.Composition.Objects;
 using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Core.Stores.State;

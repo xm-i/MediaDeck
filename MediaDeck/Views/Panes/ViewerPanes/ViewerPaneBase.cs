@@ -2,7 +2,7 @@ using System.IO;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using MediaDeck.Common.Utilities;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.ViewModels;
-using MediaDeck.Composition.Interfaces.Services;
+using MediaDeck.Services;
 using MediaDeck.ViewModels.Panes.ViewerPanes;
 using MediaDeck.Views.Thumbnails;
 using Microsoft.UI.Input;
@@ -15,10 +15,12 @@ using Windows.UI.Core;
 namespace MediaDeck.Views.Panes.ViewerPanes;
 
 public class ViewerPaneBase : UserControlBase<ViewerSelectorViewModel> {
-	private readonly IWindowService _windowService;
+	private readonly WindowService _windowService;
+	private readonly WindowManager _windowManager;
 
 	public ViewerPaneBase() {
-		this._windowService = Ioc.Default.GetRequiredService<IWindowService>();
+		this._windowService = Ioc.Default.GetRequiredService<WindowService>();
+		this._windowManager = Ioc.Default.GetRequiredService<WindowManager>();
 	}
 
 	protected virtual void List_SelectionChanged(object sender, SelectionChangedEventArgs e) {
@@ -81,11 +83,21 @@ public class ViewerPaneBase : UserControlBase<ViewerSelectorViewModel> {
 				if (targetFiles.Length > 1) {
 					var bulkWindow = Ioc.Default.GetRequiredService<BulkThumbnailRegenerationWindow>();
 					bulkWindow.ViewModel.Initialize(targetFiles);
-					this._windowService.ActivateCenteredOnMainWindow(bulkWindow);
+					var parent = this._windowManager.GetWindowFromElement(this);
+					if (parent == null) {
+						// TODO: notify
+						return;
+					}
+					this._windowService.ActivateCenteredOnMainWindow(bulkWindow, parent);
 				} else {
 					var window = Ioc.Default.GetRequiredService<ThumbnailPickerWindow>();
 					window.ViewModel.FileViewModel.Value = fvm;
-					this._windowService.ActivateCenteredOnMainWindow(window);
+					var parent = this._windowManager.GetWindowFromElement(this);
+					if (parent == null) {
+						// TODO: notify
+						return;
+					}
+					this._windowService.ActivateCenteredOnMainWindow(window, parent);
 				}
 				break;
 			case "RemoveFile":

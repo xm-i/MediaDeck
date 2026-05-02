@@ -60,7 +60,7 @@ public partial class App {
 
 		await this.InitializeAsync();
 
-		var windowManager = Ioc.Default.GetRequiredService<IWindowManager>();
+		var windowManager = Ioc.Default.GetRequiredService<WindowManager>();
 		windowManager.RestoreWindows();
 
 		var logger = LoggerFactory.CreateLogger<App>();
@@ -143,7 +143,7 @@ public partial class App {
 		var tagsManager = Ioc.Default.GetRequiredService<ITagsManager>();
 		await tagsManager.InitializeAsync();
 
-		var backgroundTasksViewModel =Ioc.Default.GetRequiredService<BackgroundTasksViewModel>();
+		var backgroundTasksViewModel = Ioc.Default.GetRequiredService<BackgroundTasksViewModel>();
 		backgroundTasksViewModel.Start();
 
 		FlyleafLib.Engine.Start(new FlyleafLib.EngineConfig() {

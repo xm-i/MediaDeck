@@ -5,12 +5,13 @@ using MediaDeck.Composition.Objects;
 using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Core.Stores.State;
 using MediaDeck.Views;
-
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.Windows.AppLifecycle;
 using ObservableCollections;
+using WinRT.Interop;
 
 namespace MediaDeck.Services;
 
@@ -47,8 +48,8 @@ public class WindowContext(IServiceScope scope, Guid windowId) : IWindowContext 
 /// <summary>
 /// ウィンドウの生成・管理・終了を一元管理するサービス。
 /// </summary>
-[Inject(InjectServiceLifetime.Singleton, typeof(IWindowManager))]
-public class WindowManager : DisposableBase, IWindowManager {
+[Inject(InjectServiceLifetime.Singleton)]
+public class WindowManager : DisposableBase {
 	private readonly IServiceProvider _rootProvider;
 	private readonly IStateStore _stateStore;
 	private readonly SaveStateService _saveStateService;
@@ -116,6 +117,38 @@ public class WindowManager : DisposableBase, IWindowManager {
 		if (ws != null) {
 			this._stateStore.RootState.Windows.Remove(ws);
 		}
+	}
+
+	/// <summary>
+	/// AppWindow.Idから対応するウィンドウのGuidを検索する。
+	/// </summary>
+	public Guid? FindWindowGuidByAppWindowId(WindowId appWindowId) {
+		foreach (var context in this._windows) {
+			if (context.Window != null) {
+				var windowAppId = GetAppWindowId(context.Window);
+				if (windowAppId.Value == appWindowId.Value) {
+					return context.WindowId;
+				}
+			}
+		}
+		return null;
+	}
+
+	/// <inheritdoc />
+	public Window? GetWindowFromElement(UIElement element) {
+		var xamlRoot = element.XamlRoot;
+		if (xamlRoot == null) {
+			return null;
+		}
+		return this._windows.FirstOrDefault(x => x.Window?.Content?.XamlRoot == xamlRoot)?.Window;
+	}
+
+	/// <summary>
+	/// WindowオブジェクトからAppWindow.Idを取得するヘルパー。
+	/// </summary>
+	private static WindowId GetAppWindowId(Window window) {
+		var hWnd = WindowNative.GetWindowHandle(window);
+		return Win32Interop.GetWindowIdFromWindow(hWnd);
 	}
 
 	private void OnWindowStateAdded(WindowStateModel windowState) {

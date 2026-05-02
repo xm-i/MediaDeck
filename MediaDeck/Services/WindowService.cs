@@ -1,7 +1,3 @@
-using MediaDeck.Composition.Interfaces.Services;
-using MediaDeck.Views;
-
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
@@ -13,18 +9,23 @@ namespace MediaDeck.Services;
 /// <summary>
 /// ウィンドウ操作を提供するサービス実装クラス
 /// </summary>
-[Inject(InjectServiceLifetime.Singleton, typeof(IWindowService))]
-public class WindowService(IServiceProvider serviceProvider) : IWindowService {
-	private readonly IServiceProvider _serviceProvider = serviceProvider;
+[Inject(InjectServiceLifetime.Singleton)]
+public class WindowService() {
 
-	/// <inheritdoc />
-	public void ActivateCenteredOnMainWindow(object window) {
+	/// <summary>
+	/// 指定したウィンドウを親ウィンドウの中央に配置してアクティブにします。
+	/// </summary>
+	/// <param name="window">対象のウィンドウ</param>
+	/// <param name="parentWindow">親となるウィンドウ。</param>
+	public void ActivateCenteredOnMainWindow(Window window, Window parentWindow) {
 		if (window is not Window childWindow) {
 			return;
 		}
 
-		var mainWindow = this._serviceProvider.GetRequiredService<MainWindow>();
-		this.CenterWindowOnMainWindow(mainWindow, childWindow);
+		var targetParent = parentWindow;
+		if (targetParent != null) {
+			this.CenterWindowOnMainWindow(targetParent, childWindow);
+		}
 		childWindow.Activate();
 	}
 

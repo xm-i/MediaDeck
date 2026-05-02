@@ -1,9 +1,7 @@
 using CommunityToolkit.Mvvm.DependencyInjection;
-
-using MediaDeck.Composition.Interfaces.Services;
+using MediaDeck.Services;
 using MediaDeck.ViewModels.Panes.FilterPanes;
 using MediaDeck.Views.Filters;
-
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
@@ -55,7 +53,13 @@ public sealed partial class FilterSelector {
 
 	private void OpenFilterSettingsWindowButton_Click(object sender, RoutedEventArgs e) {
 		var window = Ioc.Default.GetRequiredService<FilterManagerWindow>();
-		Ioc.Default.GetRequiredService<IWindowService>().ActivateCenteredOnMainWindow(window);
+		var windowManager = Ioc.Default.GetRequiredService<WindowManager>();
+		var parent = windowManager.GetWindowFromElement(this);
+		if (parent == null) {
+			// TODO: notify
+			return;
+		}
+		Ioc.Default.GetRequiredService<WindowService>().ActivateCenteredOnMainWindow(window, parent);
 	}
 
 	protected override void OnViewModelChanged(FilterSelectorViewModel? oldViewModel, FilterSelectorViewModel? newViewModel) {

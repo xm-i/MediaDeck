@@ -1,23 +1,23 @@
 using CommunityToolkit.Mvvm.DependencyInjection;
-
-using MediaDeck.Composition.Interfaces.Services;
+using MediaDeck.Services;
 using MediaDeck.ViewModels;
 using MediaDeck.Views.FolderManager;
 using MediaDeck.Views.Preferences;
 using MediaDeck.Views.Tags;
 using MediaDeck.Views.Tools;
-
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
 namespace MediaDeck.Views;
 
 public sealed partial class NavigationMenu {
-	private readonly IWindowService _windowService;
+	private readonly WindowService _windowService;
+	private readonly WindowManager _windowManager;
 
 	public NavigationMenu() {
 		this.InitializeComponent();
-		this._windowService = Ioc.Default.GetRequiredService<IWindowService>();
+		this._windowService = Ioc.Default.GetRequiredService<WindowService>();
+		this._windowManager = Ioc.Default.GetRequiredService<WindowManager>();
 		this.Loaded += this.NavigationMenu_Loaded;
 	}
 
@@ -51,13 +51,23 @@ public sealed partial class NavigationMenu {
 		};
 
 		if (window != null) {
-			this._windowService.ActivateCenteredOnMainWindow(window);
+			var parent = this._windowManager.GetWindowFromElement(this);
+			if (parent == null) {
+				// TODO: notify
+				return;
+			}
+			this._windowService.ActivateCenteredOnMainWindow(window, parent);
 		}
 	}
 
 	private void SyncNotificationButton_Click(object sender, RoutedEventArgs e) {
 		var window = Ioc.Default.GetRequiredService<FileChangeSyncWindow>();
-		this._windowService.ActivateCenteredOnMainWindow(window);
+		var parent = this._windowManager.GetWindowFromElement(this);
+		if (parent == null) {
+			// TODO: notify
+			return;
+		}
+		this._windowService.ActivateCenteredOnMainWindow(window, parent);
 	}
 
 	private void MenuFlyoutItem_Click_1(object sender, RoutedEventArgs e) {

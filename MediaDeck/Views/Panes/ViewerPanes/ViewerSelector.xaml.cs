@@ -1,6 +1,6 @@
 using CommunityToolkit.Mvvm.DependencyInjection;
 
-using MediaDeck.Composition.Interfaces.Services;
+using MediaDeck.Services;
 using MediaDeck.ViewModels.Panes.ViewerPanes;
 using MediaDeck.Views.Sort;
 
@@ -17,7 +17,13 @@ public sealed partial class ViewerSelector {
 	}
 	private void Button_Click(object sender, RoutedEventArgs e) {
 		var window = Ioc.Default.GetRequiredService<SortManagerWindow>();
-		Ioc.Default.GetRequiredService<IWindowService>().ActivateCenteredOnMainWindow(window);
+		var windowManager = Ioc.Default.GetRequiredService<WindowManager>();
+		var parent = windowManager.GetWindowFromElement(this);
+		if (parent == null) {
+			// TODO: notify
+			return;
+		}
+		Ioc.Default.GetRequiredService<WindowService>().ActivateCenteredOnMainWindow(window, parent);
 	}
 
 	private void Segmented_SelectionChanged(object sender, Microsoft.UI.Xaml.Controls.SelectionChangedEventArgs e) {
