@@ -7,7 +7,9 @@
 	xmlns:config="using:MediaDeck.ViewModels.Preferences.Config"
 	mc:Ignorable="d"
 	Title="設定" >
-
+	<Window.SystemBackdrop>
+		<DesktopAcrylicBackdrop/>
+	</Window.SystemBackdrop>
 	<Grid Background="Transparent"
 		Loaded="Window_Loaded" >
 		<Grid.RowDefinitions>
