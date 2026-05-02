@@ -50,7 +50,8 @@ public sealed partial class SearchConditionManagerView {
 				}
 				this.ViewModel?.SearchConditionNotificationDispatcher.UpdateRequest.OnNext(x => {
 					if (x.IndexOf(stub) is int i && i >= 0) {
-						x[i] = condition;
+						x.RemoveAt(i);
+						x.Insert(i, condition);
 					}
 				});
 
