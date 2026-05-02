@@ -5,22 +5,63 @@
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:local="using:MediaDeck.Views.Dialogs"
+	xmlns:viewmodels="using:MediaDeck.ViewModels.Dialogs"
 	mc:Ignorable="d"
 	Title="プロパティ比較条件"
 	PrimaryButtonText="OK"
 	CloseButtonText="キャンセル"
 	DefaultButton="Primary">
 
+	<ContentDialog.Resources>
+		<DataTemplate x:Key="StringTemplate" x:DataType="viewmodels:PropertyComparisonDialogViewModel">
+			<TextBox Text="{x:Bind StringValue.Value, Mode=TwoWay}"
+					 Header="値"
+					 PlaceholderText="比較する値を入力"
+					 Loaded="ValueControl_Loaded" />
+		</DataTemplate>
+		<DataTemplate x:Key="NumberTemplate" x:DataType="viewmodels:PropertyComparisonDialogViewModel">
+			<NumberBox Value="{x:Bind NumberValue.Value, Mode=TwoWay}"
+					   Header="値"
+					   PlaceholderText="比較する数値を入力"
+					   Loaded="ValueControl_Loaded" />
+		</DataTemplate>
+		<DataTemplate x:Key="DateTimeTemplate" x:DataType="viewmodels:PropertyComparisonDialogViewModel">
+			<CalendarDatePicker Date="{x:Bind DateTimeValue.Value, Mode=TwoWay}"
+								Header="日付"
+								PlaceholderText="日付を選択"
+								Loaded="ValueControl_Loaded" />
+		</DataTemplate>
+		<DataTemplate x:Key="EnumTemplate" x:DataType="viewmodels:PropertyComparisonDialogViewModel">
+			<ComboBox ItemsSource="{x:Bind EnumItems}"
+					  SelectedValue="{x:Bind EnumValue.Value, Mode=TwoWay}"
+					  SelectedValuePath="Value"
+					  DisplayMemberPath="DisplayString"
+					  Header="値"
+					  HorizontalAlignment="Stretch"
+					  Loaded="ValueControl_Loaded" />
+		</DataTemplate>
+
+		<local:PropertyComparisonTemplateSelector x:Key="TemplateSelector"
+												  StringTemplate="{StaticResource StringTemplate}"
+												  NumberTemplate="{StaticResource NumberTemplate}"
+												  DateTimeTemplate="{StaticResource DateTimeTemplate}"
+												  EnumTemplate="{StaticResource EnumTemplate}" />
+	</ContentDialog.Resources>
+
 	<StackPanel Margin="0,8" Spacing="8" MinWidth="320">
-		<TextBlock x:Name="PropertyNameText" FontWeight="SemiBold" />
+		<TextBlock Text="{x:Bind ViewModel.PropertyNameText}" FontWeight="SemiBold" />
 		<ComboBox x:Name="OperatorComboBox"
 				  Header="演算子"
 				  HorizontalAlignment="Stretch"
+				  ItemsSource="{x:Bind ViewModel.OperatorItems}"
+				  SelectedItem="{x:Bind ViewModel.SelectedOperator.Value, Mode=TwoWay}"
 				  DisplayMemberPath="DisplayString" />
-		<TextBox x:Name="ValueTextBox"
-				 Header="値"
-				 PlaceholderText="比較する値を入力"
-				 Loaded="ValueTextBox_Loaded" />
+		
+		<ContentControl Content="{x:Bind ViewModel}"
+						ContentTemplateSelector="{StaticResource TemplateSelector}"
+						HorizontalContentAlignment="Stretch" />
+
 		<TextBlock x:Name="ErrorText"
 				   Foreground="{ThemeResource SystemFillColorCriticalBrush}"
 				   Visibility="Collapsed" />

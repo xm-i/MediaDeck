@@ -80,6 +80,7 @@ public class PropertySearchCondition : ISearchCondition {
 			SearchTypeComparison.Equal => "=",
 			SearchTypeComparison.LessThanOrEqual => "<=",
 			SearchTypeComparison.LessThan => "<",
+			SearchTypeComparison.Contains => "contains",
 			_ => "?",
 		};
 	}

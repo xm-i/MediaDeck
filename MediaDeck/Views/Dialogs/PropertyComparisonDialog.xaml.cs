@@ -1,8 +1,6 @@
-using System.Collections.Generic;
-
 using MediaDeck.Composition.Enum;
 using MediaDeck.Core.Models.Files.SearchConditions;
-using MediaDeck.Core.Primitives;
+using MediaDeck.ViewModels.Dialogs;
 
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -13,28 +11,17 @@ namespace MediaDeck.Views.Dialogs;
 /// <c>prop.&lt;Name&gt;</c> 検索候補が選択された際に表示される、比較演算子と値を入力するダイアログ。
 /// </summary>
 public sealed partial class PropertyComparisonDialog : ContentDialog {
-	private static readonly Dictionary<SearchTypeComparison, string> OperatorLabels = new() {
-		{ SearchTypeComparison.GreaterThan, "を超える (>)" },
-		{ SearchTypeComparison.GreaterThanOrEqual, "以上 (>=)" },
-		{ SearchTypeComparison.Equal, "と等しい (=)" },
-		{ SearchTypeComparison.LessThanOrEqual, "以下 (<=)" },
-		{ SearchTypeComparison.LessThan, "未満 (<)" },
-	};
 
-	private readonly MediaItemPropertyDescriptor _descriptor;
+	public PropertyComparisonDialogViewModel ViewModel {
+		get;
+	}
 
 	public PropertyComparisonDialog(MediaItemPropertyDescriptor descriptor) {
+		this.ViewModel = new PropertyComparisonDialogViewModel(descriptor);
 		this.InitializeComponent();
-		this._descriptor = descriptor;
-		this.PropertyNameText.Text = $"prop.{descriptor.Name}  ({descriptor.ValueType.Name})";
-
-		var items = descriptor.SupportedOperators
-			.Select(op => new DisplayObject<SearchTypeComparison>(OperatorLabels[op], op))
-			.ToList();
-		this.OperatorComboBox.ItemsSource = items;
-		this.OperatorComboBox.SelectedIndex = 0;
 
 		this.PrimaryButtonClick += this.OnPrimaryButtonClick;
+		this.Closed += (_, _) => this.ViewModel.Dispose();
 	}
 
 	/// <summary>確定後の比較演算子。</summary>
@@ -50,24 +37,24 @@ public sealed partial class PropertyComparisonDialog : ContentDialog {
 	} = string.Empty;
 
 	private void OnPrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args) {
-		if (this.OperatorComboBox.SelectedItem is not DisplayObject<SearchTypeComparison> opItem) {
+		if (this.ViewModel.SelectedOperator.Value == null) {
 			args.Cancel = true;
 			this.ShowError("演算子を選択してください。");
 			return;
 		}
-		var raw = this.ValueTextBox.Text ?? string.Empty;
+		var raw = this.ViewModel.GetRawValueString();
 		if (string.IsNullOrWhiteSpace(raw)) {
 			args.Cancel = true;
 			this.ShowError("値を入力してください。");
 			return;
 		}
 		// 入力値が型として解釈可能か Build で検証する
-		if (this._descriptor.Build(opItem.Value, raw) is null) {
+		if (this.ViewModel.Descriptor.Build(this.ViewModel.SelectedOperator.Value.Value, raw) is null) {
 			args.Cancel = true;
-			this.ShowError($"値を {this._descriptor.ValueType.Name} として解釈できません。");
+			this.ShowError($"値を {this.ViewModel.Descriptor.ValueType.Name} として解釈できません。");
 			return;
 		}
-		this.SelectedOperator = opItem.Value;
+		this.SelectedOperator = this.ViewModel.SelectedOperator.Value.Value;
 		this.SelectedValue = raw;
 	}
 
@@ -76,7 +63,9 @@ public sealed partial class PropertyComparisonDialog : ContentDialog {
 		this.ErrorText.Visibility = Visibility.Visible;
 	}
 
-	private void ValueTextBox_Loaded(object sender, RoutedEventArgs e) {
-		this.ValueTextBox.Focus(FocusState.Programmatic);
+	private void ValueControl_Loaded(object sender, RoutedEventArgs e) {
+		if (sender is Control control) {
+			control.Focus(FocusState.Programmatic);
+		}
 	}
 }
