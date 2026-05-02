@@ -34,17 +34,12 @@ public class MainWindowViewModel : ViewModelBase {
 			},
 			SynchronizationContextCollectionEventDispatcher.Current);
 
-		this.WindowActivatedCommand.Subscribe(_ => {
-			backgroundTasksViewModel.Start();
-
-			// 初回起動時に保存済みタブがあればそれを選択、なければ新規タブ
-			if (!this.Tabs.Any()) {
-				this.AddTab();
-			} else {
-				var idx = Math.Clamp(this._windowState.ActiveTabIndex, 0, ((IReadOnlyList<TabContext>)this.Tabs).Count - 1);
-				this.SelectedTab.Value = this.Tabs.ElementAt(idx);
-			}
-		}).AddTo(this.CompositeDisposable);
+		this.SelectedTab = this._windowState.SelectedTab.ToTwoWayBindableReactiveProperty(
+			x => this.Tabs.FirstOrDefault(t => t.TabState == x),
+			x => x?.TabState,
+			null,
+			this.CompositeDisposable
+			);
 
 		this.AddTabCommand.Subscribe(x => {
 			this.AddTab();
@@ -65,7 +60,7 @@ public class MainWindowViewModel : ViewModelBase {
 	/// </summary>
 	public BindableReactiveProperty<TabContext?> SelectedTab {
 		get;
-	} = new();
+	}
 
 	public NavigationMenuViewModel NavigationMenuViewModel {
 		get;
@@ -119,12 +114,6 @@ public class MainWindowViewModel : ViewModelBase {
 
 	protected override void Dispose(bool disposing) {
 		if (disposing) {
-			// アクティブタブインデックスを保存
-			var selected = this.SelectedTab.Value;
-			this._windowState.ActiveTabIndex = selected is not null
-				? this.Tabs.IndexOf(selected)
-				: 0;
-
 			foreach (var tab in this.Tabs) {
 				tab.Dispose();
 			}

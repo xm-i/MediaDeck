@@ -12,6 +12,7 @@ using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Core.Stores.Config;
 using MediaDeck.Core.Stores.State;
 using MediaDeck.Services;
+using MediaDeck.ViewModels.Tools;
 
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.DependencyInjection;
@@ -142,6 +143,8 @@ public partial class App {
 		var tagsManager = Ioc.Default.GetRequiredService<ITagsManager>();
 		await tagsManager.InitializeAsync();
 
+		var backgroundTasksViewModel =Ioc.Default.GetRequiredService<BackgroundTasksViewModel>();
+		backgroundTasksViewModel.Start();
 
 		FlyleafLib.Engine.Start(new FlyleafLib.EngineConfig() {
 #if DEBUG

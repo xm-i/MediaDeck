@@ -28,9 +28,9 @@ public class WindowStateModel {
 	/// <summary>
 	/// アクティブだったタブのインデックス
 	/// </summary>
-	public int ActiveTabIndex {
+	public ReactiveProperty<TabStateModel?> SelectedTab {
 		get;
 		set;
-	}
+	} = new();
 
 }
