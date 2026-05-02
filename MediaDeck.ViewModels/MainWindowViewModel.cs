@@ -86,6 +86,13 @@ public class MainWindowViewModel : ViewModelBase {
 		var scope = this._rootServiceProvider.CreateScope();
 		var tabState = scope.ServiceProvider.GetRequiredService<TabStateModel>();
 
+		// 通知コンテキストの初期化（所属するWindowを動的に検索する）
+		var notifContext = scope.ServiceProvider.GetRequiredService<NotificationContextProvider>();
+		var stateStore = scope.ServiceProvider.GetRequiredService<IStateStore>();
+		notifContext.TargetWindowIdResolver = () => {
+			return stateStore.RootState.Windows.FirstOrDefault(w => w.Tabs.Contains(tabState))?.WindowId;
+		};
+
 		// 自身のウィンドウの状態リストに追加
 		this._windowState.Tabs.Add(tabState);
 

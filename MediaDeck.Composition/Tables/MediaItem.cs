@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations.Schema;
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Tables.Metadata;
 

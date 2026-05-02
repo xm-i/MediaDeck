@@ -144,6 +144,19 @@ public class WindowManager : DisposableBase {
 	}
 
 	/// <summary>
+	/// 指定されたUI要素が所属するウィンドウのGuidを取得する。
+	/// </summary>
+	/// <param name="element">UI要素</param>
+	/// <returns>ウィンドウのGuid。見つからない場合はnull。</returns>
+	public Guid? GetWindowIdFromElement(UIElement element) {
+		var xamlRoot = element.XamlRoot;
+		if (xamlRoot == null) {
+			return null;
+		}
+		return this._windows.FirstOrDefault(x => x.Window?.Content?.XamlRoot == xamlRoot)?.WindowId;
+	}
+
+	/// <summary>
 	/// WindowオブジェクトからAppWindow.Idを取得するヘルパー。
 	/// </summary>
 	private static WindowId GetAppWindowId(Window window) {
@@ -162,6 +175,10 @@ public class WindowManager : DisposableBase {
 		// スコープに状態をセット
 		var provider = windowScope.ServiceProvider.GetRequiredService<WindowStateProvider>();
 		provider.State = windowState;
+
+		// 通知コンテキストの初期化
+		var notifContext = windowScope.ServiceProvider.GetRequiredService<NotificationContextProvider>();
+		notifContext.TargetWindowIdResolver = () => windowState.WindowId;
 
 		var window = windowScope.ServiceProvider.GetRequiredService<MainWindow>();
 		windowContext.SetWindow(window);

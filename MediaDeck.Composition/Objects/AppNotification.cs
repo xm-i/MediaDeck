@@ -37,6 +37,14 @@ public record AppNotification {
 	} = 3000;
 
 	/// <summary>
+	/// 通知の対象となるWindowId。nullの場合は全Windowへブロードキャストされる。
+	/// </summary>
+	public Guid? TargetWindowId {
+		get;
+		init;
+	} = null;
+
+	/// <summary>
 	/// 情報通知を作成
 	/// </summary>
 	/// <param name="message">通知メッセージ</param>

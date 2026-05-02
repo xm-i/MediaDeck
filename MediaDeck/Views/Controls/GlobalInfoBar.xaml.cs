@@ -6,6 +6,7 @@ using CommunityToolkit.Mvvm.DependencyInjection;
 
 using MediaDeck.Composition.Objects;
 using MediaDeck.Core.Models.NotificationDispatcher;
+using MediaDeck.Services;
 
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml.Controls;
@@ -31,8 +32,24 @@ public sealed partial class GlobalInfoBar {
 		this.InitializeComponent();
 		this._dispatcherQueue = DispatcherQueue.GetForCurrentThread();
 		this._dispatcher = Ioc.Default.GetRequiredService<AppNotificationDispatcher>();
+		Guid? myWindowId = null;
 		this._dispatcher.Notify
 			.ObserveOnCurrentSynchronizationContext()
+			.Where(appNotification => {
+				// ブロードキャスト通知なら表示
+				if (appNotification.TargetWindowId == null) {
+					return true;
+				}
+
+				// 自身のWindowIdを解決（一度だけ解決してキャッシュ）
+				if (myWindowId == null) {
+					var windowManager = Ioc.Default.GetRequiredService<WindowManager>();
+					myWindowId = windowManager.GetWindowIdFromElement(this);
+				}
+
+				// 自身のWindowへの通知なら表示
+				return appNotification.TargetWindowId == myWindowId;
+			})
 			.Subscribe(appNotification => {
 				var infoBarNotification = InfoBarNotification.FromAppNotification(appNotification);
 				this.EnqueueNotification(infoBarNotification);
