@@ -260,7 +260,5 @@ paket-files/
 __pycache__/
 *.pyc
 # MediaDeck AI Assistant artifacts
-*_output.txt
-test_results*.txt
-error.log
-test_output.log
+*.txt
+*.log
