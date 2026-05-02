@@ -67,11 +67,13 @@ public class FileStatusUpdatorService {
 			updateList.Add(file);
 		}
 
-		await using (var db = await this._dbFactory.CreateDbContextAsync()) {
-			using var transaction = await db.Database.BeginTransactionAsync();
-			db.UpdateRange(updateList);
-			await db.SaveChangesAsync();
-			await transaction.CommitAsync();
+		if (updateList.Any()) {
+			await using (var db = await this._dbFactory.CreateDbContextAsync()) {
+				using var transaction = await db.Database.BeginTransactionAsync();
+				db.UpdateRange(updateList);
+				await db.SaveChangesAsync();
+				await transaction.CommitAsync();
+			}
 		}
 
 		// PreHash更新がなかった場合もFullHashのチェックを行う
