@@ -7,23 +7,37 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:controls="using:CommunityToolkit.WinUI.Controls"
 	mc:Ignorable="d" >
-	<controls:TokenizingTextBox
+	<Grid Margin="8,4" >
+		<controls:TokenizingTextBox
 		RelativePanel.AlignVerticalCenterWithPanel="True"
-		ItemsSource="{x:Bind ViewModel.SearchConditions}"
-		SuggestedItemsSource="{x:Bind ViewModel.FilteredSearchConditionCandidates}"
-		TextChanged="TokenizingTextBox_TextChanged"
-		TokenItemAdding="TokenizingTextBox_TokenItemAdding"
-		TokenItemAdded="TokenizingTextBox_TokenItemAdded"
-		TokenItemRemoving="TokenizingTextBox_TokenItemRemoving" >
-		<controls:TokenizingTextBox.TokenItemTemplate>
-			<DataTemplate>
+			ItemsSource="{x:Bind ViewModel.SearchConditions}"
+			SuggestedItemsSource="{x:Bind ViewModel.FilteredSearchConditionCandidates}"
+			TextChanged="TokenizingTextBox_TextChanged"
+			TokenItemAdding="TokenizingTextBox_TokenItemAdding"
+			TokenItemAdded="TokenizingTextBox_TokenItemAdded"
+			TokenItemRemoving="TokenizingTextBox_TokenItemRemoving" >
+			<controls:TokenizingTextBox.TokenItemTemplate>
+				<DataTemplate>
 				<TextBlock Text="{Binding DisplayText}" />
-			</DataTemplate>
-		</controls:TokenizingTextBox.TokenItemTemplate>
-		<controls:TokenizingTextBox.SuggestedItemTemplate>
-			<DataTemplate>
-				<TextBlock Text="{Binding DisplayText}" />
-			</DataTemplate>
-		</controls:TokenizingTextBox.SuggestedItemTemplate>
-	</controls:TokenizingTextBox>
+				</DataTemplate>
+			</controls:TokenizingTextBox.TokenItemTemplate>
+			<controls:TokenizingTextBox.SuggestedItemTemplate>
+				<DataTemplate>
+					<StackPanel Orientation="Horizontal" Spacing="12" Padding="8,4">
+						<FontIcon Glyph="&#xE12B;" FontSize="14" Opacity="0.6" />
+						<TextBlock Text="{Binding DisplayText}" VerticalAlignment="Center" />
+					</StackPanel>
+				</DataTemplate>
+			</controls:TokenizingTextBox.SuggestedItemTemplate>
+		</controls:TokenizingTextBox>
+
+		<FontIcon
+			Glyph="&#xE721;"
+			FontSize="14"
+			Margin="16,0,0,0"
+			Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+			HorizontalAlignment="Left"
+			VerticalAlignment="Center"
+			IsHitTestVisible="False" />
+	</Grid>
 </local:SearchConditionManagerViewUserControl>

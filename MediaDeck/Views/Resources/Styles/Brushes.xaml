@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" >
+
+	<!-- ===== Dark Theme Brush Overrides ===== -->
+	<ResourceDictionary.ThemeDictionaries>
+		<ResourceDictionary x:Key="Default">
+			<!-- Make NavigationView / TabView backgrounds transparent for acrylic effect -->
+			<SolidColorBrush x:Key="NavigationViewContentBackground" Color="Transparent" />
+			<SolidColorBrush x:Key="TabViewBackground" Color="Transparent" />
+			<SolidColorBrush x:Key="TabViewItemHeaderBackground" Color="Transparent" />
+			<SolidColorBrush x:Key="MenuBarBackground" Color="Transparent" />
+			<SolidColorBrush x:Key="MenuBarItemBackground" Color="Transparent" />
+
+			<!-- Subtle surface for cards -->
+			<SolidColorBrush x:Key="CardBackgroundBrush" Color="#1CFFFFFF" />
+			<SolidColorBrush x:Key="CardBackgroundPointerOverBrush" Color="#2AFFFFFF" />
+			<SolidColorBrush x:Key="CardBorderBrush" Color="#14FFFFFF" />
+
+			<!-- Chip / Tag colors -->
+			<SolidColorBrush x:Key="ChipBackground1" Color="#333078CF" />
+			<SolidColorBrush x:Key="ChipBackground2" Color="#3330CF78" />
+			<SolidColorBrush x:Key="ChipBackground3" Color="#33CF7830" />
+			<SolidColorBrush x:Key="ChipBackground4" Color="#33CF30A0" />
+			<SolidColorBrush x:Key="ChipForeground" Color="#DDFFFFFF" />
+
+			<!-- Title bar -->
+			<SolidColorBrush x:Key="TitleBarBackgroundBrush" Color="Transparent" />
+			<SolidColorBrush x:Key="TitleBarForegroundBrush" Color="#CCFFFFFF" />
+		</ResourceDictionary>
+	</ResourceDictionary.ThemeDictionaries>
+
+</ResourceDictionary>

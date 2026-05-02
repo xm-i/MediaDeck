@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" >
+
+	<ResourceDictionary.MergedDictionaries>
+		<ResourceDictionary Source="ms-appx:///Views/Resources/Styles/Brushes.xaml" />
+		<ResourceDictionary Source="ms-appx:///Views/Resources/Styles/Common.xaml" />
+		<ResourceDictionary Source="ms-appx:///Views/Resources/Styles/MediaCard.xaml" />
+		<ResourceDictionary Source="ms-appx:///Views/Resources/Styles/SearchBox.xaml" />
+		<ResourceDictionary Source="ms-appx:///Views/Resources/Styles/MenuBar.xaml" />
+	</ResourceDictionary.MergedDictionaries>
+
+</ResourceDictionary>

@@ -30,7 +30,7 @@
 			<ColumnDefinition Width="Auto" />
 		</Grid.ColumnDefinitions>
 
-		<MenuBar Grid.Column="0" >
+		<MenuBar Grid.Column="0" Style="{StaticResource TransparentMenuBarStyle}">
 			<MenuBarItem Title="Tools" >
 				<MenuFlyoutItem Text="Tag Manager"
 					Click="MenuFlyoutItem_Click"

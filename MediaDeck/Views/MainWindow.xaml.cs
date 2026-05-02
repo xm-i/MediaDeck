@@ -16,6 +16,10 @@ public sealed partial class MainWindow {
 		this._viewModel = viewModel;
 		this.InitializeComponent();
 
+		// カスタムタイトルバーの設定
+		this.ExtendsContentIntoTitleBar = true;
+		this.SetTitleBar(this.AppTitleBar);
+
 		this._viewModel.SelectedTab.Subscribe(tab => {
 			if (tab != null && this.MainTabView.SelectedItem != tab) {
 				this.MainTabView.SelectedItem = tab;
