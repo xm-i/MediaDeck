@@ -120,6 +120,73 @@ public class WindowManager : DisposableBase {
 	}
 
 	/// <summary>
+	/// タブ切り離し用に新しいウィンドウを作成し、そのAppWindow.Idを返す。
+	/// </summary>
+	public WindowId CreateWindowForTearOut() {
+		var newState = new WindowStateModel();
+
+		// 状態リストに追加すると ObserveAdd が同期的に OnWindowStateAdded を発火し、
+		// ウィンドウが作成・Activateされる
+		this._stateStore.RootState.Windows.Add(newState);
+
+		var context = this._windows.FirstOrDefault(x => x.WindowId == newState.WindowId);
+		if (context?.Window == null) {
+			throw new InvalidOperationException("タブ切り離し用ウィンドウの作成に失敗しました。");
+		}
+
+		return GetAppWindowId(context.Window);
+	}
+
+	/// <summary>
+	/// 指定した<see cref="TabStateModel"/>を元ウィンドウから移動先ウィンドウへ移動する。
+	/// </summary>
+	public void MoveTabToWindow(TabStateModel tabState, Guid sourceWindowId, WindowId targetWindowId, int insertIndex = -1) {
+		var sourceWindowState = this._stateStore.RootState.Windows.FirstOrDefault(x => x.WindowId == sourceWindowId);
+		var targetGuid = this.FindWindowGuidByAppWindowId(targetWindowId);
+		if (targetGuid == null) {
+			this._logger.LogWarning("移動先ウィンドウが見つかりません (AppWindowId={TargetWindowId})", targetWindowId);
+			return;
+		}
+
+		var targetWindowState = this._stateStore.RootState.Windows.FirstOrDefault(x => x.WindowId == targetGuid.Value);
+		if (sourceWindowState == null || targetWindowState == null) {
+			this._logger.LogWarning("タブ移動に失敗: 元/先ウィンドウ状態が見つかりません");
+			return;
+		}
+
+		// 元のウィンドウからタブ状態を削除
+		sourceWindowState.Tabs.Remove(tabState);
+
+		// 移動先ウィンドウにタブ状態を追加
+		if (insertIndex >= 0 && insertIndex <= targetWindowState.Tabs.Count) {
+			targetWindowState.Tabs.Insert(insertIndex, tabState);
+		} else {
+			targetWindowState.Tabs.Add(tabState);
+		}
+		targetWindowState.SelectedTab.Value = tabState;
+
+		this._logger.LogInformation(
+			"タブを移動しました (Source={SourceWindowId}, Target={TargetWindowId})",
+			sourceWindowId, targetGuid.Value);
+	}
+
+	/// <summary>
+	/// 指定した<see cref="TabStateModel"/>を、自動検索した元ウィンドウから移動先ウィンドウへ移動する。
+	/// </summary>
+	public void MoveTabToWindow(TabStateModel tabState, WindowId targetWindowId, int insertIndex = -1) {
+		// 全ウィンドウ状態からタブ状態を含むソースウィンドウを検索
+		var sourceWindowState = this._stateStore.RootState.Windows
+			.FirstOrDefault(w => w.Tabs.Contains(tabState));
+
+		if (sourceWindowState == null) {
+			this._logger.LogWarning("タブ状態を含むソースウィンドウが見つかりません");
+			return;
+		}
+
+		this.MoveTabToWindow(tabState, sourceWindowState.WindowId, targetWindowId, insertIndex);
+	}
+
+	/// <summary>
 	/// AppWindow.Idから対応するウィンドウのGuidを検索する。
 	/// </summary>
 	public Guid? FindWindowGuidByAppWindowId(WindowId appWindowId) {

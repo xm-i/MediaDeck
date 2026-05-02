@@ -29,9 +29,14 @@
 			x:Name="MainTabView"
 			VerticalAlignment="Stretch"
 			IsAddTabButtonVisible="True"
+			CanTearOutTabs="True"
 			AddTabButtonCommand="{x:Bind _viewModel.AddTabCommand}"
 			TabCloseRequested="MainTabView_TabCloseRequested"
 			SelectionChanged="MainTabView_SelectionChanged"
+			TabTearOutWindowRequested="MainTabView_TabTearOutWindowRequested"
+			TabTearOutRequested="MainTabView_TabTearOutRequested"
+			ExternalTornOutTabsDropping="MainTabView_ExternalTornOutTabsDropping"
+			ExternalTornOutTabsDropped="MainTabView_ExternalTornOutTabsDropped"
 			TabWidthMode="SizeToContent"
 			TabItemsSource="{x:Bind _viewModel.Tabs}">
 			<TabView.TabItemTemplate>

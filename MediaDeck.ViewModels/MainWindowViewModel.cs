@@ -113,6 +113,30 @@ public class MainWindowViewModel : ViewModelBase {
 		}
 	}
 
+	/// <summary>
+	/// タブ切り離し用：タブを破棄せずにこのウィンドウから切り離す。
+	/// </summary>
+	/// <param name="tab">切り離すタブコンテキスト</param>
+	/// <returns>切り離されたタブの状態モデル（移動先で再利用される）</returns>
+	public TabStateModel? DetachTab(TabContext tab) {
+		var tabState = tab.TabState;
+
+		if (this.SelectedTab.Value == tab) {
+			this.SelectedTab.Value = this.Tabs.LastOrDefault();
+		}
+
+		return tabState;
+	}
+
+	/// <summary>
+	/// このViewModelが属するウィンドウのGuid
+	/// </summary>
+	public Guid WindowId {
+		get {
+			return this._windowState.WindowId;
+		}
+	}
+
 	protected override void Dispose(bool disposing) {
 		if (disposing) {
 			foreach (var tab in this.Tabs) {
