@@ -15,26 +15,26 @@
 
 	<ContentDialog.Resources>
 		<DataTemplate x:Key="StringTemplate" x:DataType="viewmodels:PropertyComparisonDialogViewModel">
-			<TextBox Text="{x:Bind StringValue.Value, Mode=TwoWay}"
+			<TextBox Text="{x:Bind StringValue.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
 					 Header="値"
 					 PlaceholderText="比較する値を入力"
 					 Loaded="ValueControl_Loaded" />
 		</DataTemplate>
 		<DataTemplate x:Key="NumberTemplate" x:DataType="viewmodels:PropertyComparisonDialogViewModel">
-			<NumberBox Value="{x:Bind NumberValue.Value, Mode=TwoWay}"
+			<NumberBox Value="{x:Bind NumberValue.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
 					   Header="値"
 					   PlaceholderText="比較する数値を入力"
 					   Loaded="ValueControl_Loaded" />
 		</DataTemplate>
 		<DataTemplate x:Key="DateTimeTemplate" x:DataType="viewmodels:PropertyComparisonDialogViewModel">
-			<CalendarDatePicker Date="{x:Bind DateTimeValue.Value, Mode=TwoWay}"
+			<CalendarDatePicker Date="{x:Bind DateTimeValue.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
 								Header="日付"
 								PlaceholderText="日付を選択"
 								Loaded="ValueControl_Loaded" />
 		</DataTemplate>
 		<DataTemplate x:Key="EnumTemplate" x:DataType="viewmodels:PropertyComparisonDialogViewModel">
 			<ComboBox ItemsSource="{x:Bind EnumItems}"
-					  SelectedValue="{x:Bind EnumValue.Value, Mode=TwoWay}"
+					  SelectedValue="{x:Bind EnumValue.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
 					  SelectedValuePath="Value"
 					  DisplayMemberPath="DisplayString"
 					  Header="値"
