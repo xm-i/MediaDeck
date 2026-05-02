@@ -70,7 +70,7 @@ public class PropertySearchCondition : ISearchCondition {
 	}
 
 	public bool IsMatchForSuggest(string searchWord) {
-		return $"prop.{this.PropertyName}".StartsWith(searchWord, StringComparison.OrdinalIgnoreCase);
+		return $"prop.{this.PropertyName}".Contains(searchWord, StringComparison.OrdinalIgnoreCase);
 	}
 
 	private static string OperatorToSymbol(SearchTypeComparison op) {
