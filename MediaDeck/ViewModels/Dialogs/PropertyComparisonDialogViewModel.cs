@@ -19,15 +19,15 @@ public class PropertyComparisonDialogViewModel : ViewModelBase {
 	public IReadOnlyList<DisplayObject<SearchTypeComparison>> OperatorItems {
 		get;
 	}
-	public ReactiveProperty<DisplayObject<SearchTypeComparison>?> SelectedOperator {
+	public ReactiveProperty<DisplayObject<SearchTypeComparison>> SelectedOperator {
 		get;
 	}
 
 	// 型ごとの入力値バインディング用プロパティ
 	public ReactiveProperty<string> StringValue { get; } = new("");
 	public ReactiveProperty<double> NumberValue { get; } = new(0.0);
-	public ReactiveProperty<DateTimeOffset?> DateTimeValue { get; } = new((DateTimeOffset?)null);
-	public ReactiveProperty<object?> EnumValue { get; } = new((object?)null);
+	public ReactiveProperty<DateTimeOffset?> DateTimeValue { get; } = new(null);
+	public ReactiveProperty<object?> EnumValue { get; } = new(null);
 
 	public IReadOnlyList<DisplayObject<object>> EnumItems {
 		get;

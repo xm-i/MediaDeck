@@ -71,8 +71,8 @@ public sealed partial class SearchConditionManagerView {
 		}
 		var condition = new PropertySearchCondition {
 			PropertyName = descriptor.Name,
-			Operator = dialog.SelectedOperator,
-			Value = dialog.SelectedValue,
+			Operator = dialog.ViewModel.SelectedOperator.Value.Value,
+			Value = dialog.ViewModel.GetRawValueString(),
 			IsConfigured = true,
 		};
 		return condition;

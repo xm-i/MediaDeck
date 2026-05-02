@@ -42,11 +42,12 @@
 					  Loaded="ValueControl_Loaded" />
 		</DataTemplate>
 
-		<local:PropertyComparisonTemplateSelector x:Key="TemplateSelector"
-												  StringTemplate="{StaticResource StringTemplate}"
-												  NumberTemplate="{StaticResource NumberTemplate}"
-												  DateTimeTemplate="{StaticResource DateTimeTemplate}"
-												  EnumTemplate="{StaticResource EnumTemplate}" />
+		<local:PropertyComparisonTemplateSelector
+			x:Key="TemplateSelector"
+			StringTemplate="{StaticResource StringTemplate}"
+			NumberTemplate="{StaticResource NumberTemplate}"
+			DateTimeTemplate="{StaticResource DateTimeTemplate}"
+			EnumTemplate="{StaticResource EnumTemplate}" />
 	</ContentDialog.Resources>
 
 	<StackPanel Margin="0,8" Spacing="8" MinWidth="320">
