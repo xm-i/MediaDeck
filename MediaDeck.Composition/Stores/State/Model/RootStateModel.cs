@@ -9,6 +9,14 @@ namespace MediaDeck.Composition.Stores.State.Model;
 [GenerateR3JsonConfigDto]
 public class RootStateModel {
 	/// <summary>
+	/// 状態バージョン
+	/// </summary>
+	public int Version {
+		get;
+		set;
+	} = 1;
+
+	/// <summary>
 	/// アプリ全体の共有状態
 	/// </summary>
 	public AppStateModel AppState {

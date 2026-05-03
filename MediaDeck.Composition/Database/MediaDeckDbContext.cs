@@ -107,6 +107,14 @@ public class MediaDeckDbContext(DbContextOptions dbContextOptions) : DbContext(d
 	} = null!;
 
 	/// <summary>
+	/// データベースバージョン
+	/// </summary>
+	public DbSet<DbVersion> DbVersions {
+		get;
+		set;
+	} = null!;
+
+	/// <summary>
 	/// Jpegメタデータテーブル
 	/// </summary>
 	public DbSet<Jpeg> Jpegs {
@@ -178,6 +186,7 @@ public class MediaDeckDbContext(DbContextOptions dbContextOptions) : DbContext(d
 		modelBuilder.Entity<Heif>().HasKey(b => b.MediaItemId);
 		modelBuilder.Entity<Container>().HasKey(b => b.MediaItemId);
 		modelBuilder.Entity<FolderGroupMetadata>().HasKey(f => f.MediaItemId);
+		modelBuilder.Entity<DbVersion>().HasKey(x => x.Id);
 
 		// Index
 		modelBuilder.Entity<MediaItem>()

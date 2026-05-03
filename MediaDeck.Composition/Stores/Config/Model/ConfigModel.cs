@@ -6,6 +6,14 @@ namespace MediaDeck.Composition.Stores.Config.Model;
 [GenerateR3JsonConfigDto]
 public class ConfigModel(PathConfigModel pathConfigModel, ScanConfigModel scanConfigModel, ExecutionConfigModel executionConfigModel, SearchConfigModel searchConfigModel) {
 	/// <summary>
+	/// 設定バージョン
+	/// </summary>
+	public int Version {
+		get;
+		set;
+	} = 1;
+
+	/// <summary>
 	/// パス設定
 	/// </summary>
 	public PathConfigModel PathConfig {

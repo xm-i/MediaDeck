@@ -132,6 +132,15 @@ public partial class App {
 		var dbFactory = Ioc.Default.GetRequiredService<IDbContextFactory<MediaDeckDbContext>>();
 		using (var db = dbFactory.CreateDbContext()) {
 			db.Database.EnsureCreated();
+
+			var dbVersion = db.DbVersions.AsNoTracking().FirstOrDefault(x => x.Id == 1);
+			if (dbVersion == null) {
+				db.DbVersions.Add(new() {
+					Id = 1,
+					Version = 1,
+				});
+				db.SaveChanges();
+			}
 		}
 
 		Directory.CreateDirectory(this._configStore.Config.PathConfig.TemporaryFolderPath.Value);
