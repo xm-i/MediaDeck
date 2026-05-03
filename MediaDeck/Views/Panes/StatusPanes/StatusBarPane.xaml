@@ -14,8 +14,7 @@
 		BorderThickness="0,1,0,0"
 		Padding="16,0"
 		Height="36"
-		ColumnSpacing="8"
-		Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" >
+		ColumnSpacing="8" >
 		<Grid ColumnSpacing="20">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="Auto" />
