@@ -69,7 +69,7 @@
 								<TextBlock Text="{x:Bind DisplayName.Value, Mode=OneWay}" />
 							</Grid>
 						</TabViewItem.Header>
-						<Grid>
+						<Grid Padding="2">
 							<Grid.ColumnDefinitions>
 								<ColumnDefinition Width="250" />
 								<ColumnDefinition Width="*" />
