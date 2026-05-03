@@ -88,10 +88,15 @@
 				VerticalAlignment="Center"
 				Spacing="12" >
 				<!-- アイコン: 小 -->
-				<FontIcon Glyph="&#xE799;"
-					FontSize="12"
-					VerticalAlignment="Center"
-					Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+				<Button Command="{x:Bind ViewModel.ZoomOutCommand, Mode=OneWay}"
+					Padding="4"
+					Background="Transparent"
+					BorderThickness="0"
+					VerticalAlignment="Center" >
+					<FontIcon Glyph="&#xE799;"
+						FontSize="12"
+						Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+				</Button>
 
 				<Slider x:Name="ItemSizeSlider"
 					TickFrequency="50"
@@ -105,10 +110,15 @@
 					Value="{x:Bind ViewModel.ItemSize.Value, Mode=TwoWay}" />
 
 				<!-- アイコン: 大 -->
-				<FontIcon Glyph="&#xE799;"
-					FontSize="20"
-					VerticalAlignment="Center"
-					Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+				<Button Command="{x:Bind ViewModel.ZoomInCommand, Mode=OneWay}"
+					Padding="4"
+					Background="Transparent"
+					BorderThickness="0"
+					VerticalAlignment="Center" >
+					<FontIcon Glyph="&#xE799;"
+						FontSize="20"
+						Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+				</Button>
 			</StackPanel>
 		</Grid>
 	</Grid>

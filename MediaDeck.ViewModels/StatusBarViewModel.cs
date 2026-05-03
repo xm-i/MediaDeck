@@ -46,6 +46,20 @@ public class StatusBarViewModel : ViewModelBase {
 	}
 
 	/// <summary>
+	/// アイテムのサイズを拡大するコマンド
+	/// </summary>
+	public ReactiveCommand<Unit> ZoomInCommand {
+		get;
+	}
+
+	/// <summary>
+	/// アイテムのサイズを縮小するコマンド
+	/// </summary>
+	public ReactiveCommand<Unit> ZoomOutCommand {
+		get;
+	}
+
+	/// <summary>
 	/// コンストラクタ
 	/// </summary>
 	/// <param name="mediaContentLibrary">メディアライブラリのViewModel</param>
@@ -59,6 +73,14 @@ public class StatusBarViewModel : ViewModelBase {
 		this.ItemSize = tabState.ViewerState.ItemSize
 			.ToTwoWayBindableReactiveProperty(tabState.ViewerState.ItemSize.Value, this.CompositeDisposable)
 			.AddTo(this.CompositeDisposable);
+
+		this.ZoomInCommand = new ReactiveCommand<Unit>(_ => {
+			this.ItemSize.Value = Math.Min(500, this.ItemSize.Value + 10);
+		}).AddTo(this.CompositeDisposable);
+
+		this.ZoomOutCommand = new ReactiveCommand<Unit>(_ => {
+			this.ItemSize.Value = Math.Max(50, this.ItemSize.Value - 10);
+		}).AddTo(this.CompositeDisposable);
 
 		this.ShowOverlay = tabState.ViewerState.ShowOverlay
 			.ToTwoWayBindableReactiveProperty(tabState.ViewerState.ShowOverlay.Value, this.CompositeDisposable)
