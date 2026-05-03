@@ -13,6 +13,14 @@ public class TabStateModel(IServiceProvider serviceProvider, SearchStateModel se
 	} = serviceProvider;
 
 	/// <summary>
+	/// タブの一意識別子
+	/// </summary>
+	public Guid TabId {
+		get;
+		set;
+	} = Guid.NewGuid();
+
+	/// <summary>
 	/// タブの表示名
 	/// </summary>
 	public ReactiveProperty<string> DisplayName {

@@ -13,6 +13,7 @@ namespace MediaDeck.ViewModels;
 public class MainWindowViewModel : ViewModelBase {
 	private readonly IServiceProvider _rootServiceProvider;
 	private readonly WindowStateModel _windowState;
+	private readonly RootStateModel _rootState;
 
 
 	public MainWindowViewModel(
@@ -23,21 +24,26 @@ public class MainWindowViewModel : ViewModelBase {
 		NavigationMenuViewModel navigationMenuViewModel) {
 		this._rootServiceProvider = serviceProvider;
 		this.NavigationMenuViewModel = navigationMenuViewModel;
+		this._rootState = stateStore.RootState;
 
 		// 自身のウィンドウの状態を取得（WindowManagerによってセット済み）
 		this._windowState = windowStateProvider.State ?? throw new InvalidOperationException("WindowStateModel was not provided to the scope.");
 
-		this.Tabs = this._windowState.Tabs.ToWritableNotifyCollectionChanged(
-			tabState => new TabContext(tabState),
-			(TabContext tabContext, TabStateModel tabState, ref bool setValue) => {
+		this.Tabs = this._windowState.TabIds.ToWritableNotifyCollectionChanged(
+			tabId => {
+				var tabState = this._rootState.Tabs.FirstOrDefault(t => t.TabId == tabId)
+					?? throw new InvalidOperationException($"TabStateModel not found for TabId: {tabId}");
+				return new TabContext(tabState);
+			},
+			(TabContext tabContext, Guid tabId, ref bool setValue) => {
 				setValue = true;
-				return tabContext.TabState;
+				return tabContext.TabState.TabId;
 			},
 			SynchronizationContextCollectionEventDispatcher.Current);
 
-		this.SelectedTab = this._windowState.SelectedTab.ToTwoWayBindableReactiveProperty(
-			x => this.Tabs.FirstOrDefault(t => t.TabState == x),
-			x => x?.TabState,
+		this.SelectedTab = this._windowState.SelectedTabId.ToTwoWayBindableReactiveProperty(
+			x => x.HasValue ? this.Tabs.FirstOrDefault(t => t.TabState.TabId == x.Value) : null,
+			x => x?.TabState.TabId,
 			null,
 			this.CompositeDisposable
 			);
@@ -90,14 +96,16 @@ public class MainWindowViewModel : ViewModelBase {
 		var notifContext = scope.ServiceProvider.GetRequiredService<NotificationContextProvider>();
 		var stateStore = scope.ServiceProvider.GetRequiredService<IStateStore>();
 		notifContext.TargetWindowIdResolver = () => {
-			return stateStore.RootState.Windows.FirstOrDefault(w => w.Tabs.Contains(tabState))?.WindowId;
+			return stateStore.RootState.Windows.FirstOrDefault(w => w.TabIds.Contains(tabState.TabId))?.WindowId;
 		};
 
-		// 自身のウィンドウの状態リストに追加
-		this._windowState.Tabs.Add(tabState);
+		// ルートの状態リストに追加
+		this._rootState.Tabs.Add(tabState);
+		// 自身のウィンドウのTabIdリストに追加
+		this._windowState.TabIds.Add(tabState.TabId);
 
 		// CreateView は同期的であるため、すぐに追加後のタブを取得できる
-		var createdTabContext = this.Tabs.FirstOrDefault(x => x.TabState == tabState);
+		var createdTabContext = this.Tabs.FirstOrDefault(x => x.TabState.TabId == tabState.TabId);
 		if (createdTabContext != null) {
 			this.SelectedTab.Value = createdTabContext;
 		}
@@ -108,7 +116,8 @@ public class MainWindowViewModel : ViewModelBase {
 	/// </summary>
 	public void CloseTab(TabContext tab) {
 		tab.Dispose();
-		this._windowState.Tabs.Remove(tab.TabState);
+		this._windowState.TabIds.Remove(tab.TabState.TabId);
+		this._rootState.Tabs.Remove(tab.TabState);
 
 		if (this.SelectedTab.Value == tab) {
 			this.SelectedTab.Value = this.Tabs.LastOrDefault();

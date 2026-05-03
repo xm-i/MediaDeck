@@ -25,6 +25,14 @@ public class RootStateModel {
 	}
 
 	/// <summary>
+	/// タブごとの状態リスト（ルートスコープから生成）
+	/// </summary>
+	[JsonConfigCreateScope]
+	public ObservableList<TabStateModel> Tabs {
+		get;
+	} = [];
+
+	/// <summary>
 	/// ウィンドウごとの状態リスト
 	/// </summary>
 	[JsonConfigCreateScope]

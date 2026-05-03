@@ -18,17 +18,16 @@ public class WindowStateModel {
 	} = Guid.NewGuid();
 
 	/// <summary>
-	/// このウィンドウが持つタブの状態リスト
+	/// このウィンドウが持つタブのIDリスト
 	/// </summary>
-	[JsonConfigCreateScope]
-	public ObservableList<TabStateModel> Tabs {
+	public ObservableList<Guid> TabIds {
 		get;
 	} = [];
 
 	/// <summary>
-	/// アクティブだったタブのインデックス
+	/// アクティブだったタブのID
 	/// </summary>
-	public ReactiveProperty<TabStateModel?> SelectedTab {
+	public ReactiveProperty<Guid?> SelectedTabId {
 		get;
 		set;
 	} = new();
