@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <local:PdfThumbnailControlViewUserControl
     x:Class="MediaDeck.MediaItemTypes.UI.Pdf.Views.PdfThumbnailControlView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -7,6 +7,24 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d" >
-    <Image Source="{x:Bind ViewModel.ThumbnailFilePath.Value, Mode=OneWay}" Stretch="Uniform" />
+    <Grid>
+        <Image Source="{x:Bind ViewModel.ThumbnailFilePath.Value, Mode=OneWay}" Stretch="Uniform" />
+        <Border Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
+            CornerRadius="0,0,0,4" Padding="5,2"
+            HorizontalAlignment="Right" VerticalAlignment="Top" >
+            <StackPanel Orientation="Horizontal" Spacing="4" >
+                <FontIcon Glyph="&#xEA90;"
+                    FontSize="10" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                <TextBlock Text="{x:Bind ViewModel.FilePath, Converter={StaticResource FilePathToExtensionConverter}}"
+                    FontSize="10" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+            </StackPanel>
+        </Border>
+        <Border Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
+            CornerRadius="4,0,0,0" Padding="5,2"
+            HorizontalAlignment="Right" VerticalAlignment="Bottom" >
+            <TextBlock Text="{x:Bind CastedViewModel.FileCountText, Mode=OneWay}"
+                FontSize="10" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+        </Border>
+    </Grid>
 </local:PdfThumbnailControlViewUserControl>
 

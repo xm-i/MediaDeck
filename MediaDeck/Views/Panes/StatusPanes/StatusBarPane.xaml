@@ -21,6 +21,7 @@
 				<ColumnDefinition Width="*" />
 				<ColumnDefinition Width="Auto" />
 				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="Auto" />
 			</Grid.ColumnDefinitions>
 			<StackPanel Orientation="Horizontal"
 				Grid.Column="0"
@@ -60,7 +61,29 @@
 				</controls:Segmented.ItemTemplate>
 			</controls:Segmented>
 
-			<StackPanel Grid.Column="3"
+				<StackPanel Grid.Column="3"
+					Orientation="Horizontal"
+					VerticalAlignment="Center"
+					Spacing="8" >
+					<ToggleButton MinWidth="96"
+						Height="30"
+						IsChecked="{x:Bind ViewModel.ShowOverlay.Value, Mode=TwoWay}" >
+						<StackPanel Orientation="Horizontal" Spacing="6" >
+							<FontIcon Glyph="&#xE71E;" FontSize="14" />
+							<TextBlock Text="Overlay" VerticalAlignment="Center" />
+						</StackPanel>
+					</ToggleButton>
+					<ToggleButton MinWidth="80"
+						Height="30"
+						IsChecked="{x:Bind ViewModel.ShowInfo.Value, Mode=TwoWay}" >
+						<StackPanel Orientation="Horizontal" Spacing="6" >
+							<FontIcon Glyph="&#xE946;" FontSize="14" />
+							<TextBlock Text="Info" VerticalAlignment="Center" />
+						</StackPanel>
+					</ToggleButton>
+				</StackPanel>
+
+				<StackPanel Grid.Column="4"
 				Orientation="Horizontal"
 				VerticalAlignment="Center"
 				Spacing="12" >

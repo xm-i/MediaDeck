@@ -3,6 +3,7 @@
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:ctConverters="using:CommunityToolkit.WinUI.Converters"
 	xmlns:converters="using:MediaDeck.Views.Resources.Converters"
+	xmlns:uiConverters="using:MediaDeck.MediaItemTypes.UI.Base.Converters"
 	xmlns:selectors="using:MediaDeck.Views.Resources"
 	xmlns:vmIf="using:MediaDeck.Composition.Interfaces.MediaItemTypes.ViewModels"
 	xmlns:archiveViews="using:MediaDeck.MediaItemTypes.UI.Archive.Views"
@@ -12,6 +13,12 @@
 	xmlns:pdfViews="using:MediaDeck.MediaItemTypes.UI.Pdf.Views"
 	xmlns:unknownViews="using:MediaDeck.MediaItemTypes.UI.Unknown.Views"
 	xmlns:videoViews="using:MediaDeck.MediaItemTypes.UI.Video.Views" >
+	<converters:FilePathToFileNameConverter x:Key="FilePathToFileNameConverter" />
+	<uiConverters:FilePathToExtensionConverter x:Key="FilePathToExtensionConverter" />
+	<uiConverters:DurationToStringConverter x:Key="DurationToStringConverter" />
+	<converters:CardDisplayModeToOverlayVisibilityConverter x:Key="CardDisplayModeToOverlayVisibilityConverter" />
+
+
 	<ctConverters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
 	<converters:EqualityToBooleanConverter x:Key="EqualityToBooleanConverter" />
 	<converters:StringNotEmptyToVisibilityConverter x:Key="StringNotEmptyToVisibilityConverter" />

@@ -36,18 +36,79 @@
 						Click="MenuFlyoutItem_Click"
 						Tag="OpenFolder" />
 				</MenuFlyout>
+				<DataTemplate x:Key="NoOverlayThumbnailTpl" x:DataType="vmIf:IMediaItemViewModel" >
+					<Image Source="{x:Bind ThumbnailFilePath.Value, Mode=OneWay}" Stretch="Uniform" />
+				</DataTemplate>
 			</GridView.Resources>
 			<GridView.ItemTemplate>
 				<DataTemplate x:DataType="vmIf:IMediaItemViewModel" >
-					<Grid DoubleTapped="File_DoubleTapped" >
-						<ContentControl
-							Content="{x:Bind}"
-							ContentTemplateSelector="{StaticResource MediaItemThumbnailControlTplSel}"
-							Height="{Binding DataContext.ItemSize.Value, Mode=OneWay, ElementName=List}"
-							HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
-						<Grid Opacity="0.7"
-							Background="DarkGray"
-							Visibility="{x:Bind Exists, Converter={StaticResource InvertBoolToVisibilityConverter}}" />
+					<Grid DoubleTapped="File_DoubleTapped"
+						Width="{Binding DataContext.ItemSize.Value, Mode=OneWay, ElementName=List}"
+						CornerRadius="8"
+						Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+						BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+						BorderThickness="1" >
+						<Grid.Shadow>
+							<ThemeShadow />
+						</Grid.Shadow>
+						<Grid.RowDefinitions>
+							<RowDefinition Height="*" />
+							<RowDefinition Height="Auto" />
+							<RowDefinition Height="Auto" />
+						</Grid.RowDefinitions>
+
+						<!-- サムネイルエリア(常時表示) -->
+						<Grid Grid.Row="0" CornerRadius="8,8,0,0" >
+							<!-- オーバーレイあり(拡張子/再生時間など) -->
+							<ContentControl
+								Visibility="{Binding DataContext.ShowOverlay.Value, ElementName=List, Converter={StaticResource BoolToVisibilityConverter}}"
+								Content="{x:Bind}"
+								ContentTemplateSelector="{StaticResource MediaItemThumbnailControlTplSel}"
+								Height="{Binding DataContext.ItemSize.Value, Mode=OneWay, ElementName=List}"
+								HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
+
+							<!-- オーバーレイなし -->
+							<ContentControl
+								Visibility="{Binding DataContext.ShowOverlay.Value, ElementName=List, Converter={StaticResource InvertBoolToVisibilityConverter}}"
+								Content="{x:Bind}"
+								ContentTemplate="{StaticResource NoOverlayThumbnailTpl}"
+								Height="{Binding DataContext.ItemSize.Value, Mode=OneWay, ElementName=List}"
+								HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
+
+							<!-- 存在しないファイルのオーバーレイ -->
+							<Grid Opacity="0.7"
+								Background="DarkGray"
+								Visibility="{x:Bind Exists, Converter={StaticResource InvertBoolToVisibilityConverter}}" />
+						</Grid>
+
+						<!-- サムネイルと情報エリアの区切り線 -->
+						<Border Grid.Row="1"
+							Height="1"
+							Visibility="{Binding DataContext.ShowInfo.Value, ElementName=List, Converter={StaticResource BoolToVisibilityConverter}}"
+							Background="{ThemeResource DividerStrokeColorDefaultBrush}" />
+
+						<!-- 情報表示エリア -->
+						<Grid Grid.Row="2" Padding="8,6,8,8"
+							Visibility="{Binding DataContext.ShowInfo.Value, ElementName=List, Converter={StaticResource BoolToVisibilityConverter}}" >
+							<Grid.RowDefinitions>
+								<RowDefinition Height="Auto" />
+								<RowDefinition Height="Auto" />
+							</Grid.RowDefinitions>
+
+							<!-- タイトル -->
+							<TextBlock Grid.Row="0"
+								Text="{x:Bind FilePath, Converter={StaticResource FilePathToFileNameConverter}}"
+								FontWeight="SemiBold" FontSize="12"
+								TextTrimming="CharacterEllipsis" MaxLines="1"
+								ToolTipService.ToolTip="{x:Bind FilePath, Converter={StaticResource FilePathToFileNameConverter}}" />
+
+							<!-- メタデータ行 -->
+							<StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="6" Margin="0,2,0,0" >
+								<TextBlock Text="{x:Bind FilePath, Converter={StaticResource FilePathToExtensionConverter}}"
+									FontSize="10" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+
+							</StackPanel>
+						</Grid>
 					</Grid>
 				</DataTemplate>
 			</GridView.ItemTemplate>

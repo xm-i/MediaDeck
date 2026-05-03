@@ -41,6 +41,7 @@ public class ArchiveMediaItemFactory :
 		var ifm = this._serviceProvider.GetRequiredService<ArchiveMediaItemModel>();
 		ifm.Initialize(MediaItem.MediaItemId, MediaItem.FilePath);
 		this.SetModelProperties(ifm, MediaItem);
+		ifm.FileCount = MediaItem.Container?.PageCount;
 		return ifm;
 	}
 

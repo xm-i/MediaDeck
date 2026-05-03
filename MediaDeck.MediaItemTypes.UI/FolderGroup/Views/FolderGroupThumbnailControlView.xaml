@@ -7,14 +7,26 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d" >
-    <Border BorderThickness="3"
-        BorderBrush="{ThemeResource AccentFillColorDefaultBrush}"
-        CornerRadius="4"
-        Padding="2"
-        Margin="2"
-        Background="{ThemeResource LayerFillColorDefaultBrush}" >
-        <Image Source="{x:Bind ViewModel.ThumbnailFilePath.Value, Mode=OneWay}"
-            Stretch="Uniform" />
-    </Border>
+    <Grid>
+        <Border BorderThickness="3"
+            BorderBrush="{ThemeResource AccentFillColorDefaultBrush}"
+            CornerRadius="4"
+            Padding="2"
+            Margin="2"
+            Background="{ThemeResource LayerFillColorDefaultBrush}" >
+            <Image Source="{x:Bind ViewModel.ThumbnailFilePath.Value, Mode=OneWay}"
+                Stretch="Uniform" />
+        </Border>
+        <Border Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
+            CornerRadius="0,0,0,4" Padding="5,2"
+            HorizontalAlignment="Right" VerticalAlignment="Top" >
+            <StackPanel Orientation="Horizontal" Spacing="4" >
+                <FontIcon Glyph="&#xED41;"
+                    FontSize="10" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                <TextBlock Text="Folder"
+                    FontSize="10" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+            </StackPanel>
+        </Border>
+    </Grid>
 </local:FolderGroupThumbnailControlViewUserControl>
 

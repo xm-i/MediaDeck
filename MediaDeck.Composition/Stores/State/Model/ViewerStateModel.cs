@@ -11,4 +11,18 @@ public class ViewerStateModel {
 	public ReactiveProperty<int> ItemSize {
 		get;
 	} = new(150);
+
+	/// <summary>
+	/// サムネイル上オーバーレイ表示
+	/// </summary>
+	public ReactiveProperty<bool> ShowOverlay {
+		get;
+	} = new(true);
+
+	/// <summary>
+	/// 情報エリア表示
+	/// </summary>
+	public ReactiveProperty<bool> ShowInfo {
+		get;
+	} = new(true);
 }

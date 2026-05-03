@@ -32,6 +32,20 @@ public class StatusBarViewModel : ViewModelBase {
 	}
 
 	/// <summary>
+	/// サムネイル上オーバーレイ表示
+	/// </summary>
+	public BindableReactiveProperty<bool> ShowOverlay {
+		get;
+	}
+
+	/// <summary>
+	/// 情報エリア表示
+	/// </summary>
+	public BindableReactiveProperty<bool> ShowInfo {
+		get;
+	}
+
+	/// <summary>
 	/// コンストラクタ
 	/// </summary>
 	/// <param name="mediaContentLibrary">メディアライブラリのViewModel</param>
@@ -44,6 +58,14 @@ public class StatusBarViewModel : ViewModelBase {
 		// StateのItemSizeと双方向に同期するプロパティを作成
 		this.ItemSize = tabState.ViewerState.ItemSize
 			.ToTwoWayBindableReactiveProperty(tabState.ViewerState.ItemSize.Value, this.CompositeDisposable)
+			.AddTo(this.CompositeDisposable);
+
+		this.ShowOverlay = tabState.ViewerState.ShowOverlay
+			.ToTwoWayBindableReactiveProperty(tabState.ViewerState.ShowOverlay.Value, this.CompositeDisposable)
+			.AddTo(this.CompositeDisposable);
+
+		this.ShowInfo = tabState.ViewerState.ShowInfo
+			.ToTwoWayBindableReactiveProperty(tabState.ViewerState.ShowInfo.Value, this.CompositeDisposable)
 			.AddTo(this.CompositeDisposable);
 	}
 }

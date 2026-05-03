@@ -30,6 +30,9 @@ public class ViewerSelectorViewModel : ViewModelBase {
 
 		this.ItemSize = tabState.ViewerState.ItemSize.ToTwoWayBindableReactiveProperty(tabState.ViewerState.ItemSize.Value, this.CompositeDisposable).AddTo(this.CompositeDisposable);
 
+		this.ShowOverlay = tabState.ViewerState.ShowOverlay.ToTwoWayBindableReactiveProperty(tabState.ViewerState.ShowOverlay.Value, this.CompositeDisposable).AddTo(this.CompositeDisposable);
+		this.ShowInfo = tabState.ViewerState.ShowInfo.ToTwoWayBindableReactiveProperty(tabState.ViewerState.ShowInfo.Value, this.CompositeDisposable).AddTo(this.CompositeDisposable);
+
 		this.SelectedViewerPane.Pairwise()
 			.Subscribe(x => {
 				x.Previous?.IsSelected.Value = false;
@@ -74,5 +77,13 @@ public class ViewerSelectorViewModel : ViewModelBase {
 	public BindableReactiveProperty<int> ItemSize {
 		get;
 	} = new(150);
+
+	public BindableReactiveProperty<bool> ShowOverlay {
+		get;
+	}
+
+	public BindableReactiveProperty<bool> ShowInfo {
+		get;
+	}
 
 }

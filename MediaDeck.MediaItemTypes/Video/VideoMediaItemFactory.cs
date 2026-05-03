@@ -41,6 +41,7 @@ public class VideoMediaItemFactory :
 		var ifm = this._serviceProvider.GetRequiredService<VideoMediaItemModel>();
 		ifm.Initialize(MediaItem.MediaItemId, MediaItem.FilePath);
 		this.SetModelProperties(ifm, MediaItem);
+		ifm.Duration = MediaItem.VideoFile?.Duration;
 		return ifm;
 	}
 
