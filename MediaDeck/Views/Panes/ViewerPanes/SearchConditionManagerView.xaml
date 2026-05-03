@@ -17,9 +17,10 @@
 			TokenItemAdded="TokenizingTextBox_TokenItemAdded"
 			TokenItemRemoving="TokenizingTextBox_TokenItemRemoving" 
 			VerticalAlignment="Stretch"
-			QuerySubmitted="TokenizingTextBox_QuerySubmitted">
+			QuerySubmitted="TokenizingTextBox_QuerySubmitted"
+			PlaceholderText="Add search tokens...">
 			<controls:TokenizingTextBox.QueryIcon>
-				<SymbolIconSource Symbol="Refresh"/>
+				<SymbolIconSource Symbol="Find"/>
 			</controls:TokenizingTextBox.QueryIcon>
 			<controls:TokenizingTextBox.TokenItemTemplate>
 				<DataTemplate>
