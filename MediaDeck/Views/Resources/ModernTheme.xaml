@@ -8,6 +8,7 @@
 		<ResourceDictionary Source="ms-appx:///Views/Resources/Styles/MediaCard.xaml" />
 		<ResourceDictionary Source="ms-appx:///Views/Resources/Styles/SearchBox.xaml" />
 		<ResourceDictionary Source="ms-appx:///Views/Resources/Styles/MenuBar.xaml" />
+		<ResourceDictionary Source="ms-appx:///Views/Resources/Styles/TabView.xaml" />
 	</ResourceDictionary.MergedDictionaries>
 
 </ResourceDictionary>
