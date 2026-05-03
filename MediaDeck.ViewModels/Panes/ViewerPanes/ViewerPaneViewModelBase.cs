@@ -4,10 +4,14 @@ using MediaDeck.Core.Models.Files;
 
 namespace MediaDeck.ViewModels.Panes.ViewerPanes;
 
-public abstract class ViewerPaneViewModelBase(string name, FilesManager filesManager) : ViewModelBase {
+public abstract class ViewerPaneViewModelBase(string name, string iconGlyph, FilesManager filesManager) : ViewModelBase {
 	public string Name {
 		get;
 	} = name;
+
+	public string IconGlyph {
+		get;
+	} = iconGlyph;
 
 	/// <summary>
 	/// このViewerが選択されているかどうか。

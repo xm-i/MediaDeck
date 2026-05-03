@@ -25,17 +25,6 @@ public sealed partial class ViewerSelector {
 		}
 		Ioc.Default.GetRequiredService<WindowService>().ActivateCenteredOnMainWindow(window, parent);
 	}
-
-	private void Segmented_SelectionChanged(object sender, Microsoft.UI.Xaml.Controls.SelectionChangedEventArgs e) {
-		if (this.ViewModel == null) {
-			return;
-		}
-		if (e.AddedItems.Count != 1 || e.AddedItems[0] is not ViewerPaneViewModelBase selectedViewerPane) {
-			return;
-		}
-
-		this.ViewModel.SelectedViewerPane.Value = selectedViewerPane;
-	}
 }
 
 

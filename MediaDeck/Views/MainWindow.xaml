@@ -11,7 +11,7 @@
 	xmlns:detailPanes="using:MediaDeck.Views.Panes.DetailPanes"
 	xmlns:repositoryPanes="using:MediaDeck.Views.Panes.RepositoryPanes"
 	xmlns:viewmodels="using:MediaDeck.ViewModels"
-	xmlns:panes="using:MediaDeck.Views.Panes"
+	xmlns:statusPanes="using:MediaDeck.Views.Panes.StatusPanes"
 	mc:Ignorable="d"
 	Title="MediaDeck" >
 	<Window.SystemBackdrop>
@@ -99,7 +99,7 @@
 		</TabView>
 
 		<!-- ステータスバー -->
-		<panes:StatusBarPane Grid.Row="2"
+		<statusPanes:StatusBarPane Grid.Row="2"
 			ViewModel="{x:Bind _viewModel.SelectedTab.Value.StatusBarViewModel, Mode=OneWay}" />
 	</Grid>
 </Window>
