@@ -25,6 +25,19 @@ public sealed partial class MainWindow : Window {
 		this.ExtendsContentIntoTitleBar = true;
 		this.SetTitleBar(this.AppTitleBar);
 
+		// ウィンドウ活性状態に応じたボーダー色の切り替え
+		this.Activated += (s, e) => {
+			if (e.WindowActivationState == WindowActivationState.Deactivated) {
+				this.RootBorder.BorderBrush = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Gray);
+			} else {
+				if (Application.Current.Resources.TryGetValue("AccentFillColorDefaultBrush", out var brush)) {
+					this.RootBorder.BorderBrush = (Microsoft.UI.Xaml.Media.Brush)brush;
+				} else {
+					this.RootBorder.BorderBrush = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.DeepSkyBlue);
+				}
+			}
+		};
+
 		this._viewModel.SelectedTab.Subscribe(tab => {
 			if (tab != null && this.MainTabView.SelectedItem != tab) {
 				this.MainTabView.SelectedItem = tab;

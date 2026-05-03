@@ -14,7 +14,7 @@
 	xmlns:viewmodels="using:MediaDeck.ViewModels"
 	xmlns:statusPanes="using:MediaDeck.Views.Panes.StatusPanes"
 	mc:Ignorable="d"
-	Title="MediaDeck" >
+	Title="MediaDeck">
 	<Window.SystemBackdrop>
 		<DesktopAcrylicBackdrop/>
 	</Window.SystemBackdrop>
@@ -105,5 +105,12 @@
 		<!-- ステータスバー -->
 		<statusPanes:StatusBarPane Grid.Row="2"
 			ViewModel="{x:Bind _viewModel.SelectedTab.Value.StatusBarViewModel, Mode=OneWay}" />
+
+		<!-- ウィンドウのボーダー (活性状態に応じて色が変わる) -->
+		<Border x:Name="RootBorder"
+				Grid.RowSpan="3"
+				BorderThickness="1"
+				BorderBrush="Gray"
+				IsHitTestVisible="False" />
 	</Grid>
 </Window>
