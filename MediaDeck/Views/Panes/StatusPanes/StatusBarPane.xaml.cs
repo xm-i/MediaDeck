@@ -1,7 +1,8 @@
 using MediaDeck.ViewModels;
 using MediaDeck.ViewModels.Panes.ViewerPanes;
 
-namespace MediaDeck.Views.Panes.StatusPanes; 
+namespace MediaDeck.Views.Panes.StatusPanes;
+
 /// <summary>
 /// ステータスバーを表示するユーザーコントロール
 /// </summary>

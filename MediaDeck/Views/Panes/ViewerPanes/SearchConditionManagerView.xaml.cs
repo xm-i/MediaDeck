@@ -9,8 +9,6 @@ using MediaDeck.Views.Dialogs;
 
 using Microsoft.UI.Xaml.Controls;
 
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Rebar;
-
 namespace MediaDeck.Views.Panes.ViewerPanes;
 
 public sealed partial class SearchConditionManagerView {
