@@ -14,17 +14,17 @@
 			<RowDefinition Height="*" />
 		</Grid.RowDefinitions>
 		<Grid Grid.Row="0"
-			Padding="8,6"
+			Padding="8,0"
 			Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" >
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="*" />
-
 				<ColumnDefinition Width="*" />
 				<ColumnDefinition Width="Auto" />
 			</Grid.ColumnDefinitions>
 
 			<StackPanel Grid.Column="3"
 				Orientation="Horizontal"
+				VerticalAlignment="Center"
 				Spacing="6" >
 				<ComboBox MinWidth="140"
 					ItemsSource="{x:Bind ViewModel.SortSelectorViewModel.SortConditions,Mode=OneWay}"
@@ -43,11 +43,6 @@
 				</ToggleButton>
 				<Button Click="Button_Click" >
 					<FontIcon Glyph="&#xE713;"
-						FontSize="14" />
-				</Button>
-				<Button Command="{x:Bind ViewModel.RefreshCommand}"
-					ToolTipService.ToolTip="更新" >
-					<FontIcon Glyph="&#xE72C;"
 						FontSize="14" />
 				</Button>
 			</StackPanel>

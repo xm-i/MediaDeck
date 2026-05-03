@@ -18,6 +18,9 @@ public class SearchConditionManagerViewModel : ViewModelBase {
 		this.SearchConditionCandidates = mediaContentLibrary.SearchConditionCandidates.CreateView(x => new SearchConditionViewModel(x).AddTo(this.CompositeDisposable));
 		this.FilteredSearchConditionCandidates = this.SearchConditionCandidates.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
 		this.SearchConditionNotificationDispatcher = searchConditionNotificationDispatcher;
+
+		this.RefreshCommand = new ReactiveCommand().AddTo(this.CompositeDisposable);
+		this.RefreshCommand.Subscribe(_ => this.Reload()).AddTo(this.CompositeDisposable);
 	}
 
 	public INotifyCollectionChangedSynchronizedViewList<SearchConditionViewModel> SearchConditions {
@@ -45,5 +48,9 @@ public class SearchConditionManagerViewModel : ViewModelBase {
 	/// <summary>手動リロードを実行する（Dispatcher 経由で検索を発火する）。</summary>
 	public void Reload() {
 		this.SearchConditionNotificationDispatcher.ReloadRequested.OnNext(Unit.Default);
+	}
+
+	public ReactiveCommand RefreshCommand {
+		get;
 	}
 }

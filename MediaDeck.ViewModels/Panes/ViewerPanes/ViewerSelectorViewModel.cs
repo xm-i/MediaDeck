@@ -39,7 +39,6 @@ public class ViewerSelectorViewModel : ViewModelBase {
 			})
 			.AddTo(this.CompositeDisposable);
 
-		this.RefreshCommand.Subscribe(x => this.SearchConditionManagerViewModel.Reload()).AddTo(this.CompositeDisposable);
 	}
 
 	public MediaContentLibraryViewModel MediaContentLibraryViewModel {
@@ -82,7 +81,4 @@ public class ViewerSelectorViewModel : ViewModelBase {
 		get;
 	} = new(150);
 
-	public ReactiveCommand RefreshCommand {
-		get;
-	} = new();
 }

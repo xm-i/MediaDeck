@@ -1,10 +1,15 @@
 using System.Threading.Tasks;
+
 using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.WinUI.Controls;
+
 using MediaDeck.Core.Models.Files.SearchConditions;
 using MediaDeck.ViewModels.Panes.ViewerPanes;
 using MediaDeck.Views.Dialogs;
+
 using Microsoft.UI.Xaml.Controls;
+
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Rebar;
 
 namespace MediaDeck.Views.Panes.ViewerPanes;
 
@@ -71,11 +76,16 @@ public sealed partial class SearchConditionManagerView {
 		}
 		var condition = new PropertySearchCondition {
 			PropertyName = descriptor.Name,
-			Operator = dialog.ViewModel.SelectedOperator.Value.Value,
+			Operator = dialog.ViewModel.SelectedOperator.Value!.Value,
 			Value = dialog.ViewModel.GetRawValueString(),
 			IsConfigured = true,
 		};
 		return condition;
+	}
+
+	private void TokenizingTextBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args) {
+		this.ViewModel?.RefreshCommand.Execute(Unit.Default);
+
 	}
 }
 
