@@ -1,4 +1,5 @@
 using MediaDeck.Composition.Database;
+using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.MediaItemTypes;
 using MediaDeck.Composition.Tables;
 
@@ -51,7 +52,7 @@ public class FileStatusUpdatorService {
 			) {
 				continue;
 			}
-			var needsHashUpdate = pathStatus.Exists && (file.PreHashUpdatedTime == null || file.PreHashUpdatedTime < pathStatus.ModifiedTime);
+			var needsHashUpdate = pathStatus.Exists && (file.PreHashUpdatedTime == null || file.PreHashUpdatedTime < pathStatus.ModifiedTime) && file.MediaType != MediaType.FolderGroup;
 
 			file.IsExists = pathStatus.Exists;
 
