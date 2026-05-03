@@ -57,6 +57,7 @@
                                         Background="Transparent"
                                         BorderThickness="0"
                                         Margin="4,0,0,0"
+                                        Padding="0"
                                         CornerRadius="4"
                                         Opacity="0"
                                         VerticalAlignment="Center"
