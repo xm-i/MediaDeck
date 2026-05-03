@@ -12,7 +12,6 @@
 		<Grid.RowDefinitions>
 			<RowDefinition Height="auto" />
 			<RowDefinition Height="*" />
-			<RowDefinition Height="auto" />
 		</Grid.RowDefinitions>
 		<Grid Grid.Row="0"
 			Padding="8,6"
@@ -75,24 +74,6 @@
 			</controls:Case>
 			-->
 		</controls:SwitchPresenter>
-		<controls:DockPanel Grid.Row="2" >
-			<TextBlock>
-				<Run Text="Count: " />
-				<Run Text="{x:Bind ViewModel.MediaContentLibraryViewModel.Files.Count,Mode=OneWay}" />
-			</TextBlock>
-			<TextBlock Visibility="{x:Bind ViewModel.MediaContentLibraryViewModel.SearchElapsedMilliseconds.Value,Mode=OneWay, Converter={StaticResource NullToCollapseConverter}}">
-				<Run Text="  /  Search: " />
-				<Run Text="{x:Bind ViewModel.MediaContentLibraryViewModel.SearchElapsedMilliseconds.Value,Mode=OneWay}" />
-				<Run Text=" ms" />
-			</TextBlock>
-			<Slider controls:DockPanel.Dock="Right"
-				TickFrequency="50"
-				TickPlacement="TopLeft"
-				StepFrequency="10"
-				Minimum="50"
-				Maximum="500"
-				Width="200"
-				Value="{x:Bind ViewModel.ItemSize.Value, Mode=TwoWay}" />
-		</controls:DockPanel>
+
 	</Grid>
 </local:ViewerSelectorUserControl>

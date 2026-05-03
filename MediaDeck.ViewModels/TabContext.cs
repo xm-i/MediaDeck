@@ -46,6 +46,10 @@ public class TabContext : ViewModelBase {
 		get;
 	}
 
+	public StatusBarViewModel StatusBarViewModel {
+		get;
+	}
+
 	public TabContext(TabStateModel tabState) {
 		this.TabState = tabState;
 		var sp = tabState.ServiceProvider;
@@ -57,6 +61,7 @@ public class TabContext : ViewModelBase {
 		this.FilterSelectorViewModel = sp.GetRequiredService<FilterSelectorViewModel>();
 		this.DetailSelectorViewModel = sp.GetRequiredService<DetailSelectorViewModel>();
 		this.RepositorySelectorViewModel = sp.GetRequiredService<RepositorySelectorViewModel>();
+		this.StatusBarViewModel = sp.GetRequiredService<StatusBarViewModel>().AddTo(this.CompositeDisposable);
 
 		this.ViewerSelectorViewModel.MediaContentLibraryViewModel.SelectedFiles.Subscribe(x => {
 			this.DetailSelectorViewModel.TargetFiles.Value = x.Select(v => v.FileModel).ToArray();
