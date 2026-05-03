@@ -13,8 +13,7 @@ public class ViewerSelectorViewModel : ViewModelBase {
 		WrapViewerViewModel wrapViewerViewModel,
 		ListViewerViewModel listViewerViewModel,
 		DetailViewerViewModel detailViewerViewModel,
-		MapViewerViewModel mapViewerViewModel,
-		SortSelectorViewModel sortSelectorViewModel) {
+		MapViewerViewModel mapViewerViewModel) {
 		this.MediaContentLibraryViewModel = mediaContentLibraryViewModel;
 		this.SearchConditionManagerViewModel = searchConditionManagerViewModel;
 		this.ViewerPaneViewModels = [
@@ -28,7 +27,6 @@ public class ViewerSelectorViewModel : ViewModelBase {
 		this.ListViewerViewModel = listViewerViewModel;
 		this.DetailViewerViewModel = detailViewerViewModel;
 		this.MapViewerViewModel = mapViewerViewModel;
-		this.SortSelectorViewModel = sortSelectorViewModel;
 
 		this.ItemSize = tabState.ViewerState.ItemSize.ToTwoWayBindableReactiveProperty(tabState.ViewerState.ItemSize.Value, this.CompositeDisposable).AddTo(this.CompositeDisposable);
 
@@ -70,10 +68,6 @@ public class ViewerSelectorViewModel : ViewModelBase {
 	}
 
 	public MapViewerViewModel MapViewerViewModel {
-		get;
-	}
-
-	public SortSelectorViewModel SortSelectorViewModel {
 		get;
 	}
 

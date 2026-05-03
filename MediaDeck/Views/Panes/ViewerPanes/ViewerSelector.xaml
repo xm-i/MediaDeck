@@ -5,49 +5,10 @@
 	xmlns:local="using:MediaDeck.Views.Panes.ViewerPanes"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-	xmlns:viewerpanesVm="using:MediaDeck.ViewModels.Panes.ViewerPanes"
 	xmlns:controls="using:CommunityToolkit.WinUI.Controls"
 	mc:Ignorable="d" >
 	<Grid>
-		<Grid.RowDefinitions>
-			<RowDefinition Height="auto" />
-			<RowDefinition Height="*" />
-		</Grid.RowDefinitions>
-		<Grid Grid.Row="0"
-			Padding="8,0"
-			Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" >
-			<Grid.ColumnDefinitions>
-				<ColumnDefinition Width="*" />
-				<ColumnDefinition Width="*" />
-				<ColumnDefinition Width="Auto" />
-			</Grid.ColumnDefinitions>
-
-			<StackPanel Grid.Column="3"
-				Orientation="Horizontal"
-				VerticalAlignment="Center"
-				Spacing="6" >
-				<ComboBox MinWidth="140"
-					ItemsSource="{x:Bind ViewModel.SortSelectorViewModel.SortConditions,Mode=OneWay}"
-					SelectedItem="{x:Bind ViewModel.SortSelectorViewModel.CurrentCondition.Value,Mode=TwoWay}" >
-					<ComboBox.ItemTemplate>
-						<DataTemplate x:DataType="viewerpanesVm:SortConditionViewModel" >
-							<TextBlock Text="{x:Bind DisplayName.Value}" />
-						</DataTemplate>
-					</ComboBox.ItemTemplate>
-				</ComboBox>
-				<ToggleButton
-					IsChecked="{x:Bind ViewModel.SortSelectorViewModel.Direction.Value, Mode=TwoWay, Converter={StaticResource ListSortDirectionToBooleanConverter}}" >
-					<FontIcon
-						Glyph="{x:Bind ViewModel.SortSelectorViewModel.Direction.Value, Mode=OneWay, Converter={StaticResource ListSortDirectionToIconGlyphConverter}}"
-						FontSize="14" />
-				</ToggleButton>
-				<Button Click="Button_Click" >
-					<FontIcon Glyph="&#xE713;"
-						FontSize="14" />
-				</Button>
-			</StackPanel>
-		</Grid>
-		<controls:SwitchPresenter Grid.Row="1"
+		<controls:SwitchPresenter
 			Value="{x:Bind ViewModel.SelectedViewerPane.Value,Mode=OneWay}" >
 			<controls:Case Value="{x:Bind ViewModel.WrapViewerViewModel,Mode=OneWay}" >
 				<local:WrapViewer ViewModel="{x:Bind ViewModel,Mode=OneWay}" />

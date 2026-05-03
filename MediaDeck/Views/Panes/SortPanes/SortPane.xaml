@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<local:SortPaneUserControl x:Class="MediaDeck.Views.Panes.SortPanes.SortPane"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:local="using:MediaDeck.Views.Panes.SortPanes"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:viewerpanesVm="using:MediaDeck.ViewModels.Panes.ViewerPanes"
+	mc:Ignorable="d" >
+
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+		</Grid.RowDefinitions>
+
+		<!-- Header -->
+		<Grid Grid.Row="0"
+			Padding="12,10"
+			Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+			BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+			BorderThickness="0,0,0,1" >
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="*" />
+				<ColumnDefinition Width="Auto" />
+			</Grid.ColumnDefinitions>
+			<StackPanel Grid.Column="0"
+				Orientation="Horizontal"
+				Spacing="8"
+				VerticalAlignment="Center" >
+				<FontIcon Glyph="&#xE8CB;"
+					FontSize="16" />
+				<TextBlock Text="Sort"
+					Style="{ThemeResource BodyStrongTextBlockStyle}"
+					VerticalAlignment="Center" />
+			</StackPanel>
+			<Button Grid.Column="2"
+				Click="OpenSortSettingsWindowButton_Click"
+				ToolTipService.ToolTip="Sort Settings" >
+				<FontIcon Glyph="&#xE713;"
+					FontSize="14" />
+			</Button>
+		</Grid>
+
+		<!-- Content -->
+		<Grid Grid.Row="1"
+			Padding="12,8"
+			Background="{ThemeResource LayerFillColorDefaultBrush}" >
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="*" />
+				<ColumnDefinition Width="Auto" />
+			</Grid.ColumnDefinitions>
+			<ComboBox Grid.Column="0"
+				HorizontalAlignment="Stretch"
+				ItemsSource="{x:Bind ViewModel.SortConditions,Mode=OneWay}"
+				SelectedItem="{x:Bind ViewModel.CurrentCondition.Value,Mode=TwoWay}" >
+				<ComboBox.ItemTemplate>
+					<DataTemplate x:DataType="viewerpanesVm:SortConditionViewModel" >
+						<TextBlock Text="{x:Bind DisplayName.Value}" />
+					</DataTemplate>
+				</ComboBox.ItemTemplate>
+			</ComboBox>
+			<ToggleButton Grid.Column="1"
+				Margin="6,0,0,0"
+				IsChecked="{x:Bind ViewModel.Direction.Value, Mode=TwoWay, Converter={StaticResource ListSortDirectionToBooleanConverter}}"
+				ToolTipService.ToolTip="Toggle Ascending / Descending" >
+				<FontIcon
+					Glyph="{x:Bind ViewModel.Direction.Value, Mode=OneWay, Converter={StaticResource ListSortDirectionToIconGlyphConverter}}"
+					FontSize="14" />
+			</ToggleButton>
+		</Grid>
+	</Grid>
+</local:SortPaneUserControl>

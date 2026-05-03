@@ -50,6 +50,10 @@ public class TabContext : ViewModelBase {
 		get;
 	}
 
+	public SortSelectorViewModel SortSelectorViewModel {
+		get;
+	}
+
 	public TabContext(TabStateModel tabState) {
 		this.TabState = tabState;
 		var sp = tabState.ServiceProvider;
@@ -59,6 +63,7 @@ public class TabContext : ViewModelBase {
 
 		this.ViewerSelectorViewModel = sp.GetRequiredService<ViewerSelectorViewModel>();
 		this.FilterSelectorViewModel = sp.GetRequiredService<FilterSelectorViewModel>();
+		this.SortSelectorViewModel = sp.GetRequiredService<SortSelectorViewModel>();
 		this.DetailSelectorViewModel = sp.GetRequiredService<DetailSelectorViewModel>();
 		this.RepositorySelectorViewModel = sp.GetRequiredService<RepositorySelectorViewModel>();
 		this.StatusBarViewModel = sp.GetRequiredService<StatusBarViewModel>().AddTo(this.CompositeDisposable);
