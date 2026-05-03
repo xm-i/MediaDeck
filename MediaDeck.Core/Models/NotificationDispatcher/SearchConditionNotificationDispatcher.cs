@@ -12,16 +12,12 @@ namespace MediaDeck.Core.Models.NotificationDispatcher;
 public class SearchConditionNotificationDispatcher : ISearchConditionNotificationDispatcher {
 	/// <summary>コンストラクタ</summary>
 	public SearchConditionNotificationDispatcher() {
-		// 検索ワード（トークン）の追加・削除・更新はユーザーのキーボード操作で高頻度に変化しうるため
-		// Debounce を挟んで無駄な検索発火を抑制する。
 		var searchConditionChanged = Observable.Merge(
 			this.AddRequest.Select(_ => Unit.Default),
 			this.RemoveRequest.Select(_ => Unit.Default),
 			this.UpdateRequest.Select(_ => Unit.Default),
-			this.SearchConditionChanged)
-			.Debounce(TimeSpan.FromMilliseconds(300));
+			this.SearchConditionChanged);
 
-		// ソート・フィルターは即時
 		var sortOrFilterChanged = Observable.Merge(
 			this.SortChanged,
 			this.FilterChanged);
@@ -31,6 +27,7 @@ public class SearchConditionNotificationDispatcher : ISearchConditionNotificatio
 			searchConditionChanged,
 			sortOrFilterChanged,
 			this.ReloadRequested)
+			.ThrottleLast(TimeSpan.FromMilliseconds(200))
 			.Publish()
 			.RefCount();
 	}

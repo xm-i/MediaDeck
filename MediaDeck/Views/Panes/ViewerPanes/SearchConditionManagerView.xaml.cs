@@ -83,7 +83,6 @@ public sealed partial class SearchConditionManagerView {
 
 	private void TokenizingTextBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args) {
 		this.ViewModel?.RefreshCommand.Execute(Unit.Default);
-
 	}
 }
 
