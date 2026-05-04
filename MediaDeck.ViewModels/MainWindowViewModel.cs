@@ -30,11 +30,11 @@ public class MainWindowViewModel : ViewModelBase {
 		this._windowState = windowStateProvider.State ?? throw new InvalidOperationException("WindowStateModel was not provided to the scope.");
 
 		this.Tabs = this._windowState.TabIds.ToWritableNotifyCollectionChanged(
-			tabId => {
-				var tabState = this._rootState.Tabs.FirstOrDefault(t => t.TabId == tabId)
-					?? throw new InvalidOperationException($"TabStateModel not found for TabId: {tabId}");
-				return new TabContext(tabState);
-			},
+				tabId => {
+					var tabState = this._rootState.Tabs.FirstOrDefault(t => t.TabId == tabId)
+						?? throw new InvalidOperationException($"TabStateModel not found for TabId: {tabId}");
+					return new TabContext(tabState);
+				},
 			(TabContext tabContext, Guid tabId, ref bool setValue) => {
 				setValue = true;
 				return tabContext.TabState.TabId;
@@ -98,6 +98,16 @@ public class MainWindowViewModel : ViewModelBase {
 		notifContext.TargetWindowIdResolver = () => {
 			return stateStore.RootState.Windows.FirstOrDefault(w => w.TabIds.Contains(tabState.TabId))?.WindowId;
 		};
+
+		// AppStateのデフォルトタブ状態を新規タブに適用
+		var defaultSearch = stateStore.AppState.DefaultTabSearchState;
+		var defaultViewer = stateStore.AppState.DefaultTabViewerState;
+		tabState.SearchState.CurrentSortCondition.Value = defaultSearch.CurrentSortCondition.Value;
+		tabState.SearchState.SortDirection.Value = defaultSearch.SortDirection.Value;
+		tabState.SearchState.CurrentFilteringConditions.Value = [.. defaultSearch.CurrentFilteringConditions.Value];
+		tabState.ViewerState.ItemSize.Value = defaultViewer.ItemSize.Value;
+		tabState.ViewerState.ShowOverlay.Value = defaultViewer.ShowOverlay.Value;
+		tabState.ViewerState.ShowInfo.Value = defaultViewer.ShowInfo.Value;
 
 		// ルートの状態リストに追加
 		this._rootState.Tabs.Add(tabState);

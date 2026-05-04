@@ -1,5 +1,6 @@
 using MediaDeck.Common.Base;
 using MediaDeck.Composition.Stores.State.Model;
+using MediaDeck.Core.Stores.State;
 using MediaDeck.ViewModels.Panes.DetailPanes;
 using MediaDeck.ViewModels.Panes.FilterPanes;
 using MediaDeck.ViewModels.Panes.RepositoryPanes;
@@ -72,8 +73,29 @@ public class TabContext : ViewModelBase {
 			this.DetailSelectorViewModel.TargetFiles.Value = x.Select(v => v.FileModel).ToArray();
 		}).AddTo(this.CompositeDisposable);
 
+		// タブの状態変更をAppStateのデフォルトタブ状態に同期
+		this.SubscribeDefaultTabStateSync(sp.GetRequiredService<IStateStore>().AppState);
+
 		// 初回ロード
 		this.ViewerSelectorViewModel.MediaContentLibraryViewModel.Reload();
+	}
+
+	/// <summary>
+	/// タブの状態変更をAppStateのデフォルトタブ状態に同期する
+	/// </summary>
+	private void SubscribeDefaultTabStateSync(AppStateModel appState) {
+		var defaultSearch = appState.DefaultTabSearchState;
+		var defaultViewer = appState.DefaultTabViewerState;
+
+		// SearchState の同期
+		this.TabState.SearchState.CurrentSortCondition.Subscribe(v => defaultSearch.CurrentSortCondition.Value = v).AddTo(this.CompositeDisposable);
+		this.TabState.SearchState.SortDirection.Subscribe(v => defaultSearch.SortDirection.Value = v).AddTo(this.CompositeDisposable);
+		this.TabState.SearchState.CurrentFilteringConditions.Subscribe(v => defaultSearch.CurrentFilteringConditions.Value = v).AddTo(this.CompositeDisposable);
+
+		// ViewerState の同期
+		this.TabState.ViewerState.ItemSize.Subscribe(v => defaultViewer.ItemSize.Value = v).AddTo(this.CompositeDisposable);
+		this.TabState.ViewerState.ShowOverlay.Subscribe(v => defaultViewer.ShowOverlay.Value = v).AddTo(this.CompositeDisposable);
+		this.TabState.ViewerState.ShowInfo.Subscribe(v => defaultViewer.ShowInfo.Value = v).AddTo(this.CompositeDisposable);
 	}
 
 	protected override void Dispose(bool disposing) {
