@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -154,6 +155,9 @@ public partial class App {
 
 		var backgroundTasksViewModel = Ioc.Default.GetRequiredService<BackgroundTasksViewModel>();
 		backgroundTasksViewModel.Start();
+
+		var _ = this._stateStore.RootState.AppState.DefaultTabState.SearchState.CurrentSortCondition.Subscribe(x => Debug.WriteLine($"CurrentSortCondition {x}"));
+		_ = this._stateStore.RootState.AppState.DefaultTabState.SearchState.SortDirection.Subscribe(x => Debug.WriteLine($"SortDirection {x}"));
 
 		FlyleafLib.Engine.Start(new FlyleafLib.EngineConfig() {
 #if DEBUG

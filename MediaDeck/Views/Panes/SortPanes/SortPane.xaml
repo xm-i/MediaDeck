@@ -52,9 +52,11 @@
 				<ColumnDefinition Width="Auto" />
 			</Grid.ColumnDefinitions>
 			<ComboBox Grid.Column="0"
+				x:Name="CurrentCondition"
 				HorizontalAlignment="Stretch"
 				ItemsSource="{x:Bind ViewModel.SortConditions,Mode=OneWay}"
-				SelectedItem="{x:Bind ViewModel.CurrentCondition.Value,Mode=TwoWay}" >
+				SelectedItem="{x:Bind ViewModel.CurrentCondition.Value,Mode=OneWay}"
+				SelectionChanged="CurrentCondition_SelectionChanged">
 				<ComboBox.ItemTemplate>
 					<DataTemplate x:DataType="viewerpanesVm:SortConditionViewModel" >
 						<TextBlock Text="{x:Bind DisplayName.Value}" />
@@ -62,8 +64,11 @@
 				</ComboBox.ItemTemplate>
 			</ComboBox>
 			<ToggleButton Grid.Column="1"
+				x:Name="DirectionToggleButton"
 				Margin="6,0,0,0"
-				IsChecked="{x:Bind ViewModel.Direction.Value, Mode=TwoWay, Converter={StaticResource ListSortDirectionToBooleanConverter}}"
+				IsChecked="{x:Bind ViewModel.Direction.Value, Mode=OneWay, Converter={StaticResource ListSortDirectionToBooleanConverter}}"
+				Checked="DirectionToggleButton_Checked"
+				Unchecked="DirectionToggleButton_Unchecked"
 				ToolTipService.ToolTip="Toggle Ascending / Descending" >
 				<FontIcon
 					Glyph="{x:Bind ViewModel.Direction.Value, Mode=OneWay, Converter={StaticResource ListSortDirectionToIconGlyphConverter}}"

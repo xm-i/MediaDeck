@@ -17,6 +17,10 @@ public sealed partial class FilterSelector {
 	}
 
 	private void FilterSelector_Loaded(object sender, RoutedEventArgs e) {
+		if(this.ViewModel == null) {
+			return;
+		}
+		this.ViewModel.UIReadyCommand.Execute(Unit.Default);
 		this.Bindings.Update();
 		this.SyncListSelectionFromViewModel(this.ViewModel.SelectedConditions.Value);
 		this._selectedConditionsSubscription?.Dispose();
@@ -66,6 +70,20 @@ public sealed partial class FilterSelector {
 		base.OnViewModelChanged(oldViewModel, newViewModel);
 		this._selectedConditionsSubscription?.Dispose();
 		this._selectedConditionsSubscription = null;
+	}
+
+	private void FilteringCondisionListBox_ItemClick(object sender, ItemClickEventArgs e) {
+		if (this._isSyncingSelection) {
+			return;
+		}
+		if (this.ViewModel == null) {
+			return;
+		}
+		if (sender is not ListView listView) {
+			return;
+		}
+		var selected = listView.SelectedItems.OfType<FilteringConditionViewModel>().ToArray();
+		this.ViewModel.ChangeFilteringConditionSelectionCommand.Execute(selected);
 	}
 }
 

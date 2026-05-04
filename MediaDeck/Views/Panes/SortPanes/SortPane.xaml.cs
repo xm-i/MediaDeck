@@ -1,3 +1,5 @@
+using System.ComponentModel;
+
 using CommunityToolkit.Mvvm.DependencyInjection;
 
 using MediaDeck.Services;
@@ -25,6 +27,23 @@ public sealed partial class SortPane {
 			return;
 		}
 		Ioc.Default.GetRequiredService<WindowService>().ActivateCenteredOnMainWindow(window, parent);
+	}
+
+	private void CurrentCondition_SelectionChanged(object sender, Microsoft.UI.Xaml.Controls.SelectionChangedEventArgs e) {
+		var selected = e.AddedItems.FirstOrDefault();
+		if (selected is not SortConditionViewModel scvm) {
+			return;
+		}
+		this.ViewModel?.CurrentCondition.Value = scvm;
+	}
+
+
+	private void DirectionToggleButton_Checked(object sender, RoutedEventArgs e) {
+		this.ViewModel?.Direction.Value = ListSortDirection.Ascending;
+	}
+
+	private void DirectionToggleButton_Unchecked(object sender, RoutedEventArgs e) {
+		this.ViewModel?.Direction.Value = ListSortDirection.Descending;
 	}
 }
 

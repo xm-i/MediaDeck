@@ -88,15 +88,16 @@ public class TabContext : ViewModelBase {
 		var defaultViewer = appState.DefaultTabState.ViewerState;
 
 		// SearchState の同期
-		this.TabState.SearchState.CurrentSortCondition.Subscribe(v => defaultSearch.CurrentSortCondition.Value = v).AddTo(this.CompositeDisposable);
-		this.TabState.SearchState.SortDirection.Subscribe(v => defaultSearch.SortDirection.Value = v).AddTo(this.CompositeDisposable);
-		this.TabState.SearchState.CurrentFilteringConditions.Subscribe(v => defaultSearch.CurrentFilteringConditions.Value = v).AddTo(this.CompositeDisposable);
+		this.TabState.SearchState.CurrentSortCondition.Skip(1).Subscribe(v => defaultSearch.CurrentSortCondition.Value = v).AddTo(this.CompositeDisposable);
+		this.TabState.SearchState.SortDirection.Skip(1).Subscribe(v => defaultSearch.SortDirection.Value = v).AddTo(this.CompositeDisposable);
+		this.TabState.SearchState.CurrentFilteringConditions.Skip(1).Subscribe(v => defaultSearch.CurrentFilteringConditions.Value = v).AddTo(this.CompositeDisposable);
 
 		// ViewerState の同期
-		this.TabState.ViewerState.ItemSize.Subscribe(v => defaultViewer.ItemSize.Value = v).AddTo(this.CompositeDisposable);
-		this.TabState.ViewerState.ShowOverlay.Subscribe(v => defaultViewer.ShowOverlay.Value = v).AddTo(this.CompositeDisposable);
-		this.TabState.ViewerState.ShowInfo.Subscribe(v => defaultViewer.ShowInfo.Value = v).AddTo(this.CompositeDisposable);
+		this.TabState.ViewerState.ItemSize.Skip(1).Subscribe(v => defaultViewer.ItemSize.Value = v).AddTo(this.CompositeDisposable);
+		this.TabState.ViewerState.ShowOverlay.Skip(1).Subscribe(v => defaultViewer.ShowOverlay.Value = v).AddTo(this.CompositeDisposable);
+		this.TabState.ViewerState.ShowInfo.Skip(1).Subscribe(v => defaultViewer.ShowInfo.Value = v).AddTo(this.CompositeDisposable);
 	}
+
 
 	protected override void Dispose(bool disposing) {
 		if (disposing) {
