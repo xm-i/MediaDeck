@@ -84,8 +84,8 @@ public class TabContext : ViewModelBase {
 	/// タブの状態変更をAppStateのデフォルトタブ状態に同期する
 	/// </summary>
 	private void SubscribeDefaultTabStateSync(AppStateModel appState) {
-		var defaultSearch = appState.DefaultTabSearchState;
-		var defaultViewer = appState.DefaultTabViewerState;
+		var defaultSearch = appState.DefaultTabState.SearchState;
+		var defaultViewer = appState.DefaultTabState.ViewerState;
 
 		// SearchState の同期
 		this.TabState.SearchState.CurrentSortCondition.Subscribe(v => defaultSearch.CurrentSortCondition.Value = v).AddTo(this.CompositeDisposable);

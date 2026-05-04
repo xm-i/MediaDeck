@@ -83,7 +83,7 @@ public class StateStoreTests : IDisposable {
 		// The constructor invokes Load automatically
 		var store = new TestableStateStore(this._serviceProviderMock.Object, this._serviceProviderMock.Object.GetRequiredService<IAppPathProvider>());
 
-		store.AppState.ShouldNotBeNull();
+		store.RootState.AppState.ShouldNotBeNull();
 		this._serviceProviderMock.Verify(x => x.GetService(typeof(AppStateModel)), Times.Once);
 	}
 
@@ -108,7 +108,7 @@ public class StateStoreTests : IDisposable {
 
 		var store = new TestableStateStore(this._serviceProviderMock.Object, this._serviceProviderMock.Object.GetRequiredService<IAppPathProvider>());
 
-		store.AppState.ShouldNotBeNull();
+		store.RootState.AppState.ShouldNotBeNull();
 		this._serviceProviderMock.Verify(x => x.GetService(typeof(AppStateModel)), Times.Once);
 	}
 

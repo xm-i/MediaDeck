@@ -91,7 +91,7 @@ public class MainWindowViewModel : ViewModelBase {
 	public void AddTab() {
 		var scope = this._rootServiceProvider.CreateScope();
 		var tabState = scope.ServiceProvider.GetRequiredService<TabStateModel>();
-		for(var num = 1; true; num++) {
+		for (var num = 1; true; num++) {
 			var tabName = $"Tab {num}";
 			if (this._rootState.Tabs.All(t => t.DisplayName.Value != tabName)) {
 				tabState.DisplayName.Value = tabName;
@@ -107,14 +107,15 @@ public class MainWindowViewModel : ViewModelBase {
 		};
 
 		// AppStateのデフォルトタブ状態を新規タブに適用
-		var defaultSearch = stateStore.RootState.AppState.DefaultTabSearchState;
-		var defaultViewer = stateStore.RootState.AppState.DefaultTabViewerState;
+		var defaultSearch = stateStore.RootState.AppState.DefaultTabState.SearchState;
+		var defaultViewer = stateStore.RootState.AppState.DefaultTabState.ViewerState;
 		tabState.SearchState.CurrentSortCondition.Value = defaultSearch.CurrentSortCondition.Value;
 		tabState.SearchState.SortDirection.Value = defaultSearch.SortDirection.Value;
 		tabState.SearchState.CurrentFilteringConditions.Value = [.. defaultSearch.CurrentFilteringConditions.Value];
 		tabState.ViewerState.ItemSize.Value = defaultViewer.ItemSize.Value;
 		tabState.ViewerState.ShowOverlay.Value = defaultViewer.ShowOverlay.Value;
 		tabState.ViewerState.ShowInfo.Value = defaultViewer.ShowInfo.Value;
+
 
 		// ルートの状態リストに追加
 		this._rootState.Tabs.Add(tabState);
