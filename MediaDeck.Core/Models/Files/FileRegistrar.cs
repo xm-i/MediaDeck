@@ -5,7 +5,7 @@ using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.MediaItemTypes;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.Models;
 using MediaDeck.Composition.Stores.Config.Model;
-using MediaDeck.Composition.Stores.State.Model.Objects;
+using MediaDeck.Composition.Stores.Config.Model.Objects;
 using MediaDeck.Core.Models.NotificationDispatcher;
 
 using Microsoft.Extensions.Logging;

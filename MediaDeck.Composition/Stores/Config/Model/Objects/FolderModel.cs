@@ -1,6 +1,6 @@
 using R3.JsonConfig.Attributes;
 
-namespace MediaDeck.Composition.Stores.State.Model.Objects;
+namespace MediaDeck.Composition.Stores.Config.Model.Objects;
 
 [Inject(InjectServiceLifetime.Transient)]
 [GenerateR3JsonConfigDto]

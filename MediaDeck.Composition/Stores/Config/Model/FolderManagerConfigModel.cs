@@ -1,15 +1,15 @@
-using MediaDeck.Composition.Stores.State.Model.Objects;
+using MediaDeck.Composition.Stores.Config.Model.Objects;
 
 using R3.JsonConfig.Attributes;
 
-namespace MediaDeck.Composition.Stores.State.Model;
+namespace MediaDeck.Composition.Stores.Config.Model;
 
 /// <summary>
-/// フォルダ管理状態
+/// フォルダ管理設定
 /// </summary>
 [Inject(InjectServiceLifetime.Singleton)]
 [GenerateR3JsonConfigDto]
-public class FolderManagerStateModel {
+public class FolderManagerConfigModel {
 	/// <summary>
 	/// 管理対象フォルダリスト
 	/// </summary>

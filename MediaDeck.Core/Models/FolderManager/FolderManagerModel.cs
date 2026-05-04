@@ -1,6 +1,6 @@
 using MediaDeck.Common.Base;
-using MediaDeck.Composition.Stores.State.Model;
-using MediaDeck.Composition.Stores.State.Model.Objects;
+using MediaDeck.Composition.Stores.Config.Model;
+using MediaDeck.Composition.Stores.Config.Model.Objects;
 using MediaDeck.Core.Models.Files;
 
 namespace MediaDeck.Core.Models.FolderManager;
@@ -8,12 +8,12 @@ namespace MediaDeck.Core.Models.FolderManager;
 [Inject(InjectServiceLifetime.Transient)]
 public class FolderManagerModel : ModelBase {
 	private readonly FileRegistrar _fileRegistrar;
-	private readonly FolderManagerStateModel _folderManagerStates;
+	private readonly FolderManagerConfigModel _folderManagerConfig;
 
-	public FolderManagerModel(FileRegistrar fileRegistrar, FolderManagerStateModel folderManagerStates) {
+	public FolderManagerModel(FileRegistrar fileRegistrar, FolderManagerConfigModel folderManagerConfig) {
 		this._fileRegistrar = fileRegistrar;
-		this._folderManagerStates = folderManagerStates;
-		this.Folders = this._folderManagerStates.Folders;
+		this._folderManagerConfig = folderManagerConfig;
+		this.Folders = this._folderManagerConfig.Folders;
 	}
 
 	public ObservableList<FolderModel> Folders {
@@ -21,11 +21,11 @@ public class FolderManagerModel : ModelBase {
 	} = [];
 
 	public void AddFolder(string folderPath) {
-		this._folderManagerStates.Folders.Add(new FolderModel() { FolderPath = folderPath });
+		this._folderManagerConfig.Folders.Add(new FolderModel() { FolderPath = folderPath });
 	}
 
 	public void RemoveFolder(FolderModel folder) {
-		this._folderManagerStates.Folders.Remove(folder);
+		this._folderManagerConfig.Folders.Remove(folder);
 	}
 
 	public async Task Scan() {

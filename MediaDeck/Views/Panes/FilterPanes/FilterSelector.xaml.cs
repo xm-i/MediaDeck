@@ -17,7 +17,7 @@ public sealed partial class FilterSelector {
 	}
 
 	private void FilterSelector_Loaded(object sender, RoutedEventArgs e) {
-		if(this.ViewModel == null) {
+		if (this.ViewModel == null) {
 			return;
 		}
 		this.ViewModel.UIReadyCommand.Execute(Unit.Default);

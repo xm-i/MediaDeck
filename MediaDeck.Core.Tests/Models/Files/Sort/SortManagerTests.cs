@@ -26,7 +26,6 @@ public class SortManagerTests {
 		services.AddTransient<SortObject>(sp => new SortObject(sp));
 		services.AddTransient<SortItemObject>();
 		services.AddSingleton<SearchStateModel>();
-		services.AddSingleton<FolderManagerStateModel>();
 		services.AddSingleton<ViewerStateModel>();
 		services.AddSingleton<AppStateModel>();
 		services.AddSingleton<TabStateModel>();

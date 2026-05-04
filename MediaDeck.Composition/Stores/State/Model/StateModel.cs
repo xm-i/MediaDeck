@@ -8,12 +8,7 @@ namespace MediaDeck.Composition.Stores.State.Model;
 /// </summary>
 [Inject(InjectServiceLifetime.Singleton)]
 [GenerateR3JsonConfigDto]
-public class AppStateModel(FolderManagerStateModel folderManagerState, SearchDefinitionsStateModel searchDefinitions, DefaultTabStateModel defaultTabState) {
-	public FolderManagerStateModel FolderManagerState {
-		get;
-		set;
-	} = folderManagerState;
-
+public class AppStateModel(SearchDefinitionsStateModel searchDefinitions, DefaultTabStateModel defaultTabState) {
 	public SearchDefinitionsStateModel SearchDefinitions {
 		get;
 		set;
@@ -35,4 +30,3 @@ public class AppStateModel(FolderManagerStateModel folderManagerState, SearchDef
 		set;
 	} = defaultTabState;
 }
-
