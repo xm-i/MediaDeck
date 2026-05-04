@@ -26,7 +26,7 @@ public class TabStateModel(IServiceProvider serviceProvider, SearchStateModel se
 	public ReactiveProperty<string> DisplayName {
 		get;
 		set;
-	} = new("New Tab");
+	} = new();
 
 	public SearchStateModel SearchState {
 		get;

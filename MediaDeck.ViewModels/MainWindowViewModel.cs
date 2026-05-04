@@ -91,6 +91,13 @@ public class MainWindowViewModel : ViewModelBase {
 	public void AddTab() {
 		var scope = this._rootServiceProvider.CreateScope();
 		var tabState = scope.ServiceProvider.GetRequiredService<TabStateModel>();
+		for(var num = 1; true; num++) {
+			var tabName = $"Tab {num}";
+			if (this._rootState.Tabs.All(t => t.DisplayName.Value != tabName)) {
+				tabState.DisplayName.Value = tabName;
+				break;
+			}
+		}
 
 		// 通知コンテキストの初期化（所属するWindowを動的に検索する）
 		var notifContext = scope.ServiceProvider.GetRequiredService<NotificationContextProvider>();
