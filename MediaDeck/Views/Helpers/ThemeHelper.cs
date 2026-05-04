@@ -17,7 +17,7 @@ public static class ThemeHelper {
 	/// <param name="stateStore">状態ストア</param>
 	/// <param name="disposable">購読管理用のCompositeDisposable</param>
 	public static void BindTheme(Window window, IStateStore stateStore, CompositeDisposable disposable) {
-		stateStore.AppState.Theme
+		stateStore.RootState.AppState.Theme
 			.Subscribe(theme => {
 				var targetTheme = theme switch {
 					AppTheme.Light => ElementTheme.Light,
@@ -73,7 +73,7 @@ public static class ThemeHelper {
 	/// <param name="stateStore">状態ストア</param>
 	/// <param name="disposable">購読管理用のCompositeDisposable</param>
 	public static void BindTheme(FrameworkElement element, IStateStore stateStore, CompositeDisposable disposable) {
-		stateStore.AppState.Theme
+		stateStore.RootState.AppState.Theme
 			.Subscribe(theme => {
 				element.RequestedTheme = theme switch {
 					AppTheme.Light => ElementTheme.Light,

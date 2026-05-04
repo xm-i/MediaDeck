@@ -34,12 +34,12 @@ public class NavigationMenuViewModel : ViewModelBase {
 			.ToBindableReactiveProperty(fileChangeMonitorService.Tracker.UnprocessedChanges.Count > 0)
 			.AddTo(this.CompositeDisposable);
 
-		this.CurrentTheme = stateStore.AppState.Theme
+		this.CurrentTheme = stateStore.RootState.AppState.Theme
 			.ToTwoWayBindableReactiveProperty()
 			.AddTo(this.CompositeDisposable);
 
 		this.SetThemeCommand.Subscribe(theme => {
-			stateStore.AppState.Theme.Value = theme;
+			stateStore.RootState.AppState.Theme.Value = theme;
 		}).AddTo(this.CompositeDisposable);
 	}
 }

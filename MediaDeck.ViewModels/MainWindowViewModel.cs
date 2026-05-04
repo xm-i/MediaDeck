@@ -100,8 +100,8 @@ public class MainWindowViewModel : ViewModelBase {
 		};
 
 		// AppStateのデフォルトタブ状態を新規タブに適用
-		var defaultSearch = stateStore.AppState.DefaultTabSearchState;
-		var defaultViewer = stateStore.AppState.DefaultTabViewerState;
+		var defaultSearch = stateStore.RootState.AppState.DefaultTabSearchState;
+		var defaultViewer = stateStore.RootState.AppState.DefaultTabViewerState;
 		tabState.SearchState.CurrentSortCondition.Value = defaultSearch.CurrentSortCondition.Value;
 		tabState.SearchState.SortDirection.Value = defaultSearch.SortDirection.Value;
 		tabState.SearchState.CurrentFilteringConditions.Value = [.. defaultSearch.CurrentFilteringConditions.Value];

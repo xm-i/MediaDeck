@@ -7,10 +7,6 @@ public interface IStateStore {
 		get;
 	}
 
-	public AppStateModel AppState {
-		get;
-	}
-
 	public RootStateModel RootState {
 		get;
 	}

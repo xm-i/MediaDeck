@@ -74,7 +74,7 @@ public class TabContext : ViewModelBase {
 		}).AddTo(this.CompositeDisposable);
 
 		// タブの状態変更をAppStateのデフォルトタブ状態に同期
-		this.SubscribeDefaultTabStateSync(sp.GetRequiredService<IStateStore>().AppState);
+		this.SubscribeDefaultTabStateSync(sp.GetRequiredService<IStateStore>().RootState.AppState);
 
 		// 初回ロード
 		this.ViewerSelectorViewModel.MediaContentLibraryViewModel.Reload();

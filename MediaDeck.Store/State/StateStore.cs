@@ -27,11 +27,6 @@ public class StateStore : DisposableBase, IStateStore {
 		get;
 	}
 
-	public AppStateModel AppState {
-		get;
-		private set;
-	}
-
 	public RootStateModel RootState {
 		get;
 		private set;
@@ -63,7 +58,6 @@ public class StateStore : DisposableBase, IStateStore {
 	/// <summary>
 	///     保存済み設定を読み込みます。
 	/// </summary>
-	[MemberNotNull(nameof(AppState))]
 	[MemberNotNull(nameof(RootState))]
 	public void Load() {
 		var scope = this.ScopedService.CreateScope().AddTo(this.CompositeDisposable);
@@ -75,7 +69,6 @@ public class StateStore : DisposableBase, IStateStore {
 					var loaded = JsonSerializer.Deserialize<RootStateModelForJson>(json, this.JsonSerializerOptions);
 					if (loaded != null) {
 						this.RootState = RootStateModelForJson.CreateModel(loaded, scope.ServiceProvider);
-						this.AppState = this.RootState.AppState;
 						this._logger.LogInformation("状態設定の読み込みに成功しました");
 						return;
 					}
@@ -99,8 +92,8 @@ public class StateStore : DisposableBase, IStateStore {
 
 		// デフォルト状態を作成
 		try {
-			this.AppState = scope.ServiceProvider.GetRequiredService<AppStateModel>();
-			this.RootState = new RootStateModel(this.AppState);
+			var appState = scope.ServiceProvider.GetRequiredService<AppStateModel>();
+			this.RootState = new RootStateModel(appState);
 			this._logger.LogWarning("デフォルトの状態設定を使用します");
 		} catch (Exception ex) {
 			this._logger.LogError(ex, "デフォルト状態設定の作成に失敗しました");
