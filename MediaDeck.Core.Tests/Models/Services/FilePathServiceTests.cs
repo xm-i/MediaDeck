@@ -20,6 +20,7 @@ public class FilePathServiceTests {
 		services.AddTransient<ExtensionObjectModel>();
 		services.AddSingleton<ScanConfigModel>();
 		services.AddSingleton<SearchConfigModel>();
+		services.AddSingleton<FolderManagerConfigModel>();
 		services.AddSingleton<ConfigModel>();
 
 		var provider = services.BuildServiceProvider();

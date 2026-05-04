@@ -28,6 +28,7 @@ public class SortManagerTests {
 		services.AddSingleton<SearchStateModel>();
 		services.AddSingleton<ViewerStateModel>();
 		services.AddSingleton<AppStateModel>();
+		services.AddSingleton<DefaultTabStateModel>();
 		services.AddSingleton<TabStateModel>();
 		services.AddSingleton<SearchDefinitionsStateModel>();
 		services.AddLogging();
