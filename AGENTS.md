@@ -33,6 +33,9 @@
   - `Dispose(bool)` のオーバーライドで独自リソースを解放する場合は、必ず `base.Dispose(disposing)` を呼ぶこと。
   - Viewのコードビハインドでは `Unloaded` イベント等で `(this.DataContext as IDisposable)?.Dispose()` を呼び、ViewModelのDisposeを確実にトリガーすること。
 - **設定管理**: アプリケーション設定は `R3.JsonConfig` を利用して管理・永続化を行う。
+- **TabState拡張時の必須更新 (重要)**: `TabStateModel` / `SearchStateModel` / `ViewerStateModel` に新しい状態プロパティを追加した場合、必ず次の2箇所も同時に更新すること。
+  - `MainWindowViewModel.AddTab`: `AppState.DefaultTabState` から新規 `tabState` へ初期値をコピーする処理を追加する。
+  - `TabContext.SubscribeDefaultTabStateSync`: タブ側変更を `AppState.DefaultTabState` へ反映する購読処理を追加する。
 - **ロギング**: プロジェクト全体のログ出力には `Serilog` を使用する。
 - **DIとサービス管理**: `AutoDiAttributes` などを活用してDIの自動登録を行い、コンポーネント間は疎結合に保つ。
 - **R3/ObservableCollectionsのバインディング (非常に重要)**: `ObservableList<T>` や `ObservableDictionary<K, V>` はそのままでは WinUI 3 の UI にバインドできません。ViewModel では `.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current)` を使用して、UI スレッドへの同期を伴う `INotifyCollectionChangedSynchronizedViewList<T>` 等に変換して公開してください。

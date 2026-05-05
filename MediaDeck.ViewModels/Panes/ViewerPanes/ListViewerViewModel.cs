@@ -18,7 +18,7 @@ public class ListViewerViewModel : ViewerPaneViewModelBase {
 		public const string Rate = "Rate";
 	}
 
-	public ListViewerViewModel(FilesManager filesManager, TabStateModel tabState) : base("List", "\uE8FD", filesManager) {
+	public ListViewerViewModel(FilesManager filesManager, TabStateModel tabState) : base(ViewerType.List, "List", "\uE8FD", filesManager) {
 		var viewerState = tabState.ViewerState;
 
 		this.ThumbnailColumn = new ListViewerColumn(ColumnIds.Thumbnail, "", 60, minWidth: 20, canHide: false);

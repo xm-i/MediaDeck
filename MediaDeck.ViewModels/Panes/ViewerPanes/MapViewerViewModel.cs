@@ -1,8 +1,7 @@
+using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Core.Models.Files;
 
 namespace MediaDeck.ViewModels.Panes.ViewerPanes;
 
 [Inject(InjectServiceLifetime.Transient)]
-public class MapViewerViewModel : ViewerPaneViewModelBase {
-	public MapViewerViewModel(FilesManager filesManager) : base("Map", "\uE800", filesManager) { }
-}
+public class MapViewerViewModel(FilesManager filesManager) : ViewerPaneViewModelBase(ViewerType.Map, "Map", "\uE800", filesManager);

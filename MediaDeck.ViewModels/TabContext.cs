@@ -94,6 +94,7 @@ public class TabContext : ViewModelBase {
 
 		// ViewerState の同期
 		this.TabState.ViewerState.ItemSize.Skip(1).Subscribe(v => defaultViewer.ItemSize.Value = v).AddTo(this.CompositeDisposable);
+		this.TabState.ViewerState.ActiveViewer.Skip(1).Subscribe(v => defaultViewer.ActiveViewer.Value = v).AddTo(this.CompositeDisposable);
 		this.TabState.ViewerState.ShowOverlay.Skip(1).Subscribe(v => defaultViewer.ShowOverlay.Value = v).AddTo(this.CompositeDisposable);
 		this.TabState.ViewerState.ShowInfo.Skip(1).Subscribe(v => defaultViewer.ShowInfo.Value = v).AddTo(this.CompositeDisposable);
 

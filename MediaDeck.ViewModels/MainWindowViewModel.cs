@@ -113,6 +113,7 @@ public class MainWindowViewModel : ViewModelBase {
 		tabState.SearchState.SortDirection.Value = defaultSearch.SortDirection.Value;
 		tabState.SearchState.CurrentFilteringConditions.Value = [.. defaultSearch.CurrentFilteringConditions.Value];
 		tabState.ViewerState.ItemSize.Value = defaultViewer.ItemSize.Value;
+		tabState.ViewerState.ActiveViewer.Value = defaultViewer.ActiveViewer.Value;
 		tabState.ViewerState.ShowOverlay.Value = defaultViewer.ShowOverlay.Value;
 		tabState.ViewerState.ShowInfo.Value = defaultViewer.ShowInfo.Value;
 

@@ -1,10 +1,15 @@
 using MediaDeck.Common.Base;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.ViewModels;
+using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Core.Models.Files;
 
 namespace MediaDeck.ViewModels.Panes.ViewerPanes;
 
-public abstract class ViewerPaneViewModelBase(string name, string iconGlyph, FilesManager filesManager) : ViewModelBase {
+public abstract class ViewerPaneViewModelBase(ViewerType viewerType, string name, string iconGlyph, FilesManager filesManager) : ViewModelBase {
+	public ViewerType ViewerType {
+		get;
+	} = viewerType;
+
 	public string Name {
 		get;
 	} = name;

@@ -22,11 +22,12 @@ public class ViewerSelectorViewModel : ViewModelBase {
 			detailViewerViewModel,
 			mapViewerViewModel
 		];
-		this.SelectedViewerPane.Value = wrapViewerViewModel;
 		this.WrapViewerViewModel = wrapViewerViewModel;
 		this.ListViewerViewModel = listViewerViewModel;
 		this.DetailViewerViewModel = detailViewerViewModel;
 		this.MapViewerViewModel = mapViewerViewModel;
+
+		this.SelectedViewerPane.Value = this.ViewerPaneViewModels.FirstOrDefault(x => x.ViewerType == tabState.ViewerState.ActiveViewer.Value) ?? wrapViewerViewModel;
 
 		this.ItemSize = tabState.ViewerState.ItemSize.ToTwoWayBindableReactiveProperty(tabState.ViewerState.ItemSize.Value, this.CompositeDisposable).AddTo(this.CompositeDisposable);
 
@@ -37,6 +38,9 @@ public class ViewerSelectorViewModel : ViewModelBase {
 			.Subscribe(x => {
 				x.Previous?.IsSelected.Value = false;
 				x.Current?.IsSelected.Value = true;
+				if (x.Current is not null) {
+					tabState.ViewerState.ActiveViewer.Value = x.Current.ViewerType;
+				}
 			})
 			.AddTo(this.CompositeDisposable);
 

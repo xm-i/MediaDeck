@@ -13,6 +13,13 @@ public class ViewerStateModel {
 	} = new(150);
 
 	/// <summary>
+	/// 現在選択されているビューワーの種類
+	/// </summary>
+	public ReactiveProperty<ViewerType> ActiveViewer {
+		get;
+	} = new(ViewerType.Wrap);
+
+	/// <summary>
 	/// サムネイル上オーバーレイ表示
 	/// </summary>
 	public ReactiveProperty<bool> ShowOverlay {
