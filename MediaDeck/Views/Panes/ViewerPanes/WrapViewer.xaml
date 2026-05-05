@@ -27,7 +27,7 @@
 			ItemContainerStyle="{StaticResource MediaCardStyle}" >
 			<GridView.ItemsPanel>
 				<ItemsPanelTemplate>
-					<ItemsWrapGrid x:Name="WrapGrid" Orientation="Horizontal" HorizontalAlignment="Center" Loaded="WrapGrid_Loaded" />
+					<ItemsWrapGrid x:Name="WrapGrid" Orientation="Horizontal" HorizontalAlignment="Left" Loaded="WrapGrid_Loaded" />
 				</ItemsPanelTemplate>
 			</GridView.ItemsPanel>
 			<GridView.Resources>
