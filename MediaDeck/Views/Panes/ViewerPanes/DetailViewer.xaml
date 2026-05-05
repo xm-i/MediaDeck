@@ -13,8 +13,10 @@
 			<RowDefinition Height="*" />
 			<RowDefinition Height="auto" />
 		</Grid.RowDefinitions>
+
 		<local:SearchConditionManagerView Grid.Row="0" ViewModel="{x:Bind ViewModel.SearchConditionManagerViewModel, Mode=OneWay}" />
-		<Grid Grid.Row="1" >
+
+		<Grid Grid.Row="1" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 			<ContentControl
 				HorizontalAlignment="Stretch"
 				VerticalAlignment="Stretch"
@@ -23,34 +25,51 @@
 				Content="{x:Bind ViewModel.DetailViewerViewModel.SelectedFile.Value, Mode=OneWay}"
 				ContentTemplateSelector="{StaticResource MediaItemDetailTplSel}" />
 		</Grid>
-		<ListView x:Name="List"
-			Margin="10"
-			Grid.Row="2"
-			ItemsSource="{x:Bind ViewModel.MediaContentLibraryViewModel.Files, Mode=OneWay}"
-			SelectedItem="{x:Bind ViewModel.MediaContentLibraryViewModel.SelectedFile.Value, Mode=TwoWay}"
-			SelectionMode="Single"
-			SelectionChanged="List_SelectionChanged"
-			ScrollViewer.HorizontalScrollMode="Auto"
-			ScrollViewer.HorizontalScrollBarVisibility="Auto" >
-			<ListView.ItemsPanel>
-				<ItemsPanelTemplate>
-					<ItemsStackPanel Orientation="Horizontal" />
-				</ItemsPanelTemplate>
-			</ListView.ItemsPanel>
-			<ListView.ItemTemplate>
-				<DataTemplate x:DataType="vmIf:IMediaItemViewModel" >
-					<Grid DoubleTapped="File_DoubleTapped" >
-						<ContentControl
-							Content="{x:Bind}"
-							ContentTemplateSelector="{StaticResource MediaItemThumbnailControlTplSel}"
-							Height="{Binding DataContext.ItemSize.Value, Mode=OneWay, ElementName=List}"
-							HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
-						<Grid Opacity="0.7"
-							Background="DarkGray"
-							Visibility="{x:Bind Exists, Converter={StaticResource InvertBoolToVisibilityConverter}}" />
-					</Grid>
-				</DataTemplate>
-			</ListView.ItemTemplate>
-		</ListView>
+
+		<!-- Filmstrip (Thumbnail List) Area -->
+		<Border Grid.Row="2"
+				Background="{ThemeResource LayerFillColorDefaultBrush}"
+				BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+				BorderThickness="0,1,0,0"
+				Padding="0,8,0,8">
+			<ListView x:Name="List"
+				ItemsSource="{x:Bind ViewModel.MediaContentLibraryViewModel.Files, Mode=OneWay}"
+				SelectedItem="{x:Bind ViewModel.MediaContentLibraryViewModel.SelectedFile.Value, Mode=TwoWay}"
+				SelectionMode="Single"
+				SelectionChanged="List_SelectionChanged"
+				ScrollViewer.HorizontalScrollMode="Auto"
+				ScrollViewer.HorizontalScrollBarVisibility="Auto"
+				ScrollViewer.VerticalScrollMode="Disabled"
+				ScrollViewer.VerticalScrollBarVisibility="Hidden"
+				HorizontalAlignment="Stretch"
+				Padding="12,0,12,12">
+				<ListView.ItemsPanel>
+					<ItemsPanelTemplate>
+						<ItemsStackPanel Orientation="Horizontal" />
+					</ItemsPanelTemplate>
+				</ListView.ItemsPanel>
+				<ListView.ItemContainerStyle>
+					<Style TargetType="ListViewItem" BasedOn="{StaticResource MediaStripItemStyle}" />
+				</ListView.ItemContainerStyle>
+				<ListView.ItemTemplate>
+					<DataTemplate x:DataType="vmIf:IMediaItemViewModel" >
+						<Grid DoubleTapped="File_DoubleTapped" CornerRadius="4" Background="{ThemeResource ControlFillColorDefaultBrush}">
+							<ContentControl
+								Content="{x:Bind}"
+								ContentTemplateSelector="{StaticResource MediaItemThumbnailControlTplSel}"
+								Height="{Binding DataContext.ItemSize.Value, Mode=OneWay, ElementName=List}"
+								HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
+							
+							<!-- Missing File Overlay -->
+							<Grid Background="{ThemeResource SystemControlBackgroundBaseMediumBrush}"
+								  Opacity="0.8"
+								  Visibility="{x:Bind Exists, Converter={StaticResource InvertBoolToVisibilityConverter}}">
+								<FontIcon Glyph="&#xE783;" FontSize="24" Foreground="{ThemeResource SystemControlForegroundChromeWhiteBrush}" />
+							</Grid>
+						</Grid>
+					</DataTemplate>
+				</ListView.ItemTemplate>
+			</ListView>
+		</Border>
 	</Grid>
 </local:ViewerPaneBase>

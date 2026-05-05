@@ -55,4 +55,57 @@
 		</Setter>
 	</Style>
 
+	<!-- ===== Media Strip Item Style (for ListView items) ===== -->
+	<Style x:Key="MediaStripItemStyle" TargetType="ListViewItem">
+		<Setter Property="Margin" Value="4,0" />
+		<Setter Property="Padding" Value="0" />
+		<Setter Property="CornerRadius" Value="4" />
+		<Setter Property="Background" Value="Transparent" />
+		<Setter Property="HorizontalContentAlignment" Value="Stretch" />
+		<Setter Property="VerticalContentAlignment" Value="Stretch" />
+		<Setter Property="UseSystemFocusVisuals" Value="False" />
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="ListViewItem">
+					<Grid x:Name="RootGrid"
+						Background="{TemplateBinding Background}"
+						BorderBrush="{TemplateBinding BorderBrush}"
+						BorderThickness="{TemplateBinding BorderThickness}"
+						CornerRadius="{TemplateBinding CornerRadius}" >
+
+						<VisualStateManager.VisualStateGroups>
+							<VisualStateGroup x:Name="CommonStates">
+								<VisualState x:Name="Normal" />
+								<VisualState x:Name="PointerOver">
+									<VisualState.Setters>
+										<Setter Target="RootGrid.Background" Value="{ThemeResource CardBackgroundPointerOverBrush}" />
+									</VisualState.Setters>
+								</VisualState>
+								<VisualState x:Name="Selected" />
+								<VisualState x:Name="SelectedPointerOver" />
+							</VisualStateGroup>
+						</VisualStateManager.VisualStateGroups>
+
+						<ContentPresenter x:Name="ContentPresenter"
+							ContentTransitions="{TemplateBinding ContentTransitions}"
+							ContentTemplate="{TemplateBinding ContentTemplate}"
+							Content="{TemplateBinding Content}"
+							HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+							VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+							Margin="{TemplateBinding Padding}" />
+
+						<!-- Selection Indicator Frame bound directly to IsSelected -->
+						<Rectangle x:Name="SelectionIndicator"
+							Stroke="{ThemeResource SystemAccentColor}"
+							StrokeThickness="3"
+							RadiusX="{TemplateBinding CornerRadius}"
+							RadiusY="{TemplateBinding CornerRadius}"
+							Visibility="{Binding IsSelected, RelativeSource={RelativeSource Mode=TemplatedParent}, Converter={StaticResource BoolToVisibilityConverter}}"
+							IsHitTestVisible="False" />
+					</Grid>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
+
 </ResourceDictionary>
