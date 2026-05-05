@@ -17,6 +17,10 @@ public class DetailSelectorViewModel : ViewModelBase {
 		get;
 	} = new();
 
+	public Subject<TagViewModel> OpenTagManagerRequested {
+		get;
+	} = new();
+
 	private readonly DetailSelectorModel _model;
 	private readonly System.Collections.Concurrent.ConcurrentDictionary<int, TagCategoryViewModel> _categoryViewModels = new();
 
@@ -100,6 +104,10 @@ public class DetailSelectorViewModel : ViewModelBase {
 				conditions.Add(condition);
 			});
 		}).AddTo(this.CompositeDisposable);
+
+		this.OpenTagManagerCommand.Subscribe(x => {
+			this.OpenTagManagerRequested.OnNext(x.Value);
+		}).AddTo(this.CompositeDisposable);
 	}
 
 	public BindableReactiveProperty<string> RepresentativeFilePath {
@@ -141,6 +149,10 @@ public class DetailSelectorViewModel : ViewModelBase {
 	}
 
 	public ReactiveCommand<ValueCountPair<TagViewModel>> SearchTaggedFilesCommand {
+		get;
+	} = new();
+
+	public ReactiveCommand<ValueCountPair<TagViewModel>> OpenTagManagerCommand {
 		get;
 	} = new();
 

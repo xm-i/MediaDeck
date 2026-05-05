@@ -18,15 +18,8 @@ public class WindowService() {
 	/// <param name="window">対象のウィンドウ</param>
 	/// <param name="parentWindow">親となるウィンドウ。</param>
 	public void ActivateCenteredOnMainWindow(Window window, Window parentWindow) {
-		if (window is not Window childWindow) {
-			return;
-		}
-
-		var targetParent = parentWindow;
-		if (targetParent != null) {
-			this.CenterWindowOnMainWindow(targetParent, childWindow);
-		}
-		childWindow.Activate();
+		this.CenterWindowOnMainWindow(parentWindow, window);
+		window.Activate();
 	}
 
 	private void CenterWindowOnMainWindow(Window mainWindow, Window childWindow) {

@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using MediaDeck.Core.Primitives;
+using MediaDeck.Services;
 using MediaDeck.ViewModels.Panes.DetailPanes;
 using MediaDeck.ViewModels.Tags;
 using MediaDeck.Views.Tags;
@@ -13,6 +14,7 @@ namespace MediaDeck.Views.Panes.DetailPanes;
 
 public sealed partial class TagsDetail {
 	private IDisposable? _newTagRequestedSubscription;
+	private IDisposable? _openTagManagerRequestedSubscription;
 
 	public TagsDetail() {
 		this.InitializeComponent();
@@ -25,6 +27,17 @@ public sealed partial class TagsDetail {
 		this._newTagRequestedSubscription?.Dispose();
 		this._newTagRequestedSubscription = newViewModel?.NewTagRequested.Subscribe(async context => {
 			await this.ShowNewTagDialogAsync(context);
+		});
+
+		this._openTagManagerRequestedSubscription?.Dispose();
+		this._openTagManagerRequestedSubscription = newViewModel?.OpenTagManagerRequested.Subscribe(tag => {
+			var window = Ioc.Default.GetRequiredService<TagManagerWindow>();
+			window.ViewModel.SelectTag(tag.Model.TagId);
+
+			var windowManager = Ioc.Default.GetRequiredService<WindowManager>();
+			var windowService = Ioc.Default.GetRequiredService<WindowService>();
+			var parent = windowManager.GetWindowFromElement(this);
+			windowService.ActivateCenteredOnMainWindow(window, parent);
 		});
 	}
 

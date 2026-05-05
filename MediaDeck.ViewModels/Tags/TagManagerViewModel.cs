@@ -74,4 +74,19 @@ public class TagManagerViewModel : ViewModelBase {
 	public ReactiveCommand DeleteTagCommand {
 		get;
 	} = new();
+
+	/// <summary>
+	/// 指定したIDのタグを選択状態にします。
+	/// </summary>
+	/// <param name="tagId">選択するタグのID</param>
+	public void SelectTag(int tagId) {
+		foreach (var category in this.TagCategories) {
+			var tagVm = category.Tags.FirstOrDefault(t => t.Model.TagId == tagId);
+			if (tagVm != null) {
+				this.SelectedTagCategory.Value = category;
+				category.SelectedTag.Value = tagVm;
+				return;
+			}
+		}
+	}
 }

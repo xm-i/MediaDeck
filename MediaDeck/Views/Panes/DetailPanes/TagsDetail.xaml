@@ -99,6 +99,13 @@
 						</StackPanel>
 						<FlyoutBase.AttachedFlyout>
 							<MenuFlyout>
+								<MenuFlyoutItem Text="Open Tag Manager"
+									Command="{Binding DataContext.OpenTagManagerCommand, ElementName=ControlRoot}"
+									CommandParameter="{Binding }" >
+									<MenuFlyoutItem.Icon>
+										<FontIcon Glyph="&#xE713;" />
+									</MenuFlyoutItem.Icon>
+								</MenuFlyoutItem>
 								<MenuFlyoutItem Text="Delete"
 									Command="{Binding DataContext.RemoveTagCommand, ElementName=ControlRoot}"
 									CommandParameter="{Binding }" >
