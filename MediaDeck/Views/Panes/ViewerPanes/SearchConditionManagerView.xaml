@@ -10,8 +10,8 @@
 	<Grid Margin="8,4">
 
 		<controls:TokenizingTextBox
-			ItemsSource="{x:Bind ViewModel.SearchConditions}"
-			SuggestedItemsSource="{x:Bind ViewModel.FilteredSearchConditionCandidates}"
+			ItemsSource="{x:Bind ViewModel.SearchConditions,Mode=OneWay}"
+			SuggestedItemsSource="{x:Bind ViewModel.FilteredSearchConditionCandidates,Mode=OneWay}"
 			TextChanged="TokenizingTextBox_TextChanged"
 			TokenItemAdding="TokenizingTextBox_TokenItemAdding"
 			TokenItemAdded="TokenizingTextBox_TokenItemAdded"
