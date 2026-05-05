@@ -95,6 +95,12 @@
     <None Update="Assets\swscale-9.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Views\Panes\ViewerPanes\ListViewer.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </None>
+    <None Update="Views\Panes\ViewerPanes\ListViewerRow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </None>
     </ItemGroup>
 
   <ItemGroup>

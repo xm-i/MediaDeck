@@ -96,6 +96,18 @@ public class TabContext : ViewModelBase {
 		this.TabState.ViewerState.ItemSize.Skip(1).Subscribe(v => defaultViewer.ItemSize.Value = v).AddTo(this.CompositeDisposable);
 		this.TabState.ViewerState.ShowOverlay.Skip(1).Subscribe(v => defaultViewer.ShowOverlay.Value = v).AddTo(this.CompositeDisposable);
 		this.TabState.ViewerState.ShowInfo.Skip(1).Subscribe(v => defaultViewer.ShowInfo.Value = v).AddTo(this.CompositeDisposable);
+
+		// ListViewer 列設定の同期
+		this.TabState.ViewerState.ListFileNameColumnWidth.Skip(1).Subscribe(v => defaultViewer.ListFileNameColumnWidth.Value = v).AddTo(this.CompositeDisposable);
+		this.TabState.ViewerState.ListResolutionColumnWidth.Skip(1).Subscribe(v => defaultViewer.ListResolutionColumnWidth.Value = v).AddTo(this.CompositeDisposable);
+		this.TabState.ViewerState.ListFileSizeColumnWidth.Skip(1).Subscribe(v => defaultViewer.ListFileSizeColumnWidth.Value = v).AddTo(this.CompositeDisposable);
+		this.TabState.ViewerState.ListCreationTimeColumnWidth.Skip(1).Subscribe(v => defaultViewer.ListCreationTimeColumnWidth.Value = v).AddTo(this.CompositeDisposable);
+		this.TabState.ViewerState.ListRateColumnWidth.Skip(1).Subscribe(v => defaultViewer.ListRateColumnWidth.Value = v).AddTo(this.CompositeDisposable);
+		this.TabState.ViewerState.ListFileNameColumnVisible.Skip(1).Subscribe(v => defaultViewer.ListFileNameColumnVisible.Value = v).AddTo(this.CompositeDisposable);
+		this.TabState.ViewerState.ListResolutionColumnVisible.Skip(1).Subscribe(v => defaultViewer.ListResolutionColumnVisible.Value = v).AddTo(this.CompositeDisposable);
+		this.TabState.ViewerState.ListFileSizeColumnVisible.Skip(1).Subscribe(v => defaultViewer.ListFileSizeColumnVisible.Value = v).AddTo(this.CompositeDisposable);
+		this.TabState.ViewerState.ListCreationTimeColumnVisible.Skip(1).Subscribe(v => defaultViewer.ListCreationTimeColumnVisible.Value = v).AddTo(this.CompositeDisposable);
+		this.TabState.ViewerState.ListRateColumnVisible.Skip(1).Subscribe(v => defaultViewer.ListRateColumnVisible.Value = v).AddTo(this.CompositeDisposable);
 	}
 
 

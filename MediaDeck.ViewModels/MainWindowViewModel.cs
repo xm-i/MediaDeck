@@ -116,6 +116,18 @@ public class MainWindowViewModel : ViewModelBase {
 		tabState.ViewerState.ShowOverlay.Value = defaultViewer.ShowOverlay.Value;
 		tabState.ViewerState.ShowInfo.Value = defaultViewer.ShowInfo.Value;
 
+		// ListViewer 列設定
+		tabState.ViewerState.ListFileNameColumnWidth.Value = defaultViewer.ListFileNameColumnWidth.Value;
+		tabState.ViewerState.ListResolutionColumnWidth.Value = defaultViewer.ListResolutionColumnWidth.Value;
+		tabState.ViewerState.ListFileSizeColumnWidth.Value = defaultViewer.ListFileSizeColumnWidth.Value;
+		tabState.ViewerState.ListCreationTimeColumnWidth.Value = defaultViewer.ListCreationTimeColumnWidth.Value;
+		tabState.ViewerState.ListRateColumnWidth.Value = defaultViewer.ListRateColumnWidth.Value;
+		tabState.ViewerState.ListFileNameColumnVisible.Value = defaultViewer.ListFileNameColumnVisible.Value;
+		tabState.ViewerState.ListResolutionColumnVisible.Value = defaultViewer.ListResolutionColumnVisible.Value;
+		tabState.ViewerState.ListFileSizeColumnVisible.Value = defaultViewer.ListFileSizeColumnVisible.Value;
+		tabState.ViewerState.ListCreationTimeColumnVisible.Value = defaultViewer.ListCreationTimeColumnVisible.Value;
+		tabState.ViewerState.ListRateColumnVisible.Value = defaultViewer.ListRateColumnVisible.Value;
+
 
 		// ルートの状態リストに追加
 		this._rootState.Tabs.Add(tabState);
