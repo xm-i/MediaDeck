@@ -37,6 +37,10 @@ public sealed partial class TagsDetail {
 			var windowManager = Ioc.Default.GetRequiredService<WindowManager>();
 			var windowService = Ioc.Default.GetRequiredService<WindowService>();
 			var parent = windowManager.GetWindowFromElement(this);
+			if (parent == null) {
+				// TODO: notify;
+				return;
+			}
 			windowService.ActivateCenteredOnMainWindow(window, parent);
 		});
 	}
