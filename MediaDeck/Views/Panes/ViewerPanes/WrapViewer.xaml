@@ -21,9 +21,15 @@
 			SelectionMode="Extended"
 			SelectionChanged="List_SelectionChanged"
 			RightTapped="List_RightTapped"
+			SizeChanged="List_SizeChanged"
 			ScrollViewer.VerticalScrollMode="Auto"
 			ScrollViewer.VerticalScrollBarVisibility="Auto"
 			ItemContainerStyle="{StaticResource MediaCardStyle}" >
+			<GridView.ItemsPanel>
+				<ItemsPanelTemplate>
+					<ItemsWrapGrid x:Name="WrapGrid" Orientation="Horizontal" HorizontalAlignment="Center" Loaded="WrapGrid_Loaded" />
+				</ItemsPanelTemplate>
+			</GridView.ItemsPanel>
 			<GridView.Resources>
 				<MenuFlyout x:Key="FileContextMenu" >
 					<MenuFlyoutItem Text="Recreate Thumbnail"
@@ -44,6 +50,7 @@
 				<DataTemplate x:DataType="vmIf:IMediaItemViewModel" >
 					<Grid DoubleTapped="File_DoubleTapped"
 						Width="{Binding DataContext.ItemSize.Value, Mode=OneWay, ElementName=List}"
+						HorizontalAlignment="Center"
 						CornerRadius="8"
 						Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
 						BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
