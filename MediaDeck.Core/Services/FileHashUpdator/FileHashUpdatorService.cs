@@ -16,6 +16,8 @@ namespace MediaDeck.Core.Services.FileHashUpdator;
 public class FileHashUpdatorService : ServiceBase, IFileHashUpdatorService {
 	private readonly IDbContextFactory<MediaDeckDbContext> _dbFactory;
 	private readonly ILogger<FileHashUpdatorService> _logger;
+	private CancellationTokenSource _hashUpdateCts = new();
+	private CancellationTokenSource _fullHashUpdateCts = new();
 
 	/// <summary>
 	/// PreHash更新待ちのメディアアイテムIDを保持するキュー
@@ -72,8 +74,10 @@ public class FileHashUpdatorService : ServiceBase, IFileHashUpdatorService {
 			.ObserveAdd()
 			.ThrottleFirst(TimeSpan.FromSeconds(0.1))
 			.ObserveOnThreadPool()
-			.SubscribeAwait(async (x, ct) =>
-					await this.UpdateHashAsync(ct).ConfigureAwait(false),
+			.SubscribeAwait(async (x, ct) => {
+				using var linked = CancellationTokenSource.CreateLinkedTokenSource(ct, this._hashUpdateCts.Token);
+				await this.UpdateHashAsync(linked.Token).ConfigureAwait(false);
+			},
 				AwaitOperation.Sequential,
 				false)
 			.AddTo(this.CompositeDisposable);
@@ -82,8 +86,10 @@ public class FileHashUpdatorService : ServiceBase, IFileHashUpdatorService {
 			.ObserveAdd()
 			.ThrottleFirst(TimeSpan.FromSeconds(0.1))
 			.ObserveOnThreadPool()
-			.SubscribeAwait(async (x, ct) =>
-					await this.UpdateFullHashAsync(ct).ConfigureAwait(false),
+			.SubscribeAwait(async (x, ct) => {
+				using var linked = CancellationTokenSource.CreateLinkedTokenSource(ct, this._fullHashUpdateCts.Token);
+				await this.UpdateFullHashAsync(linked.Token).ConfigureAwait(false);
+			},
 				AwaitOperation.Sequential,
 				false)
 			.AddTo(this.CompositeDisposable);
@@ -116,6 +122,23 @@ public class FileHashUpdatorService : ServiceBase, IFileHashUpdatorService {
 		if (this.HashUpdateQueue.Count == 0) {
 			await this.EnqueueDuplicatePreHashForFullHashAsync(ct).ConfigureAwait(false);
 		}
+	}
+
+	/// <summary>
+	/// 存在する全メディアアイテムのPreHash更新をキューに追加する。
+	/// </summary>
+	/// <param name="ct">キャンセルトークン</param>
+	public async Task EnqueueAllHashUpdatesAsync(CancellationToken ct = default) {
+		List<long> ids;
+		await using (var db = await this._dbFactory.CreateDbContextAsync(ct).ConfigureAwait(false)) {
+			ids = await db.MediaItems
+				.Where(m => m.IsExists && m.MediaType != MediaType.FolderGroup)
+				.Select(m => m.MediaItemId)
+				.ToListAsync(ct)
+				.ConfigureAwait(false);
+		}
+
+		this.EnqueueHashUpdateRange(ids);
 	}
 
 	/// <summary>
@@ -264,5 +287,43 @@ public class FileHashUpdatorService : ServiceBase, IFileHashUpdatorService {
 				this.FullHashCompletedCount.Value++;
 			}
 		}
+	}
+
+	/// <summary>
+	/// PreHash更新をキャンセルし、キューをクリアする。
+	/// </summary>
+	public void CancelUpdate() {
+		this._hashUpdateCts.Cancel();
+		this._hashUpdateCts.Dispose();
+		this._hashUpdateCts = new();
+		this.HashUpdateQueue.Clear();
+		this.TargetCount.Value = 0;
+		this.CompletedCount.Value = 0;
+	}
+
+	/// <summary>
+	/// FullHash更新をキャンセルし、キューをクリアする。
+	/// </summary>
+	public void CancelFullHashUpdate() {
+		this._fullHashUpdateCts.Cancel();
+		this._fullHashUpdateCts.Dispose();
+		this._fullHashUpdateCts = new();
+		this.FullHashUpdateQueue.Clear();
+		this.FullHashTargetCount.Value = 0;
+		this.FullHashCompletedCount.Value = 0;
+	}
+
+	/// <summary>
+	/// リソースを解放する。
+	/// </summary>
+	/// <param name="disposing">マネージドリソースを解放するかどうか</param>
+	protected override void Dispose(bool disposing) {
+		if (disposing) {
+			this._hashUpdateCts.Cancel();
+			this._hashUpdateCts.Dispose();
+			this._fullHashUpdateCts.Cancel();
+			this._fullHashUpdateCts.Dispose();
+		}
+		base.Dispose(disposing);
 	}
 }

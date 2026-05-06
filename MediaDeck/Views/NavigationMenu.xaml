@@ -58,10 +58,6 @@
 				<MenuFlyoutItem Text="設定"
 					Click="MenuFlyoutItem_Click"
 					Tag="Config" />
-				<MenuFlyoutSeparator />
-				<MenuFlyoutItem Text="バックグラウンドタスク"
-					Click="MenuFlyoutItem_Click"
-					Tag="BackgroundTasks" />
 			</MenuBarItem>
 		</MenuBar>
 

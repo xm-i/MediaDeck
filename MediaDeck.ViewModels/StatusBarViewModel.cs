@@ -2,6 +2,7 @@ using MediaDeck.Common.Base;
 using MediaDeck.Common.Extensions;
 using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.ViewModels.Panes.ViewerPanes;
+using MediaDeck.ViewModels.Tools;
 
 namespace MediaDeck.ViewModels;
 
@@ -14,6 +15,13 @@ public class StatusBarViewModel : ViewModelBase {
 	/// メディアライブラリのViewModel
 	/// </summary>
 	public MediaContentLibraryViewModel MediaContentLibrary {
+		get;
+	}
+
+	/// <summary>
+	/// バックグラウンドタスク表示ViewModel
+	/// </summary>
+	public BackgroundTasksViewModel BackgroundTasks {
 		get;
 	}
 
@@ -64,10 +72,12 @@ public class StatusBarViewModel : ViewModelBase {
 	/// </summary>
 	/// <param name="mediaContentLibrary">メディアライブラリのViewModel</param>
 	/// <param name="viewerSelector">表示モード切り替え用のViewModel</param>
+	/// <param name="backgroundTasks">バックグラウンドタスク表示ViewModel</param>
 	/// <param name="tabState">タブの状態モデル</param>
-	public StatusBarViewModel(MediaContentLibraryViewModel mediaContentLibrary, ViewerSelectorViewModel viewerSelector, TabStateModel tabState) {
+	public StatusBarViewModel(MediaContentLibraryViewModel mediaContentLibrary, ViewerSelectorViewModel viewerSelector, BackgroundTasksViewModel backgroundTasks, TabStateModel tabState) {
 		this.MediaContentLibrary = mediaContentLibrary;
 		this.ViewerSelector = viewerSelector;
+		this.BackgroundTasks = backgroundTasks;
 
 		// StateのItemSizeと双方向に同期するプロパティを作成
 		this.ItemSize = tabState.ViewerState.ItemSize

@@ -47,7 +47,6 @@ public sealed partial class NavigationMenu {
 			"FolderManager" => Ioc.Default.GetRequiredService<FolderManagerWindow>(),
 			"DuplicateDetector" => Ioc.Default.GetRequiredService<DuplicateDetectorWindow>(),
 			"Config" => Ioc.Default.GetRequiredService<ConfigWindow>(),
-			"BackgroundTasks" => Ioc.Default.GetRequiredService<BackgroundTasksWindow>(),
 			_ => null
 		};
 

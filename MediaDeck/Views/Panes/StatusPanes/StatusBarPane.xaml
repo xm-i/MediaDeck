@@ -27,6 +27,8 @@
 				Grid.Column="0"
 				VerticalAlignment="Center"
 				Spacing="16" >
+				<local:BackgroundTasksStatusIndicator
+					ViewModel="{x:Bind ViewModel.BackgroundTasks, Mode=OneWay}" />
 				<StackPanel Orientation="Horizontal"
 					VerticalAlignment="Center"
 					Spacing="8" >

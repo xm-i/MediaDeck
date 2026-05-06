@@ -25,15 +25,18 @@ public class FileStatusUpdatorService {
 		get;
 	} = new();
 
-	public async Task UpdateFileInfo() {
+	public async Task UpdateFileInfo(CancellationToken ct = default) {
 		var updateList = new List<MediaItem>();
 		var targetFiles = new List<MediaItem>();
-		await using (var db = await this._dbFactory.CreateDbContextAsync()) {
-			targetFiles = await db.MediaItems.ToListAsync();
+		await using (var db = await this._dbFactory.CreateDbContextAsync(ct)) {
+			targetFiles = await db.MediaItems.ToListAsync(ct);
 		}
 		this.TargetCount.Value = targetFiles.Count;
 		this.CompletedCount.Value = 0;
 		foreach (var file in targetFiles) {
+			if (ct.IsCancellationRequested) {
+				return;
+			}
 			this.CompletedCount.Value++;
 			var mediaItemTypeProvider = this._mediaItemTypeService.GetMediaItemTypeProvider(file.MediaType);
 			var pathStatus = mediaItemTypeProvider.GetPathStatus(file.FilePath);
@@ -69,15 +72,15 @@ public class FileStatusUpdatorService {
 		}
 
 		if (updateList.Any()) {
-			await using (var db = await this._dbFactory.CreateDbContextAsync()) {
-				using var transaction = await db.Database.BeginTransactionAsync();
+			await using (var db = await this._dbFactory.CreateDbContextAsync(ct)) {
+				using var transaction = await db.Database.BeginTransactionAsync(ct);
 				db.UpdateRange(updateList);
-				await db.SaveChangesAsync();
-				await transaction.CommitAsync();
+				await db.SaveChangesAsync(ct);
+				await transaction.CommitAsync(ct);
 			}
 		}
 
 		// PreHash更新がなかった場合もFullHashのチェックを行う
-		await this._fileHashUpdatorService.CheckAndEnqueueFullHashUpdatesAsync();
+		await this._fileHashUpdatorService.CheckAndEnqueueFullHashUpdatesAsync(ct);
 	}
 }

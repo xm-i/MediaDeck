@@ -3,7 +3,6 @@ using MediaDeck.Common.Extensions;
 using MediaDeck.Composition.Objects;
 using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Core.Stores.State;
-using MediaDeck.ViewModels.Tools;
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -20,7 +19,6 @@ public class MainWindowViewModel : ViewModelBase {
 		IServiceProvider serviceProvider,
 		IStateStore stateStore,
 		WindowStateProvider windowStateProvider,
-		BackgroundTasksViewModel backgroundTasksViewModel,
 		NavigationMenuViewModel navigationMenuViewModel) {
 		this._rootServiceProvider = serviceProvider;
 		this.NavigationMenuViewModel = navigationMenuViewModel;
@@ -73,14 +71,23 @@ public class MainWindowViewModel : ViewModelBase {
 		get;
 	}
 
+	/// <summary>
+	/// ウィンドウ活性化コマンド
+	/// </summary>
 	public ReactiveCommand WindowActivatedCommand {
 		get;
 	} = new();
 
+	/// <summary>
+	/// タブ追加コマンド
+	/// </summary>
 	public ReactiveCommand AddTabCommand {
 		get;
 	} = new();
 
+	/// <summary>
+	/// タブ終了コマンド
+	/// </summary>
 	public ReactiveCommand<TabContext> CloseTabCommand {
 		get;
 	} = new();
