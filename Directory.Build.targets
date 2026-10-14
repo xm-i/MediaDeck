@@ -15,8 +15,8 @@
     <PackageReference Update="MetadataExtractor" Version="2.9.3" />
     <PackageReference Update="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.9" />
     <PackageReference Update="SQLitePCLRaw.lib.e_sqlite3" Version="2.1.12" />
-    <PackageReference Update="Microsoft.Extensions.DependencyInjection" Version="10.0.10" />
-    <PackageReference Update="Microsoft.Extensions.Logging" Version="10.0.10" />
+    <PackageReference Update="Microsoft.Extensions.DependencyInjection" Version="10.0.13" />
+    <PackageReference Update="Microsoft.Extensions.Logging" Version="10.0.13" />
     <PackageReference Update="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.1839" />
     <PackageReference Update="Microsoft.WindowsAppSDK" Version="2.2.0" />
     <PackageReference Update="ObservableCollections" Version="3.3.4" />
