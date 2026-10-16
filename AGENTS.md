@@ -17,10 +17,33 @@
 
 ## 3. コーディング規約とアーキテクチャルール
 ### プロジェクト構成とファイル定義
-- `MediaDeck/` (メインアプリ): Views (XAML), ViewModels, Models (ビジネスロジック) が含まれる。
-  - **`MediaItemTypes/`**: 画像、動画、PDF、アーカイブなど、メディアタイプ（ファイルタイプ）ごとの個別処理や詳細な実装コードはこのディレクトリ以下に配置する。
-- `MediaDeck.Database/`: データベース層 (EF Core)。DBコンテキストやエンティティの定義・アクセスはここに集約する。
-- `MediaDeck.Composition/`: DI（依存性の注入）やシステム全体の共通設定。
+ソリューションは以下のマルチプロジェクト構成（14プロジェクト）で責務が分離されています。コードの配置や参照時は各プロジェクトの責務を厳守してください。
+
+#### アプリケーション本体
+- **`MediaDeck/`** (メインアプリケーション / WinUI 3):
+  - View (XAML) とそのコードビハインド、UI固有のライフサイクル管理、UIダイアログ/ウィンドウ制御サービス（`WindowManager`, `DialogService` 等）を配置。
+- **`MediaDeck.ViewModels/`** (ViewModel層):
+  - アプリケーション全体の ViewModel（`MainWindowViewModel`, `TabViewModel`, セレクター各種, ペイン・ダイアログ ViewModel 等）。View と Model の調停を R3 でリアクティブに行う。
+- **`MediaDeck.Core/`** (ドメインモデル・ビジネスロジック・サービス):
+  - ファイル、フォルダ、タグ、検索条件、ソート条件などのコアモデル、リポジトリ、ドメインサービス（`FileRegistrar`, `FileChangeMonitorService` 等）を集約。
+- **`MediaDeck.MediaItemTypes/`** (メディア種別コア拡張):
+  - 画像 (`Image`)、動画 (`Video`)、PDF (`Pdf`)、アーカイブ (`Archive`)、フォルダグループ (`FolderGroup`)、不明 (`Unknown`) などのメディア種別ごとのプロバイダー（`IMediaItemTypeProvider`）、オペレーター（`IMediaItemOperator`）、ドメインモデル。
+- **`MediaDeck.MediaItemTypes.UI/`** (メディア種別 UI 拡張 / WinUI 3):
+  - 各メディア種別に対応する View / ViewModel（Viewer、サムネイルピッカー、一括サムネイル生成設定コントロール等）。
+- **`MediaDeck.Composition/`** (共通契約・DI・システム共通設定・DB層):
+  - アプリケーション全体の共通インターフェース（`Interfaces/`）、DI登録設定、定数（`Constants/`）、状態モデル・設定モデル（`Stores/State/`, `Stores/Config/`）。
+  - データベース層（EF Core の `MediaDeckDbContext`、マイグレーション、エンティティ `Tables/`）もここに集約して管理する。
+- **`MediaDeck.Store/`** (永続化ストア):
+  - 設定（Config）や状態（State）のファイル永続化処理（`ConfigStore`, `StateStore`）、JSON シリアライザー。
+- **`MediaDeck.Common/`** (共通基盤):
+  - プロジェクト横断で使用される基底クラス（`DisposableBase` 等）、共通ヘルパー、拡張メソッド。
+- **`MediaDeck.Core.Tests/`** (ユニットテスト):
+  - `MediaDeck.Core` を対象とした xUnit 単体テスト。
+
+#### 自社製基盤ライブラリ・Source Generator (`lib/` 配下)
+- **`lib/AutoDiAttributes/`**: `[Inject]` 属性による DI（依存性の注入）登録自動化 Source Generator。
+- **`lib/GenJsonConfig/`**: `ReactiveProperty` や `ObservableList` に対応した JSON DTO / シリアライザー自動生成 Source Generator。
+- **`lib/MediaDeck.Analyzers/`**: R3 の `AddTo(this.CompositeDisposable)` 漏れを静的解析で検出するカスタム Roslyn アナライザー（`RequireAddToAnalyzer` など）。
 
 ### 実装上のルール
 - **コメント規約**: コメントは必ず「日本語」で記述すること。また、新規作成・編集したクラス、メソッド、プロパティには必ずXMLドキュメンテーションコメント（`/// <summary>...`）を付与すること。
@@ -33,8 +56,8 @@
   - `Dispose(bool)` のオーバーライドで独自リソースを解放する場合は、必ず `base.Dispose(disposing)` を呼ぶこと。
 - **設定管理**: アプリケーション設定は `GenJsonConfig` を利用して管理・永続化を行う。
 - **TabState拡張時の必須更新 (重要)**: `TabStateModel` / `SearchStateModel` / `ViewerStateModel` に新しい状態プロパティを追加した場合、必ず次の2箇所も同時に更新すること。
-  - `MainWindowViewModel.AddTab`: `AppState.DefaultTabState` から新規 `tabState` へ初期値をコピーする処理を追加する。
-  - `TabContext.SubscribeDefaultTabStateSync`: タブ側変更を `AppState.DefaultTabState` へ反映する購読処理を追加する。
+  - `TabStateModel.ApplyDefaultState`: `AppState.DefaultTabState` から新規 `tabState` へ初期値をコピーする処理を追加する（※新規タブ作成時に `MainWindowViewModel.AddTab` や `WindowManager` から本メソッドが呼ばれます）。
+  - `TabViewModel.SubscribeDefaultTabStateSync`: タブ側変更を `AppState.DefaultTabState` へ反映する購読処理を追加する。
 - **ロギング**: プロジェクト全体のログ出力には `Serilog` を使用する。
 - **DIとサービス管理**: `AutoDiAttributes` などを活用してDIの自動登録を行い、コンポーネント間は疎結合に保つ。
 - **R3/ObservableCollectionsのバインディング (非常に重要)**: `ObservableList<T>` や `ObservableDictionary<K, V>` はそのままでは WinUI 3 の UI にバインドできません。ViewModel では `.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current)` を使用して、UI スレッドへの同期を伴う `INotifyCollectionChangedSynchronizedViewList<T>` 等に変換して公開してください。
