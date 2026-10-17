@@ -1,3 +1,4 @@
+using MediaDeck.Common.Base;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.Models;
 using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Composition.Tables.Metadata;
@@ -9,7 +10,7 @@ namespace MediaDeck.Core.Models.Files;
 /// 詳細セレクタのビジネスロジックを管理するモデル
 /// </summary>
 [Inject(InjectServiceLifetime.Scoped)]
-public class DetailSelectorModel : IDisposable {
+public class DetailSelectorModel : ModelBase {
 	private readonly SerialDisposable _propertyChangedSubscription = new();
 	private readonly ITagsManager _tagsManager;
 	private readonly ObservableList<ValueCountPair<ITagModel>> _tags = [];
@@ -99,8 +100,20 @@ public class DetailSelectorModel : IDisposable {
 		get;
 	} = new();
 
+	/// <summary>
+	/// <see cref="DetailSelectorModel"/> の新しいインスタンスを初期化します。
+	/// </summary>
+	/// <param name="tagsManager">タグマネージャー</param>
 	public DetailSelectorModel(ITagsManager tagsManager) {
 		this._tagsManager = tagsManager;
+		this._propertyChangedSubscription.AddTo(this.CompositeDisposable);
+		this.ContentChanged.AddTo(this.CompositeDisposable);
+		this.Properties.AddTo(this.CompositeDisposable);
+		this.Rate.AddTo(this.CompositeDisposable);
+		this.UsageCount.AddTo(this.CompositeDisposable);
+		this.RepresentativeFilePath.AddTo(this.CompositeDisposable);
+		this.Description.AddTo(this.CompositeDisposable);
+		this.Metadata.AddTo(this.CompositeDisposable);
 	}
 
 	/// <summary>
@@ -144,9 +157,6 @@ public class DetailSelectorModel : IDisposable {
 				});
 	}
 
-	public void Dispose() {
-		this._propertyChangedSubscription.Dispose();
-	}
 
 	/// <summary>
 	/// タグリストを再計算して更新する

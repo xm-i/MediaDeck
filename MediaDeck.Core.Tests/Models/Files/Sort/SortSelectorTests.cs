@@ -6,6 +6,7 @@ using MediaDeck.Composition.Stores.State.Model.Objects;
 using MediaDeck.Core.Models.Files.Sort;
 using MediaDeck.Core.Models.NotificationDispatcher;
 using Microsoft.Extensions.DependencyInjection;
+using R3;
 
 namespace MediaDeck.Core.Tests.Models.Files.Sort;
 
@@ -166,5 +167,30 @@ public class SortSelectorTests {
 
 		Assert.Equal(3, result[2].Rate);
 		Assert.Equal("A", result[2].FilePath);
+	}
+
+	/// <summary>
+	/// SortSelector が Dispose された際、ソート項目の変更監視が解除されることを確認します。
+	/// </summary>
+	[Fact]
+	public void Dispose_UnsubscribesFromSortItemObjects() {
+		// Arrange
+		var sortObject = this._searchDefinitions.AddSortCondition();
+		this._tabState.SearchState.CurrentSortCondition.Value = sortObject.Id;
+
+		var dispatcher = new SearchConditionNotificationDispatcher();
+		var selector = new SortSelector(this._tabState, this._searchDefinitions, dispatcher);
+
+		var notified = false;
+		dispatcher.SortChanged.Subscribe(_ => notified = true);
+
+		// Act: Dispose 呼び出し
+		selector.Dispose();
+
+		// ソート項目を追加しても通知が発火しないこと
+		sortObject.AddSortItemObject();
+
+		// Assert
+		Assert.False(notified);
 	}
 }

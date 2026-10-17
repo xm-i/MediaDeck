@@ -1,0 +1,79 @@
+using MediaDeck.Common.Base;
+using MediaDeck.Common.Extensions;
+using MediaDeck.Core.Models.Files;
+using R3;
+using Shouldly;
+
+namespace MediaDeck.Core.Tests.Common;
+
+/// <summary>
+/// <see cref="R3Ex"/> および <see cref="DisposableBase"/> のリソース管理に関するテスト
+/// </summary>
+public class R3ExAndDisposableBaseTests {
+	/// <summary>
+	/// ToTwoWayBindableReactiveProperty に渡した CompositeDisposable が破棄された際、生成されたプロパティも破棄されることを検証します。
+	/// </summary>
+	[Fact]
+	public void ToTwoWayBindableReactiveProperty_DisposesProperty_WhenCompositeDisposableDisposed() {
+		var disposables = new CompositeDisposable();
+		var source = new ReactiveProperty<string>("initial").AddTo(disposables);
+		var target = source.ToTwoWayBindableReactiveProperty("initial", disposables);
+
+		disposables.Dispose();
+
+		// Dispose後はプロパティが破棄され、代入時に ObjectDisposedException がスローされること
+		Should.Throw<ObjectDisposedException>(() => target.Value = "changed");
+		source.Value.ShouldBe("initial");
+	}
+
+	/// <summary>
+	/// ToTwoWayReactiveProperty に渡した CompositeDisposable が破棄された際、生成されたプロパティも破棄されることを検証します。
+	/// </summary>
+	[Fact]
+	public void ToTwoWayReactiveProperty_DisposesProperty_WhenCompositeDisposableDisposed() {
+		var disposables = new CompositeDisposable();
+		var source = new ReactiveProperty<int>(1).AddTo(disposables);
+		var target = source.ToTwoWayReactiveProperty(x => x.ToString(), int.Parse, "1", disposables);
+
+		disposables.Dispose();
+
+		// Dispose後はプロパティが破棄され、代入時に ObjectDisposedException がスローされること
+		Should.Throw<ObjectDisposedException>(() => target.Value = "2");
+		source.Value.ShouldBe(1);
+	}
+
+#if DEBUG
+	private class TestDisposable : DisposableBase {
+	}
+
+	/// <summary>
+	/// DisposableBase のインスタンスが Dispose された際、CreatedInstances から正しく削除されることを検証します。
+	/// </summary>
+	[Fact]
+	public void DisposableBase_RemovesFromCreatedInstances_OnDispose() {
+		var instance = new TestDisposable();
+
+		DisposableBase.CreatedInstances.TryGetValue(typeof(TestDisposable), out var dict).ShouldBeTrue();
+		dict!.Count.ShouldBeGreaterThan(0);
+
+		instance.Dispose();
+
+		dict.Count.ShouldBe(0);
+	}
+#endif
+
+	/// <summary>
+	/// DetailSelectorModel が ModelBase を継承し、Dispose 時に ReactiveProperty が破棄されることを検証します。
+	/// </summary>
+	[Fact]
+	public void DetailSelectorModel_InheritsModelBase_AndDisposesPropertiesOnDispose() {
+		var mockTagsManager = new Moq.Mock<MediaDeck.Composition.Interfaces.Tags.ITagsManager>();
+		var model = new DetailSelectorModel(mockTagsManager.Object);
+		model.ShouldBeAssignableTo<ModelBase>();
+
+		model.Dispose();
+
+		// Dispose済み状態であることを検証
+		model.DisposeState.ShouldBe(MediaDeck.Composition.Enum.DisposeState.Disposed);
+	}
+}

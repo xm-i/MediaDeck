@@ -46,24 +46,27 @@ namespace MediaDeck.Analyzers {
 				return;
 			}
 
+			if (IsIgnoredInvocation(node)) {
+				return;
+			}
+
 			// If it's part of a Chained .AddTo(...) call, it's handled.
 			if (HasChainedAddTo(node)) {
 				return;
 			}
 
 			// Check if it is "handled" by language constructs or patterns.
-			// We allow assignment to a variable/field and passing as an argument to any method 
-			// because we cannot easily determine if they are correctly disposed later.
-			// The analyzer will focus on "floating" expressions that are never captured.
+			// Assignments to .Disposable (e.g. SerialDisposable.Disposable) or static members are permitted.
+			// Other assignments (AssignmentExpressionSyntax) without AddTo are flagged to detect leaks.
 			var ancestor = node.FirstAncestorOrSelf<SyntaxNode>(n =>
 				n is ReturnStatementSyntax ||
 				n is YieldStatementSyntax ||
 				n is ArrowExpressionClauseSyntax ||
 				n is EqualsValueClauseSyntax ||
-				n is AssignmentExpressionSyntax ||
 				n is ArgumentSyntax ||
 				(n is LocalDeclarationStatementSyntax l && l.UsingKeyword.IsKind(SyntaxKind.UsingKeyword)) ||
-				n is UsingStatementSyntax);
+				n is UsingStatementSyntax ||
+				IsHandledAssignment(n, context.SemanticModel));
 
 			if (ancestor != null) {
 				return;
@@ -102,6 +105,46 @@ namespace MediaDeck.Analyzers {
 		private static bool IsAddToInvocation(SyntaxNode node) {
 			if (node is InvocationExpressionSyntax inv && inv.Expression is MemberAccessExpressionSyntax ma) {
 				return ma.Name.Identifier.Text == "AddTo";
+			}
+			return false;
+		}
+
+		/// <summary>
+		/// 代入式が破棄管理されている（SerialDisposable.Disposable への代入や静的メンバへの代入など）かどうかを判定します。
+		/// </summary>
+		/// <param name="n">判定対象の構文ノード</param>
+		/// <param name="semanticModel">セマンティックモデル</param>
+		/// <returns>破棄管理された代入式の場合 true</returns>
+		private static bool IsHandledAssignment(SyntaxNode n, SemanticModel semanticModel) {
+			if (n is AssignmentExpressionSyntax assignment) {
+				// SerialDisposable.Disposable = ... のような Disposable プロパティへの代入は破棄管理されているため許可する
+				if (assignment.Left is MemberAccessExpressionSyntax ma && ma.Name.Identifier.Text == "Disposable") {
+					return true;
+				}
+
+				// 静的メンバ（例: Log.Logger）への代入は CompositeDisposable に追加できないため許可する
+				var leftSymbol = semanticModel.GetSymbolInfo(assignment.Left).Symbol;
+				if (leftSymbol?.IsStatic == true) {
+					return true;
+				}
+
+				return false;
+			}
+			return false;
+		}
+
+		/// <summary>
+		/// メソッド呼び出しが解析対象から除外すべき呼び出し（DI コンテナからのサービス取得など）かどうかを判定します。
+		/// </summary>
+		/// <param name="node">判定対象の式</param>
+		/// <returns>除外すべき呼び出しの場合 true</returns>
+		private static bool IsIgnoredInvocation(ExpressionSyntax node) {
+			if (node is InvocationExpressionSyntax inv && inv.Expression is MemberAccessExpressionSyntax ma) {
+				var name = ma.Name.Identifier.Text;
+				// DI コンテナからのサービス取得はコンテナがライフサイクルを管理するため除外する
+				if (name is "GetRequiredService" or "GetService" or "CreateScope") {
+					return true;
+				}
 			}
 			return false;
 		}

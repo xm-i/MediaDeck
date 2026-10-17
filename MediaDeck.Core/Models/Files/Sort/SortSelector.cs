@@ -17,8 +17,10 @@ public class SortSelector : ModelBase {
 	public SortSelector(TabStateModel tabState, SearchDefinitionsConfigModel searchDefinitions, ISearchConditionNotificationDispatcher dispatcher) {
 		// 設定値初回値読み込み
 		this.SortConditions = searchDefinitions.SortConditions;
-		this.CurrentSortCondition = tabState.SearchState.CurrentSortCondition.ToTwoWayReactiveProperty(x => this.SortConditions.FirstOrDefault(sc => sc.Id == x), x => x?.Id, null, this.CompositeDisposable);
+		this.CurrentSortCondition = tabState.SearchState.CurrentSortCondition.ToTwoWayReactiveProperty(x => this.SortConditions.FirstOrDefault(sc => sc.Id == x), x => x?.Id, null, this.CompositeDisposable).AddTo(this.CompositeDisposable);
 		this.Direction = tabState.SearchState.SortDirection;
+
+		this._onUpdateSortConditionChanged.AddTo(this.CompositeDisposable);
 
 		// ソート条件変更を内部 Subject に通知しつつ、Dispatcher 経由で検索発火を依頼する
 		this.CurrentSortCondition.Select(_ => Unit.Default)
@@ -29,10 +31,9 @@ public class SortSelector : ModelBase {
 			})
 			.AddTo(this.CompositeDisposable);
 
-		IDisposable? before = null;
+		var itemChangedSubscription = new SerialDisposable().AddTo(this.CompositeDisposable);
 		this.CurrentSortCondition.Subscribe(x => {
-			before?.Dispose();
-			before = x?.SortItemObjects.ObserveChanged().Subscribe(_ => {
+			itemChangedSubscription.Disposable = x?.SortItemObjects.ObserveChanged().Subscribe(_ => {
 				this._onUpdateSortConditionChanged.OnNext(Unit.Default);
 				dispatcher.SortChanged.OnNext(Unit.Default);
 			});

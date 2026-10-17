@@ -16,10 +16,18 @@ namespace MediaDeck.Common.Base;
 public class DisposableBase : ObservableObject, IDisposableBase {
 #if DEBUG
 	private readonly InstanceTrackingInfo _trackingInfo;
-	public static readonly ConcurrentDictionary<Type, ConcurrentBag<InstanceTrackingInfo>> CreatedInstances = [];
+
+	/// <summary>
+	/// 生成されたインスタンスの追跡情報ディクショナリ（デバッグ用）
+	/// </summary>
+	public static readonly ConcurrentDictionary<Type, ConcurrentDictionary<InstanceTrackingInfo, byte>> CreatedInstances = [];
+
+	/// <summary>
+	/// 生成順にソートされた生成中インスタンスの追跡情報コレクション（デバッグ用）
+	/// </summary>
 	public static IEnumerable<InstanceTrackingInfo> SortedCreatedInstances {
 		get {
-			return CreatedInstances.Values.SelectMany(bag => bag).OrderBy(info => info.CreationOrder);
+			return CreatedInstances.Values.SelectMany(dict => dict.Keys).OrderBy(info => info.CreationOrder);
 		}
 	}
 #endif
@@ -68,8 +76,14 @@ public class DisposableBase : ObservableObject, IDisposableBase {
 #if DEBUG
 	protected DisposableBase() {
 		this._trackingInfo = new InstanceTrackingInfo(this);
-		var bag = CreatedInstances.GetOrAdd(this.GetType(), _ => []);
-		bag.Add(this._trackingInfo);
+		var dict = CreatedInstances.GetOrAdd(this.GetType(), _ => new ConcurrentDictionary<InstanceTrackingInfo, byte>());
+		dict.TryAdd(this._trackingInfo, 0);
+	}
+
+	private void RemoveTrackingInfo() {
+		if (CreatedInstances.TryGetValue(this.GetType(), out var dict)) {
+			dict.TryRemove(this._trackingInfo, out _);
+		}
 	}
 #endif
 
@@ -99,6 +113,7 @@ public class DisposableBase : ObservableObject, IDisposableBase {
 			if (disposing) {
 #if DEBUG
 				this._trackingInfo?.RecordDispose();
+				this.RemoveTrackingInfo();
 #endif
 				this._onDisposed.OnNext(Unit.Default);
 				this._compositeDisposable?.Dispose();
@@ -119,6 +134,7 @@ public class DisposableBase : ObservableObject, IDisposableBase {
 		if (this.DisposeState == DisposeState.NotDisposed) {
 			// Debug.WriteLine($"[DISPOSE LEAK] {this.GetType().FullName} がDisposeされずにGCされました。");
 		}
+		this.RemoveTrackingInfo();
 	}
 #endif
 }
