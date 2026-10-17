@@ -4,8 +4,14 @@ using Microsoft.UI.Xaml.Navigation;
 
 namespace MediaDeck.Views.Preferences.Config;
 
-public sealed partial class ScanConfigPage {
-	public ScanConfigPage() {
+/// <summary>
+/// 外部プログラム実行設定ページ
+/// </summary>
+public sealed partial class ExecutionConfigPage {
+	/// <summary>
+	/// コンストラクタ
+	/// </summary>
+	public ExecutionConfigPage() {
 		this.InitializeComponent();
 	}
 
@@ -13,7 +19,7 @@ public sealed partial class ScanConfigPage {
 	/// ナビゲート時に ViewModel を受け取り、DataContext にも設定します。
 	/// </summary>
 	protected override void OnNavigatedTo(NavigationEventArgs e) {
-		if (e.Parameter is not ScanConfigPageViewModel vm) {
+		if (e.Parameter is not ExecutionConfigPageViewModel vm) {
 			throw new InvalidOperationException("ViewModel is not passed.");
 		}
 		this.ViewModel = vm;
@@ -24,7 +30,7 @@ public sealed partial class ScanConfigPage {
 	/// <summary>
 	/// ビューモデル
 	/// </summary>
-	public ScanConfigPageViewModel? ViewModel {
+	public ExecutionConfigPageViewModel? ViewModel {
 		get;
 		set;
 	}

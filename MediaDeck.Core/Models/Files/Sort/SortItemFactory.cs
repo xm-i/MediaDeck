@@ -3,7 +3,15 @@ using MediaDeck.Composition.Stores.State.Model.Objects;
 
 namespace MediaDeck.Core.Models.Files.Sort;
 
+/// <summary>
+/// ソート項目の生成を行うファクトリクラス
+/// </summary>
 public static class SortItemFactory {
+	/// <summary>
+	/// ソート項目オブジェクトからソート項目インスタンスを生成します。
+	/// </summary>
+	/// <param name="sortItemObject">ソート項目オブジェクト</param>
+	/// <returns>生成されたソート項目インスタンス</returns>
 	public static ISortItem Create(SortItemObject sortItemObject) {
 		return sortItemObject.SortItemKey switch {
 			SortItemKey.FilePath => new SortItem(sortItemObject.SortItemKey, mf => (object?)mf.FilePath, sortItemObject.Direction),

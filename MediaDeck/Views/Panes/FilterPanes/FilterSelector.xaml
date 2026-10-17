@@ -46,11 +46,11 @@
 		<!-- Content -->
 		<Border Grid.Row="1"
 			Background="{ThemeResource LayerFillColorDefaultBrush}" >
-			<ListView x:Name="FilteringCondisionListBox"
+			<ListView x:Name="FilteringConditionListBox"
 				Padding="8"
 				SelectionMode="Multiple"
 				ItemsSource="{x:Bind ViewModel.FilteringConditions, Mode=OneWay}"
-				SelectionChanged="FilteringCondisionListBox_SelectionChanged" >
+				SelectionChanged="FilteringConditionListBox_SelectionChanged" >
 				<ItemsControl.ItemTemplate>
 					<DataTemplate x:DataType="filtersVm:FilteringConditionViewModel" >
 						<TextBlock Text="{x:Bind DisplayName.Value, Mode=OneWay, TargetNullValue=NoName}"

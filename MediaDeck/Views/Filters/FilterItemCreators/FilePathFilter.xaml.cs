@@ -11,4 +11,7 @@ public partial class FilePathFilter {
 	}
 }
 
-public class FlePathFilterPageBase : PageBase<FilePathFilterCreatorViewModel>;
+/// <summary>
+/// ファイルパスフィルターページの基底クラス
+/// </summary>
+public class FilePathFilterPageBase : PageBase<FilePathFilterCreatorViewModel>;

@@ -32,16 +32,16 @@ public sealed partial class FilterSelector {
 		var selectedArray = selected ?? [];
 		this._isSyncingSelection = true;
 		try {
-			this.FilteringCondisionListBox.SelectedItems.Clear();
+			this.FilteringConditionListBox.SelectedItems.Clear();
 			foreach (var item in selectedArray) {
-				this.FilteringCondisionListBox.SelectedItems.Add(item);
+				this.FilteringConditionListBox.SelectedItems.Add(item);
 			}
 		} finally {
 			this._isSyncingSelection = false;
 		}
 	}
 
-	private void FilteringCondisionListBox_SelectionChanged(object sender, SelectionChangedEventArgs e) {
+	private void FilteringConditionListBox_SelectionChanged(object sender, SelectionChangedEventArgs e) {
 		if (this._isSyncingSelection) {
 			return;
 		}
@@ -72,7 +72,7 @@ public sealed partial class FilterSelector {
 		this._selectedConditionsSubscription = null;
 	}
 
-	private void FilteringCondisionListBox_ItemClick(object sender, ItemClickEventArgs e) {
+	private void FilteringConditionListBox_ItemClick(object sender, ItemClickEventArgs e) {
 		if (this._isSyncingSelection) {
 			return;
 		}
