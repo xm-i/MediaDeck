@@ -15,15 +15,26 @@ public class BulkThumbnailRegenerationViewModel : ViewModelBase {
 	private readonly IMediaItemTypeService _mediaItemTypeService;
 	private CancellationTokenSource? _cts;
 
+	/// <summary>
+	/// <see cref="BulkThumbnailRegenerationViewModel"/> クラスの新しいインスタンスを初期化します。
+	/// </summary>
+	/// <param name="mediaItemTypeService">メディアアイテム種別サービス</param>
 	public BulkThumbnailRegenerationViewModel(IMediaItemTypeService mediaItemTypeService) {
 		this._mediaItemTypeService = mediaItemTypeService;
 
+		this.TargetMediaType = new BindableReactiveProperty<MediaType>(MediaType.Unknown).AddTo(this.CompositeDisposable);
+		this.ConfigViewModel = new BindableReactiveProperty<IBulkThumbnailConfigViewModel?>().AddTo(this.CompositeDisposable);
+		this.IsRunning = new BindableReactiveProperty<bool>(false).AddTo(this.CompositeDisposable);
+		this.CompletedCount = new BindableReactiveProperty<int>(0).AddTo(this.CompositeDisposable);
+		this.TotalCount = new BindableReactiveProperty<int>(0).AddTo(this.CompositeDisposable);
+
 		this.ExecuteCommand = this.IsRunning
 			.Select(running => !running)
-			.ToReactiveCommand();
+			.ToReactiveCommand()
+			.AddTo(this.CompositeDisposable);
 		this.ExecuteCommand.SubscribeAwait(async (_, ct) => await this.ExecuteAsync(), AwaitOperation.Drop).AddTo(this.CompositeDisposable);
 
-		this.CancelCommand = this.IsRunning.ToReactiveCommand();
+		this.CancelCommand = this.IsRunning.ToReactiveCommand().AddTo(this.CompositeDisposable);
 		this.CancelCommand.Subscribe(_ => this.Cancel()).AddTo(this.CompositeDisposable);
 	}
 
@@ -39,40 +50,46 @@ public class BulkThumbnailRegenerationViewModel : ViewModelBase {
 	/// </summary>
 	public BindableReactiveProperty<MediaType> TargetMediaType {
 		get;
-	} = new(MediaType.Unknown);
+	}
 
 	/// <summary>
 	/// メディアタイプに応じた設定 ViewModel (右側ペイン用)。
 	/// </summary>
 	public BindableReactiveProperty<IBulkThumbnailConfigViewModel?> ConfigViewModel {
 		get;
-	} = new();
+	}
 
 	/// <summary>
 	/// 実行中フラグ。
 	/// </summary>
 	public BindableReactiveProperty<bool> IsRunning {
 		get;
-	} = new(false);
+	}
 
 	/// <summary>
 	/// 完了済み件数。
 	/// </summary>
 	public BindableReactiveProperty<int> CompletedCount {
 		get;
-	} = new(0);
+	}
 
 	/// <summary>
 	/// 全件数。
 	/// </summary>
 	public BindableReactiveProperty<int> TotalCount {
 		get;
-	} = new(0);
+	}
 
+	/// <summary>
+	/// 一括再生成実行コマンド。
+	/// </summary>
 	public ReactiveCommand ExecuteCommand {
 		get;
 	}
 
+	/// <summary>
+	/// 一括再生成キャンセルコマンド。
+	/// </summary>
 	public ReactiveCommand CancelCommand {
 		get;
 	}
@@ -82,7 +99,12 @@ public class BulkThumbnailRegenerationViewModel : ViewModelBase {
 	/// </summary>
 	/// <param name="selectedItems">右クリック時の選択アイテム群。</param>
 	public void Initialize(IReadOnlyList<IMediaItemViewModel> selectedItems) {
+		foreach (var existing in this.Items) {
+			existing.Dispose();
+		}
 		this.Items.Clear();
+		(this.ConfigViewModel.Value as IDisposable)?.Dispose();
+		this.ConfigViewModel.Value = null;
 		this.CompletedCount.Value = 0;
 		this.TotalCount.Value = 0;
 		if (selectedItems.Count == 0) {
@@ -142,5 +164,19 @@ public class BulkThumbnailRegenerationViewModel : ViewModelBase {
 
 	private void Cancel() {
 		this._cts?.Cancel();
+	}
+
+	/// <inheritdoc/>
+	protected override void Dispose(bool disposing) {
+		if (disposing) {
+			this._cts?.Cancel();
+			this._cts?.Dispose();
+			this._cts = null;
+			(this.ConfigViewModel.Value as IDisposable)?.Dispose();
+			foreach (var item in this.Items) {
+				item.Dispose();
+			}
+		}
+		base.Dispose(disposing);
 	}
 }

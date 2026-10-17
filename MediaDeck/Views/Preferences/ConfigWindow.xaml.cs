@@ -12,13 +12,22 @@ namespace MediaDeck.Views.Preferences;
 public sealed partial class ConfigWindow : Window {
 	private readonly CompositeDisposable _disposable = new();
 
+	/// <summary>
+	/// 設定ウィンドウのViewModel
+	/// </summary>
 	public ConfigWindowViewModel ViewModel {
 		get;
 	}
 
+	/// <summary>
+	/// <see cref="ConfigWindow"/> クラスの新しいインスタンスを初期化します。
+	/// </summary>
+	/// <param name="configWindowViewModel">設定ウィンドウのViewModel</param>
+	/// <param name="configStore">設定ストア</param>
+	/// <param name="stringProvider">文字列プロバイダー</param>
 	public ConfigWindow(ConfigWindowViewModel configWindowViewModel, IConfigStore configStore, IStringProvider stringProvider) {
 		this.InitializeComponent();
-		this.ViewModel = configWindowViewModel;
+		this.ViewModel = configWindowViewModel.AddTo(this._disposable);
 
 		this.Title = stringProvider.GetString("ConfigWindow_Title");
 

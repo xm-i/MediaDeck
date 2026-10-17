@@ -8,9 +8,14 @@ namespace MediaDeck.Views.Thumbnails;
 public sealed partial class BulkThumbnailRegenerationWindow : Microsoft.UI.Xaml.Window {
 	private readonly CompositeDisposable _disposable = new();
 
+	/// <summary>
+	/// <see cref="BulkThumbnailRegenerationWindow"/> クラスの新しいインスタンスを初期化します。
+	/// </summary>
+	/// <param name="viewModel">一括サムネイル再生成ViewModel</param>
+	/// <param name="configStore">設定ストア</param>
 	public BulkThumbnailRegenerationWindow(BulkThumbnailRegenerationViewModel viewModel, IConfigStore configStore) {
 		this.InitializeComponent();
-		this.ViewModel = viewModel;
+		this.ViewModel = viewModel.AddTo(this._disposable);
 
 		// テーマのバインド
 		ThemeHelper.BindTheme(this, configStore, this._disposable);
@@ -20,6 +25,9 @@ public sealed partial class BulkThumbnailRegenerationWindow : Microsoft.UI.Xaml.
 		this.Closed += (s, e) => this._disposable.Dispose();
 	}
 
+	/// <summary>
+	/// 一括サムネイル再生成ViewModel
+	/// </summary>
 	public BulkThumbnailRegenerationViewModel ViewModel {
 		get;
 	}

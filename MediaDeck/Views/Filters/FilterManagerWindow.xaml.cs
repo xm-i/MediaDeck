@@ -9,8 +9,14 @@ namespace MediaDeck.Views.Filters;
 public sealed partial class FilterManagerWindow : Microsoft.UI.Xaml.Window {
 	private readonly CompositeDisposable _disposable = new();
 
+	/// <summary>
+	/// <see cref="FilterManagerWindow"/> クラスの新しいインスタンスを初期化します。
+	/// </summary>
+	/// <param name="viewModel">フィルター管理ViewModel</param>
+	/// <param name="configStore">設定ストア</param>
+	/// <param name="stringProvider">文字列プロバイダー</param>
 	public FilterManagerWindow(FilterManagerViewModel viewModel, IConfigStore configStore, IStringProvider stringProvider) {
-		this.ViewModel = viewModel;
+		this.ViewModel = viewModel.AddTo(this._disposable);
 		this.InitializeComponent();
 
 		this.Title = stringProvider.GetString("FilterManager_WindowTitle");
@@ -26,6 +32,9 @@ public sealed partial class FilterManagerWindow : Microsoft.UI.Xaml.Window {
 		this.Closed += (s, e) => this._disposable.Dispose();
 	}
 
+	/// <summary>
+	/// フィルター管理ViewModel
+	/// </summary>
 	public FilterManagerViewModel ViewModel {
 		get;
 	}

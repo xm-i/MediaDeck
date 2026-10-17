@@ -20,7 +20,7 @@ public sealed partial class AboutWindow : Window {
 	/// <param name="configStore">設定ストア</param>
 	/// <param name="stringProvider">文字列プロバイダー</param>
 	public AboutWindow(AboutWindowViewModel viewModel, IConfigStore configStore, IStringProvider stringProvider) {
-		this.ViewModel = viewModel;
+		this.ViewModel = viewModel.AddTo(this._disposable);
 		this.InitializeComponent();
 
 		// ウィンドウタイトルのローカライズ設定 (Windowクラスはx:UidによるTitle設定をサポートしていないため)

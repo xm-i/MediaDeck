@@ -20,7 +20,7 @@ public sealed partial class LicenseWindow : Window {
 	/// <param name="configStore">設定ストア</param>
 	/// <param name="stringProvider">文字列プロバイダー</param>
 	public LicenseWindow(LicenseWindowViewModel viewModel, IConfigStore configStore, IStringProvider stringProvider) {
-		this.ViewModel = viewModel;
+		this.ViewModel = viewModel.AddTo(this._disposable);
 		this.InitializeComponent();
 
 		// ウィンドウタイトルのローカライズ設定

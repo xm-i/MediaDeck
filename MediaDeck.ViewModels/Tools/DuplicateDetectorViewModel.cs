@@ -101,17 +101,22 @@ public class DuplicateDetectorViewModel : ViewModelBase {
 
 		this.DuplicateGroups = this._detector.DuplicateGroups.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
 
-		this.IsDetecting = this._detector.IsDetecting.ToBindableReactiveProperty();
-		this.IsCompleted = this._detector.IsCompleted.ToBindableReactiveProperty();
-		this.DuplicateGroupCount = this._detector.DuplicateGroupCount.ToBindableReactiveProperty();
-		this.DuplicateFileCount = this._detector.DuplicateFileCount.ToBindableReactiveProperty();
+		this.IsDetecting = this._detector.IsDetecting.ToBindableReactiveProperty().AddTo(this.CompositeDisposable);
+		this.IsCompleted = this._detector.IsCompleted.ToBindableReactiveProperty().AddTo(this.CompositeDisposable);
+		this.DuplicateGroupCount = this._detector.DuplicateGroupCount.ToBindableReactiveProperty().AddTo(this.CompositeDisposable);
+		this.DuplicateFileCount = this._detector.DuplicateFileCount.ToBindableReactiveProperty().AddTo(this.CompositeDisposable);
 
 		this.SelectedHashType.Value = this.HashTypeList.First();
 
 		this.SelectedGroup
 			.Subscribe(g => {
+				if (this.SelectedGroupFiles.Value != null) {
+					foreach (var existing in this.SelectedGroupFiles.Value) {
+						(existing as IDisposable)?.Dispose();
+					}
+				}
 				this.SelectedGroupFiles.Value = g?.Files
-					.Select(f => this._MediaItemTypeService.CreateMediaItemViewModel(this._MediaItemTypeService.CreateMediaItemModelFromRecord(f)))
+					.Select(f => this._MediaItemTypeService.CreateMediaItemViewModel(this._MediaItemTypeService.CreateMediaItemModelFromRecord(f).AddTo(this.CompositeDisposable)))
 					.ToArray();
 			})
 			.AddTo(this.CompositeDisposable);
@@ -129,5 +134,15 @@ public class DuplicateDetectorViewModel : ViewModelBase {
 	/// </summary>
 	public static void ShowInExplorer(string filePath) {
 		ShellUtility.ShowInExplorer(filePath);
+	}
+
+	/// <inheritdoc/>
+	protected override void Dispose(bool disposing) {
+		if (disposing && this.SelectedGroupFiles.Value != null) {
+			foreach (var existing in this.SelectedGroupFiles.Value) {
+				(existing as IDisposable)?.Dispose();
+			}
+		}
+		base.Dispose(disposing);
 	}
 }

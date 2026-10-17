@@ -9,8 +9,14 @@ namespace MediaDeck.Views.Sort;
 public sealed partial class SortManagerWindow : Microsoft.UI.Xaml.Window {
 	private readonly CompositeDisposable _disposable = new();
 
+	/// <summary>
+	/// <see cref="SortManagerWindow"/> クラスの新しいインスタンスを初期化します。
+	/// </summary>
+	/// <param name="viewModel">ソート管理ViewModel</param>
+	/// <param name="configStore">設定ストア</param>
+	/// <param name="stringProvider">文字列プロバイダー</param>
 	public SortManagerWindow(SortManagerViewModel viewModel, IConfigStore configStore, IStringProvider stringProvider) {
-		this.ViewModel = viewModel;
+		this.ViewModel = viewModel.AddTo(this._disposable);
 		this.InitializeComponent();
 
 		this.Title = stringProvider.GetString("SortManager_WindowTitle");
@@ -26,6 +32,9 @@ public sealed partial class SortManagerWindow : Microsoft.UI.Xaml.Window {
 		this.Closed += (s, e) => this._disposable.Dispose();
 	}
 
+	/// <summary>
+	/// ソート管理ViewModel
+	/// </summary>
 	public SortManagerViewModel ViewModel {
 		get;
 	}
