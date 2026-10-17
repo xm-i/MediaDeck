@@ -59,7 +59,7 @@
 				SelectionChanged="CurrentCondition_SelectionChanged">
 				<ComboBox.ItemTemplate>
 					<DataTemplate x:DataType="sortpanesVm:SortConditionViewModel" >
-						<TextBlock Text="{x:Bind DisplayName.Value}" />
+						<TextBlock Text="{x:Bind DisplayName.Value, Mode=OneWay}" />
 					</DataTemplate>
 				</ComboBox.ItemTemplate>
 			</ComboBox>

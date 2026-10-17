@@ -32,7 +32,7 @@
 				SelectedItem="{x:Bind ViewModel.SelectedCategory.Value, Mode=TwoWay}" >
 				<ComboBox.ItemTemplate>
 					<DataTemplate x:DataType="tags:TagCategoryViewModel" >
-						<TextBlock Text="{x:Bind TagCategoryName.Value}" />
+						<TextBlock Text="{x:Bind TagCategoryName.Value, Mode=OneWay}" />
 					</DataTemplate>
 				</ComboBox.ItemTemplate>
 			</ComboBox>

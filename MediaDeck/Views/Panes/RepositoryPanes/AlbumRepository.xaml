@@ -24,7 +24,7 @@
 					<TreeViewItem AutomationProperties.Name="{x:Bind AlbumName}"
 						ItemsSource="{x:Bind ChildAlbums}"
 						DoubleTapped="TreeViewItem_DoubleTapped"
-						IsExpanded="{x:Bind IsExpanded}" >
+						IsExpanded="{x:Bind IsExpanded, Mode=TwoWay}" >
 						<StackPanel Orientation="Horizontal" >
 							<FontIcon Glyph="&#xE8FD;" />
 							<TextBlock Margin="0,0,10,0" />

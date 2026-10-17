@@ -44,7 +44,7 @@
 					SelectedItem="{x:Bind ViewModel.SelectedTagCategory.Value, Mode=TwoWay}" >
 					<ItemsControl.ItemTemplate>
 						<DataTemplate x:DataType="tags:TagCategoryViewModel" >
-							<TextBlock Text="{x:Bind TagCategoryName.Value}"
+							<TextBlock Text="{x:Bind TagCategoryName.Value, Mode=OneWay}"
 								TextTrimming="CharacterEllipsis" />
 						</DataTemplate>
 					</ItemsControl.ItemTemplate>
@@ -196,7 +196,7 @@
 						SelectedItem="{x:Bind ViewModel.SelectedTagCategory.Value.SelectedTag.Value.TagCategory.Value, Mode=TwoWay}" >
 						<ComboBox.ItemTemplate>
 							<DataTemplate x:DataType="tags:TagCategoryViewModel" >
-								<TextBlock Text="{x:Bind TagCategoryName.Value}" />
+								<TextBlock Text="{x:Bind TagCategoryName.Value, Mode=OneWay}" />
 							</DataTemplate>
 						</ComboBox.ItemTemplate>
 					</ComboBox>
