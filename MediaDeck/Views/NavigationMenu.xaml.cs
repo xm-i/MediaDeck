@@ -42,7 +42,13 @@ public sealed partial class NavigationMenu {
 		if (sender is not MenuFlyoutItem selectedItem) {
 			return;
 		}
-		Window? window = selectedItem.Tag.ToString() switch {
+
+		if (selectedItem.Tag?.ToString() == "Exit") {
+			Application.Current.Exit();
+			return;
+		}
+
+		Window? window = selectedItem.Tag?.ToString() switch {
 			"TagManager" => Ioc.Default.GetRequiredService<TagManagerWindow>(),
 			"FolderManager" => Ioc.Default.GetRequiredService<FolderManagerWindow>(),
 			"DuplicateDetector" => Ioc.Default.GetRequiredService<DuplicateDetectorWindow>(),

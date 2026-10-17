@@ -107,6 +107,12 @@
   </data>
 
   <!-- Navigation menu -->
+  <data name="NavMenu_File.Title" xml:space="preserve">
+    <value>File</value>
+  </data>
+  <data name="NavMenu_Exit.Text" xml:space="preserve">
+    <value>Exit</value>
+  </data>
   <data name="NavMenu_View.Title" xml:space="preserve">
     <value>View</value>
   </data>

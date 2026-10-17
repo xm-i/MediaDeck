@@ -58,6 +58,7 @@ public partial class App {
 #endif
 		this.InitializeComponent();
 		AppDomain.CurrentDomain.ProcessExit += (_, _) => {
+			this._stateStore.Save();
 			this._configStore.Save();
 			this.Vacuum();
 		};

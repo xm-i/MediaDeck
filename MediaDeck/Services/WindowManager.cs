@@ -52,7 +52,6 @@ public class WindowContext(IServiceScope scope, Guid windowId) : IWindowContext 
 public class WindowManager : DisposableBase {
 	private readonly IServiceProvider _rootProvider;
 	private readonly IStateStore _stateStore;
-	private readonly SaveStateService _saveStateService;
 	private readonly ILogger<WindowManager> _logger;
 	private readonly List<WindowContext> _windows = [];
 
@@ -74,12 +73,10 @@ public class WindowManager : DisposableBase {
 	public WindowManager(
 		IServiceProvider rootProvider,
 		IStateStore stateStore,
-		SaveStateService saveStateService,
 		ILogger<WindowManager> logger) {
 		this._rootProvider = rootProvider;
 		this._stateStore = stateStore;
 		this._logger = logger;
-		this._saveStateService = saveStateService;
 
 		// 状態の変化を監視してウィンドウを開閉する
 		this._stateStore.RootState.Windows.ObserveAdd()
@@ -288,16 +285,13 @@ public class WindowManager : DisposableBase {
 	}
 
 	private void OnWindowUIClosed(WindowContext windowContext) {
-		// UIから閉じられた場合は状態リストから削除する
-		// これにより OnWindowStateRemoved が呼ばれ、コンテキストの破棄などが行われる
-		this._saveStateService.RequestSave();
-		var ws = this._stateStore.RootState.Windows.FirstOrDefault(x => x.WindowId == windowContext.WindowId);
-		if (ws != null) {
-			this._stateStore.RootState.Windows.Remove(ws);
-		}
-
-		if (this.WindowCount == 0) {
-			Application.Current.Exit();
+		// 他にウィンドウがある場合のみ状態リストから削除する
+		// （最後の1ウィンドウの場合は削除せずに残すことで、プロセス終了時にそのウィンドウが保存される）
+		if (this.WindowCount > 1) {
+			var ws = this._stateStore.RootState.Windows.FirstOrDefault(x => x.WindowId == windowContext.WindowId);
+			if (ws != null) {
+				this._stateStore.RootState.Windows.Remove(ws);
+			}
 		}
 	}
 

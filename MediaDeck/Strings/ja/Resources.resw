@@ -107,6 +107,12 @@
   </data>
 
   <!-- ナビゲーションメニュー -->
+  <data name="NavMenu_File.Title" xml:space="preserve">
+    <value>ファイル</value>
+  </data>
+  <data name="NavMenu_Exit.Text" xml:space="preserve">
+    <value>終了</value>
+  </data>
   <data name="NavMenu_View.Title" xml:space="preserve">
     <value>表示</value>
   </data>
