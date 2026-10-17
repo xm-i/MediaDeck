@@ -72,6 +72,30 @@ public class ConfigStoreTests : IDisposable {
 	}
 
 	[Fact]
+	public void Load_WhenAlreadyLoaded_DoesNotReplaceConfigInstance() {
+		// Arrange
+		var services = new ServiceCollection();
+		var mockConfig = (ConfigModel)RuntimeHelpers.GetUninitializedObject(typeof(ConfigModel));
+		services.AddSingleton(mockConfig);
+		services.AddLogging();
+		services.AddSingleton<AppNotificationDispatcher>();
+		services.AddSingleton<MediaDeck.Composition.Interfaces.IStringProvider, StubStringProvider>();
+		var mockPathProvider = new Mock<IAppPathProvider>();
+		mockPathProvider.Setup(x => x.ConfigFilePath).Returns(() => TestableConfigStore.TestPath);
+		services.AddSingleton(mockPathProvider.Object);
+
+		var serviceProvider = services.BuildServiceProvider();
+		var store = new TestableConfigStore(serviceProvider, mockPathProvider.Object);
+		var initialConfig = store.Config;
+
+		// Act: 既に読み込まれた状態で再度 Load を呼び出す
+		store.Load();
+
+		// Assert: Config のインスタンスが差し替えられていないことを検証
+		store.Config.ShouldBeSameAs(initialConfig);
+	}
+
+	[Fact]
 	public void Save_ThrowsException_DoesNotCrash() {
 		// Arrange
 		Directory.CreateDirectory(Path.GetDirectoryName(this._testConfigFilePath)!);

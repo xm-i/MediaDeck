@@ -58,6 +58,11 @@ public class ConfigStore : DisposableBase, IConfigStore {
 	/// </summary>
 	[MemberNotNull(nameof(Config))]
 	public void Load() {
+		if (this.Config != null) {
+			this._logger.LogWarning("アプリケーション設定は既に読み込まれています。インスタンスの再生成はスキップされました。");
+			return;
+		}
+
 		var scope = this.ScopedService.CreateScope().AddTo(this.CompositeDisposable);
 		try {
 			if (File.Exists(this.ConfigFilePath)) {

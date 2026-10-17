@@ -30,52 +30,74 @@ public class ConfigWindowViewModel : ViewModelBase {
 		this.ApplyCommand.Subscribe(_ => {
 			configStore.Save();
 		}).AddTo(this.CompositeDisposable);
-
-		this.LoadCommand.Subscribe(_ => {
-			configStore.Load();
-		}).AddTo(this.CompositeDisposable);
 	}
 
+	/// <summary>
+	/// 設定ページのViewModel一覧
+	/// </summary>
 	public IConfigPageViewModel[] ConfigPageViewModels {
 		get;
 	}
 
+	/// <summary>
+	/// 選択中の設定ページViewModel
+	/// </summary>
 	public BindableReactiveProperty<IConfigPageViewModel> SelectedPageViewModel {
 		get;
 	} = new();
 
+	/// <summary>
+	/// 保存してウィンドウを閉じるコマンド
+	/// </summary>
 	public ReactiveCommand SaveCommand {
 		get;
 	} = new();
 
+	/// <summary>
+	/// 設定を保存して適用するコマンド
+	/// </summary>
 	public ReactiveCommand ApplyCommand {
 		get;
 	} = new();
 
-	public ReactiveCommand LoadCommand {
-		get;
-	} = new();
-
+	/// <summary>
+	/// スキャン設定ページのViewModel
+	/// </summary>
 	public ScanConfigPageViewModel ScanConfigPageViewModel {
 		get;
 	}
 
+	/// <summary>
+	/// サムネイル設定ページのViewModel
+	/// </summary>
 	public ThumbnailConfigPageViewModel ThumbnailConfigPageViewModel {
 		get;
 	}
 
+	/// <summary>
+	/// 実行プログラム設定ページのViewModel
+	/// </summary>
 	public ExecutionConfigPageViewModel ExecutionConfigPageViewModel {
 		get;
 	}
 
+	/// <summary>
+	/// 検索設定ページのViewModel
+	/// </summary>
 	public SearchConfigPageViewModel SearchConfigPageViewModel {
 		get;
 	}
 
+	/// <summary>
+	/// 言語設定ページのViewModel
+	/// </summary>
 	public LanguageConfigPageViewModel LanguageConfigPageViewModel {
 		get;
 	}
 
+	/// <summary>
+	/// 環境設定ページのViewModel
+	/// </summary>
 	public EnvironmentConfigPageViewModel EnvironmentConfigPageViewModel {
 		get;
 	}

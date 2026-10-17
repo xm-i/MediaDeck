@@ -25,7 +25,6 @@ public sealed partial class ConfigWindow : Window {
 		// テーマのバインド
 		ThemeHelper.BindTheme(this, configStore, this._disposable);
 
-		this.ViewModel.LoadCommand.Execute(Unit.Default);
 		this.AppWindow.Resize(new(1000, 700));
 
 		this.ViewModel.SelectedPageViewModel.Subscribe(vm => {
