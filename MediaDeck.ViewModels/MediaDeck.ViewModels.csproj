@@ -12,4 +12,8 @@
     <ProjectReference Include="..\MediaDeck.Core\MediaDeck.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="Help\licenses.json" />
+  </ItemGroup>
+
 </Project>
