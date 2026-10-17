@@ -3,7 +3,6 @@ using MediaDeck.Composition.Database;
 using MediaDeck.Composition.Objects;
 using MediaDeck.Core.Models.Files;
 using MediaDeck.Core.Models.NotificationDispatcher;
-using MediaDeck.Core.Stores.State;
 
 using Microsoft.Extensions.Logging;
 
@@ -32,14 +31,13 @@ public class FileChangeMonitorService : ModelBase {
 	/// <summary>
 	/// FileChangeMonitorServiceクラスの新しいインスタンスを初期化します。
 	/// </summary>
-	/// <param name="stateStore">状態管理ストア</param>
 	/// <param name="dbFactory">DBコンテキストファクトリー</param>
 	/// <param name="tracker">ファイル変更トラッカー</param>
 	/// <param name="logger">ロガー</param>
 	/// <param name="appNotificationDispatcher">通知送信クラス</param>
 	/// <param name="fileRegistrar">ファイル登録クラス</param>
 	/// <param name="databaseWriteCoordinator">データベース書き込み直列化サービス</param>
-	public FileChangeMonitorService(IStateStore stateStore, IDbContextFactory<MediaDeckDbContext> dbFactory, FileChangeTracker tracker, ILogger<FileChangeMonitorService> logger, AppNotificationDispatcher appNotificationDispatcher, FileRegistrar fileRegistrar, IDatabaseWriteCoordinator databaseWriteCoordinator) {
+	public FileChangeMonitorService(IDbContextFactory<MediaDeckDbContext> dbFactory, FileChangeTracker tracker, ILogger<FileChangeMonitorService> logger, AppNotificationDispatcher appNotificationDispatcher, FileRegistrar fileRegistrar, IDatabaseWriteCoordinator databaseWriteCoordinator) {
 		this._dbFactory = dbFactory;
 		this._databaseWriteCoordinator = databaseWriteCoordinator;
 		this._logger = logger;

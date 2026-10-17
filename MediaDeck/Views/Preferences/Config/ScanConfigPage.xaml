@@ -8,14 +8,6 @@
 	Background="Transparent"
 	x:Name="PageRoot" >
 
-	<Page.Resources>
-		<!-- カードの背景ブラシ -->
-		<SolidColorBrush x:Key="CardBackgroundBrush"
-			Color="{ThemeResource CardBackgroundFillColorDefaultColor}" />
-		<SolidColorBrush x:Key="CardBorderBrush"
-			Color="{ThemeResource CardStrokeColorDefaultColor}" />
-	</Page.Resources>
-
 	<Grid MaxWidth="800" Margin="36,24,36,36">
 		<ScrollViewer VerticalScrollBarVisibility="Auto">
 			<StackPanel Spacing="4">

@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Text;
@@ -228,9 +227,6 @@ public partial class App {
 			splashViewModel?.UpdateStatus(stringProvider.GetString("Splash_PreparingBackgroundTasks"));
 			var backgroundTasksModel = Ioc.Default.GetRequiredService<BackgroundTasksModel>();
 			backgroundTasksModel.Start();
-
-			var _ = this._stateStore.RootState.AppState.DefaultTabState.SearchState.CurrentSortCondition.Subscribe(x => Debug.WriteLine($"CurrentSortCondition {x}"));
-			_ = this._stateStore.RootState.AppState.DefaultTabState.SearchState.SortDirection.Subscribe(x => Debug.WriteLine($"SortDirection {x}"));
 
 			splashViewModel?.UpdateStatus(stringProvider.GetString("Splash_StartingMediaEngine"));
 			await Task.Delay(100);

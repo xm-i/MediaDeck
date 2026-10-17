@@ -6,7 +6,6 @@ using MediaDeck.Composition.Stores.State.Model.Objects;
 using MediaDeck.Core.Models.Files;
 using MediaDeck.Core.Models.NotificationDispatcher;
 using MediaDeck.Core.Services.FileChangeMonitor;
-using MediaDeck.Core.Stores.State;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -33,7 +32,6 @@ public class FileChangeMonitorServiceTests {
 		var trackerLogger = new Mock<ILogger<FileChangeTracker>>();
 		this._tracker = new FileChangeTracker(dbFactoryMock.Object, trackerLogger.Object);
 
-		var stateStore = new Mock<IStateStore>();
 		var logger = new Mock<ILogger<FileChangeMonitorService>>();
 		var appNotifDispatcher = new AppNotificationDispatcher();
 		var dbWriteCoord = new Mock<IDatabaseWriteCoordinator>();
@@ -63,7 +61,7 @@ public class FileChangeMonitorServiceTests {
 		mediaItemTypeService.Setup(x => x.CreateMediaItemOperators()).Returns([]);
 		var fileRegistrar = new FileRegistrar(config, new Mock<ILogger<FileRegistrar>>().Object, mediaItemTypeService.Object);
 
-		this._sut = new FileChangeMonitorService(stateStore.Object, dbFactoryMock.Object, this._tracker, logger.Object, appNotifDispatcher, fileRegistrar, dbWriteCoord.Object);
+		this._sut = new FileChangeMonitorService(dbFactoryMock.Object, this._tracker, logger.Object, appNotifDispatcher, fileRegistrar, dbWriteCoord.Object);
 	}
 
 	[Fact]

@@ -6,17 +6,8 @@
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:folderManagerVm="using:MediaDeck.ViewModels.FolderManager"
-	xmlns:converters="using:MediaDeck.Views.Resources.Converters"
 	xmlns:toolkit="using:CommunityToolkit.WinUI.Controls"
 	mc:Ignorable="d" >
-
-	<local:FolderManagerViewUserControl.Resources>
-		<ResourceDictionary>
-			<converters:ToVisibilityConverter x:Key="NullToVisibleConverter"
-				Visible="{x:Null}"
-				Collapse="*" />
-		</ResourceDictionary>
-	</local:FolderManagerViewUserControl.Resources>
 
 	<Grid Padding="12" >
 		<Grid.ColumnDefinitions>

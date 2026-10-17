@@ -16,14 +16,10 @@
 	<converters:FilePathToFileNameConverter x:Key="FilePathToFileNameConverter" />
 	<uiConverters:FilePathToExtensionConverter x:Key="FilePathToExtensionConverter" />
 	<uiConverters:DurationToStringConverter x:Key="DurationToStringConverter" />
-	<converters:CardDisplayModeToOverlayVisibilityConverter x:Key="CardDisplayModeToOverlayVisibilityConverter" />
-
 
 	<ctConverters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
-	<converters:EqualityToBooleanConverter x:Key="EqualityToBooleanConverter" />
 	<converters:StringNotEmptyToVisibilityConverter x:Key="StringNotEmptyToVisibilityConverter" />
 	<converters:LongToDoubleConverter x:Key="LongToDoubleConverter" />
-	<converters:NullToBooleanConverter x:Key="NullToBooleanConverter" />
 	<converters:ToVisibilityConverter x:Key="NullToCollapseConverter"
 		Collapse="{x:Null}"
 		Visible="*" />
@@ -31,7 +27,6 @@
 	<converters:SortKeyToDisplayNameConverter x:Key="SortKeyToDisplayNameConverter" />
 	<converters:ListSortDirectionToIconGlyphConverter x:Key="ListSortDirectionToIconGlyphConverter" />
 	<converters:ListSortDirectionToBooleanConverter x:Key="ListSortDirectionToBooleanConverter" />
-	<converters:PathToMediaPlaybackSourceConverter x:Key="PathToMediaPlaybackSourceConverter" />
 	<converters:BinaryToImageSourceConverter x:Key="BinaryToImageSourceConverter" />
 	<converters:TimeSpanToStringConverter x:Key="TimeSpanToStringConverter" />
 	<converters:FileSizeConverter x:Key="FileSizeConverter" />
