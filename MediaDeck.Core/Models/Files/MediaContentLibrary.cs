@@ -17,6 +17,7 @@ public class MediaContentLibrary : ModelBase {
 	private readonly SearchConfigModel _searchConfig;
 	private readonly SearchConditionManager _searchConditionManager;
 	private readonly IUiDispatcher _uiDispatcher;
+	private readonly SerialDisposable _searchDisposables = new();
 
 	/// <summary>コンストラクタ</summary>
 	public MediaContentLibrary(FilesLoader filesLoader, SearchConfigModel searchConfig, SearchConditionManager searchConditionManager, ISearchConditionNotificationDispatcher dispatcher, IUiDispatcher uiDispatcher) {
@@ -24,6 +25,7 @@ public class MediaContentLibrary : ModelBase {
 		this._searchConfig = searchConfig;
 		this._searchConditionManager = searchConditionManager;
 		this._uiDispatcher = uiDispatcher;
+		this._searchDisposables.AddTo(this.CompositeDisposable);
 
 		// Dispatcher の統合ストリームを監視する。
 		// Switch により、新しい検索リクエストが来たら前の検索タスクを自動キャンセルする。
@@ -85,6 +87,11 @@ public class MediaContentLibrary : ModelBase {
 			this.TotalCount.Value = null;
 			this.ClearFiles();
 		}
+		var session = this._searchDisposables.Disposable as CompositeDisposable ?? new CompositeDisposable();
+		if (this._searchDisposables.Disposable != session) {
+			this._searchDisposables.Disposable = session;
+		}
+
 		var batch = new List<IMediaItemModel>();
 		try {
 			await Task.Run(async () => {
@@ -101,7 +108,7 @@ public class MediaContentLibrary : ModelBase {
 				var batchLimit = isInitial ? initialLoadCount : incrementalLoadCount;
 
 				await foreach (var fileModel in stream.WithCancellation(token)) {
-					batch.Add(fileModel.AddTo(this.CompositeDisposable));
+					batch.Add(fileModel.AddTo(session));
 					totalLoaded++;
 
 					if (batch.Count >= batchLimit) {
@@ -140,12 +147,10 @@ public class MediaContentLibrary : ModelBase {
 		}
 	}
 
-	/// <summary>ファイルリストをクリアし、各要素を Dispose する。</summary>
+	/// <summary>ファイルリストをクリアし、セッションのリソースを破棄する。</summary>
 	private void ClearFiles() {
+		this._searchDisposables.Disposable = new CompositeDisposable();
 		this._uiDispatcher.Run(() => {
-			foreach (var file in this.Files) {
-				file.Dispose();
-			}
 			this.Files.Clear();
 		});
 	}

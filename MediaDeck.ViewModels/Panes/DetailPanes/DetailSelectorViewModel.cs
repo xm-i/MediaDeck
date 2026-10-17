@@ -1,4 +1,5 @@
 using MediaDeck.Common.Base;
+using MediaDeck.Common.Extensions;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.Models;
 using MediaDeck.Composition.Interfaces.Notifications;
 using MediaDeck.Composition.Interfaces.Tags;
@@ -42,17 +43,17 @@ public class DetailSelectorViewModel : ViewModelBase {
 		this.Metadata = model.Metadata.ToBindableReactiveProperty().AddTo(this.CompositeDisposable);
 		this._model.AddTo(this.CompositeDisposable);
 
-		this.TagCandidates = model.TagModels.CreateView(x => {
+		this.TagCandidates = model.TagModels.CreateViewWithDisposal(x => {
 			var categoryViewModel = this.GetCategoryViewModel(x.TagCategory, model.TagsManager, tagModelFactory);
 			return new TagViewModel(categoryViewModel, x, model.TagsManager, tagModelFactory);
-		});
+		}).AddTo(this.CompositeDisposable);
 		this.FilteredTagCandidates = this.TagCandidates.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current).AddTo(this.CompositeDisposable);
 
-		this.Tags = model.Tags.CreateView(x => {
+		this.Tags = model.Tags.CreateViewWithDisposal(x => {
 			var categoryViewModel = this.GetCategoryViewModel(x.Value.TagCategory, model.TagsManager, tagModelFactory);
 			return new ValueCountPair<TagViewModel>(new TagViewModel(categoryViewModel, x.Value, model.TagsManager, tagModelFactory), x.Count);
 		})
-			.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current).AddTo(this.CompositeDisposable);
+			.ToNotifyCollectionChangedWithDisposal(SynchronizationContextCollectionEventDispatcher.Current).AddTo(this.CompositeDisposable);
 
 		Observable.Merge(this.TargetFiles.Where(x => x != null).Select(_ => Unit.Default),
 				model.ContentChanged.AsObservable())
@@ -220,5 +221,19 @@ public class DetailSelectorViewModel : ViewModelBase {
 		// このマジックナンバーはキャッシュ管理のためだけに内部で使用され、外部（モデルやUI）には影響しません。
 		var key = category.TagCategoryId ?? int.MinValue;
 		return this._categoryViewModels.GetOrAdd(key, _ => new TagCategoryViewModel(category, tagsManager, factory));
+	}
+
+	/// <summary>
+	/// リソースを破棄します。
+	/// </summary>
+	/// <param name="disposing">マネージドリソースを破棄するかどうか</param>
+	protected override void Dispose(bool disposing) {
+		if (disposing) {
+			foreach (var categoryVm in this._categoryViewModels.Values) {
+				categoryVm.Dispose();
+			}
+			this._categoryViewModels.Clear();
+		}
+		base.Dispose(disposing);
 	}
 }

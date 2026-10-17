@@ -26,7 +26,7 @@ public class FilesLoader(IDbContextFactory<MediaDeckDbContext> dbFactory, SortSe
 	/// <param name="take">取得件数</param>
 	/// <param name="cancellationToken">キャンセルトークン</param>
 	/// <returns>IMediaItemModelのストリーム</returns>
-	public async IAsyncEnumerable<IMediaItemModel> GetFilesStreamAsync(IEnumerable<ISearchCondition> searchConditions, int? skip = null, int? take = null, [EnumeratorCancellation] CancellationToken cancellationToken = default) {
+	public virtual async IAsyncEnumerable<IMediaItemModel> GetFilesStreamAsync(IEnumerable<ISearchCondition> searchConditions, int? skip = null, int? take = null, [EnumeratorCancellation] CancellationToken cancellationToken = default) {
 		await using var db = await dbFactory.CreateDbContextAsync(cancellationToken);
 		var query = this.BuildQuery(db, searchConditions);
 
@@ -48,7 +48,7 @@ public class FilesLoader(IDbContextFactory<MediaDeckDbContext> dbFactory, SortSe
 	/// <param name="searchConditions">検索条件</param>
 	/// <param name="cancellationToken">キャンセルトークン</param>
 	/// <returns>全件数</returns>
-	public async Task<int> GetTotalCountAsync(IEnumerable<ISearchCondition> searchConditions, CancellationToken cancellationToken = default) {
+	public virtual async Task<int> GetTotalCountAsync(IEnumerable<ISearchCondition> searchConditions, CancellationToken cancellationToken = default) {
 		await using var db = await dbFactory.CreateDbContextAsync(cancellationToken);
 		var query = db.MediaItems.AsNoTracking().Where(searchConditions).Where(this.FilterSetter);
 		return await query.CountAsync(cancellationToken);

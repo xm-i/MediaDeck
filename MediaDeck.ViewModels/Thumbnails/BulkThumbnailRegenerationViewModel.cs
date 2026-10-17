@@ -15,6 +15,8 @@ public class BulkThumbnailRegenerationViewModel : ViewModelBase {
 	private readonly IMediaItemTypeService _mediaItemTypeService;
 	private CancellationTokenSource? _cts;
 
+	private readonly ObservableList<BulkThumbnailItemViewModel> _items = [];
+
 	/// <summary>
 	/// <see cref="BulkThumbnailRegenerationViewModel"/> クラスの新しいインスタンスを初期化します。
 	/// </summary>
@@ -22,6 +24,7 @@ public class BulkThumbnailRegenerationViewModel : ViewModelBase {
 	public BulkThumbnailRegenerationViewModel(IMediaItemTypeService mediaItemTypeService) {
 		this._mediaItemTypeService = mediaItemTypeService;
 
+		this.Items = this._items.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current).AddTo(this.CompositeDisposable);
 		this.TargetMediaType = new BindableReactiveProperty<MediaType>(MediaType.Unknown).AddTo(this.CompositeDisposable);
 		this.ConfigViewModel = new BindableReactiveProperty<IBulkThumbnailConfigViewModel?>().AddTo(this.CompositeDisposable);
 		this.IsRunning = new BindableReactiveProperty<bool>(false).AddTo(this.CompositeDisposable);
@@ -41,9 +44,9 @@ public class BulkThumbnailRegenerationViewModel : ViewModelBase {
 	/// <summary>
 	/// 処理対象アイテム一覧 (左側ペイン用)。
 	/// </summary>
-	public ObservableList<BulkThumbnailItemViewModel> Items {
+	public INotifyCollectionChangedSynchronizedViewList<BulkThumbnailItemViewModel> Items {
 		get;
-	} = [];
+	}
 
 	/// <summary>
 	/// 抽出された対象メディアタイプ。
@@ -102,7 +105,7 @@ public class BulkThumbnailRegenerationViewModel : ViewModelBase {
 		foreach (var existing in this.Items) {
 			existing.Dispose();
 		}
-		this.Items.Clear();
+		this._items.Clear();
 		(this.ConfigViewModel.Value as IDisposable)?.Dispose();
 		this.ConfigViewModel.Value = null;
 		this.CompletedCount.Value = 0;
@@ -114,9 +117,9 @@ public class BulkThumbnailRegenerationViewModel : ViewModelBase {
 		this.TargetMediaType.Value = firstType;
 		var filtered = selectedItems.Where(x => x.MediaType == firstType).ToList();
 		foreach (var item in filtered) {
-			this.Items.Add(new BulkThumbnailItemViewModel(item));
+			this._items.Add(new BulkThumbnailItemViewModel(item));
 		}
-		this.TotalCount.Value = this.Items.Count;
+		this.TotalCount.Value = this._items.Count;
 		this.ConfigViewModel.Value = this._mediaItemTypeService.CreateBulkThumbnailConfigViewModel(firstType);
 	}
 
@@ -124,7 +127,7 @@ public class BulkThumbnailRegenerationViewModel : ViewModelBase {
 		if (this.ConfigViewModel.Value is not { } config) {
 			return;
 		}
-		if (this.Items.Count == 0) {
+		if (this._items.Count == 0) {
 			return;
 		}
 

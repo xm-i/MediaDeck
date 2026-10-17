@@ -81,7 +81,7 @@ public class DisposableBase : ObservableObject, IDisposableBase {
 	}
 
 	private void RemoveTrackingInfo() {
-		if (CreatedInstances.TryGetValue(this.GetType(), out var dict)) {
+		if (this._trackingInfo != null && CreatedInstances.TryGetValue(this.GetType(), out var dict)) {
 			dict.TryRemove(this._trackingInfo, out _);
 		}
 	}

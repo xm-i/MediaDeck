@@ -4,7 +4,7 @@ namespace MediaDeck.Core.Primitives;
 /// 値と件数のペア
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public readonly struct ValueCountPair<T> : IEquatable<ValueCountPair<T>> {
+public readonly struct ValueCountPair<T> : IEquatable<ValueCountPair<T>>, IDisposable {
 	public ValueCountPair(T value, int count) {
 		this.Value = value;
 		this.Count = count;
@@ -29,5 +29,14 @@ public readonly struct ValueCountPair<T> : IEquatable<ValueCountPair<T>> {
 			return true;
 		}
 		return false;
+	}
+
+	/// <summary>
+	/// 保持している値が <see cref="IDisposable"/> の場合にリソースを破棄します。
+	/// </summary>
+	public void Dispose() {
+		if (this.Value is IDisposable disposable) {
+			disposable.Dispose();
+		}
 	}
 }

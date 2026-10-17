@@ -1,4 +1,5 @@
 using MediaDeck.Common.Base;
+using MediaDeck.Common.Extensions;
 using MediaDeck.Composition.Interfaces.Tags;
 
 namespace MediaDeck.ViewModels.Tags;
@@ -6,8 +7,8 @@ namespace MediaDeck.ViewModels.Tags;
 [Inject(InjectServiceLifetime.Transient)]
 public class TagManagerViewModel : ViewModelBase {
 	public TagManagerViewModel(ITagsManager tagsManager, ITagModelFactory tagModelFactory) {
-		var tagCategoriesView = tagsManager.TagCategories.CreateView(x => new TagCategoryViewModel(x, tagsManager, tagModelFactory));
-		this.TagCategories = tagCategoriesView.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
+		var tagCategoriesView = tagsManager.TagCategories.CreateViewWithDisposal(x => new TagCategoryViewModel(x, tagsManager, tagModelFactory));
+		this.TagCategories = tagCategoriesView.ToNotifyCollectionChangedWithDisposal(SynchronizationContextCollectionEventDispatcher.Current).AddTo(this.CompositeDisposable);
 		this.SaveCommand.SubscribeAwait(async (_, ct) => {
 			foreach (var category in this.TagCategories) {
 				category.SyncToModel();

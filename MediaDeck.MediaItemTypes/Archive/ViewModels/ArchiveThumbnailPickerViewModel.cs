@@ -17,10 +17,13 @@ public class ArchiveThumbnailPickerViewModel : BaseThumbnailPickerViewModel<Base
 	private readonly IMediaItemTypeService _mediaItemTypeService;
 	private readonly ILogger<ArchiveThumbnailPickerViewModel> _logger;
 
+	private readonly ObservableList<string> _entries = [];
+
 	public ArchiveThumbnailPickerViewModel(BaseThumbnailPickerModel thumbnailPickerModel, ArchiveMediaItemOperator PdfMediaItemOperator, IMediaItemTypeService mediaItemTypeService, ILogger<ArchiveThumbnailPickerViewModel> logger, IFilePickerService filePickerService, ConfigModel config) : base(thumbnailPickerModel, filePickerService, config) {
 		this._ArchiveMediaItemOperator = PdfMediaItemOperator;
 		this._mediaItemTypeService = mediaItemTypeService;
 		this._logger = logger;
+		this.Entries = this._entries.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current).AddTo(this.CompositeDisposable);
 		this.SelectedEntry.SubscribeAwait(async (x, ct) => {
 			if (x is null) {
 				this.FileName.Value = null;
@@ -35,9 +38,9 @@ public class ArchiveThumbnailPickerViewModel : BaseThumbnailPickerViewModel<Base
 		get;
 	} = new();
 
-	public ObservableList<string> Entries {
+	public INotifyCollectionChangedSynchronizedViewList<string> Entries {
 		get;
-	} = [];
+	}
 
 	public BindableReactiveProperty<string?> SelectedEntry {
 		get;
@@ -69,8 +72,8 @@ public class ArchiveThumbnailPickerViewModel : BaseThumbnailPickerViewModel<Base
 
 	public override async Task LoadAsync(IMediaItemViewModel fileViewModel) {
 		await base.LoadAsync(fileViewModel);
-		this.Entries.Clear();
+		this._entries.Clear();
 		using var archive = ZipFile.OpenRead(fileViewModel.FileModel.FilePath);
-		this.Entries.AddRange(archive.Entries.Where(x => this._mediaItemTypeService.IsTargetPath(x.Name, MediaType.Image)).Select(x => x.FullName).ToList());
+		this._entries.AddRange(archive.Entries.Where(x => this._mediaItemTypeService.IsTargetPath(x.Name, MediaType.Image)).Select(x => x.FullName).ToList());
 	}
 }
