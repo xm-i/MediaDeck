@@ -6,7 +6,7 @@ using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Core.Models.Files.Filter.FilterItemObjects;
 using MediaDeck.Core.Models.Files.SearchConditions;
 using MediaDeck.Core.Models.Tags;
-using MediaDeck.Stores.SerializerContext;
+using MediaDeck.Store.SerializerContext;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using ObservableCollections;

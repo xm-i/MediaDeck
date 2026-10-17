@@ -9,7 +9,7 @@ using MediaDeck.Composition.Objects;
 using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Core.Models.NotificationDispatcher;
 using MediaDeck.Core.Stores.Config;
-using MediaDeck.Stores.SerializerContext;
+using MediaDeck.Store.SerializerContext;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using R3;

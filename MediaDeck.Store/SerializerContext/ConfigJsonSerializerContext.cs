@@ -7,7 +7,7 @@ using MediaDeck.MediaItemTypes.Base.Models;
 using MediaDeck.MediaItemTypes.FolderGroup.Models;
 using MediaDeck.Store.Converters;
 
-namespace MediaDeck.Stores.SerializerContext;
+namespace MediaDeck.Store.SerializerContext;
 
 [JsonSourceGenerationOptions(
 	WriteIndented = true,

@@ -2,9 +2,8 @@ using MediaDeck.Common.Base;
 using MediaDeck.Common.Extensions;
 using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.ViewModels.Panes.ViewerPanes;
-using MediaDeck.ViewModels.Tools;
 
-namespace MediaDeck.ViewModels;
+namespace MediaDeck.ViewModels.Panes.StatusPanes;
 
 /// <summary>
 /// ステータスバーの情報を管理するViewModel

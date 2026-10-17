@@ -7,7 +7,7 @@ using MediaDeck.Core.Models.Files.SearchConditions;
 using MediaDeck.Core.Models.Tags;
 using MediaDeck.Store.Converters;
 
-namespace MediaDeck.Stores.SerializerContext;
+namespace MediaDeck.Store.SerializerContext;
 
 [JsonSourceGenerationOptions(
 	WriteIndented = true,

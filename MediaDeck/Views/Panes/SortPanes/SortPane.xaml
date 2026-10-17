@@ -5,7 +5,7 @@
 	xmlns:local="using:MediaDeck.Views.Panes.SortPanes"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-	xmlns:viewerpanesVm="using:MediaDeck.ViewModels.Panes.ViewerPanes"
+	xmlns:sortpanesVm="using:MediaDeck.ViewModels.Panes.SortPanes"
 	mc:Ignorable="d" >
 
 	<Grid>
@@ -58,7 +58,7 @@
 				SelectedItem="{x:Bind ViewModel.CurrentCondition.Value,Mode=OneWay}"
 				SelectionChanged="CurrentCondition_SelectionChanged">
 				<ComboBox.ItemTemplate>
-					<DataTemplate x:DataType="viewerpanesVm:SortConditionViewModel" >
+					<DataTemplate x:DataType="sortpanesVm:SortConditionViewModel" >
 						<TextBlock Text="{x:Bind DisplayName.Value}" />
 					</DataTemplate>
 				</ComboBox.ItemTemplate>

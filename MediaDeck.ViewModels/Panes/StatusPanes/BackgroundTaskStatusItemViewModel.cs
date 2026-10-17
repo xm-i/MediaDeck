@@ -1,7 +1,7 @@
 using MediaDeck.Common.Base;
 using MediaDeck.Core.Models.Tools;
 
-namespace MediaDeck.ViewModels.Tools;
+namespace MediaDeck.ViewModels.Panes.StatusPanes;
 
 /// <summary>
 /// ステータスバーに表示するバックグラウンドタスク項目。

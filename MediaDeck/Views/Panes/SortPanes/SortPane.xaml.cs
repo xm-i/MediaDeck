@@ -3,7 +3,7 @@ using System.ComponentModel;
 using CommunityToolkit.Mvvm.DependencyInjection;
 
 using MediaDeck.Services;
-using MediaDeck.ViewModels.Panes.ViewerPanes;
+using MediaDeck.ViewModels.Panes.SortPanes;
 using MediaDeck.Views.Sort;
 
 using Microsoft.UI.Xaml;

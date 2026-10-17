@@ -1,4 +1,4 @@
-using MediaDeck.ViewModels.Tools;
+using MediaDeck.ViewModels.Panes.StatusPanes;
 using Microsoft.UI.Xaml;
 
 namespace MediaDeck.Views.Panes.StatusPanes;

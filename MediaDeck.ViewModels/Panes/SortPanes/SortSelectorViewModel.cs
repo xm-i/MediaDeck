@@ -5,7 +5,7 @@ using MediaDeck.Common.Extensions;
 using MediaDeck.Core.Models.Files.Sort;
 using MediaDeck.Core.Stores.State;
 
-namespace MediaDeck.ViewModels.Panes.ViewerPanes;
+namespace MediaDeck.ViewModels.Panes.SortPanes;
 
 /// <summary>
 /// ソートセレクターViewModel
@@ -44,6 +44,9 @@ public class SortSelectorViewModel : ViewModelBase {
 		get;
 	}
 
+	/// <summary>
+	/// ソート方向
+	/// </summary>
 	public BindableReactiveProperty<ListSortDirection> Direction {
 		get;
 	} = new();

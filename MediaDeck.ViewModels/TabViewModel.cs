@@ -5,6 +5,8 @@ using MediaDeck.Core.Stores.State;
 using MediaDeck.ViewModels.Panes.DetailPanes;
 using MediaDeck.ViewModels.Panes.FilterPanes;
 using MediaDeck.ViewModels.Panes.RepositoryPanes;
+using MediaDeck.ViewModels.Panes.SortPanes;
+using MediaDeck.ViewModels.Panes.StatusPanes;
 using MediaDeck.ViewModels.Panes.ViewerPanes;
 
 namespace MediaDeck.ViewModels;

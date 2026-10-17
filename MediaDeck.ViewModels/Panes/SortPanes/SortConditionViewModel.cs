@@ -1,8 +1,11 @@
 using MediaDeck.Common.Base;
 using MediaDeck.Composition.Stores.State.Model.Objects;
 
-namespace MediaDeck.ViewModels.Panes.ViewerPanes;
+namespace MediaDeck.ViewModels.Panes.SortPanes;
 
+/// <summary>
+/// ソート条件ViewModel
+/// </summary>
 public class SortConditionViewModel : ViewModelBase {
 	/// <summary>
 	/// モデル
@@ -18,8 +21,12 @@ public class SortConditionViewModel : ViewModelBase {
 		get;
 	}
 
+	/// <summary>
+	/// コンストラクタ
+	/// </summary>
+	/// <param name="model">ソート条件モデル</param>
 	public SortConditionViewModel(SortObject model) {
 		this.Model = model;
-		this.DisplayName = this.Model.DisplayName.ToBindableReactiveProperty(string.Empty);
+		this.DisplayName = this.Model.DisplayName.ToBindableReactiveProperty(string.Empty).AddTo(this.CompositeDisposable);
 	}
 }
