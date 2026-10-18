@@ -168,4 +168,39 @@ public class MediaItemMetadataUpdatorServiceTests {
 
 		service.CompletedCount.Value.ShouldBe(2);
 	}
+
+	/// <summary>
+	/// 一部のファイルでメタデータ更新時に例外が発生しても、他のファイルが正常に処理され完了数がインクリメントされることを検証します。
+	/// </summary>
+	[Fact]
+	public async Task UpdateMetadataAsync_ShouldContinueProcessing_WhenOneItemFails() {
+		var dbName = nameof(this.UpdateMetadataAsync_ShouldContinueProcessing_WhenOneItemFails);
+		var dbFactory = this.CreateInMemoryDbFactory(dbName);
+		await using (var db = await dbFactory.CreateDbContextAsync()) {
+			db.MediaItems.Add(new MediaItem { MediaItemId = 1, MediaType = MediaType.Image, FilePath = "test1", DirectoryPath = "dir", Description = "", IsUnderFolderGroup = false });
+			db.MediaItems.Add(new MediaItem { MediaItemId = 2, MediaType = MediaType.Image, FilePath = "test2", DirectoryPath = "dir", Description = "", IsUnderFolderGroup = false });
+			await db.SaveChangesAsync();
+		}
+
+		var operatorMock = new Mock<IMediaItemOperator>();
+		operatorMock.SetupGet(x => x.TargetMediaType).Returns(MediaType.Image);
+		// 1件目は例外をスローし、2件目は正常終了する
+		operatorMock.Setup(x => x.UpdateMetadata(It.Is<MediaItem>(m => m.MediaItemId == 1)))
+			.ThrowsAsync(new InvalidOperationException("Corrupted file"));
+		operatorMock.Setup(x => x.UpdateMetadata(It.Is<MediaItem>(m => m.MediaItemId == 2)))
+			.Returns(Task.CompletedTask);
+
+		var typeServiceMock = new Mock<IMediaItemTypeService>();
+		typeServiceMock.Setup(x => x.CreateMediaItemOperators()).Returns([operatorMock.Object]);
+		typeServiceMock.Setup(x => x.IncludeTables(It.IsAny<IQueryable<MediaItem>>())).Returns((IQueryable<MediaItem> q) => q);
+
+		var service = new MediaItemMetadataUpdatorService(dbFactory, typeServiceMock.Object);
+
+		await service.UpdateMetadataAsync([1, 2]);
+
+		operatorMock.Verify(x => x.UpdateMetadata(It.Is<MediaItem>(m => m.MediaItemId == 1)), Times.Once);
+		operatorMock.Verify(x => x.UpdateMetadata(It.Is<MediaItem>(m => m.MediaItemId == 2)), Times.Once);
+		service.CompletedCount.Value.ShouldBe(2);
+		service.TargetCount.Value.ShouldBe(2);
+	}
 }

@@ -8,51 +8,88 @@ using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Composition.Tables;
 using MediaDeck.MediaItemTypes.Base.Models;
 using MediaDeck.MediaItemTypes.Image.Utils;
+using Microsoft.Extensions.Logging;
 
 namespace MediaDeck.MediaItemTypes.Image.Models;
 
+/// <summary>
+/// 画像メディアアイテムの操作クラス
+/// </summary>
 [Inject(InjectServiceLifetime.Transient)]
 public class ImageMediaItemOperator : BaseMediaItemOperator {
 	private readonly IFilePathService _filePathService;
 	private readonly ConfigModel _config;
+	private readonly ILogger<ImageMediaItemOperator> _logger;
 
+	/// <summary>
+	/// コンストラクタ
+	/// </summary>
+	/// <param name="filePathService">ファイルパスサービス</param>
+	/// <param name="config">設定モデル</param>
+	/// <param name="dbFactory">DbContextファクトリ</param>
+	/// <param name="updateFileHashBackgroundService">ハッシュ更新サービス</param>
+	/// <param name="databaseWriteCoordinator">データベース書き込みコーディネーター</param>
+	/// <param name="logger">ロガー</param>
 	public ImageMediaItemOperator(
 		IFilePathService filePathService,
 		ConfigModel config,
 		IDbContextFactory<MediaDeckDbContext> dbFactory,
-		IFileHashUpdatorService updateFileHashBackgroundService)
-		: base(dbFactory, updateFileHashBackgroundService, MediaType.Image) {
+		IFileHashUpdatorService updateFileHashBackgroundService,
+		IDatabaseWriteCoordinator databaseWriteCoordinator,
+		ILogger<ImageMediaItemOperator> logger)
+		: base(dbFactory, updateFileHashBackgroundService, databaseWriteCoordinator, MediaType.Image) {
 		this._filePathService = filePathService;
 		this._config = config;
+		this._logger = logger;
 	}
 
+	/// <summary>
+	/// メディアアイテムをDBに登録します。
+	/// </summary>
+	/// <param name="filePath">対象ファイルパス</param>
+	/// <returns>登録されたメディアアイテム</returns>
 	public override async Task<MediaItem?> RegisterMediaItemAsync(string filePath) {
-		await using var db = await this._dbFactory.CreateDbContextAsync();
-		using var transaction = await db.Database.BeginTransactionAsync();
-		var isExists = await db.MediaItems.AnyAsync(x => x.FilePath == filePath);
-		if (isExists) {
-			return null;
+		await using (var dbCheck = await this._dbFactory.CreateDbContextAsync()) {
+			var isExists = await dbCheck.MediaItems.AnyAsync(x => x.FilePath == filePath);
+			if (isExists) {
+				return null;
+			}
 		}
-		using var fileMs = new MemoryStream();
 
+		using var fileMs = new MemoryStream();
 		using (var fileFs = File.OpenRead(filePath)) {
-			fileFs.CopyTo(fileMs);
+			await fileFs.CopyToAsync(fileMs);
 			fileMs.Position = 0;
 		}
-		var thumbRelativePath = this._filePathService.GetThumbnailRelativeFilePath();
-		var thumbPath = this._filePathService.GetThumbnailAbsoluteFilePath(thumbRelativePath);
+
+		string? thumbRelativePath = null;
 		try {
+			var candidateRelativePath = this._filePathService.GetThumbnailRelativeFilePath();
+			var thumbPath = this._filePathService.GetThumbnailAbsoluteFilePath(candidateRelativePath);
 			var image = this.CreateThumbnail(fileMs, (uint)this._config.ThumbnailConfig.ThumbnailSize.Value, (uint)this._config.ThumbnailConfig.ThumbnailSize.Value);
 			new FileInfo(thumbPath).Directory?.Create();
-			File.WriteAllBytes(thumbPath, image);
-		} catch {
-			thumbPath = null;
+			await File.WriteAllBytesAsync(thumbPath, image);
+			thumbRelativePath = candidateRelativePath;
+		} catch (Exception ex) {
+			this._logger.LogError(ex, "Failed to create image thumbnail for file {FilePath}", filePath);
 			thumbRelativePath = null;
 		}
 
 		var fileInfo = new FileInfo(filePath);
 		var directoryPath = Path.GetDirectoryName(filePath)!;
-		var isUnderFolderGroup = await this.GetIsUnderFolderGroup(db, directoryPath);
+
+		// metadata
+		fileMs.Position = 0;
+		using var meta = ImageMetadataFactory.Create(fileMs);
+
+		double? latitude = null;
+		double? longitude = null;
+		double? altitude = null;
+		if (meta.Latitude != null && meta.Longitude != null && meta.LatitudeRef != null && meta.LongitudeRef != null) {
+			latitude = (meta.Latitude[0].ToDouble() + (meta.Latitude[1].ToDouble() / 60) + (meta.Latitude[2].ToDouble() / 3600)) * (meta.LatitudeRef == "S" ? -1 : 1);
+			longitude = (meta.Longitude[0].ToDouble() + (meta.Longitude[1].ToDouble() / 60) + (meta.Longitude[2].ToDouble() / 3600)) * (meta.LongitudeRef == "W" ? -1 : 1);
+			altitude = meta.Altitude?.ToDouble() * (meta.AltitudeRef == 1 ? -1 : 1);
+		}
 
 		var mf = new MediaItem {
 			MediaType = MediaType.Image,
@@ -68,36 +105,44 @@ public class ImageMediaItemOperator : BaseMediaItemOperator {
 			LastAccessTime = fileInfo.Exists ? fileInfo.LastAccessTime : DateTime.MinValue,
 			RegisteredTime = DateTime.Now,
 			IsExists = fileInfo.Exists,
-			IsUnderFolderGroup = isUnderFolderGroup,
-			ThumbnailSize = this._config.ThumbnailConfig.ThumbnailSize.Value
+			IsUnderFolderGroup = false,
+			ThumbnailSize = this._config.ThumbnailConfig.ThumbnailSize.Value,
+			Altitude = altitude,
+			Latitude = latitude,
+			Longitude = longitude,
+			Height = meta.Height,
+			Width = meta.Width,
+			Metadata = meta.CreateMetadata()
 		};
 
-		// metadata
-		fileMs.Position = 0;
-		using var meta = ImageMetadataFactory.Create(fileMs);
+		var registeredItem = await this._databaseWriteCoordinator.ExecuteAsync(async ct => {
+			await using var db = await this._dbFactory.CreateDbContextAsync(ct);
+			using var transaction = await db.Database.BeginTransactionAsync(ct);
 
-		if (meta.Latitude != null && meta.Longitude != null && meta.LatitudeRef != null && meta.LongitudeRef != null) {
-			var latitude = (meta.Latitude[0].ToDouble() + (meta.Latitude[1].ToDouble() / 60) + (meta.Latitude[2].ToDouble() / 3600)) * (meta.LatitudeRef == "S" ? -1 : 1);
-			var longitude = (meta.Longitude[0].ToDouble() + (meta.Longitude[1].ToDouble() / 60) + (meta.Longitude[2].ToDouble() / 3600)) * (meta.LongitudeRef == "W" ? -1 : 1);
-			mf.Altitude = meta.Altitude?.ToDouble() * (meta.AltitudeRef == 1 ? -1 : 1);
-			mf.Latitude = latitude;
-			mf.Longitude = longitude;
-			if (!db.Positions.Any(x => x.Latitude == latitude && x.Longitude == longitude)) {
-				db.Add(new Position() { Latitude = latitude, Longitude = longitude });
+			if (await db.MediaItems.AnyAsync(x => x.FilePath == filePath, ct)) {
+				return null;
 			}
+
+			mf.IsUnderFolderGroup = await this.GetIsUnderFolderGroup(db, directoryPath);
+
+			if (latitude != null && longitude != null) {
+				if (!await db.Positions.AnyAsync(x => x.Latitude == latitude.Value && x.Longitude == longitude.Value, ct)) {
+					await db.Positions.AddAsync(new Position { Latitude = latitude.Value, Longitude = longitude.Value }, ct);
+				}
+			}
+
+			await db.MediaItems.AddAsync(mf, ct);
+			await db.SaveChangesAsync(ct);
+			await transaction.CommitAsync(ct);
+
+			return mf;
+		});
+
+		if (registeredItem != null) {
+			this._updateFileHashBackgroundService.EnqueueHashUpdate(registeredItem.MediaItemId);
 		}
 
-		mf.Height = meta.Height;
-		mf.Width = meta.Width;
-		mf.Metadata = meta.CreateMetadata();
-
-		await db.MediaItems.AddAsync(mf);
-		await db.SaveChangesAsync();
-		await transaction.CommitAsync();
-
-		this._updateFileHashBackgroundService.EnqueueHashUpdate(mf.MediaItemId);
-
-		return mf;
+		return registeredItem;
 	}
 
 	public override async Task UpdateMetadata(MediaItem mediaItem) {

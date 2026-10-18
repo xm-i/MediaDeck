@@ -86,7 +86,10 @@ public class SortSelector : ModelBase {
 			return query;
 		}
 		if (cond.SortItemObjects.Count == 0) {
-			throw new InvalidOperationException();
+			cond = this.SortConditions.FirstOrDefault(x => x.SortItemObjects.Count > 0);
+			if (cond == null || cond.SortItemObjects.Count == 0) {
+				return query;
+			}
 		}
 		IOrderedQueryable<MediaItem>? sortedQuery = null;
 		foreach (var si in cond.SortItemObjects.Select(SortItemFactory.Create)) {
@@ -97,6 +100,6 @@ public class SortSelector : ModelBase {
 
 			sortedQuery = si.ApplyThenBySort(sortedQuery, reverse);
 		}
-		return sortedQuery!;
+		return sortedQuery ?? query;
 	}
 }

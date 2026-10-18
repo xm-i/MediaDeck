@@ -50,19 +50,27 @@ public class SortSelectorTests {
 	}
 
 	/// <summary>
-	/// ソート条件オブジェクトが空の場合、<see cref="InvalidOperationException"/> が送出されることを確認します。
+	/// ソート項目が空の条件を選択した場合、デフォルトソートが適用されることを確認します。
 	/// </summary>
 	[Fact]
-	public void SetSortConditions_ThrowsInvalidOperationException_WhenSortItemObjectsIsEmpty() {
+	public void SetSortConditions_AppliesDefaultSort_WhenSortItemObjectsIsEmpty() {
 		// Arrange
-		var sortObject = this._searchDefinitions.AddSortCondition();
-		this._tabState.SearchState.CurrentSortCondition.Value = sortObject.Id;
+		var emptySortObject = this._searchDefinitions.AddSortCondition();
+		this._tabState.SearchState.CurrentSortCondition.Value = emptySortObject.Id;
 
 		var selector = new SortSelector(this._tabState, this._searchDefinitions, new SearchConditionNotificationDispatcher());
-		var files = new[] { new TestFileModel { Id = 1 } };
+		var files = new[]
+		{
+			new TestFileModel { FilePath = "B" },
+			new TestFileModel { FilePath = "A" }
+		};
 
-		// Act & Assert
-		Assert.Throws<InvalidOperationException>(() => selector.SetSortConditions(files.AsQueryable()));
+		// Act
+		var result = selector.SetSortConditions(files.AsQueryable()).Cast<TestFileModel>().ToList();
+
+		// Assert: デフォルトソート（FilePath昇順）が適用されること
+		Assert.Equal("A", result[0].FilePath);
+		Assert.Equal("B", result[1].FilePath);
 	}
 
 	/// <summary>
