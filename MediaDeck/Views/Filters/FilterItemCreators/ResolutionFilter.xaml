@@ -15,13 +15,8 @@
 		<TextBox Width="50"
 			Text="{x:Bind ViewModel.ResolutionHeightText.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 		<ComboBox ItemsSource="{x:Bind ViewModel.SearchTypeList}"
-			SelectedItem="{x:Bind ViewModel.SearchType.Value, Mode=TwoWay}" >
-			<ItemsControl.ItemTemplate>
-				<DataTemplate>
-					<TextBlock Text="{Binding DisplayString}" />
-				</DataTemplate>
-			</ItemsControl.ItemTemplate>
-		</ComboBox>
+			SelectedItem="{x:Bind ViewModel.SearchType.Value, Mode=TwoWay}"
+			ItemTemplate="{StaticResource DisplayObjectComboBoxItemTemplate}" />
 		<Button Command="{x:Bind ViewModel.AddFilterCommand}"
 			Content="Add Filter" />
 	</StackPanel>

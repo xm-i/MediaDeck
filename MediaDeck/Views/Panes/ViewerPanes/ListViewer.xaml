@@ -95,7 +95,7 @@
 								<TextBlock Text="{x:Bind FileModel.Rate}" VerticalAlignment="Center" Margin="8,0,8,0" />
 							</Border>
 						</StackPanel>
-						<Grid Opacity="0.7" Background="DarkGray" Visibility="{x:Bind Exists, Converter={StaticResource InvertBoolToVisibilityConverter}}" />
+						<Grid Opacity="0.7" Background="{ThemeResource NonExistentFileOverlayBrush}" Visibility="{x:Bind Exists, Converter={StaticResource InvertBoolToVisibilityConverter}}" />
 					</Grid>
 				</DataTemplate>
 			</ListView.ItemTemplate>

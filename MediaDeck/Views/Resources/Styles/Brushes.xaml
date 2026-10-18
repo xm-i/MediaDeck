@@ -27,6 +27,60 @@
 			<!-- Title bar -->
 			<SolidColorBrush x:Key="TitleBarBackgroundBrush" Color="Transparent" />
 			<SolidColorBrush x:Key="TitleBarForegroundBrush" Color="#CCFFFFFF" />
+
+			<!-- Tab item border -->
+			<SolidColorBrush x:Key="TabItemLightGrayBorderBrush" Color="#FF333333" />
+
+			<!-- Non-existent file overlay -->
+			<SolidColorBrush x:Key="NonExistentFileOverlayBrush" Color="#B0202020" />
+
+			<!-- Map pin badge -->
+			<SolidColorBrush x:Key="MapPinBadgeBackgroundBrush" Color="#EE2B2B2B" />
+			<SolidColorBrush x:Key="MapPinBadgeBorderBrush" Color="#FF555555" />
+			<SolidColorBrush x:Key="MapPinBadgeForegroundBrush" Color="#FFFFFFFF" />
+
+			<!-- Window border -->
+			<SolidColorBrush x:Key="WindowBorderDeactivatedBrush" Color="#FF555555" />
+		</ResourceDictionary>
+
+		<!-- ===== Light Theme Brush Overrides ===== -->
+		<ResourceDictionary x:Key="Light">
+			<!-- Make NavigationView / TabView backgrounds transparent for acrylic effect -->
+			<SolidColorBrush x:Key="NavigationViewContentBackground" Color="Transparent" />
+			<SolidColorBrush x:Key="TabViewBackground" Color="Transparent" />
+			<SolidColorBrush x:Key="TabViewItemHeaderBackground" Color="Transparent" />
+			<SolidColorBrush x:Key="MenuBarBackground" Color="Transparent" />
+			<SolidColorBrush x:Key="MenuBarItemBackground" Color="Transparent" />
+
+			<!-- Subtle surface for cards -->
+			<SolidColorBrush x:Key="CardBackgroundBrush" Color="#F5FFFFFF" />
+			<SolidColorBrush x:Key="CardBackgroundPointerOverBrush" Color="#E5FFFFFF" />
+			<SolidColorBrush x:Key="CardBorderBrush" Color="#0F000000" />
+
+			<!-- Chip / Tag colors -->
+			<SolidColorBrush x:Key="ChipBackground1" Color="#263078CF" />
+			<SolidColorBrush x:Key="ChipBackground2" Color="#2630CF78" />
+			<SolidColorBrush x:Key="ChipBackground3" Color="#26CF7830" />
+			<SolidColorBrush x:Key="ChipBackground4" Color="#26CF30A0" />
+			<SolidColorBrush x:Key="ChipForeground" Color="#DD000000" />
+
+			<!-- Title bar -->
+			<SolidColorBrush x:Key="TitleBarBackgroundBrush" Color="Transparent" />
+			<SolidColorBrush x:Key="TitleBarForegroundBrush" Color="#CC000000" />
+
+			<!-- Tab item border -->
+			<SolidColorBrush x:Key="TabItemLightGrayBorderBrush" Color="#FFE0E0E0" />
+
+			<!-- Non-existent file overlay -->
+			<SolidColorBrush x:Key="NonExistentFileOverlayBrush" Color="#B0808080" />
+
+			<!-- Map pin badge -->
+			<SolidColorBrush x:Key="MapPinBadgeBackgroundBrush" Color="#EEFFFFFF" />
+			<SolidColorBrush x:Key="MapPinBadgeBorderBrush" Color="#FFCCCCCC" />
+			<SolidColorBrush x:Key="MapPinBadgeForegroundBrush" Color="#FF000000" />
+
+			<!-- Window border -->
+			<SolidColorBrush x:Key="WindowBorderDeactivatedBrush" Color="#FFCCCCCC" />
 		</ResourceDictionary>
 	</ResourceDictionary.ThemeDictionaries>
 

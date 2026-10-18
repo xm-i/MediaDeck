@@ -3,8 +3,6 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <SolidColorBrush x:Key="TabItemLightGrayBorderBrush" Color="#FF333333" />
-
     <!-- TabViewのタブアイテム用モダンスタイル -->
     <Style x:Key="ModernTabViewItemStyle" TargetType="TabViewItem">
         <Setter Property="CornerRadius" Value="0" />
@@ -20,7 +18,7 @@
 
                         <Border x:Name="TabContainer"
                                 Background="{TemplateBinding Background}"
-                                BorderBrush="{StaticResource TabItemLightGrayBorderBrush}"
+                                BorderBrush="{ThemeResource TabItemLightGrayBorderBrush}"
                                 BorderThickness="1,1,1,0"
                                 CornerRadius="{TemplateBinding CornerRadius}"
                                 Padding="2,0">

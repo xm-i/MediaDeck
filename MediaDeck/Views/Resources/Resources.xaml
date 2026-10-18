@@ -40,6 +40,11 @@
 	<converters:FilterItemToDisplayNameConverter x:Key="FilterItemToDisplayNameConverter" />
 	<converters:StringNullOrEmptyToDefaultConverter x:Key="StringNullOrEmptyToDefaultConverter" />
 
+	<!-- FilterItemCreators 等で使用する共通 DisplayObject ComboBox テンプレート -->
+	<DataTemplate x:Key="DisplayObjectComboBoxItemTemplate" >
+		<TextBlock Text="{Binding DisplayString}" />
+	</DataTemplate>
+
 	<DataTemplate x:Key="ImageDetailTpl" >
 		<imageViews:ImageDetailViewerPreviewControlView />
 	</DataTemplate>

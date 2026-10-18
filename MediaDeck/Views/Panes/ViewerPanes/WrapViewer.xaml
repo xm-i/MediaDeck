@@ -81,7 +81,7 @@
 
 							<!-- 存在しないファイルのオーバーレイ -->
 							<Grid Opacity="0.7"
-								Background="DarkGray"
+								Background="{ThemeResource NonExistentFileOverlayBrush}"
 								Visibility="{x:Bind Exists, Converter={StaticResource InvertBoolToVisibilityConverter}}" />
 						</Grid>
 

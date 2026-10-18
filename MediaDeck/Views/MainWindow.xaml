@@ -94,7 +94,7 @@
 		<Border x:Name="RootBorder"
 				Grid.RowSpan="3"
 				BorderThickness="1"
-				BorderBrush="Gray"
+				BorderBrush="{ThemeResource WindowBorderDeactivatedBrush}"
 				IsHitTestVisible="False" />
 	</Grid>
 </Window>

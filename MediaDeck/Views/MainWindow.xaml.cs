@@ -38,12 +38,14 @@ public sealed partial class MainWindow : Window {
 		// ウィンドウ活性状態に応じたボーダー色の切り替え
 		this.Activated += (s, e) => {
 			if (e.WindowActivationState == WindowActivationState.Deactivated) {
-				this.RootBorder.BorderBrush = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Gray);
+				if (Application.Current.Resources.TryGetValue("WindowBorderDeactivatedBrush", out var deactivatedBrush) && deactivatedBrush is Brush brush) {
+					this.RootBorder.BorderBrush = brush;
+				} else if (Application.Current.Resources.TryGetValue("CardStrokeColorDefaultBrush", out var fallbackBrush) && fallbackBrush is Brush fallback) {
+					this.RootBorder.BorderBrush = fallback;
+				}
 			} else {
-				if (Application.Current.Resources.TryGetValue("AccentFillColorDefaultBrush", out var brush)) {
-					this.RootBorder.BorderBrush = (Microsoft.UI.Xaml.Media.Brush)brush;
-				} else {
-					this.RootBorder.BorderBrush = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.DeepSkyBlue);
+				if (Application.Current.Resources.TryGetValue("AccentFillColorDefaultBrush", out var activeBrush) && activeBrush is Brush brush) {
+					this.RootBorder.BorderBrush = brush;
 				}
 			}
 		};

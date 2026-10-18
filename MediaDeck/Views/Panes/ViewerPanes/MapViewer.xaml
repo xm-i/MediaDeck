@@ -50,14 +50,14 @@
 									Height="26"
 									Padding="4,0"
 									CornerRadius="13"
-									Background="White"
-									BorderBrush="#FFCCCCCC"
+									Background="{ThemeResource MapPinBadgeBackgroundBrush}"
+									BorderBrush="{ThemeResource MapPinBadgeBorderBrush}"
 									BorderThickness="2"
 									HorizontalAlignment="Right"
 									VerticalAlignment="Top"
 									Margin="0,-6,-6,0" >
 									<TextBlock Text="{x:Bind Count.Value, Mode=OneWay, Converter={StaticResource CountToFormattedStringConverter}}"
-										Foreground="Black"
+										Foreground="{ThemeResource MapPinBadgeForegroundBrush}"
 										FontSize="14"
 										FontWeight="SemiBold"
 										HorizontalAlignment="Center"
@@ -66,8 +66,8 @@
 							</Grid>
 							<Path Grid.Row="1"
 								Data="M 0,0 L 28,0 L 14,24 Z"
-								Fill="White"
-								Stroke="#FFCCCCCC"
+								Fill="{ThemeResource MapPinBadgeBackgroundBrush}"
+								Stroke="{ThemeResource MapPinBadgeBorderBrush}"
 								StrokeThickness="2"
 								HorizontalAlignment="Center"
 								Margin="0,-4,0,0" />
