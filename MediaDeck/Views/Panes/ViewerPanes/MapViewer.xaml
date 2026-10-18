@@ -23,7 +23,8 @@
 			ZoomLevel="{x:Bind ViewModel.MapViewerViewModel.ZoomLevel.Value, Mode=TwoWay}"
 			ManipulationMode="All"
 			Grid.Row="2"
-			Loaded="Map_Loaded" >
+			Loaded="Map_Loaded"
+			Unloaded="Map_Unloaded" >
 			<map:MapItemsControl ItemsSource="{x:Bind ViewModel.MapViewerViewModel.MapPins.Value, Mode=OneWay}"
 				LocationMemberPath="Location" >
 				<map:MapItemsControl.ItemTemplate>

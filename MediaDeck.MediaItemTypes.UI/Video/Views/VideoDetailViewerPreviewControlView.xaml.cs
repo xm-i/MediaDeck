@@ -8,6 +8,9 @@ using Microsoft.UI.Xaml.Controls;
 
 namespace MediaDeck.MediaItemTypes.UI.Video.Views;
 
+/// <summary>
+/// ビデオプレビュー詳細ビューのコントロール。
+/// </summary>
 public sealed partial class VideoDetailViewerPreviewControlView : VideoDetailViewerPreviewControlViewUserControl {
 	private readonly SymbolIcon _iconPlay = new(Symbol.Play);
 	private readonly SymbolIcon _iconPause = new(Symbol.Pause);
@@ -27,8 +30,14 @@ public sealed partial class VideoDetailViewerPreviewControlView : VideoDetailVie
 		this.btnPlayback.Content = this.Player.Status == Status.Playing ? this._iconPause : this._iconPlay;
 		this.Player.PropertyChanged += this.Player_PropertyChanged;
 		this.rootGrid.DataContext = this;
+		this.Unloaded += this.OnUnloaded;
 	}
 
+	/// <summary>
+	/// ViewModelが変更された際の処理。ビデオを停止または新規オープンします。
+	/// </summary>
+	/// <param name="oldViewModel">古いViewModel。</param>
+	/// <param name="newViewModel">新しいViewModel。</param>
 	protected override void OnViewModelChanged(IMediaItemViewModel? oldViewModel, IMediaItemViewModel? newViewModel) {
 		if (newViewModel is null) {
 			this.Player.Stop();
@@ -41,6 +50,20 @@ public sealed partial class VideoDetailViewerPreviewControlView : VideoDetailVie
 		base.OnViewModelChanged(oldViewModel, newViewModel);
 	}
 
+	/// <summary>
+	/// コントロールがアンロードされた際の処理。再生を停止します。
+	/// </summary>
+	/// <param name="sender">イベント発生元。</param>
+	/// <param name="e">イベント引数。</param>
+	private void OnUnloaded(object sender, RoutedEventArgs e) {
+		this.Player.Stop();
+	}
+
+	/// <summary>
+	/// プレイヤーのプロパティ変更イベントハンドラ。再生・一時停止ボタンの表示状態を更新します。
+	/// </summary>
+	/// <param name="sender">イベント発生元。</param>
+	/// <param name="e">イベント引数。</param>
 	private void Player_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e) {
 		switch (e.PropertyName) {
 			case nameof(this.Player.Status):
@@ -52,10 +75,6 @@ public sealed partial class VideoDetailViewerPreviewControlView : VideoDetailVie
 
 				break;
 		}
-	}
-
-	~VideoDetailViewerPreviewControlView() {
-		this.Player.Dispose();
 	}
 }
 

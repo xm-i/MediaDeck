@@ -5,17 +5,20 @@ using Microsoft.UI.Xaml.Controls;
 
 namespace MediaDeck.MediaItemTypes.UI.Video.Views;
 
+/// <summary>
+/// ビデオサムネイル選択ビュー。
+/// </summary>
 public sealed partial class VideoThumbnailPickerView : VideoThumbnailPickerViewUserControl {
 	private readonly SymbolIcon _iconPlay = new(Symbol.Play);
 	private readonly SymbolIcon _iconPause = new(Symbol.Pause);
-	private readonly CompositeDisposable _disposables = [];
+	private readonly SerialDisposable _viewModelDisposable = new();
 
 	public Player Player {
 		get; set;
 	}
 
 	public VideoThumbnailPickerView() {
-		this.Player = new Player().AddTo(this._disposables);
+		this.Player = new();
 		this.InitializeComponent();
 		this.btnPlayback.Content = this.Player.Status == Status.Playing ? this._iconPause : this._iconPlay;
 		this.Player.PropertyChanged += this.Player_PropertyChanged;
@@ -23,12 +26,22 @@ public sealed partial class VideoThumbnailPickerView : VideoThumbnailPickerViewU
 		this.Unloaded += this.VideoThumbnailPickerView_Unloaded;
 	}
 
+	/// <summary>
+	/// ViewModelが変更された際の処理。古い購読を解除し新しいViewModelとの同期を設定します。
+	/// </summary>
+	/// <param name="oldViewModel">古いViewModel。</param>
+	/// <param name="newViewModel">新しいViewModel。</param>
 	protected override void OnViewModelChanged(VideoThumbnailPickerViewModel? oldViewModel, VideoThumbnailPickerViewModel? newViewModel) {
 		base.OnViewModelChanged(oldViewModel, newViewModel);
 
 		if (newViewModel == null) {
+			this._viewModelDisposable.Disposable = null;
+			this.Player.Stop();
 			return;
 		}
+
+		var disposables = new CompositeDisposable();
+		this._viewModelDisposable.Disposable = disposables;
 
 		// ビデオファイルパスの変更を監視して再生
 		newViewModel.VideoFilePath.Subscribe(filePath => {
@@ -38,7 +51,7 @@ public sealed partial class VideoThumbnailPickerView : VideoThumbnailPickerViewU
 			} else {
 				this.Player.Stop();
 			}
-		}).AddTo(this._disposables);
+		}).AddTo(disposables);
 
 		// Player の位置変更を ViewModel に同期
 		Observable.FromEvent<System.ComponentModel.PropertyChangedEventHandler, System.ComponentModel.PropertyChangedEventArgs>(
@@ -50,16 +63,21 @@ public sealed partial class VideoThumbnailPickerView : VideoThumbnailPickerViewU
 		.Subscribe(_ => {
 			newViewModel.UpdateTime(TimeSpan.FromTicks(this.Player.CurTime));
 		})
-		.AddTo(this._disposables);
+		.AddTo(disposables);
 
 		// ViewModel の Time 変更を Player に同期（シーク）
 		newViewModel.Time.Subscribe(time => {
 			if (Math.Abs(this.Player.CurTime - time.Ticks) > TimeSpan.FromMilliseconds(100).Ticks) {
 				this.Player.CurTime = time.Ticks;
 			}
-		}).AddTo(this._disposables);
+		}).AddTo(disposables);
 	}
 
+	/// <summary>
+	/// プレイヤーのプロパティ変更イベントハンドラ。
+	/// </summary>
+	/// <param name="sender">イベント発生元。</param>
+	/// <param name="e">イベント引数。</param>
 	private void Player_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e) {
 		switch (e.PropertyName) {
 			case nameof(this.Player.Status):
@@ -69,13 +87,12 @@ public sealed partial class VideoThumbnailPickerView : VideoThumbnailPickerViewU
 	}
 
 	/// <summary>
-	/// ビューがアンロードされた際に呼び出され、再生プレイヤーおよび関連リソースを破棄します。
+	/// ビューがアンロードされた際に呼び出され、再生を一時停止します。
 	/// </summary>
 	/// <param name="sender">イベントの発生元。</param>
 	/// <param name="e">イベントデータ。</param>
 	private void VideoThumbnailPickerView_Unloaded(object sender, Microsoft.UI.Xaml.RoutedEventArgs e) {
-		this.Player.PropertyChanged -= this.Player_PropertyChanged;
-		this._disposables.Dispose();
+		this.Player.Pause();
 	}
 }
 

@@ -6,9 +6,14 @@ using Microsoft.UI.Xaml;
 
 namespace MediaDeck.Views.Panes.ViewerPanes;
 
+/// <summary>
+/// メディアアイテムをマップ上に表示するビュー。
+/// </summary>
 public sealed partial class MapViewer {
 	private readonly Subject<Unit> PinUpdateRequest = new();
 	private readonly CompositeDisposable _disposables = new();
+	private readonly SerialDisposable _filesSubscription = new();
+
 	public MapViewer() {
 		this.InitializeComponent();
 		this.PinUpdateRequest
@@ -35,11 +40,18 @@ public sealed partial class MapViewer {
 			}).AddTo(this._disposables);
 	}
 
+	/// <summary>
+	/// マップコントロールがロードされた際の処理。イベントを接続し初期状態にフィットさせます。
+	/// </summary>
+	/// <param name="sender">イベント発生元。</param>
+	/// <param name="e">イベント引数。</param>
 	private void Map_Loaded(object sender, RoutedEventArgs e) {
+		this.Map.ViewportChanged -= this.Map_ViewportChanged;
+		this.Map.ViewportChanged += this.Map_ViewportChanged;
+
 		if (this.ViewModel is not { } vm) {
 			return;
 		}
-		this.UpdateMapControl();
 
 		// 初期状態で全アイテムが入るように調整
 		// Files が空でない場合は即座に、空の場合は最初の更新を待つ
@@ -47,19 +59,59 @@ public sealed partial class MapViewer {
 			vm.MapViewerViewModel.FitToItems(this.Map.ActualWidth, this.Map.ActualHeight);
 		}
 
-		// アイテム変更時にもフィットさせる
-		vm.MapViewerViewModel.MediaContentLibraryViewModel.Files.CollectionChanged += this.OnFilesCollectionChanged;
+		this.SubscribeFiles(vm);
 	}
 
-	private void OnFilesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e) {
-		if (this.ViewModel is not { } vm) {
-			return;
+	/// <summary>
+	/// マップコントロールがアンロードされた際の処理。イベントハンドラおよびコレクション購読を解除します。
+	/// </summary>
+	/// <param name="sender">イベント発生元。</param>
+	/// <param name="e">イベント引数。</param>
+	private void Map_Unloaded(object sender, RoutedEventArgs e) {
+		this.Map.ViewportChanged -= this.Map_ViewportChanged;
+		this._filesSubscription.Disposable = null;
+	}
+
+	/// <summary>
+	/// ViewModelが変更された際の処理。新しいViewModelのファイルコレクションを購読します。
+	/// </summary>
+	/// <param name="oldViewModel">古いViewModel。</param>
+	/// <param name="newViewModel">新しいViewModel。</param>
+	protected override void OnViewModelChanged(ViewerSelectorViewModel? oldViewModel, ViewerSelectorViewModel? newViewModel) {
+		base.OnViewModelChanged(oldViewModel, newViewModel);
+		if (this.Map.IsLoaded) {
+			this.SubscribeFiles(newViewModel);
+			if (newViewModel?.MapViewerViewModel.MediaContentLibraryViewModel.Files.Count > 0) {
+				newViewModel.MapViewerViewModel.FitToItems(this.Map.ActualWidth, this.Map.ActualHeight);
+			}
 		}
-		this.DispatcherQueue.TryEnqueue(() => {
-			this.PinUpdateRequest.OnNext(Unit.Default);
-		});
 	}
 
+	/// <summary>
+	/// ファイルコレクションの変更を購読します。古い購読は自動的に破棄されます。
+	/// </summary>
+	/// <param name="vm">ViewModel。</param>
+	private void SubscribeFiles(ViewerSelectorViewModel? vm) {
+		if (vm?.MapViewerViewModel?.MediaContentLibraryViewModel?.Files is { } files) {
+			this._filesSubscription.Disposable = Observable.FromEvent<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>(
+				h => (s, e) => h(e),
+				h => files.CollectionChanged += h,
+				h => files.CollectionChanged -= h
+			).Subscribe(_ => {
+				this.DispatcherQueue.TryEnqueue(() => {
+					this.PinUpdateRequest.OnNext(Unit.Default);
+				});
+			});
+		} else {
+			this._filesSubscription.Disposable = null;
+		}
+	}
+
+	/// <summary>
+	/// ピンがタップされた際の処理。タップされたピンを選択状態にします。
+	/// </summary>
+	/// <param name="sender">イベント発生元。</param>
+	/// <param name="e">イベント引数。</param>
 	private void Pin_Tapped(object sender, Microsoft.UI.Xaml.Input.TappedRoutedEventArgs e) {
 		if (this.ViewModel is not { } vm) {
 			return;
@@ -68,14 +120,12 @@ public sealed partial class MapViewer {
 		vm.MapViewerViewModel.SelectPin(pinVm);
 	}
 
-	private void UpdateMapControl() {
-		// ビューポート変更時にアイテムを更新する
-		this.Map.ViewportChanged += (_, _) => {
-			this.PinUpdateRequest.OnNext(Unit.Default);
-		};
-	}
-
-	~MapViewer() {
-		this._disposables.Dispose();
+	/// <summary>
+	/// マップのビューポート変更時のイベントハンドラ。ピン更新リクエストを発行します。
+	/// </summary>
+	/// <param name="sender">イベント発生元。</param>
+	/// <param name="e">イベント引数。</param>
+	private void Map_ViewportChanged(object? sender, EventArgs e) {
+		this.PinUpdateRequest.OnNext(Unit.Default);
 	}
 }

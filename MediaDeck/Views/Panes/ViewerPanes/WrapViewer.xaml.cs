@@ -9,16 +9,37 @@ namespace MediaDeck.Views.Panes.ViewerPanes;
 /// メディアアイテムをグリッド状に表示するビュー。
 /// 表示領域に合わせてアイテム幅を調整し、エクスプローラーのように均等な余白を実現します。
 /// </summary>
-public sealed partial class WrapViewer : IDisposable {
-	private readonly CompositeDisposable _disposables = new();
+public sealed partial class WrapViewer {
+	private readonly SerialDisposable _viewModelDisposable = new();
+	private readonly PointerEventHandler _pointerWheelHandler;
 	private ItemsWrapGrid? _wrapGrid;
 
 	public WrapViewer() {
 		this.InitializeComponent();
-		this.Loaded += (_, _) => {
-			this.List.AddHandler(PointerWheelChangedEvent, new PointerEventHandler(this.HandleListPointerWheelChanged), true);
-			this.UpdateItemWidth();
-		};
+		this._pointerWheelHandler = new PointerEventHandler(this.HandleListPointerWheelChanged);
+		this.Loaded += this.OnLoaded;
+		this.Unloaded += this.OnUnloaded;
+	}
+
+	/// <summary>
+	/// コントロールがロードされた際の処理。イベントハンドラを登録し、ViewModelの購読を開始します。
+	/// </summary>
+	/// <param name="sender">イベント発生元。</param>
+	/// <param name="e">イベント引数。</param>
+	private void OnLoaded(object sender, RoutedEventArgs e) {
+		this.List.AddHandler(PointerWheelChangedEvent, this._pointerWheelHandler, true);
+		this.SubscribeViewModel(this.ViewModel);
+		this.UpdateItemWidth();
+	}
+
+	/// <summary>
+	/// コントロールがアンロードされた際の処理。多重登録やリークを防ぐためイベントハンドラおよびViewModelの購読を解除します。
+	/// </summary>
+	/// <param name="sender">イベント発生元。</param>
+	/// <param name="e">イベント引数。</param>
+	private void OnUnloaded(object sender, RoutedEventArgs e) {
+		this.List.RemoveHandler(PointerWheelChangedEvent, this._pointerWheelHandler);
+		this._viewModelDisposable.Disposable = null;
 	}
 
 	/// <summary>
@@ -28,9 +49,18 @@ public sealed partial class WrapViewer : IDisposable {
 	/// <param name="newViewModel">新しいViewModel。</param>
 	protected override void OnViewModelChanged(ViewerSelectorViewModel? oldViewModel, ViewerSelectorViewModel? newViewModel) {
 		base.OnViewModelChanged(oldViewModel, newViewModel);
-		newViewModel?.ItemSize
-				.Subscribe(_ => this.UpdateItemWidth())
-				.AddTo(this._disposables);
+		if (this.IsLoaded) {
+			this.SubscribeViewModel(newViewModel);
+		}
+	}
+
+	/// <summary>
+	/// ViewModelのプロパティ変更を購読します。古い購読は自動的に破棄されます。
+	/// </summary>
+	/// <param name="viewModel">購読対象のViewModel。</param>
+	private void SubscribeViewModel(ViewerSelectorViewModel? viewModel) {
+		this._viewModelDisposable.Disposable = viewModel?.ItemSize
+			.Subscribe(_ => this.UpdateItemWidth());
 	}
 
 	/// <summary>
@@ -73,16 +103,5 @@ public sealed partial class WrapViewer : IDisposable {
 
 		// 1列あたりの幅を計算してパネルに設定
 		this._wrapGrid.ItemWidth = availableWidth / columns;
-	}
-
-	/// <summary>
-	/// リソースを解放します。
-	/// </summary>
-	public void Dispose() {
-		this._disposables.Dispose();
-	}
-
-	~WrapViewer() {
-		this.Dispose();
 	}
 }
