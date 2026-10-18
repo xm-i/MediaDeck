@@ -6,14 +6,9 @@
 	xmlns:localControls="using:MediaDeck.Views.Controls"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-	xmlns:viewerPanes="using:MediaDeck.Views.Panes.ViewerPanes"
-	xmlns:filterPanes="using:MediaDeck.Views.Panes.FilterPanes"
-	xmlns:sortPanes="using:MediaDeck.Views.Panes.SortPanes"
-	xmlns:detailPanes="using:MediaDeck.Views.Panes.DetailPanes"
-	xmlns:repositoryPanes="using:MediaDeck.Views.Panes.RepositoryPanes"
+	xmlns:tabPanes="using:MediaDeck.Views.Panes.TabPanes"
 	xmlns:viewmodels="using:MediaDeck.ViewModels"
 	xmlns:statusPanes="using:MediaDeck.Views.Panes.StatusPanes"
-	xmlns:toolkit="using:CommunityToolkit.WinUI.Controls"
 	mc:Ignorable="d"
 	Title="MediaDeck" >
 	<Window.SystemBackdrop>
@@ -78,49 +73,7 @@
 								<TextBlock Text="{x:Bind DisplayName.Value, Mode=OneWay}" />
 							</Grid>
 						</TabViewItem.Header>
-						<Grid x:Name="TabContentGrid"
-							Padding="2"
-							Tag="{x:Bind}">
-							<Grid.ColumnDefinitions>
-								<ColumnDefinition Width="{Binding ElementName=TabContentGrid, Path=Tag.LeftPaneWidth.Value, Mode=TwoWay, Converter={StaticResource DoubleToGridLengthConverter}}" MinWidth="100" />
-								<ColumnDefinition Width="Auto" />
-								<ColumnDefinition Width="*" />
-								<ColumnDefinition Width="Auto" />
-								<ColumnDefinition Width="{Binding ElementName=TabContentGrid, Path=Tag.RightPaneWidth.Value, Mode=TwoWay, Converter={StaticResource DoubleToGridLengthConverter}}" MinWidth="100" />
-							</Grid.ColumnDefinitions>
-							<Grid.RowDefinitions>
-								<RowDefinition Height="{Binding ElementName=TabContentGrid, Path=Tag.RepositoryPaneHeight.Value, Mode=TwoWay, Converter={StaticResource DoubleToGridLengthConverter}}" MinHeight="100" />
-								<RowDefinition Height="Auto" />
-								<RowDefinition Height="*" />
-							</Grid.RowDefinitions>
-							<repositoryPanes:RepositorySelector Grid.Column="0" Grid.Row="0"
-								ViewModel="{x:Bind RepositorySelectorViewModel, Mode=OneWay}" />
-							<toolkit:GridSplitter Grid.Column="0" Grid.Row="1"
-								Height="4"
-								ResizeDirection="Rows"
-								ResizeBehavior="BasedOnAlignment"
-								HorizontalAlignment="Stretch" />
-							<Grid Grid.Column="0" Grid.Row="2">
-								<Grid.RowDefinitions>
-									<RowDefinition Height="Auto" />
-									<RowDefinition Height="*" />
-								</Grid.RowDefinitions>
-								<sortPanes:SortPane Grid.Row="0"
-									ViewModel="{x:Bind SortSelectorViewModel, Mode=OneWay}" />
-								<filterPanes:FilterSelector Grid.Row="1"
-									ViewModel="{x:Bind FilterSelectorViewModel, Mode=OneWay}" />
-							</Grid>
-							<toolkit:GridSplitter Grid.Column="1" Grid.Row="0" Grid.RowSpan="3"
-								Width="4"
-								ResizeBehavior="BasedOnAlignment" />
-							<viewerPanes:ViewerSelector Grid.Column="2" Grid.Row="0" Grid.RowSpan="3"
-								ViewModel="{x:Bind ViewerSelectorViewModel, Mode=OneWay}" />
-							<toolkit:GridSplitter Grid.Column="3" Grid.Row="0" Grid.RowSpan="3"
-								Width="4"
-								ResizeBehavior="BasedOnAlignment" />
-							<detailPanes:DetailSelector Grid.Column="4" Grid.Row="0" Grid.RowSpan="3"
-								ViewModel="{x:Bind DetailSelectorViewModel, Mode=OneWay}" />
-						</Grid>
+						<tabPanes:TabContentPane ViewModel="{x:Bind Mode=OneWay}" />
 					</TabViewItem>
 				</DataTemplate>
 			</TabView.TabItemTemplate>
