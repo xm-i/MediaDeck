@@ -31,7 +31,7 @@ public sealed partial class TagManagerView {
 		}
 	}
 
-	private async void DeleteTagButton_Click(object sender, RoutedEventArgs e) {
+	private async void TagDetailView_DeleteTagRequested(object? sender, EventArgs e) {
 		if (this.ViewModel?.SelectedTagCategory.Value?.SelectedTag.Value == null)
 			return;
 		var dialog = new ContentDialog {

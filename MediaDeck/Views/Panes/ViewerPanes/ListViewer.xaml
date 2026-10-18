@@ -17,33 +17,33 @@
 			<ScrollViewer x:Name="HeaderScrollViewer" HorizontalScrollMode="Disabled" HorizontalScrollBarVisibility="Hidden" VerticalScrollMode="Disabled" VerticalScrollBarVisibility="Hidden" >
 				<Grid Height="32" RightTapped="HeaderGrid_RightTapped" >
 					<Grid.ColumnDefinitions>
-						<ColumnDefinition Width="{Binding ItemSize.Value, Mode=OneWay, Converter={StaticResource DoubleToGridLengthConverter}}" MinWidth="{Binding ItemSize.Value, Mode=OneWay}" />
-						<ColumnDefinition Width="{Binding FileNameColumn.EffectiveWidth.Value, Mode=OneWay, Converter={StaticResource DoubleToGridLengthConverter}}" MinWidth="{Binding FileNameColumn.EffectiveMinWidth.Value, Mode=OneWay}" />
-						<ColumnDefinition Width="{Binding ResolutionColumn.EffectiveWidth.Value, Mode=OneWay, Converter={StaticResource DoubleToGridLengthConverter}}" MinWidth="{Binding ResolutionColumn.EffectiveMinWidth.Value, Mode=OneWay}" />
-						<ColumnDefinition Width="{Binding FileSizeColumn.EffectiveWidth.Value, Mode=OneWay, Converter={StaticResource DoubleToGridLengthConverter}}" MinWidth="{Binding FileSizeColumn.EffectiveMinWidth.Value, Mode=OneWay}" />
-						<ColumnDefinition Width="{Binding CreationTimeColumn.EffectiveWidth.Value, Mode=OneWay, Converter={StaticResource DoubleToGridLengthConverter}}" MinWidth="{Binding CreationTimeColumn.EffectiveMinWidth.Value, Mode=OneWay}" />
-						<ColumnDefinition Width="{Binding RateColumn.EffectiveWidth.Value, Mode=OneWay, Converter={StaticResource DoubleToGridLengthConverter}}" MinWidth="{Binding RateColumn.EffectiveMinWidth.Value, Mode=OneWay}" />
+						<ColumnDefinition Width="{x:Bind ViewModel.ItemSize.Value, Mode=OneWay, Converter={StaticResource DoubleToGridLengthConverter}}" MinWidth="{x:Bind ViewModel.ItemSize.Value, Mode=OneWay}" />
+						<ColumnDefinition Width="{x:Bind ViewModel.FileNameColumn.EffectiveWidth.Value, Mode=OneWay, Converter={StaticResource DoubleToGridLengthConverter}}" MinWidth="{x:Bind ViewModel.FileNameColumn.EffectiveMinWidth.Value, Mode=OneWay}" />
+						<ColumnDefinition Width="{x:Bind ViewModel.ResolutionColumn.EffectiveWidth.Value, Mode=OneWay, Converter={StaticResource DoubleToGridLengthConverter}}" MinWidth="{x:Bind ViewModel.ResolutionColumn.EffectiveMinWidth.Value, Mode=OneWay}" />
+						<ColumnDefinition Width="{x:Bind ViewModel.FileSizeColumn.EffectiveWidth.Value, Mode=OneWay, Converter={StaticResource DoubleToGridLengthConverter}}" MinWidth="{x:Bind ViewModel.FileSizeColumn.EffectiveMinWidth.Value, Mode=OneWay}" />
+						<ColumnDefinition Width="{x:Bind ViewModel.CreationTimeColumn.EffectiveWidth.Value, Mode=OneWay, Converter={StaticResource DoubleToGridLengthConverter}}" MinWidth="{x:Bind ViewModel.CreationTimeColumn.EffectiveMinWidth.Value, Mode=OneWay}" />
+						<ColumnDefinition Width="{x:Bind ViewModel.RateColumn.EffectiveWidth.Value, Mode=OneWay, Converter={StaticResource DoubleToGridLengthConverter}}" MinWidth="{x:Bind ViewModel.RateColumn.EffectiveMinWidth.Value, Mode=OneWay}" />
 					</Grid.ColumnDefinitions>
 					<Grid Grid.Column="0" />
-					<Grid Grid.Column="1" Visibility="{Binding FileNameColumn.IsVisible.Value, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" >
+					<Grid Grid.Column="1" Visibility="{x:Bind ViewModel.FileNameColumn.IsVisible.Value, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" >
 						<TextBlock x:Uid="Viewer_ColumnFileName" FontWeight="SemiBold" VerticalAlignment="Center" Margin="8,0,8,0" TextTrimming="CharacterEllipsis" />
-						<primitives:Thumb Tag="{Binding FileNameColumn, Mode=OneWay}" Width="6" HorizontalAlignment="Right" DragDelta="HeaderResizer_DragDelta" PointerEntered="HeaderResizer_PointerEntered" PointerExited="HeaderResizer_PointerExited" />
+						<primitives:Thumb Tag="{x:Bind ViewModel.FileNameColumn, Mode=OneWay}" Width="6" HorizontalAlignment="Right" DragDelta="HeaderResizer_DragDelta" PointerEntered="HeaderResizer_PointerEntered" PointerExited="HeaderResizer_PointerExited" />
 					</Grid>
-					<Grid Grid.Column="2" Visibility="{Binding ResolutionColumn.IsVisible.Value, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" >
+					<Grid Grid.Column="2" Visibility="{x:Bind ViewModel.ResolutionColumn.IsVisible.Value, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" >
 						<TextBlock x:Uid="Viewer_ColumnResolution" FontWeight="SemiBold" VerticalAlignment="Center" Margin="8,0,8,0" TextTrimming="CharacterEllipsis" />
-						<primitives:Thumb Tag="{Binding ResolutionColumn, Mode=OneWay}" Width="6" HorizontalAlignment="Right" DragDelta="HeaderResizer_DragDelta" PointerEntered="HeaderResizer_PointerEntered" PointerExited="HeaderResizer_PointerExited" />
+						<primitives:Thumb Tag="{x:Bind ViewModel.ResolutionColumn, Mode=OneWay}" Width="6" HorizontalAlignment="Right" DragDelta="HeaderResizer_DragDelta" PointerEntered="HeaderResizer_PointerEntered" PointerExited="HeaderResizer_PointerExited" />
 					</Grid>
-					<Grid Grid.Column="3" Visibility="{Binding FileSizeColumn.IsVisible.Value, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" >
+					<Grid Grid.Column="3" Visibility="{x:Bind ViewModel.FileSizeColumn.IsVisible.Value, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" >
 						<TextBlock x:Uid="Viewer_ColumnSize" FontWeight="SemiBold" VerticalAlignment="Center" Margin="8,0,8,0" TextTrimming="CharacterEllipsis" />
-						<primitives:Thumb Tag="{Binding FileSizeColumn, Mode=OneWay}" Width="6" HorizontalAlignment="Right" DragDelta="HeaderResizer_DragDelta" PointerEntered="HeaderResizer_PointerEntered" PointerExited="HeaderResizer_PointerExited" />
+						<primitives:Thumb Tag="{x:Bind ViewModel.FileSizeColumn, Mode=OneWay}" Width="6" HorizontalAlignment="Right" DragDelta="HeaderResizer_DragDelta" PointerEntered="HeaderResizer_PointerEntered" PointerExited="HeaderResizer_PointerExited" />
 					</Grid>
-					<Grid Grid.Column="4" Visibility="{Binding CreationTimeColumn.IsVisible.Value, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" >
+					<Grid Grid.Column="4" Visibility="{x:Bind ViewModel.CreationTimeColumn.IsVisible.Value, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" >
 						<TextBlock x:Uid="Viewer_ColumnCreationTime" FontWeight="SemiBold" VerticalAlignment="Center" Margin="8,0,8,0" TextTrimming="CharacterEllipsis" />
-						<primitives:Thumb Tag="{Binding CreationTimeColumn, Mode=OneWay}" Width="6" HorizontalAlignment="Right" DragDelta="HeaderResizer_DragDelta" PointerEntered="HeaderResizer_PointerEntered" PointerExited="HeaderResizer_PointerExited" />
+						<primitives:Thumb Tag="{x:Bind ViewModel.CreationTimeColumn, Mode=OneWay}" Width="6" HorizontalAlignment="Right" DragDelta="HeaderResizer_DragDelta" PointerEntered="HeaderResizer_PointerEntered" PointerExited="HeaderResizer_PointerExited" />
 					</Grid>
-					<Grid Grid.Column="5" Visibility="{Binding RateColumn.IsVisible.Value, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" >
+					<Grid Grid.Column="5" Visibility="{x:Bind ViewModel.RateColumn.IsVisible.Value, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" >
 						<TextBlock x:Uid="Viewer_ColumnRate" FontWeight="SemiBold" VerticalAlignment="Center" Margin="8,0,8,0" TextTrimming="CharacterEllipsis" />
-						<primitives:Thumb Tag="{Binding RateColumn, Mode=OneWay}" Width="6" HorizontalAlignment="Right" DragDelta="HeaderResizer_DragDelta" PointerEntered="HeaderResizer_PointerEntered" PointerExited="HeaderResizer_PointerExited" />
+						<primitives:Thumb Tag="{x:Bind ViewModel.RateColumn, Mode=OneWay}" Width="6" HorizontalAlignment="Right" DragDelta="HeaderResizer_DragDelta" PointerEntered="HeaderResizer_PointerEntered" PointerExited="HeaderResizer_PointerExited" />
 					</Grid>
 				</Grid>
 			</ScrollViewer>

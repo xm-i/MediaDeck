@@ -6,6 +6,7 @@
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:metadata="using:MediaDeck.Composition.Tables.Metadata"
+	xmlns:primitives="using:MediaDeck.Core.Primitives"
 	mc:Ignorable="d" >
 
 	<StackPanel Spacing="12" >
@@ -59,32 +60,32 @@
 		<!-- Dynamic Properties -->
 		<ItemsRepeater ItemsSource="{x:Bind ViewModel.Properties.Value, Mode=OneWay}" >
 			<ItemsRepeater.ItemTemplate>
-				<DataTemplate>
+				<DataTemplate x:DataType="primitives:FileProperty">
 					<Grid Margin="0,2">
-						<Grid Visibility="{Binding HasMultipleValues, Converter={StaticResource InvertBoolToVisibilityConverter}}" >
+						<Grid Visibility="{x:Bind HasMultipleValues, Converter={StaticResource InvertBoolToVisibilityConverter}}" >
 							<Grid.ColumnDefinitions>
 								<ColumnDefinition Width="120" />
 								<ColumnDefinition Width="*" />
 							</Grid.ColumnDefinitions>
 							<TextBlock Grid.Column="0"
-								Text="{Binding Title}"
+								Text="{x:Bind Title}"
 								Style="{ThemeResource CaptionTextBlockStyle}"
 								Foreground="{ThemeResource TextFillColorSecondaryBrush}"
 								IsTextSelectionEnabled="True"
 								VerticalAlignment="Center" />
 							<TextBlock Grid.Column="1"
-								Text="{Binding RepresentativeValue.Value}"
+								Text="{x:Bind RepresentativeValue.Value}"
 								IsTextSelectionEnabled="True"
 								VerticalAlignment="Center"
 								TextWrapping="Wrap" />
 						</Grid>
-						<Grid Visibility="{Binding HasMultipleValues, Converter={StaticResource BoolToVisibilityConverter}}" >
+						<Grid Visibility="{x:Bind HasMultipleValues, Converter={StaticResource BoolToVisibilityConverter}}" >
 							<Grid.ColumnDefinitions>
 								<ColumnDefinition Width="120" />
 								<ColumnDefinition Width="*" />
 							</Grid.ColumnDefinitions>
 							<TextBlock Grid.Column="0"
-								Text="{Binding Title}"
+								Text="{x:Bind Title}"
 								Style="{ThemeResource CaptionTextBlockStyle}"
 								Foreground="{ThemeResource TextFillColorSecondaryBrush}"
 								IsTextSelectionEnabled="True"

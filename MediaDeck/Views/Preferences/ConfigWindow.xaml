@@ -36,14 +36,14 @@
 				<DataTemplate x:DataType="config:IConfigPageViewModel" >
 					<NavigationViewItem>
 						<NavigationViewItem.Icon>
-							<FontIcon Glyph="{Binding PageIconGlyph}" />
+							<FontIcon Glyph="{x:Bind PageIconGlyph}" />
 						</NavigationViewItem.Icon>
 						<NavigationViewItem.Content>
 							<StackPanel Spacing="2" >
-								<TextBlock Text="{Binding PageName}"
+								<TextBlock Text="{x:Bind PageName}"
 									FontSize="14"
 									FontWeight="SemiBold" />
-								<TextBlock Text="{Binding PageDescription}"
+								<TextBlock Text="{x:Bind PageDescription}"
 									FontSize="11"
 									Foreground="{ThemeResource TextFillColorSecondaryBrush}"
 									TextTrimming="CharacterEllipsis" />
