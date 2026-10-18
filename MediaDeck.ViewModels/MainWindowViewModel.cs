@@ -3,6 +3,7 @@ using MediaDeck.Common.Extensions;
 using MediaDeck.Composition.Objects;
 using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Core.Stores.State;
+using MediaDeck.ViewModels.Controls;
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -25,9 +26,11 @@ public class MainWindowViewModel : ViewModelBase {
 		IServiceProvider serviceProvider,
 		IStateStore stateStore,
 		WindowStateProvider windowStateProvider,
-		NavigationMenuViewModel navigationMenuViewModel) {
+		NavigationMenuViewModel navigationMenuViewModel,
+		GlobalInfoBarViewModel globalInfoBarViewModel) {
 		this._rootServiceProvider = serviceProvider;
 		this.NavigationMenuViewModel = navigationMenuViewModel;
+		this.GlobalInfoBarViewModel = globalInfoBarViewModel.AddTo(this.CompositeDisposable);
 		this._rootState = stateStore.RootState;
 
 		// 自身のウィンドウの状態を取得（WindowManagerによってセット済み）
@@ -74,6 +77,13 @@ public class MainWindowViewModel : ViewModelBase {
 	}
 
 	public NavigationMenuViewModel NavigationMenuViewModel {
+		get;
+	}
+
+	/// <summary>
+	/// グローバル情報バー ViewModel
+	/// </summary>
+	public GlobalInfoBarViewModel GlobalInfoBarViewModel {
 		get;
 	}
 

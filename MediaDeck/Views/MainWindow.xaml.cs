@@ -19,7 +19,7 @@ public sealed partial class MainWindow : Window {
 	private readonly IStringProvider _stringProvider;
 
 	public MainWindow(MainWindowViewModel viewModel, IConfigStore configStore, IStringProvider stringProvider) {
-		this._viewModel = viewModel;
+		this._viewModel = viewModel.AddTo(this._disposable);
 		this._stringProvider = stringProvider;
 		this.InitializeComponent();
 

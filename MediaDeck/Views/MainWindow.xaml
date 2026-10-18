@@ -126,6 +126,7 @@
 			</TabView.TabItemTemplate>
 			<TabView.TabStripFooter>
 				<localControls:GlobalInfoBar
+					ViewModel="{x:Bind _viewModel.GlobalInfoBarViewModel, Mode=OneWay}"
 					VerticalAlignment="Center"
 					HorizontalAlignment="Right"
 					Margin="0,0,8,0" />
