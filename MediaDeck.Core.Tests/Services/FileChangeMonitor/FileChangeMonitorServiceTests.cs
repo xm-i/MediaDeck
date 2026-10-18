@@ -94,12 +94,17 @@ public class FileChangeMonitorServiceTests {
 
 	[Fact]
 	public async Task ApplyChangesAsync_MovedItem_UpdatesFilePathAndDirectoryPath() {
+		var oldDir = Path.GetFullPath("OldFolder");
+		var newDir = Path.GetFullPath("NewFolder");
+		var oldPath = Path.Combine(oldDir, "image.png");
+		var newPath = Path.Combine(newDir, "image.png");
+
 		await using (var db = new MediaDeckDbContext(this._options)) {
 			db.MediaItems.Add(new MediaItem {
 				MediaItemId = 100,
 				MediaType = MediaType.Image,
-				FilePath = @"C:\OldFolder\image.png",
-				DirectoryPath = @"C:\OldFolder",
+				FilePath = oldPath,
+				DirectoryPath = oldDir,
 				Description = string.Empty,
 				IsUnderFolderGroup = false,
 			});
@@ -109,8 +114,8 @@ public class FileChangeMonitorServiceTests {
 		var item = new FileChangeItem {
 			ChangeType = FileChangeType.Moved,
 			MediaItemId = 100,
-			OldPath = @"C:\OldFolder\image.png",
-			NewPath = @"C:\NewFolder\image.png",
+			OldPath = oldPath,
+			NewPath = newPath,
 		};
 		this._tracker.UnprocessedChanges.Add(item);
 
@@ -119,8 +124,8 @@ public class FileChangeMonitorServiceTests {
 		await using (var db = new MediaDeckDbContext(this._options)) {
 			var updated = await db.MediaItems.FindAsync(100L);
 			updated.ShouldNotBeNull();
-			updated.FilePath.ShouldBe(@"C:\NewFolder\image.png");
-			updated.DirectoryPath.ShouldBe(@"C:\NewFolder");
+			updated.FilePath.ShouldBe(newPath);
+			updated.DirectoryPath.ShouldBe(newDir);
 		}
 	}
 
