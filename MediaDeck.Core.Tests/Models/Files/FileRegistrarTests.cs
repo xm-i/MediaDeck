@@ -68,7 +68,8 @@ public class FileRegistrarTests {
 
 	[Fact]
 	public async Task ScanFolderAsync_InvalidDirectory_ResetsIsScanningToFalse() {
-		var folder = new FolderModel { FolderPath = @"Z:\NonExistentPath_XYZ_12345" };
+		var nonExistentPath = Path.Combine(Path.GetTempPath(), $"NonExistentPath_{Guid.NewGuid()}");
+		var folder = new FolderModel { FolderPath = nonExistentPath };
 		await Should.ThrowAsync<DirectoryNotFoundException>(async () => {
 			await this._sut.ScanFolderAsync(folder);
 		});

@@ -95,6 +95,16 @@ public class MediaContentLibraryTests : IDisposable {
 		Should.NotThrow(() => this._sut.Dispose());
 	}
 
+	private static async Task WaitForConditionAsync(Func<bool> condition, int timeoutMs = 5000) {
+		var sw = System.Diagnostics.Stopwatch.StartNew();
+		while (!condition()) {
+			if (sw.ElapsedMilliseconds > timeoutMs) {
+				throw new TimeoutException("Condition was not met within timeout.");
+			}
+			await Task.Delay(10);
+		}
+	}
+
 	/// <summary>
 	/// 新しい検索が実行された際、前回の検索セッションで読み込まれたファイルモデルが破棄されることを検証します。
 	/// </summary>
@@ -133,18 +143,14 @@ public class MediaContentLibraryTests : IDisposable {
 
 		// 1回目の検索
 		searchRequested.OnNext(Unit.Default);
-		await Task.Delay(100);
+		await WaitForConditionAsync(() => sut.Files.Count == 1);
 
-		sut.Files.Count.ShouldBe(1);
 		sut.Files[0].ShouldBe(mockFile1.Object);
 		mockFile1.Verify(x => x.Dispose(), Times.Never);
 
 		// 2回目の検索
 		searchRequested.OnNext(Unit.Default);
-		await Task.Delay(100);
-
-		sut.Files.Count.ShouldBe(1);
-		sut.Files[0].ShouldBe(mockFile2.Object);
+		await WaitForConditionAsync(() => sut.Files.Count == 1 && sut.Files[0] == mockFile2.Object);
 
 		// 1回目のファイルモデルがセッション更新により破棄されていることを検証
 		mockFile1.Verify(x => x.Dispose(), Times.Once);
