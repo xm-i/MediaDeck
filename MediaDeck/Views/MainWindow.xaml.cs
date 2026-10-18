@@ -19,7 +19,7 @@ public sealed partial class MainWindow : Window {
 	private readonly IStringProvider _stringProvider;
 
 	public MainWindow(MainWindowViewModel viewModel, IConfigStore configStore, IStringProvider stringProvider) {
-		this._viewModel = viewModel.AddTo(this._disposable);
+		this._viewModel = viewModel;
 		this._stringProvider = stringProvider;
 		this.InitializeComponent();
 
@@ -27,6 +27,9 @@ public sealed partial class MainWindow : Window {
 
 		// テーマのバインド
 		ThemeHelper.BindTheme(this, configStore, this._disposable);
+
+		// グローバル通知バーの購読をウィンドウクローズ時に確実に破棄する
+		viewModel.GlobalInfoBarViewModel.AddTo(this._disposable);
 
 		// カスタムタイトルバーの設定
 		this.ExtendsContentIntoTitleBar = true;
