@@ -1,3 +1,4 @@
+using MediaDeck.Composition.Interfaces;
 using MediaDeck.Core.Stores.Config;
 using MediaDeck.ViewModels.Thumbnails;
 using MediaDeck.Views.Helpers;
@@ -13,9 +14,12 @@ public sealed partial class ThumbnailPickerWindow : Microsoft.UI.Xaml.Window {
 	/// </summary>
 	/// <param name="thumbnailPickerSelectorViewModel">サムネイルピッカーセレクターViewModel</param>
 	/// <param name="configStore">設定ストア</param>
-	public ThumbnailPickerWindow(ThumbnailPickerSelectorViewModel thumbnailPickerSelectorViewModel, IConfigStore configStore) {
-		this.InitializeComponent();
+	/// <param name="stringProvider">文字列プロバイダー</param>
+	public ThumbnailPickerWindow(ThumbnailPickerSelectorViewModel thumbnailPickerSelectorViewModel, IConfigStore configStore, IStringProvider stringProvider) {
 		this.ViewModel = thumbnailPickerSelectorViewModel.AddTo(this._disposable);
+		this.InitializeComponent();
+
+		this.Title = stringProvider.GetString("ThumbnailPicker_WindowTitle");
 
 		// テーマのバインド
 		ThemeHelper.BindTheme(this, configStore, this._disposable);

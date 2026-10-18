@@ -10,6 +10,6 @@
 			SelectedItem="{x:Bind ViewModel.HasLocation.Value, Mode=TwoWay}"
 			ItemTemplate="{StaticResource DisplayObjectComboBoxItemTemplate}" />
 		<Button Command="{x:Bind ViewModel.AddFilterCommand}"
-			Content="Add Filter" />
+			x:Uid="FilterCreator_AddFilter" />
 	</StackPanel>
 </local:LocationFilterPageBase>

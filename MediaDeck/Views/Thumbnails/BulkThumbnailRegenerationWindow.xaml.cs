@@ -1,3 +1,4 @@
+using MediaDeck.Composition.Interfaces;
 using MediaDeck.Core.Stores.Config;
 using MediaDeck.ViewModels.Thumbnails;
 using MediaDeck.Views.Helpers;
@@ -13,9 +14,12 @@ public sealed partial class BulkThumbnailRegenerationWindow : Microsoft.UI.Xaml.
 	/// </summary>
 	/// <param name="viewModel">一括サムネイル再生成ViewModel</param>
 	/// <param name="configStore">設定ストア</param>
-	public BulkThumbnailRegenerationWindow(BulkThumbnailRegenerationViewModel viewModel, IConfigStore configStore) {
-		this.InitializeComponent();
+	/// <param name="stringProvider">文字列プロバイダー</param>
+	public BulkThumbnailRegenerationWindow(BulkThumbnailRegenerationViewModel viewModel, IConfigStore configStore, IStringProvider stringProvider) {
 		this.ViewModel = viewModel.AddTo(this._disposable);
+		this.InitializeComponent();
+
+		this.Title = stringProvider.GetString("BulkThumbnailRegeneration_WindowTitle");
 
 		// テーマのバインド
 		ThemeHelper.BindTheme(this, configStore, this._disposable);

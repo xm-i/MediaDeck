@@ -45,6 +45,7 @@
 
                                 <Button x:Name="CloseButton"
                                         Grid.Column="2"
+                                        x:Uid="TabView_CloseButton"
                                         Content="&#xE711;"
                                         FontFamily="{ThemeResource SymbolThemeFontFamily}"
                                         FontSize="10"
@@ -55,8 +56,7 @@
                                         Padding="0"
                                         CornerRadius="12"
                                         Opacity="0"
-                                        VerticalAlignment="Center"
-                                        ToolTipService.ToolTip="タブを閉じる" />
+                                        VerticalAlignment="Center" />
                             </Grid>
                         </Border>
 

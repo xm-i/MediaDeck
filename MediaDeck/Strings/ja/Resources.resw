@@ -597,6 +597,9 @@
     <value>準備完了...</value>
   </data>
   <!-- 重複ファイル検索 -->
+  <data name="DuplicateDetector_WindowTitle" xml:space="preserve">
+    <value>重複ファイル検出</value>
+  </data>
   <data name="Duplicate_StartDetection.Content" xml:space="preserve">
     <value>検出開始</value>
   </data>
@@ -616,8 +619,14 @@
     <value>総重複ファイル数: </value>
   </data>
   <!-- タグマネージャー -->
+  <data name="TagManager_WindowTitle" xml:space="preserve">
+    <value>タグ管理</value>
+  </data>
   <data name="TagManager_Category.Text" xml:space="preserve">
     <value>タグカテゴリ</value>
+  </data>
+  <data name="TagManager_AddTagCategory.ToolTipService.ToolTip" xml:space="preserve">
+    <value>新しいタグカテゴリを追加</value>
   </data>
   <data name="TagManager_CategoryName.Text" xml:space="preserve">
     <value>カテゴリ名</value>
@@ -677,6 +686,9 @@
     <value>このタグを削除します</value>
   </data>
   <!-- フォルダマネージャー -->
+  <data name="FolderManager_WindowTitle" xml:space="preserve">
+    <value>フォルダ管理</value>
+  </data>
   <data name="FolderManager_RegisteredFolders.Text" xml:space="preserve">
     <value>登録フォルダ</value>
   </data>
@@ -824,6 +836,9 @@
   </data>
   <data name="TabViewModel_RenameTab" xml:space="preserve">
     <value>タブの名前を変更</value>
+  </data>
+  <data name="TabView_CloseButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>タブを閉じる</value>
   </data>
   <data name="AppName" xml:space="preserve">
     <value>MediaDeck</value>
@@ -1044,6 +1059,36 @@
   <data name="FilterCreator_Comparison_LessThan" xml:space="preserve">
     <value>未満</value>
   </data>
+  <data name="FilterCreator_AddFilter.Content" xml:space="preserve">
+    <value>フィルターを追加</value>
+  </data>
+  <data name="FilterCreator_FilePath_Prefix.Text" xml:space="preserve">
+    <value>ファイルパスに</value>
+  </data>
+  <data name="FilterCreator_FilePath_Suffix.Text" xml:space="preserve">
+    <value>を</value>
+  </data>
+  <data name="FilterCreator_FolderGroup_Prefix.Text" xml:space="preserve">
+    <value>フォルダグループ</value>
+  </data>
+  <data name="FilterCreator_FolderGroup_Suffix.Text" xml:space="preserve">
+    <value>ファイルを検索する</value>
+  </data>
+  <data name="FilterCreator_Rate_Prefix.Text" xml:space="preserve">
+    <value>評価が</value>
+  </data>
+  <data name="FilterCreator_Resolution_Width.Text" xml:space="preserve">
+    <value>幅</value>
+  </data>
+  <data name="FilterCreator_Resolution_Height.Text" xml:space="preserve">
+    <value>高さ</value>
+  </data>
+  <data name="FilterCreator_Tag_Prefix.Text" xml:space="preserve">
+    <value>タグに</value>
+  </data>
+  <data name="FilterCreator_Tag_Suffix.Text" xml:space="preserve">
+    <value>を</value>
+  </data>
 
   <!-- FilterItemObject DisplayName Formats -->
   <data name="FilterItem_Exists_True" xml:space="preserve">
@@ -1184,8 +1229,12 @@
   <data name="NewTagDialog_DescriptionInput.PlaceholderText" xml:space="preserve">
     <value>説明を入力</value>
   </data>
-  <data name="BulkThumbnailRegenerationWindow.Title" xml:space="preserve">
+  <!-- サムネイル一括再生成 / サムネイル選択 -->
+  <data name="BulkThumbnailRegeneration_WindowTitle" xml:space="preserve">
     <value>サムネイル一括再生成</value>
+  </data>
+  <data name="ThumbnailPicker_WindowTitle" xml:space="preserve">
+    <value>サムネイル選択</value>
   </data>
   <data name="BulkThumbnailRegeneration_TargetFiles.Text" xml:space="preserve">
     <value>対象ファイル</value>

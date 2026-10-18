@@ -6,12 +6,12 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	mc:Ignorable="d" >
 	<StackPanel Orientation="Horizontal" >
-		<TextBlock Text="フォルダグループ" />
+		<TextBlock x:Uid="FilterCreator_FolderGroup_Prefix" />
 		<ComboBox ItemsSource="{x:Bind ViewModel.SearchTypeList}"
 			SelectedItem="{x:Bind ViewModel.SearchType.Value, Mode=TwoWay}"
 			ItemTemplate="{StaticResource DisplayObjectComboBoxItemTemplate}" />
-		<TextBlock Text="ファイルを検索する" />
+		<TextBlock x:Uid="FilterCreator_FolderGroup_Suffix" />
 		<Button Command="{x:Bind ViewModel.AddFilterCommand}"
-			Content="Add Filter" />
+			x:Uid="FilterCreator_AddFilter" />
 	</StackPanel>
 </local:FolderGroupFilterPageBase>

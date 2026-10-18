@@ -7,8 +7,7 @@
 	xmlns:local="using:MediaDeck.Views.Thumbnails"
 	xmlns:controls="using:MediaDeck.Views.Controls"
 	xmlns:vm="using:MediaDeck.ViewModels.Thumbnails"
-	mc:Ignorable="d"
-	x:Uid="BulkThumbnailRegenerationWindow" >
+	mc:Ignorable="d" >
 	<Window.SystemBackdrop>
 		<DesktopAcrylicBackdrop/>
 	</Window.SystemBackdrop>

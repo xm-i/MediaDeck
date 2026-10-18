@@ -8,10 +8,10 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	mc:Ignorable="d" >
 	<StackPanel Padding="12" Spacing="12" >
-		<TextBlock Text="アーカイブ (Archive)" FontWeight="SemiBold" />
-		<TextBlock Text="アーカイブ内画像エントリの何番目を代表サムネイルとするかを指定します。"
+		<TextBlock x:Uid="ArchiveBulkThumbnailConfig_Title" FontWeight="SemiBold" />
+		<TextBlock x:Uid="ArchiveBulkThumbnailConfig_Description"
 			TextWrapping="Wrap" />
-		<NumberBox Header="エントリ番号 (1 始まり)"
+		<NumberBox x:Uid="ArchiveBulkThumbnailConfig_EntryIndex"
 			Minimum="1" SpinButtonPlacementMode="Inline"
 			Value="{x:Bind ViewModel.EntryIndex.Value, Mode=TwoWay}" />
 	</StackPanel>

@@ -1,3 +1,4 @@
+using MediaDeck.Composition.Interfaces;
 using MediaDeck.Core.Stores.Config;
 using MediaDeck.ViewModels.Tools;
 using MediaDeck.Views.Helpers;
@@ -13,9 +14,12 @@ public sealed partial class DuplicateDetectorWindow : Microsoft.UI.Xaml.Window {
 	/// </summary>
 	/// <param name="duplicateDetectorViewModel">重複検出ViewModel</param>
 	/// <param name="configStore">設定ストア</param>
-	public DuplicateDetectorWindow(DuplicateDetectorViewModel duplicateDetectorViewModel, IConfigStore configStore) {
-		this.InitializeComponent();
+	/// <param name="stringProvider">文字列プロバイダー</param>
+	public DuplicateDetectorWindow(DuplicateDetectorViewModel duplicateDetectorViewModel, IConfigStore configStore, IStringProvider stringProvider) {
 		this.ViewModel = duplicateDetectorViewModel.AddTo(this._disposable);
+		this.InitializeComponent();
+
+		this.Title = stringProvider.GetString("DuplicateDetector_WindowTitle");
 
 		// テーマのバインド
 		ThemeHelper.BindTheme(this, configStore, this._disposable);

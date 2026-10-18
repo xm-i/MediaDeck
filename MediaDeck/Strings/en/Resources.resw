@@ -597,6 +597,9 @@
     <value>Ready...</value>
   </data>
   <!-- Duplicate File Finder -->
+  <data name="DuplicateDetector_WindowTitle" xml:space="preserve">
+    <value>Duplicate File Detector</value>
+  </data>
   <data name="Duplicate_StartDetection.Content" xml:space="preserve">
     <value>Start Detection</value>
   </data>
@@ -616,8 +619,14 @@
     <value>Total Duplicate Files: </value>
   </data>
   <!-- Tag Manager -->
+  <data name="TagManager_WindowTitle" xml:space="preserve">
+    <value>Tag Manager</value>
+  </data>
   <data name="TagManager_Category.Text" xml:space="preserve">
     <value>Tag Category</value>
+  </data>
+  <data name="TagManager_AddTagCategory.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Add new tag category</value>
   </data>
   <data name="TagManager_CategoryName.Text" xml:space="preserve">
     <value>Category Name</value>
@@ -677,6 +686,9 @@
     <value>Delete this tag</value>
   </data>
   <!-- Folder Manager -->
+  <data name="FolderManager_WindowTitle" xml:space="preserve">
+    <value>Folder Manager</value>
+  </data>
   <data name="FolderManager_RegisteredFolders.Text" xml:space="preserve">
     <value>Registered Folders</value>
   </data>
@@ -824,6 +836,9 @@
   </data>
   <data name="TabViewModel_RenameTab" xml:space="preserve">
     <value>Rename Tab</value>
+  </data>
+  <data name="TabView_CloseButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Close tab</value>
   </data>
   <data name="AppName" xml:space="preserve">
     <value>MediaDeck</value>
@@ -1044,6 +1059,36 @@
   <data name="FilterCreator_Comparison_LessThan" xml:space="preserve">
     <value>less than</value>
   </data>
+  <data name="FilterCreator_AddFilter.Content" xml:space="preserve">
+    <value>Add Filter</value>
+  </data>
+  <data name="FilterCreator_FilePath_Prefix.Text" xml:space="preserve">
+    <value>File path contains </value>
+  </data>
+  <data name="FilterCreator_FilePath_Suffix.Text" xml:space="preserve">
+    <value> </value>
+  </data>
+  <data name="FilterCreator_FolderGroup_Prefix.Text" xml:space="preserve">
+    <value>Folder group </value>
+  </data>
+  <data name="FilterCreator_FolderGroup_Suffix.Text" xml:space="preserve">
+    <value> files</value>
+  </data>
+  <data name="FilterCreator_Rate_Prefix.Text" xml:space="preserve">
+    <value>Rating is </value>
+  </data>
+  <data name="FilterCreator_Resolution_Width.Text" xml:space="preserve">
+    <value>Width</value>
+  </data>
+  <data name="FilterCreator_Resolution_Height.Text" xml:space="preserve">
+    <value>Height</value>
+  </data>
+  <data name="FilterCreator_Tag_Prefix.Text" xml:space="preserve">
+    <value>Tag contains </value>
+  </data>
+  <data name="FilterCreator_Tag_Suffix.Text" xml:space="preserve">
+    <value> </value>
+  </data>
 
   <!-- FilterItemObject DisplayName Formats -->
   <data name="FilterItem_Exists_True" xml:space="preserve">
@@ -1184,8 +1229,12 @@
   <data name="NewTagDialog_DescriptionInput.PlaceholderText" xml:space="preserve">
     <value>Enter description</value>
   </data>
-  <data name="BulkThumbnailRegenerationWindow.Title" xml:space="preserve">
+  <!-- Bulk Thumbnail Regeneration / Thumbnail Picker -->
+  <data name="BulkThumbnailRegeneration_WindowTitle" xml:space="preserve">
     <value>Bulk Thumbnail Regeneration</value>
+  </data>
+  <data name="ThumbnailPicker_WindowTitle" xml:space="preserve">
+    <value>Thumbnail Picker</value>
   </data>
   <data name="BulkThumbnailRegeneration_TargetFiles.Text" xml:space="preserve">
     <value>Target Files</value>
@@ -1289,4 +1338,4 @@
   <data name="Viewer_ContextCreateNewAlbum" xml:space="preserve">
     <value>Create New Album</value>
   </data>
-</root>
+</root>

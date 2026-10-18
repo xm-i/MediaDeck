@@ -8,8 +8,8 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	mc:Ignorable="d" >
 	<StackPanel Padding="12" Spacing="8" >
-		<TextBlock Text="画像 (Image)" FontWeight="SemiBold" />
-		<TextBlock Text="このメディアタイプには追加の設定はありません。各ファイルの先頭画像からサムネイルを再生成します。"
+		<TextBlock x:Uid="ImageBulkThumbnailConfig_Title" FontWeight="SemiBold" />
+		<TextBlock x:Uid="ImageBulkThumbnailConfig_Description"
 			TextWrapping="Wrap" />
 	</StackPanel>
 </local:ImageBulkThumbnailConfigViewUserControl>

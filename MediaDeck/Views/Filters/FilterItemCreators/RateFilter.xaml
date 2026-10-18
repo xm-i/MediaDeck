@@ -6,13 +6,13 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	mc:Ignorable="d" >
 	<StackPanel Orientation="Horizontal" >
-		<TextBlock Text="評価が" />
+		<TextBlock x:Uid="FilterCreator_Rate_Prefix" />
 		<TextBox Width="50"
 			Text="{x:Bind ViewModel.RateText.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 		<ComboBox ItemsSource="{x:Bind ViewModel.SearchTypeList}"
 			SelectedItem="{x:Bind ViewModel.SearchType.Value, Mode=TwoWay}"
 			ItemTemplate="{StaticResource DisplayObjectComboBoxItemTemplate}" />
 		<Button Command="{x:Bind ViewModel.AddFilterCommand}"
-			Content="Add Filter" />
+			x:Uid="FilterCreator_AddFilter" />
 	</StackPanel>
 </local:RateFilterUserPageBase>

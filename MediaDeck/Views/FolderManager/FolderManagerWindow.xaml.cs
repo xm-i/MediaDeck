@@ -1,3 +1,4 @@
+using MediaDeck.Composition.Interfaces;
 using MediaDeck.Core.Stores.Config;
 using MediaDeck.ViewModels.FolderManager;
 using MediaDeck.Views.Helpers;
@@ -13,9 +14,12 @@ public sealed partial class FolderManagerWindow : Microsoft.UI.Xaml.Window {
 	/// </summary>
 	/// <param name="viewModel">フォルダ管理ViewModel</param>
 	/// <param name="configStore">設定ストア</param>
-	public FolderManagerWindow(FolderManagerViewModel viewModel, IConfigStore configStore) {
+	/// <param name="stringProvider">文字列プロバイダー</param>
+	public FolderManagerWindow(FolderManagerViewModel viewModel, IConfigStore configStore, IStringProvider stringProvider) {
 		this.ViewModel = viewModel.AddTo(this._disposable);
 		this.InitializeComponent();
+
+		this.Title = stringProvider.GetString("FolderManager_WindowTitle");
 
 		// テーマのバインド
 		ThemeHelper.BindTheme(this, configStore, this._disposable);

@@ -6,8 +6,7 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:config="using:MediaDeck.ViewModels.Preferences.Config"
 	xmlns:controls="using:MediaDeck.Views.Controls"
-	mc:Ignorable="d"
-	Title="設定" >
+	mc:Ignorable="d" >
 	<Window.SystemBackdrop>
 		<DesktopAcrylicBackdrop/>
 	</Window.SystemBackdrop>
