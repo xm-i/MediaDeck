@@ -1,5 +1,6 @@
 using MediaDeck.Common.Base;
 using MediaDeck.Composition.Enum;
+using MediaDeck.Composition.Interfaces;
 using MediaDeck.Composition.Interfaces.MediaItemTypes;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.ViewModels;
 
@@ -13,6 +14,7 @@ namespace MediaDeck.ViewModels.Thumbnails;
 [Inject(InjectServiceLifetime.Transient)]
 public class BulkThumbnailRegenerationViewModel : ViewModelBase {
 	private readonly IMediaItemTypeService _mediaItemTypeService;
+	private readonly IStringProvider _stringProvider;
 	private CancellationTokenSource? _cts;
 
 	private readonly ObservableList<BulkThumbnailItemViewModel> _items = [];
@@ -21,8 +23,10 @@ public class BulkThumbnailRegenerationViewModel : ViewModelBase {
 	/// <see cref="BulkThumbnailRegenerationViewModel"/> クラスの新しいインスタンスを初期化します。
 	/// </summary>
 	/// <param name="mediaItemTypeService">メディアアイテム種別サービス</param>
-	public BulkThumbnailRegenerationViewModel(IMediaItemTypeService mediaItemTypeService) {
+	/// <param name="stringProvider">文字列プロバイダー</param>
+	public BulkThumbnailRegenerationViewModel(IMediaItemTypeService mediaItemTypeService, IStringProvider stringProvider) {
 		this._mediaItemTypeService = mediaItemTypeService;
+		this._stringProvider = stringProvider;
 
 		this.Items = this._items.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current).AddTo(this.CompositeDisposable);
 		this.TargetMediaType = new BindableReactiveProperty<MediaType>(MediaType.Unknown).AddTo(this.CompositeDisposable);
@@ -117,7 +121,7 @@ public class BulkThumbnailRegenerationViewModel : ViewModelBase {
 		this.TargetMediaType.Value = firstType;
 		var filtered = selectedItems.Where(x => x.MediaType == firstType).ToList();
 		foreach (var item in filtered) {
-			this._items.Add(new BulkThumbnailItemViewModel(item));
+			this._items.Add(new BulkThumbnailItemViewModel(item, this._stringProvider));
 		}
 		this.TotalCount.Value = this._items.Count;
 		this.ConfigViewModel.Value = this._mediaItemTypeService.CreateBulkThumbnailConfigViewModel(firstType);

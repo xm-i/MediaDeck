@@ -1,4 +1,5 @@
 using MediaDeck.Composition.Enum;
+using MediaDeck.Composition.Interfaces;
 using MediaDeck.Core.Models.Files.SearchConditions;
 using MediaDeck.Core.Stores.Config;
 using MediaDeck.ViewModels.Dialogs;
@@ -18,10 +19,12 @@ public sealed partial class PropertyComparisonDialog : ContentDialog {
 		get;
 	}
 
+	private readonly IStringProvider _stringProvider;
 	private readonly CompositeDisposable _disposable = new();
 
-	public PropertyComparisonDialog(PropertyComparisonDialogViewModel viewModel, IConfigStore configStore) {
+	public PropertyComparisonDialog(PropertyComparisonDialogViewModel viewModel, IConfigStore configStore, IStringProvider stringProvider) {
 		this.ViewModel = viewModel;
+		this._stringProvider = stringProvider;
 		this.InitializeComponent();
 
 		ThemeHelper.BindTheme(this, configStore, this._disposable);
@@ -52,19 +55,19 @@ public sealed partial class PropertyComparisonDialog : ContentDialog {
 	private void OnPrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args) {
 		if (this.ViewModel.SelectedOperator.Value == null) {
 			args.Cancel = true;
-			this.ShowError("演算子を選択してください。");
+			this.ShowError(this._stringProvider.GetString("PropertyComparisonDialog_Error_SelectOperator"));
 			return;
 		}
 		var raw = this.ViewModel.GetRawValueString();
 		if (string.IsNullOrWhiteSpace(raw)) {
 			args.Cancel = true;
-			this.ShowError("値を入力してください。");
+			this.ShowError(this._stringProvider.GetString("PropertyComparisonDialog_Error_EnterValue"));
 			return;
 		}
 		// 入力値が型として解釈可能か Build で検証する
 		if (this.ViewModel.Descriptor.Build(this.ViewModel.SelectedOperator.Value.Value, raw) is null) {
 			args.Cancel = true;
-			this.ShowError($"値を {this.ViewModel.Descriptor.ValueType.Name} として解釈できません。");
+			this.ShowError(this._stringProvider.GetString("PropertyComparisonDialog_Error_CannotParseValue", this.ViewModel.Descriptor.ValueType.Name));
 			return;
 		}
 		this.SelectedOperator = this.ViewModel.SelectedOperator.Value.Value;

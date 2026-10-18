@@ -64,7 +64,8 @@ public class FileChangeMonitorServiceTests {
 		mediaItemTypeService.Setup(x => x.CreateMediaItemOperators()).Returns([]);
 		var fileRegistrar = new FileRegistrar(config, new Mock<ILogger<FileRegistrar>>().Object, mediaItemTypeService.Object);
 
-		this._sut = new FileChangeMonitorService(dbFactoryMock.Object, this._tracker, logger.Object, appNotifDispatcher, fileRegistrar, dbWriteCoord.Object);
+		var stringProvider = provider.GetRequiredService<MediaDeck.Composition.Interfaces.IStringProvider>();
+		this._sut = new FileChangeMonitorService(dbFactoryMock.Object, this._tracker, logger.Object, appNotifDispatcher, fileRegistrar, dbWriteCoord.Object, stringProvider);
 	}
 
 	[Fact]

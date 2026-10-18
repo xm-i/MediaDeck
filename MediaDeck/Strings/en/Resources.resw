@@ -105,6 +105,9 @@
   <data name="DialogButton_Cancel" xml:space="preserve">
     <value>Cancel</value>
   </data>
+  <data name="DialogButton_Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
 
   <!-- Navigation menu -->
   <data name="NavMenu_File.Title" xml:space="preserve">
@@ -1059,6 +1062,9 @@
   <data name="FilterCreator_Comparison_LessThan" xml:space="preserve">
     <value>less than</value>
   </data>
+  <data name="FilterCreator_Comparison_Contains" xml:space="preserve">
+    <value>contains</value>
+  </data>
   <data name="FilterCreator_AddFilter.Content" xml:space="preserve">
     <value>Add Filter</value>
   </data>
@@ -1337,5 +1343,102 @@
   </data>
   <data name="Viewer_ContextCreateNewAlbum" xml:space="preserve">
     <value>Create New Album</value>
+  </data>
+
+  <!-- FolderManager Dialogs -->
+  <data name="FolderManager_DeleteConfirmation_Title" xml:space="preserve">
+    <value>Are you sure you want to remove this folder? This action cannot be undone.</value>
+  </data>
+
+  <!-- TagManager Dialogs -->
+  <data name="TagManager_DeleteCategoryConfirmation_Title" xml:space="preserve">
+    <value>Are you sure you want to delete this category?</value>
+  </data>
+  <data name="TagManager_DeleteCategoryConfirmation_Content" xml:space="preserve">
+    <value>Tags in this category will be moved to 'Unset'. This action cannot be undone.</value>
+  </data>
+  <data name="TagManager_DeleteTagConfirmation_Title" xml:space="preserve">
+    <value>Are you sure you want to delete this tag?</value>
+  </data>
+  <data name="TagManager_DeleteTagConfirmation_Content" xml:space="preserve">
+    <value>This action cannot be undone. Tagging from associated files will also be removed.</value>
+  </data>
+
+  <!-- PropertyComparison Dialog -->
+  <data name="PropertyComparisonDialog_Error_SelectOperator" xml:space="preserve">
+    <value>Please select an operator.</value>
+  </data>
+  <data name="PropertyComparisonDialog_Error_EnterValue" xml:space="preserve">
+    <value>Please enter a value.</value>
+  </data>
+  <data name="PropertyComparisonDialog_Error_CannotParseValue" xml:space="preserve">
+    <value>Cannot interpret the value as {0}.</value>
+  </data>
+
+  <!-- BulkThumbnail Status -->
+  <data name="BulkThumbnail_Status_Pending" xml:space="preserve">
+    <value>Pending</value>
+  </data>
+  <data name="BulkThumbnail_Status_Processing" xml:space="preserve">
+    <value>Processing</value>
+  </data>
+  <data name="BulkThumbnail_Status_Completed" xml:space="preserve">
+    <value>Completed</value>
+  </data>
+  <data name="BulkThumbnail_Status_Failed" xml:space="preserve">
+    <value>Failed</value>
+  </data>
+
+  <!-- Splash Screen -->
+  <data name="Splash_Starting" xml:space="preserve">
+    <value>Starting...</value>
+  </data>
+
+  <!-- FileChangeMonitor -->
+  <data name="FileChangeMonitor_BufferOverflow_Message" xml:space="preserve">
+    <value>File change monitoring could not keep up. Please manually reload folders to reflect the latest changes.</value>
+  </data>
+  <data name="FileChangeMonitor_BufferOverflow_Title" xml:space="preserve">
+    <value>Monitoring Error</value>
+  </data>
+
+  <!-- ConfigStore Notifications -->
+  <data name="ConfigStore_LoadError_Corrupted" xml:space="preserve">
+    <value>The configuration file is corrupted. Using default settings.</value>
+  </data>
+  <data name="ConfigStore_LoadError_Title" xml:space="preserve">
+    <value>Configuration Load Error</value>
+  </data>
+  <data name="ConfigStore_SaveError_Message" xml:space="preserve">
+    <value>Cannot save application settings.</value>
+  </data>
+  <data name="ConfigStore_SaveError_Title" xml:space="preserve">
+    <value>Save Error</value>
+  </data>
+
+  <!-- StateStore Notifications -->
+  <data name="StateStore_LoadError_Corrupted" xml:space="preserve">
+    <value>The state file is corrupted. Using default state.</value>
+  </data>
+  <data name="StateStore_LoadError_CannotRead" xml:space="preserve">
+    <value>Cannot read the state file. Using default state.</value>
+  </data>
+  <data name="StateStore_LoadError_Unexpected" xml:space="preserve">
+    <value>An unexpected error occurred while loading state. Using default state.</value>
+  </data>
+  <data name="StateStore_LoadError_Title" xml:space="preserve">
+    <value>State Load Error</value>
+  </data>
+  <data name="StateStore_SaveError_CannotSave" xml:space="preserve">
+    <value>Cannot save state.</value>
+  </data>
+  <data name="StateStore_SaveError_Serialize" xml:space="preserve">
+    <value>Failed to serialize state.</value>
+  </data>
+  <data name="StateStore_SaveError_Unexpected" xml:space="preserve">
+    <value>An unexpected error occurred while saving state.</value>
+  </data>
+  <data name="StateStore_SaveError_Title" xml:space="preserve">
+    <value>Save Error</value>
   </data>
 </root>

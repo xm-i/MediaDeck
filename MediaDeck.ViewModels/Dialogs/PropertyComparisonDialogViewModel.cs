@@ -1,5 +1,6 @@
 using MediaDeck.Common.Base;
 using MediaDeck.Composition.Enum;
+using MediaDeck.Composition.Interfaces;
 using MediaDeck.Core.Models.Files.SearchConditions;
 using MediaDeck.Core.Primitives;
 
@@ -7,6 +8,8 @@ namespace MediaDeck.ViewModels.Dialogs;
 
 [Inject(InjectServiceLifetime.Transient)]
 public class PropertyComparisonDialogViewModel : ViewModelBase {
+	private readonly IStringProvider _stringProvider;
+
 	public MediaItemPropertyDescriptor Descriptor {
 		get {
 			return this._descriptor ?? throw new InvalidOperationException("ViewModel was not initialized.");
@@ -40,7 +43,12 @@ public class PropertyComparisonDialogViewModel : ViewModelBase {
 		private set;
 	} = [];
 
-	public PropertyComparisonDialogViewModel() {
+	/// <summary>
+	/// <see cref="PropertyComparisonDialogViewModel"/> クラスの新しいインスタンスを初期化します。
+	/// </summary>
+	/// <param name="stringProvider">文字列プロバイダー</param>
+	public PropertyComparisonDialogViewModel(IStringProvider stringProvider) {
+		this._stringProvider = stringProvider;
 		this.SelectedOperator = new ReactiveProperty<DisplayObject<SearchTypeComparison>?>().AddTo(this.CompositeDisposable);
 		this.StringValue.AddTo(this.CompositeDisposable);
 		this.NumberValue.AddTo(this.CompositeDisposable);
@@ -53,7 +61,7 @@ public class PropertyComparisonDialogViewModel : ViewModelBase {
 		this.PropertyNameText = $"prop.{descriptor.Name}  ({descriptor.ValueType.Name})";
 
 		this.OperatorItems = descriptor.SupportedOperators
-			.Select(op => new DisplayObject<SearchTypeComparison>(GetOperatorLabel(op), op))
+			.Select(op => new DisplayObject<SearchTypeComparison>(this.GetOperatorLabel(op), op))
 			.ToList();
 
 		this.SelectedOperator.Value = this.OperatorItems.FirstOrDefault();
@@ -92,14 +100,19 @@ public class PropertyComparisonDialogViewModel : ViewModelBase {
 			   type == typeof(decimal);
 	}
 
-	private static string GetOperatorLabel(SearchTypeComparison op) {
+	/// <summary>
+	/// 比較演算子の表示ラベルを取得します。
+	/// </summary>
+	/// <param name="op">比較演算子</param>
+	/// <returns>表示ラベル</returns>
+	private string GetOperatorLabel(SearchTypeComparison op) {
 		return op switch {
-			SearchTypeComparison.GreaterThan => "を超える (>)",
-			SearchTypeComparison.GreaterThanOrEqual => "以上 (>=)",
-			SearchTypeComparison.Equal => "と等しい (=)",
-			SearchTypeComparison.LessThanOrEqual => "以下 (<=)",
-			SearchTypeComparison.LessThan => "未満 (<)",
-			SearchTypeComparison.Contains => "を含む (Contains)",
+			SearchTypeComparison.GreaterThan => $"{this._stringProvider.GetString("FilterCreator_Comparison_GreaterThan")} (>)",
+			SearchTypeComparison.GreaterThanOrEqual => $"{this._stringProvider.GetString("FilterCreator_Comparison_GreaterThanOrEqual")} (>=)",
+			SearchTypeComparison.Equal => $"{this._stringProvider.GetString("FilterCreator_Comparison_Equal")} (=)",
+			SearchTypeComparison.LessThanOrEqual => $"{this._stringProvider.GetString("FilterCreator_Comparison_LessThanOrEqual")} (<=)",
+			SearchTypeComparison.LessThan => $"{this._stringProvider.GetString("FilterCreator_Comparison_LessThan")} (<)",
+			SearchTypeComparison.Contains => $"{this._stringProvider.GetString("FilterCreator_Comparison_Contains")} (Contains)",
 			_ => op.ToString()
 		};
 	}

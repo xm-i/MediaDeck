@@ -105,6 +105,9 @@
   <data name="DialogButton_Cancel" xml:space="preserve">
     <value>キャンセル</value>
   </data>
+  <data name="DialogButton_Delete" xml:space="preserve">
+    <value>削除</value>
+  </data>
 
   <!-- ナビゲーションメニュー -->
   <data name="NavMenu_File.Title" xml:space="preserve">
@@ -1059,6 +1062,9 @@
   <data name="FilterCreator_Comparison_LessThan" xml:space="preserve">
     <value>未満</value>
   </data>
+  <data name="FilterCreator_Comparison_Contains" xml:space="preserve">
+    <value>を含む</value>
+  </data>
   <data name="FilterCreator_AddFilter.Content" xml:space="preserve">
     <value>フィルターを追加</value>
   </data>
@@ -1337,5 +1343,102 @@
   </data>
   <data name="Viewer_ContextCreateNewAlbum" xml:space="preserve">
     <value>アルバムを新規作成</value>
+  </data>
+
+  <!-- FolderManager Dialogs -->
+  <data name="FolderManager_DeleteConfirmation_Title" xml:space="preserve">
+    <value>このフォルダを削除しますか？この操作は元に戻せません。</value>
+  </data>
+
+  <!-- TagManager Dialogs -->
+  <data name="TagManager_DeleteCategoryConfirmation_Title" xml:space="preserve">
+    <value>このカテゴリを削除しますか？</value>
+  </data>
+  <data name="TagManager_DeleteCategoryConfirmation_Content" xml:space="preserve">
+    <value>カテゴリに含まれるタグは「未設定」に移動します。この操作は元に戻せません。</value>
+  </data>
+  <data name="TagManager_DeleteTagConfirmation_Title" xml:space="preserve">
+    <value>このタグを削除しますか？</value>
+  </data>
+  <data name="TagManager_DeleteTagConfirmation_Content" xml:space="preserve">
+    <value>この操作は元に戻せません。関連するファイルからのタグ付けも解除されます。</value>
+  </data>
+
+  <!-- PropertyComparison Dialog -->
+  <data name="PropertyComparisonDialog_Error_SelectOperator" xml:space="preserve">
+    <value>演算子を選択してください。</value>
+  </data>
+  <data name="PropertyComparisonDialog_Error_EnterValue" xml:space="preserve">
+    <value>値を入力してください。</value>
+  </data>
+  <data name="PropertyComparisonDialog_Error_CannotParseValue" xml:space="preserve">
+    <value>値を {0} として解釈できません。</value>
+  </data>
+
+  <!-- BulkThumbnail Status -->
+  <data name="BulkThumbnail_Status_Pending" xml:space="preserve">
+    <value>未処理</value>
+  </data>
+  <data name="BulkThumbnail_Status_Processing" xml:space="preserve">
+    <value>処理中</value>
+  </data>
+  <data name="BulkThumbnail_Status_Completed" xml:space="preserve">
+    <value>完了</value>
+  </data>
+  <data name="BulkThumbnail_Status_Failed" xml:space="preserve">
+    <value>失敗</value>
+  </data>
+
+  <!-- Splash Screen -->
+  <data name="Splash_Starting" xml:space="preserve">
+    <value>起動しています...</value>
+  </data>
+
+  <!-- FileChangeMonitor -->
+  <data name="FileChangeMonitor_BufferOverflow_Message" xml:space="preserve">
+    <value>ファイルの変更監視が追いつきませんでした。最新状態を反映するには、手動でフォルダの再読み込みを実行してください。</value>
+  </data>
+  <data name="FileChangeMonitor_BufferOverflow_Title" xml:space="preserve">
+    <value>監視エラー</value>
+  </data>
+
+  <!-- ConfigStore Notifications -->
+  <data name="ConfigStore_LoadError_Corrupted" xml:space="preserve">
+    <value>アプリケーション設定ファイルが破損しています。デフォルト設定を使用します。</value>
+  </data>
+  <data name="ConfigStore_LoadError_Title" xml:space="preserve">
+    <value>設定読み込みエラー</value>
+  </data>
+  <data name="ConfigStore_SaveError_Message" xml:space="preserve">
+    <value>アプリケーション設定を保存できません。</value>
+  </data>
+  <data name="ConfigStore_SaveError_Title" xml:space="preserve">
+    <value>保存エラー</value>
+  </data>
+
+  <!-- StateStore Notifications -->
+  <data name="StateStore_LoadError_Corrupted" xml:space="preserve">
+    <value>状態設定ファイルが破損しています。デフォルト設定を使用します。</value>
+  </data>
+  <data name="StateStore_LoadError_CannotRead" xml:space="preserve">
+    <value>状態設定ファイルを読み込めません。デフォルト設定を使用します。</value>
+  </data>
+  <data name="StateStore_LoadError_Unexpected" xml:space="preserve">
+    <value>状態設定の読み込み中にエラーが発生しました。デフォルト設定を使用します。</value>
+  </data>
+  <data name="StateStore_LoadError_Title" xml:space="preserve">
+    <value>設定読み込みエラー</value>
+  </data>
+  <data name="StateStore_SaveError_CannotSave" xml:space="preserve">
+    <value>状態設定を保存できません。</value>
+  </data>
+  <data name="StateStore_SaveError_Serialize" xml:space="preserve">
+    <value>状態設定のシリアライズに失敗しました。</value>
+  </data>
+  <data name="StateStore_SaveError_Unexpected" xml:space="preserve">
+    <value>状態設定の保存中にエラーが発生しました。</value>
+  </data>
+  <data name="StateStore_SaveError_Title" xml:space="preserve">
+    <value>保存エラー</value>
   </data>
 </root>

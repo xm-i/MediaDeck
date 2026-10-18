@@ -4,6 +4,7 @@ using System.Text.Json.Serialization.Metadata;
 
 using AutoDiAttributes;
 using MediaDeck.Common.Base;
+using MediaDeck.Composition.Interfaces;
 using MediaDeck.Composition.Interfaces.Services;
 using MediaDeck.Composition.Objects;
 using MediaDeck.Composition.Stores.State.Model;
@@ -22,6 +23,7 @@ public class StateStore : DisposableBase, IStateStore {
 	private readonly ILogger<StateStore> _logger;
 	private readonly AppNotificationDispatcher _notificationDispatcher;
 	private readonly IAppPathProvider _pathProvider;
+	private readonly IStringProvider? _stringProvider;
 
 	public IServiceProvider ScopedService {
 		get;
@@ -38,9 +40,16 @@ public class StateStore : DisposableBase, IStateStore {
 		}
 	}
 
-	public StateStore(IServiceProvider service, IAppPathProvider pathProvider) {
+	/// <summary>
+	/// <see cref="StateStore"/> クラスの新しいインスタンスを初期化します。
+	/// </summary>
+	/// <param name="service">サービスプロバイダー</param>
+	/// <param name="pathProvider">アプリケーションパスプロバイダー</param>
+	/// <param name="stringProvider">文字列プロバイダー（省略可能）</param>
+	public StateStore(IServiceProvider service, IAppPathProvider pathProvider, IStringProvider? stringProvider = null) {
 		this.ScopedService = service;
 		this._pathProvider = pathProvider;
+		this._stringProvider = stringProvider ?? service.GetService<IStringProvider>();
 		this._logger = service.GetRequiredService<ILogger<StateStore>>();
 		this._notificationDispatcher = service.GetRequiredService<AppNotificationDispatcher>();
 		this.Load();
@@ -74,16 +83,22 @@ public class StateStore : DisposableBase, IStateStore {
 					}
 				} catch (JsonException je) {
 					this._logger.LogError(je, "状態設定ファイルのJSON解析に失敗しました: {FilePath}", this.StateFilePath);
+					var message = this._stringProvider?.GetString("StateStore_LoadError_Corrupted") ?? "状態設定ファイルが破損しています。デフォルト設定を使用します。";
+					var title = this._stringProvider?.GetString("StateStore_LoadError_Title") ?? "設定読み込みエラー";
 					this._notificationDispatcher.Notify.OnNext(
-						AppNotification.Error("状態設定ファイルが破損しています。デフォルト設定を使用します。", "設定読み込みエラー", 0));
+						AppNotification.Error(message, title, 0));
 				} catch (IOException ie) {
 					this._logger.LogError(ie, "状態設定ファイルの読み込みに失敗しました: {FilePath}", this.StateFilePath);
+					var message = this._stringProvider?.GetString("StateStore_LoadError_CannotRead") ?? "状態設定ファイルを読み込めません。デフォルト設定を使用します。";
+					var title = this._stringProvider?.GetString("StateStore_LoadError_Title") ?? "設定読み込みエラー";
 					this._notificationDispatcher.Notify.OnNext(
-						AppNotification.Error("状態設定ファイルを読み込めません。デフォルト設定を使用します。", "設定読み込みエラー", 0));
+						AppNotification.Error(message, title, 0));
 				} catch (Exception ex) {
 					this._logger.LogError(ex, "状態設定の読み込み処理中に予期しないエラーが発生しました: {FilePath}", this.StateFilePath);
+					var message = this._stringProvider?.GetString("StateStore_LoadError_Unexpected") ?? "状態設定の読み込み中にエラーが発生しました。デフォルト設定を使用します。";
+					var title = this._stringProvider?.GetString("StateStore_LoadError_Title") ?? "設定読み込みエラー";
 					this._notificationDispatcher.Notify.OnNext(
-						AppNotification.Error("状態設定の読み込み中にエラーが発生しました。デフォルト設定を使用します。", "設定読み込みエラー", 0));
+						AppNotification.Error(message, title, 0));
 				}
 			}
 		} catch (Exception ex) {
@@ -115,16 +130,22 @@ public class StateStore : DisposableBase, IStateStore {
 			this._logger.LogInformation("状態設定を保存しました: {FilePath}", this.StateFilePath);
 		} catch (IOException ie) {
 			this._logger.LogError(ie, "状態設定ファイルの保存に失敗しました: {FilePath}", this.StateFilePath);
+			var message = this._stringProvider?.GetString("StateStore_SaveError_CannotSave") ?? "状態設定を保存できません。";
+			var title = this._stringProvider?.GetString("StateStore_SaveError_Title") ?? "保存エラー";
 			this._notificationDispatcher.Notify.OnNext(
-				AppNotification.Error("状態設定を保存できません。", "保存エラー"));
+				AppNotification.Error(message, title));
 		} catch (JsonException je) {
 			this._logger.LogError(je, "状態設定のシリアライズに失敗しました");
+			var message = this._stringProvider?.GetString("StateStore_SaveError_Serialize") ?? "状態設定のシリアライズに失敗しました。";
+			var title = this._stringProvider?.GetString("StateStore_SaveError_Title") ?? "保存エラー";
 			this._notificationDispatcher.Notify.OnNext(
-				AppNotification.Error("状態設定のシリアライズに失敗しました。", "保存エラー"));
+				AppNotification.Error(message, title));
 		} catch (Exception ex) {
 			this._logger.LogError(ex, "状態設定の保存中に予期しないエラーが発生しました");
+			var message = this._stringProvider?.GetString("StateStore_SaveError_Unexpected") ?? "状態設定の保存中にエラーが発生しました。";
+			var title = this._stringProvider?.GetString("StateStore_SaveError_Title") ?? "保存エラー";
 			this._notificationDispatcher.Notify.OnNext(
-				AppNotification.Error("状態設定の保存中にエラーが発生しました。", "保存エラー"));
+				AppNotification.Error(message, title));
 		}
 	}
 }

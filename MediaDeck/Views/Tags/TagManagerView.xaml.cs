@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.DependencyInjection;
+using MediaDeck.Composition.Interfaces;
 using MediaDeck.Core.Stores.Config;
 using MediaDeck.ViewModels.Tags;
 using MediaDeck.Views.Helpers;
@@ -16,12 +17,13 @@ public sealed partial class TagManagerView {
 		if (this.ViewModel?.SelectedTagCategory.Value == null)
 			return;
 
+		var stringProvider = Ioc.Default.GetRequiredService<IStringProvider>();
 		var dialog = new ContentDialog {
 			XamlRoot = this.Content.XamlRoot,
-			Title = "このカテゴリを削除しますか？",
-			Content = "カテゴリに含まれるタグは「未設定」に移動します。この操作は元に戻せません。",
-			PrimaryButtonText = "削除",
-			CloseButtonText = "キャンセル",
+			Title = stringProvider.GetString("TagManager_DeleteCategoryConfirmation_Title"),
+			Content = stringProvider.GetString("TagManager_DeleteCategoryConfirmation_Content"),
+			PrimaryButtonText = stringProvider.GetString("DialogButton_Delete"),
+			CloseButtonText = stringProvider.GetString("DialogButton_Cancel"),
 			DefaultButton = ContentDialogButton.Close
 		};
 		using var disposable = new CompositeDisposable();
@@ -34,12 +36,13 @@ public sealed partial class TagManagerView {
 	private async void TagDetailView_DeleteTagRequested(object? sender, EventArgs e) {
 		if (this.ViewModel?.SelectedTagCategory.Value?.SelectedTag.Value == null)
 			return;
+		var stringProvider = Ioc.Default.GetRequiredService<IStringProvider>();
 		var dialog = new ContentDialog {
 			XamlRoot = this.Content.XamlRoot,
-			Title = "このタグを削除しますか？",
-			Content = "この操作は元に戻せません。関連するファイルからのタグ付けも解除されます。",
-			PrimaryButtonText = "削除",
-			CloseButtonText = "キャンセル",
+			Title = stringProvider.GetString("TagManager_DeleteTagConfirmation_Title"),
+			Content = stringProvider.GetString("TagManager_DeleteTagConfirmation_Content"),
+			PrimaryButtonText = stringProvider.GetString("DialogButton_Delete"),
+			CloseButtonText = stringProvider.GetString("DialogButton_Cancel"),
 			DefaultButton = ContentDialogButton.Close
 		};
 		using var disposable = new CompositeDisposable();

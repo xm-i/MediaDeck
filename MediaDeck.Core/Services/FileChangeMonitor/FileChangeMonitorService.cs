@@ -1,5 +1,6 @@
 using MediaDeck.Common.Base;
 using MediaDeck.Composition.Database;
+using MediaDeck.Composition.Interfaces;
 using MediaDeck.Composition.Objects;
 using MediaDeck.Core.Models.Files;
 using MediaDeck.Core.Models.NotificationDispatcher;
@@ -20,6 +21,7 @@ public class FileChangeMonitorService : ModelBase {
 	private readonly AppNotificationDispatcher _appNotificationDispatcher;
 	private readonly FileRegistrar _fileRegistrar;
 	private readonly FileSystemWatcherManager _watcherManager;
+	private readonly IStringProvider _stringProvider;
 
 	/// <summary>
 	/// 未処理の変更リストを管理するトラッカー
@@ -37,12 +39,14 @@ public class FileChangeMonitorService : ModelBase {
 	/// <param name="appNotificationDispatcher">通知送信クラス</param>
 	/// <param name="fileRegistrar">ファイル登録クラス</param>
 	/// <param name="databaseWriteCoordinator">データベース書き込み直列化サービス</param>
-	public FileChangeMonitorService(IDbContextFactory<MediaDeckDbContext> dbFactory, FileChangeTracker tracker, ILogger<FileChangeMonitorService> logger, AppNotificationDispatcher appNotificationDispatcher, FileRegistrar fileRegistrar, IDatabaseWriteCoordinator databaseWriteCoordinator) {
+	/// <param name="stringProvider">文字列プロバイダー</param>
+	public FileChangeMonitorService(IDbContextFactory<MediaDeckDbContext> dbFactory, FileChangeTracker tracker, ILogger<FileChangeMonitorService> logger, AppNotificationDispatcher appNotificationDispatcher, FileRegistrar fileRegistrar, IDatabaseWriteCoordinator databaseWriteCoordinator, IStringProvider stringProvider) {
 		this._dbFactory = dbFactory;
 		this._databaseWriteCoordinator = databaseWriteCoordinator;
 		this._logger = logger;
 		this._appNotificationDispatcher = appNotificationDispatcher;
 		this._fileRegistrar = fileRegistrar;
+		this._stringProvider = stringProvider;
 
 		this.Tracker = tracker;
 		this.Tracker.AddTo(this.CompositeDisposable);
@@ -81,7 +85,10 @@ public class FileChangeMonitorService : ModelBase {
 	/// <param name="ex">発生した例外</param>
 	private void HandleWatcherError(Exception ex) {
 		if (ex is InternalBufferOverflowException) {
-			var notif = AppNotification.Warning("ファイルの変更監視が追いつきませんでした。最新状態を反映するには、手動でフォルダの再読み込みを実行してください。", "監視エラー", 10000);
+			var notif = AppNotification.Warning(
+				this._stringProvider.GetString("FileChangeMonitor_BufferOverflow_Message"),
+				this._stringProvider.GetString("FileChangeMonitor_BufferOverflow_Title"),
+				10000);
 			this._appNotificationDispatcher.Notify.OnNext(notif);
 		}
 	}

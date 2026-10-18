@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.DependencyInjection;
+using MediaDeck.Composition.Interfaces;
 using MediaDeck.Core.Stores.Config;
 using MediaDeck.ViewModels.FolderManager;
 using MediaDeck.Views.Helpers;
@@ -42,11 +43,12 @@ public sealed partial class FolderManagerView {
 			return;
 		}
 
+		var stringProvider = Ioc.Default.GetRequiredService<IStringProvider>();
 		var dialog = new ContentDialog {
 			XamlRoot = this.Content.XamlRoot,
-			Title = "このフォルダを削除しますか？この操作は元に戻せません。",
-			PrimaryButtonText = "削除",
-			CloseButtonText = "キャンセル",
+			Title = stringProvider.GetString("FolderManager_DeleteConfirmation_Title"),
+			PrimaryButtonText = stringProvider.GetString("DialogButton_Delete"),
+			CloseButtonText = stringProvider.GetString("DialogButton_Cancel"),
 			DefaultButton = ContentDialogButton.Primary
 		};
 		using var disposable = new CompositeDisposable();

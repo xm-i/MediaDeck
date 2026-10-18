@@ -1,4 +1,5 @@
 using MediaDeck.Common.Base;
+using MediaDeck.Composition.Interfaces;
 
 namespace MediaDeck.ViewModels;
 
@@ -20,12 +21,17 @@ public class SplashScreenViewModel : ViewModelBase {
 		get;
 	}
 
-	private readonly ReactiveProperty<string> _statusMessage = new("起動しています...");
+	private readonly ReactiveProperty<string> _statusMessage;
 
-	public SplashScreenViewModel() {
+	/// <summary>
+	/// <see cref="SplashScreenViewModel"/> クラスの新しいインスタンスを初期化します。
+	/// </summary>
+	/// <param name="stringProvider">文字列プロバイダー</param>
+	public SplashScreenViewModel(IStringProvider? stringProvider = null) {
+		var initialMessage = stringProvider?.GetString("Splash_Starting") ?? "起動しています...";
+		this._statusMessage = new ReactiveProperty<string>(initialMessage).AddTo(this.CompositeDisposable);
 		this.StatusMessage = this._statusMessage.ObserveOnCurrentSynchronizationContext().ToBindableReactiveProperty<string>();
 		this.StatusMessage.AddTo(this.CompositeDisposable);
-		this._statusMessage.AddTo(this.CompositeDisposable);
 
 		// バージョン情報の取得
 		var version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
