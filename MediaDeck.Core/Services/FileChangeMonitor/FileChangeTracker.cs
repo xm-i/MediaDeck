@@ -1,3 +1,4 @@
+using MediaDeck.Common.Base;
 using MediaDeck.Common.Extensions;
 using MediaDeck.Common.Utilities;
 using MediaDeck.Composition.Database;
@@ -10,10 +11,11 @@ namespace MediaDeck.Core.Services.FileChangeMonitor;
 /// 未処理のファイル変更リストの管理・マッチング・統合ロジックを担うクラスです。
 /// </summary>
 [Inject(InjectServiceLifetime.Singleton)]
-public class FileChangeTracker : IDisposable {
+public class FileChangeTracker : ServiceBase {
 	private readonly IDbContextFactory<MediaDeckDbContext> _dbFactory;
 	private readonly ILogger<FileChangeTracker> _logger;
-	private readonly CompositeDisposable _compositeDisposable = new();
+	private readonly Lock _lock = new();
+	private readonly SemaphoreSlim _processLock = new(1, 1);
 
 	/// <summary>
 	/// 未処理の変更リスト
@@ -34,10 +36,10 @@ public class FileChangeTracker : IDisposable {
 		this.UnprocessedChanges
 			.ObserveAdd()
 			.SubscribeAwait(async (_, ct) => {
-				await this.ProcessPendingChangesAsync();
+				await this.ProcessPendingChangesAsync().ConfigureAwait(false);
 			},
 				AwaitOperation.ThrottleFirstLast)
-			.AddTo(this._compositeDisposable);
+			.AddTo(this.CompositeDisposable);
 	}
 
 	/// <summary>
@@ -47,7 +49,9 @@ public class FileChangeTracker : IDisposable {
 	public void OnCreated(string path) {
 		this._logger.LogDebug("File created (Pending): {Path}", path);
 		var model = new FileChangeItem { ChangeType = FileChangeType.Added, NewPath = path, IsPending = true };
-		this.UnprocessedChanges.Add(model);
+		lock (this._lock) {
+			this.UnprocessedChanges.Add(model);
+		}
 	}
 
 	/// <summary>
@@ -57,7 +61,9 @@ public class FileChangeTracker : IDisposable {
 	public void OnDeleted(string path) {
 		this._logger.LogDebug("File deleted (Pending): {Path}", path);
 		var model = new FileChangeItem { ChangeType = FileChangeType.Deleted, OldPath = path, IsPending = true };
-		this.UnprocessedChanges.Add(model);
+		lock (this._lock) {
+			this.UnprocessedChanges.Add(model);
+		}
 	}
 
 	/// <summary>
@@ -68,7 +74,9 @@ public class FileChangeTracker : IDisposable {
 	public void OnRenamed(string oldPath, string newPath) {
 		this._logger.LogDebug("File renamed (Pending): {OldPath} -> {NewPath}", oldPath, newPath);
 		var model = new FileChangeItem { ChangeType = FileChangeType.Renamed, OldPath = oldPath, NewPath = newPath, IsPending = true };
-		this.UnprocessedChanges.Add(model);
+		lock (this._lock) {
+			this.UnprocessedChanges.Add(model);
+		}
 	}
 
 	/// <summary>
@@ -79,16 +87,23 @@ public class FileChangeTracker : IDisposable {
 		this._logger.LogDebug("File changed (Pending): {Path}", path);
 
 		// Addedアイテムが既にあれば時間をリセットしてハッシュ計算を遅らせる
-		var existing = this.UnprocessedChanges.FirstOrDefault(c => c.ChangeType == FileChangeType.Added && c.NewPath == path);
-		existing?.CreatedAt = DateTime.UtcNow;
+		lock (this._lock) {
+			var existing = this.UnprocessedChanges.FirstOrDefault(c => c.ChangeType == FileChangeType.Added && c.NewPath == path);
+			existing?.CreatedAt = DateTime.UtcNow;
+		}
 	}
 
 	/// <summary>
 	/// 未確定アイテムの情報を補完し、連続した変更を統合します。
 	/// </summary>
 	private async Task ProcessPendingChangesAsync() {
-		await this.EnrichPendingItemsAsync();
-		this.ConsolidateEvents();
+		await this._processLock.WaitAsync().ConfigureAwait(false);
+		try {
+			await this.EnrichPendingItemsAsync().ConfigureAwait(false);
+			this.ConsolidateEvents();
+		} finally {
+			this._processLock.Release();
+		}
 	}
 
 	/// <summary>
@@ -96,23 +111,29 @@ public class FileChangeTracker : IDisposable {
 	/// </summary>
 	private async Task EnrichPendingItemsAsync() {
 		// 発生順に処理することで、A->B, B->C のような連鎖で前者の情報を後者が引き継げるようにする
-		var pendingItems = this.UnprocessedChanges.Where(c => c.IsPending).ToList();
-		if (!pendingItems.Any()) {
+		List<FileChangeItem> pendingItems;
+		lock (this._lock) {
+			pendingItems = this.UnprocessedChanges.Where(c => c.IsPending).ToList();
+		}
+		if (pendingItems.Count == 0) {
 			return;
 		}
 
-		await using var db = await this._dbFactory.CreateDbContextAsync();
+		await using var db = await this._dbFactory.CreateDbContextAsync().ConfigureAwait(false);
 		foreach (var item in pendingItems) {
 			if (item.ChangeType == FileChangeType.Deleted || item.ChangeType == FileChangeType.Renamed) {
 				// 1. 先行する変更アイテムが既に UnprocessedChanges にないか確認 (A->B, B->C のケース対応)
-				var predecessor = this.UnprocessedChanges.FirstOrDefault(c => !c.IsPending && c.NewPath == item.OldPath);
+				FileChangeItem? predecessor;
+				lock (this._lock) {
+					predecessor = this.UnprocessedChanges.FirstOrDefault(c => !c.IsPending && c.NewPath == item.OldPath);
+				}
 				if (predecessor != null) {
 					item.MediaItemId = predecessor.MediaItemId;
 					item.FileSize = predecessor.FileSize;
 					item.OldHash = predecessor.OldHash;
 				} else {
 					// 2. DBから取得
-					var file = await db.MediaItems.FirstOrDefaultAsync(mf => mf.FilePath == item.OldPath);
+					var file = await db.MediaItems.FirstOrDefaultAsync(mf => mf.FilePath == item.OldPath).ConfigureAwait(false);
 					if (file != null) {
 						item.MediaItemId = file.MediaItemId;
 						item.FileSize = file.FileSize;
@@ -156,37 +177,39 @@ public class FileChangeTracker : IDisposable {
 	/// 同一ファイルに対する複数の変更（A->B, B->C, 削除+追加など）を時系列順に統合します。
 	/// </summary>
 	private void ConsolidateEvents() {
-		for (int i = 0; i < this.UnprocessedChanges.Count; i++) {
-			var item = this.UnprocessedChanges[i];
-			if (item.IsPending) {
-				break;
-			}
-
-			// 追加以外でMediaItemIdがないアイテムはもとから管理していなかったファイルのため、対象外として削除する。
-			if (item.ChangeType != FileChangeType.Added && item.MediaItemId is null) {
-				this.UnprocessedChanges.RemoveAt(i);
-				i--;
-				continue;
-			}
-
-
-			for (int j = i + 1; j < this.UnprocessedChanges.Count; j++) {
-				var next = this.UnprocessedChanges[j];
-				if (next.IsPending) {
+		lock (this._lock) {
+			for (int i = 0; i < this.UnprocessedChanges.Count; i++) {
+				var item = this.UnprocessedChanges[i];
+				if (item.IsPending) {
 					break;
 				}
 
-				if (this.TryMergeItems(item, next)) {
-					this.UnprocessedChanges.RemoveAt(j);
-					j--; // 次の要素を再チェック
+				// 追加以外でMediaItemIdがないアイテムはもとから管理していなかったファイルのため、対象外として削除する。
+				if (item.ChangeType != FileChangeType.Added && item.MediaItemId is null) {
+					this.UnprocessedChanges.RemoveAt(i);
+					i--;
+					continue;
+				}
 
-					// 元の位置に戻ったか、不要な変更になった場合は削除して終了
-					if (item.OldPath == item.NewPath && item.ChangeType != FileChangeType.Deleted) {
-						this.UnprocessedChanges.RemoveAt(i);
-						i--;
+
+				for (int j = i + 1; j < this.UnprocessedChanges.Count; j++) {
+					var next = this.UnprocessedChanges[j];
+					if (next.IsPending) {
 						break;
 					}
-					this.UnprocessedChanges[i] = item;
+
+					if (this.TryMergeItems(item, next)) {
+						this.UnprocessedChanges.RemoveAt(j);
+						j--; // 次の要素を再チェック
+
+						// 元の位置に戻ったか、不要な変更になった場合は削除して終了
+						if (item.OldPath == item.NewPath && item.ChangeType != FileChangeType.Deleted) {
+							this.UnprocessedChanges.RemoveAt(i);
+							i--;
+							break;
+						}
+						this.UnprocessedChanges[i] = item;
+					}
 				}
 			}
 		}
@@ -246,16 +269,23 @@ public class FileChangeTracker : IDisposable {
 	/// </summary>
 	/// <param name="items">削除対象のアイテム一覧</param>
 	public void RemoveItems(IEnumerable<FileChangeItem> items) {
-		var targetElements = this.UnprocessedChanges
-			.Where(x => items.Any(i => i.MediaItemId == x.MediaItemId && (x.MediaItemId != null || i.NewPath == x.NewPath)))
-			.ToList();
-		this.UnprocessedChanges.RemoveRange(targetElements);
+		var itemList = items.ToList();
+		lock (this._lock) {
+			var targetElements = this.UnprocessedChanges
+				.Where(x => itemList.Any(i => i.MediaItemId == x.MediaItemId && (x.MediaItemId != null || i.NewPath == x.NewPath)))
+				.ToList();
+			this.UnprocessedChanges.RemoveRange(targetElements);
+		}
 	}
 
 	/// <summary>
 	/// リソースを破棄します。
 	/// </summary>
-	public void Dispose() {
-		this._compositeDisposable.Dispose();
+	/// <param name="disposing">マネージドリソースを破棄するかどうか</param>
+	protected override void Dispose(bool disposing) {
+		if (disposing) {
+			this._processLock.Dispose();
+		}
+		base.Dispose(disposing);
 	}
 }

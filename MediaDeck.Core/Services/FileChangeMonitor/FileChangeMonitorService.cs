@@ -52,7 +52,8 @@ public class FileChangeMonitorService : ModelBase {
 			onFileRenamed: (oldPath, newPath) => this.Tracker.OnRenamed(oldPath, newPath),
 			onFileCreated: path => this.Tracker.OnCreated(path),
 			onFileChanged: path => this.Tracker.OnChanged(path),
-			onError: this.HandleWatcherError);
+			onError: this.HandleWatcherError)
+			.AddTo(this.CompositeDisposable);
 
 		// 初期フォルダーの監視を開始
 		foreach (var folder in this._fileRegistrar.Config.FolderManagerConfig.Folders) {
@@ -96,7 +97,7 @@ public class FileChangeMonitorService : ModelBase {
 		try {
 			foreach (var item in targetItems.Where(static x => x.ChangeType == FileChangeType.Added)) {
 				// 新規追加アイテムが承認された場合はFileRegistrarへ回す
-				this._fileRegistrar.RegistrationQueue.Enqueue(item.NewPath);
+				this._fileRegistrar.Enqueue(item.NewPath);
 			}
 
 			var dbUpdateItems = targetItems
@@ -114,6 +115,7 @@ public class FileChangeMonitorService : ModelBase {
 									db.MediaItems.Remove(file);
 								} else if (item.ChangeType == FileChangeType.Moved || item.ChangeType == FileChangeType.Renamed) {
 									file.FilePath = item.NewPath;
+									file.DirectoryPath = Path.GetDirectoryName(item.NewPath) ?? string.Empty;
 								}
 							}
 						}
@@ -134,16 +136,5 @@ public class FileChangeMonitorService : ModelBase {
 	/// <param name="items">破棄対象のアイテム一覧</param>
 	public void DiscardChanges(IEnumerable<FileChangeItem> items) {
 		this.Tracker.RemoveItems(items);
-	}
-
-	/// <summary>
-	/// リソースを破棄します。
-	/// </summary>
-	/// <param name="disposing">マネージドリソースを破棄するかどうか</param>
-	protected override void Dispose(bool disposing) {
-		if (disposing) {
-			this._watcherManager.Dispose();
-		}
-		base.Dispose(disposing);
 	}
 }

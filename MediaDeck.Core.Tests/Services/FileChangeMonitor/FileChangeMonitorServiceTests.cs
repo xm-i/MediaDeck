@@ -1,8 +1,10 @@
 using MediaDeck.Composition.Database;
+using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.Services;
 using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Composition.Stores.Config.Model.Objects;
 using MediaDeck.Composition.Stores.State.Model.Objects;
+using MediaDeck.Composition.Tables;
 using MediaDeck.Core.Models.Files;
 using MediaDeck.Core.Models.NotificationDispatcher;
 using MediaDeck.Core.Services.FileChangeMonitor;
@@ -20,14 +22,15 @@ namespace MediaDeck.Core.Tests.Services.FileChangeMonitor;
 public class FileChangeMonitorServiceTests {
 	private readonly FileChangeMonitorService _sut;
 	private readonly FileChangeTracker _tracker;
+	private readonly DbContextOptions<MediaDeckDbContext> _options;
 
 	public FileChangeMonitorServiceTests() {
-		var options = new DbContextOptionsBuilder<MediaDeckDbContext>()
+		this._options = new DbContextOptionsBuilder<MediaDeckDbContext>()
 			.UseInMemoryDatabase($"FCM_{Guid.NewGuid()}")
 			.Options;
 		var dbFactoryMock = new Mock<IDbContextFactory<MediaDeckDbContext>>();
 		dbFactoryMock.Setup(x => x.CreateDbContextAsync(It.IsAny<CancellationToken>()))
-			.ReturnsAsync(() => new MediaDeckDbContext(options));
+			.ReturnsAsync(() => new MediaDeckDbContext(this._options));
 
 		var trackerLogger = new Mock<ILogger<FileChangeTracker>>();
 		this._tracker = new FileChangeTracker(dbFactoryMock.Object, trackerLogger.Object);
@@ -87,6 +90,38 @@ public class FileChangeMonitorServiceTests {
 		await this._sut.ApplyChangesAsync([item], false);
 
 		this._tracker.UnprocessedChanges.ShouldNotContain(item);
+	}
+
+	[Fact]
+	public async Task ApplyChangesAsync_MovedItem_UpdatesFilePathAndDirectoryPath() {
+		await using (var db = new MediaDeckDbContext(this._options)) {
+			db.MediaItems.Add(new MediaItem {
+				MediaItemId = 100,
+				MediaType = MediaType.Image,
+				FilePath = @"C:\OldFolder\image.png",
+				DirectoryPath = @"C:\OldFolder",
+				Description = string.Empty,
+				IsUnderFolderGroup = false,
+			});
+			await db.SaveChangesAsync();
+		}
+
+		var item = new FileChangeItem {
+			ChangeType = FileChangeType.Moved,
+			MediaItemId = 100,
+			OldPath = @"C:\OldFolder\image.png",
+			NewPath = @"C:\NewFolder\image.png",
+		};
+		this._tracker.UnprocessedChanges.Add(item);
+
+		await this._sut.ApplyChangesAsync([item], false);
+
+		await using (var db = new MediaDeckDbContext(this._options)) {
+			var updated = await db.MediaItems.FindAsync(100L);
+			updated.ShouldNotBeNull();
+			updated.FilePath.ShouldBe(@"C:\NewFolder\image.png");
+			updated.DirectoryPath.ShouldBe(@"C:\NewFolder");
+		}
 	}
 
 	[Fact]

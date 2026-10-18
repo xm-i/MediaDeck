@@ -92,4 +92,30 @@ public class FileChangeTrackerTests {
 			Assert.NotNull(change.MediaItemId); // DBから取得できたはず
 		}
 	}
+
+	[Fact]
+	public async Task ConcurrentAccess_DoesNotThrow() {
+		var options = new DbContextOptionsBuilder<MediaDeckDbContext>()
+			.UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+			.Options;
+		var dbFactory = new TestDbContextFactory(options);
+		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance);
+
+		var tasks = new List<Task>();
+		for (int t = 0; t < 10; t++) {
+			int threadId = t;
+			tasks.Add(Task.Run(() => {
+				for (int i = 0; i < 50; i++) {
+					var path = $"/test/path/thread{threadId}_file{i}.txt";
+					tracker.OnCreated(path);
+					tracker.OnChanged(path);
+					tracker.OnRenamed(path, path + ".renamed");
+					tracker.OnDeleted(path + ".renamed");
+				}
+			}));
+		}
+
+		await Task.WhenAll(tasks);
+		Assert.True(tracker.UnprocessedChanges.Count > 0);
+	}
 }

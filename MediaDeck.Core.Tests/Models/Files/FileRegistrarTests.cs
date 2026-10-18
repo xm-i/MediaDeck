@@ -53,6 +53,43 @@ public class FileRegistrarTests {
 	}
 
 	[Fact]
+	public void Enqueue_AddsItemToQueue() {
+		this._sut.Enqueue("file1.png");
+		this._sut.RegistrationQueue.Count.ShouldBe(1);
+		this._sut.TryDequeue(out var dequeued).ShouldBeTrue();
+		dequeued.ShouldBe("file1.png");
+	}
+
+	[Fact]
+	public void EnqueueRange_AddsItemsToQueue() {
+		this._sut.EnqueueRange(["file1.png", "file2.png"]);
+		this._sut.RegistrationQueue.Count.ShouldBe(2);
+	}
+
+	[Fact]
+	public async Task ScanFolderAsync_InvalidDirectory_ResetsIsScanningToFalse() {
+		var folder = new FolderModel { FolderPath = @"Z:\NonExistentPath_XYZ_12345" };
+		await Should.ThrowAsync<DirectoryNotFoundException>(async () => {
+			await this._sut.ScanFolderAsync(folder);
+		});
+		folder.IsScanning.Value.ShouldBeFalse();
+	}
+
+	[Fact]
+	public async Task ScanFolderAsync_ValidEmptyFolder_CompletesAndSetsIsScanningToFalse() {
+		var tempDir = Path.Combine(Path.GetTempPath(), $"MD_Test_{Guid.NewGuid()}");
+		Directory.CreateDirectory(tempDir);
+		try {
+			var folder = new FolderModel { FolderPath = tempDir };
+			await this._sut.ScanFolderAsync(folder);
+			folder.IsScanning.Value.ShouldBeFalse();
+			folder.TotalCount.Value.ShouldBe(0);
+		} finally {
+			Directory.Delete(tempDir, true);
+		}
+	}
+
+	[Fact]
 	public void Dispose_DoesNotThrow() {
 		Should.NotThrow(() => this._sut.Dispose());
 	}
