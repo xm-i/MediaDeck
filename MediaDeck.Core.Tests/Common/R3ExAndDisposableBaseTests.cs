@@ -223,4 +223,43 @@ public class R3ExAndDisposableBaseTests {
 
 		inner.IsDisposed.ShouldBeTrue();
 	}
+
+	/// <summary>
+	/// AttachFilter および ResetFilter を呼び出しても、コレクション内に残存している要素が誤って破棄されないことを検証します。
+	/// また、フィルター適用中に除外された要素がコレクションから削除された際にも正しく破棄されることを検証します。
+	/// </summary>
+	[Fact]
+	public void CreateViewWithDisposal_DoesNotDisposeItems_OnAttachFilterAndResetFilter() {
+		var list = new ObservableList<int>();
+		var createdItems = new List<MockDisposableItem>();
+		var view = list.CreateViewWithDisposal(x => {
+			var item = new MockDisposableItem(x);
+			createdItems.Add(item);
+			return item;
+		});
+
+		list.Add(1);
+		list.Add(2);
+		list.Add(3);
+
+		// フィルター適用（Reset イベントが発火する）
+		view.AttachFilter(x => x % 2 == 1);
+
+		// 全ての要素が破棄されていないこと
+		createdItems.Count.ShouldBe(3);
+		createdItems.All(x => !x.IsDisposed).ShouldBeTrue();
+		view.Count.ShouldBe(2);
+
+		// フィルターで除外されている要素 (2) を削除した場合も破棄されること
+		var item2 = createdItems.First(x => x.Id == 2);
+		list.Remove(2);
+		item2.IsDisposed.ShouldBeTrue();
+
+		// フィルターリセット時も残存要素 (1, 3) は破棄されないこと
+		view.ResetFilter();
+		createdItems.Where(x => x.Id != 2).All(x => !x.IsDisposed).ShouldBeTrue();
+
+		view.Dispose();
+		createdItems.All(x => x.IsDisposed).ShouldBeTrue();
+	}
 }

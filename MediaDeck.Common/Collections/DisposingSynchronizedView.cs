@@ -31,6 +31,7 @@ public sealed class DisposingSynchronizedView<TSource, TView> : ISynchronizedVie
 		}
 
 		this._inner.ViewChanged += this.OnViewChanged;
+		this._inner.RejectedViewChanged += this.OnRejectedViewChanged;
 	}
 
 	private void OnViewChanged(in SynchronizedViewChangedEventArgs<TSource, TView> e) {
@@ -98,24 +99,45 @@ public sealed class DisposingSynchronizedView<TSource, TView> : ISynchronizedVie
 					break;
 				}
 
-			case NotifyCollectionChangedAction.Reset: {
-					List<TView> toDispose;
-					lock (this._gate) {
-						if (this._isDisposed) {
-							return;
-						}
-						toDispose = [.. this._activeViews];
-						this._activeViews.Clear();
-					}
-					foreach (var item in toDispose) {
-						(item as IDisposable)?.Dispose();
-					}
-					break;
-				}
+			case NotifyCollectionChangedAction.Reset:
+				this.SyncWithUnfiltered();
+				break;
 
 			case NotifyCollectionChangedAction.Move:
 				// 移動時は要素の破棄・生成は行わない
 				break;
+		}
+	}
+
+	private void OnRejectedViewChanged(RejectedViewChangedAction action, int index, int id) {
+		this.SyncWithUnfiltered();
+	}
+
+	private void SyncWithUnfiltered() {
+		List<TView> toDispose = [];
+		lock (this._gate) {
+			if (this._isDisposed) {
+				return;
+			}
+
+			var currentViews = new List<TView>(this._inner.UnfilteredCount);
+			foreach (var (_, view) in this._inner.Unfiltered) {
+				currentViews.Add(view);
+			}
+
+			var remainingSet = new HashSet<TView>(currentViews);
+			foreach (var active in this._activeViews) {
+				if (!remainingSet.Contains(active)) {
+					toDispose.Add(active);
+				}
+			}
+
+			this._activeViews.Clear();
+			this._activeViews.AddRange(currentViews);
+		}
+
+		foreach (var item in toDispose) {
+			(item as IDisposable)?.Dispose();
 		}
 	}
 
@@ -242,6 +264,7 @@ public sealed class DisposingSynchronizedView<TSource, TView> : ISynchronizedVie
 		}
 
 		this._inner.ViewChanged -= this.OnViewChanged;
+		this._inner.RejectedViewChanged -= this.OnRejectedViewChanged;
 		this._inner.Dispose();
 
 		foreach (var item in toDispose) {
