@@ -113,7 +113,7 @@ public partial class App {
 	/// </summary>
 	public void HandleRedirectedActivation(AppActivationArguments args) {
 		this._dispatcherQueue?.TryEnqueue(() => {
-			this._stateStore.RootState.Windows.Add(new WindowStateModel());
+			this._stateStore.RootState.Windows.Add(Ioc.Default.GetRequiredService<WindowStateModel>());
 		});
 	}
 

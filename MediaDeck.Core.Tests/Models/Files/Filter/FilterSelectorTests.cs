@@ -3,6 +3,7 @@ using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Composition.Stores.State.Model.Objects;
 using MediaDeck.Core.Models.Files.Filter;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using R3;
 using Shouldly;
@@ -20,7 +21,9 @@ public class FilterSelectorTests : IDisposable {
 		var spMock = new Mock<IServiceProvider>();
 		spMock.Setup(x => x.GetService(typeof(SortObject))).Returns(() => new SortObject(spMock.Object));
 		this._searchDefinitions = new SearchDefinitionsConfigModel(spMock.Object, new StubStringProvider());
-		var tabState = new TabStateModel(null!, new SearchStateModel(), new ViewerStateModel());
+		var services = new ServiceCollection();
+		MediaDeck.Composition.DIRegistration.AddGeneratedServices(services);
+		var tabState = services.BuildServiceProvider().GetRequiredService<TabStateModel>();
 
 		this._sut = new FilterSelector(tabState, this._searchDefinitions, this._dispatcherMock.Object);
 	}

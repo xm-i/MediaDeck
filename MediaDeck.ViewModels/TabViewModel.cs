@@ -17,8 +17,6 @@ namespace MediaDeck.ViewModels;
 /// </summary>
 [Inject(InjectServiceLifetime.Scoped)]
 public class TabViewModel : ViewModelBase {
-	private readonly IDisposable? _scopeDisposable;
-
 	/// <summary>
 	/// このタブの状態モデル
 	/// </summary>
@@ -79,7 +77,6 @@ public class TabViewModel : ViewModelBase {
 		RepositorySelectorViewModel repositorySelectorViewModel,
 		StatusBarViewModel statusBarViewModel) {
 		this.TabState = tabState;
-		this._scopeDisposable = tabState.ServiceProvider as IDisposable;
 
 		this.DisplayName = this.TabState.DisplayName.ToBindableReactiveProperty("New Tab").AddTo(this.CompositeDisposable);
 		this.LeftPaneWidth = this.TabState.LeftPaneWidth.ToTwoWayBindableReactiveProperty().AddTo(this.CompositeDisposable);
@@ -139,13 +136,5 @@ public class TabViewModel : ViewModelBase {
 		this.TabState.LeftPaneWidth.Skip(1).Subscribe(v => appState.DefaultTabState.LeftPaneWidth.Value = v).AddTo(this.CompositeDisposable);
 		this.TabState.RightPaneWidth.Skip(1).Subscribe(v => appState.DefaultTabState.RightPaneWidth.Value = v).AddTo(this.CompositeDisposable);
 		this.TabState.RepositoryPaneHeight.Skip(1).Subscribe(v => appState.DefaultTabState.RepositoryPaneHeight.Value = v).AddTo(this.CompositeDisposable);
-	}
-
-
-	protected override void Dispose(bool disposing) {
-		if (disposing) {
-			this._scopeDisposable?.Dispose();
-		}
-		base.Dispose(disposing);
 	}
 }

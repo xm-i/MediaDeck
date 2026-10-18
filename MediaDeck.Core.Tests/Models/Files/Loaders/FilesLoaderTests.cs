@@ -11,6 +11,7 @@ using MediaDeck.Core.Models.Files.Filter;
 using MediaDeck.Core.Models.Files.Loaders;
 using MediaDeck.Core.Models.Files.Sort;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using R3;
 using Shouldly;
@@ -40,7 +41,9 @@ public class FilesLoaderTests {
 		var spMock = new Mock<IServiceProvider>();
 		spMock.Setup(x => x.GetService(typeof(SortObject))).Returns(() => new SortObject(spMock.Object));
 		var searchDefs = new SearchDefinitionsConfigModel(spMock.Object, new StubStringProvider());
-		var tabState = new TabStateModel(null!, new SearchStateModel(), new ViewerStateModel());
+		var services = new ServiceCollection();
+		MediaDeck.Composition.DIRegistration.AddGeneratedServices(services);
+		var tabState = services.BuildServiceProvider().GetRequiredService<TabStateModel>();
 		var sortSelector = new SortSelector(tabState, searchDefs, sortDispatcherMock.Object);
 
 		// FilterSelector

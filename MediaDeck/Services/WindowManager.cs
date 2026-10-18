@@ -4,6 +4,7 @@ using MediaDeck.Composition.Interfaces.Services;
 using MediaDeck.Composition.Objects;
 using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Core.Stores.State;
+using MediaDeck.ViewModels.Tabs;
 using MediaDeck.Views;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -52,6 +53,7 @@ public class WindowContext(IServiceScope scope, Guid windowId) : IWindowContext 
 public class WindowManager : DisposableBase {
 	private readonly IServiceProvider _rootProvider;
 	private readonly IStateStore _stateStore;
+	private readonly ITabScopeFactory _tabScopeFactory;
 	private readonly ILogger<WindowManager> _logger;
 	private readonly List<WindowContext> _windows = [];
 
@@ -73,9 +75,11 @@ public class WindowManager : DisposableBase {
 	public WindowManager(
 		IServiceProvider rootProvider,
 		IStateStore stateStore,
+		ITabScopeFactory tabScopeFactory,
 		ILogger<WindowManager> logger) {
 		this._rootProvider = rootProvider;
 		this._stateStore = stateStore;
+		this._tabScopeFactory = tabScopeFactory;
 		this._logger = logger;
 
 		// 状態の変化を監視してウィンドウを開閉する
@@ -98,9 +102,8 @@ public class WindowManager : DisposableBase {
 			return;
 		}
 
-		var newState = new WindowStateModel {
-			WindowId = windowId ?? Guid.NewGuid()
-		};
+		var newState = this._rootProvider.GetRequiredService<WindowStateModel>();
+		newState.WindowId = windowId ?? Guid.NewGuid();
 		this._stateStore.RootState.Windows.Add(newState);
 	}
 
@@ -122,7 +125,7 @@ public class WindowManager : DisposableBase {
 	private void CleanAndAdjustState() {
 		var rootState = this._stateStore.RootState;
 
-		// 1. 所属ウィンドウのないタブをクリーンアップ
+		// 1. 所属ウィンドウのないタブをクリーンアップ（RootState.Tabsからの削除によりTabScopeFactoryが自動的にスコープを破棄）
 		var activeTabIds = rootState.Windows
 			.SelectMany(w => w.TabIds)
 			.ToHashSet();
@@ -147,22 +150,15 @@ public class WindowManager : DisposableBase {
 
 		// 3. 保存されたウィンドウ情報がなければ（あるいは上の処理で0件になったら）、空のウィンドウを1つ追加しておく
 		if (rootState.Windows.Count == 0) {
-			rootState.Windows.Add(new WindowStateModel());
+			rootState.Windows.Add(this._rootProvider.GetRequiredService<WindowStateModel>());
 		}
 
 		// 4. ウィンドウが1つで、かつそのウィンドウのタブ数が0の場合、デフォルト設定でタブを1つ追加する
 		if (rootState.Windows.Count == 1 && rootState.Windows[0].TabIds.Count == 0) {
 			var windowState = rootState.Windows[0];
 
-			var scope = this._rootProvider.CreateScope();
-			var tabState = scope.ServiceProvider.GetRequiredService<TabStateModel>();
-			tabState.DisplayName.Value = "Tab 1";
+			var tabState = this._tabScopeFactory.CreateTabState("Tab 1");
 
-			// デフォルト値のコピー
-			var defaultTab = rootState.AppState.DefaultTabState;
-			tabState.ApplyDefaultState(defaultTab);
-
-			rootState.Tabs.Add(tabState);
 			windowState.TabIds.Add(tabState.TabId);
 			windowState.SelectedTabId.Value = tabState.TabId;
 
@@ -346,9 +342,8 @@ public class WindowManager : DisposableBase {
 	/// <param name="sourceWindowId">元のウィンドウID（参考用、この段階では削除済み）</param>
 	public void MoveTabToNewWindow(Guid tabId, Guid sourceWindowId) {
 		// 新しいウィンドウ状態を作成
-		var newWindowState = new WindowStateModel {
-			WindowId = Guid.NewGuid()
-		};
+		var newWindowState = this._rootProvider.GetRequiredService<WindowStateModel>();
+		newWindowState.WindowId = Guid.NewGuid();
 
 		newWindowState.TabIds.Add(tabId);
 		this._stateStore.RootState.Windows.Add(newWindowState);

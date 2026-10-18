@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using System.Text.Json.Serialization.Metadata;
 using MediaDeck.Composition.Interfaces.Services;
 using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Core.Models.NotificationDispatcher;
@@ -120,5 +121,62 @@ public class StateStoreTests : IDisposable {
 
 		var act = () => store.Save();
 		Should.NotThrow(act);
+	}
+
+	/// <summary>
+	/// 複数タブを含む <see cref="RootStateModel"/> のシリアライズ・デシリアライズで各タブの <see cref="TabStateModel"/> が上書きされず個別に復元され、かつ各タブスコープ内では同一インスタンスとして解決されることを確認します。
+	/// </summary>
+	[Fact]
+	public void RootState_SerializeAndDeserialize_RestoresMultipleTabStates() {
+		var services = new ServiceCollection();
+		MediaDeck.Composition.DIRegistration.AddGeneratedServices(services);
+		using var sp = services.BuildServiceProvider();
+
+		var root = sp.GetRequiredService<RootStateModel>();
+
+		using var scope1 = sp.CreateScope();
+		var tabState1 = scope1.ServiceProvider.GetRequiredService<TabStateModel>();
+		scope1.ServiceProvider.GetRequiredService<TabStateModel>().ShouldBeSameAs(tabState1);
+		tabState1.DisplayName.Value = "Test Tab 1";
+		tabState1.LeftPaneWidth.Value = 320;
+		root.Tabs.Add(tabState1);
+
+		using var scope2 = sp.CreateScope();
+		var tabState2 = scope2.ServiceProvider.GetRequiredService<TabStateModel>();
+		tabState2.DisplayName.Value = "Test Tab 2";
+		tabState2.LeftPaneWidth.Value = 400;
+		root.Tabs.Add(tabState2);
+
+		tabState1.ShouldNotBeSameAs(tabState2);
+		tabState1.TabId.ShouldNotBe(tabState2.TabId);
+
+		var jsonDto = RootStateModelForJson.CreateJson(root);
+		var options = new System.Text.Json.JsonSerializerOptions {
+			TypeInfoResolver = MediaDeck.Store.SerializerContext.StateJsonSerializerContext.Default
+				.WithAddedModifier(global::GenJsonConfig.ForJsonConverterRegistry.ApplyPolymorphism)
+		};
+		var json = System.Text.Json.JsonSerializer.Serialize(jsonDto, options);
+
+		using var loadScope = sp.CreateScope();
+		var loadedDto = System.Text.Json.JsonSerializer.Deserialize<RootStateModelForJson>(json, options);
+		var restored = RootStateModelForJson.CreateModel(loadedDto!, loadScope.ServiceProvider);
+
+		restored.Tabs.Count.ShouldBe(2);
+		restored.Tabs[0].ShouldNotBeSameAs(restored.Tabs[1]);
+		restored.Tabs[0].TabId.ShouldBe(tabState1.TabId);
+		restored.Tabs[0].DisplayName.Value.ShouldBe("Test Tab 1");
+		restored.Tabs[0].LeftPaneWidth.Value.ShouldBe(320);
+		restored.Tabs[1].TabId.ShouldBe(tabState2.TabId);
+		restored.Tabs[1].DisplayName.Value.ShouldBe("Test Tab 2");
+		restored.Tabs[1].LeftPaneWidth.Value.ShouldBe(400);
+
+		// デシリアライズ時に生成された各タブ固有スコープ内で同一の TabStateModel インスタンスが解決されることを確認
+		restored.Tabs[0].ServiceProvider.ShouldNotBeSameAs(restored.Tabs[1].ServiceProvider);
+		restored.Tabs[0].ServiceProvider.GetRequiredService<TabStateModel>().ShouldBeSameAs(restored.Tabs[0]);
+		restored.Tabs[1].ServiceProvider.GetRequiredService<TabStateModel>().ShouldBeSameAs(restored.Tabs[1]);
+
+		foreach (var tab in restored.Tabs) {
+			(tab.ServiceProvider as IDisposable)?.Dispose();
+		}
 	}
 }

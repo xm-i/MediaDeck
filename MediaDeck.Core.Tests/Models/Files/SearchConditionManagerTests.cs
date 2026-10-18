@@ -8,6 +8,7 @@ using MediaDeck.Core.Models.Files.SearchConditions;
 using MediaDeck.Core.Models.Repositories;
 using MediaDeck.Core.Models.Repositories.Objects;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using ObservableCollections;
 using R3;
@@ -47,7 +48,9 @@ public class SearchConditionManagerTests {
 		var folderDispatcherMock = new Mock<ISearchConditionNotificationDispatcher>();
 		var folderUpdateSubject = new Subject<Action<ObservableList<ISearchCondition>>>();
 		folderDispatcherMock.Setup(x => x.UpdateRequest).Returns(folderUpdateSubject);
-		var tabState = new TabStateModel(null!, new SearchStateModel(), new ViewerStateModel());
+		var services = new ServiceCollection();
+		MediaDeck.Composition.DIRegistration.AddGeneratedServices(services);
+		var tabState = services.BuildServiceProvider().GetRequiredService<TabStateModel>();
 		var folderRepo = new FolderRepository(dbFactory, folderDispatcherMock.Object, tabState);
 		folderRepo.RootFolder.Value = new FolderObject(null, "", []);
 

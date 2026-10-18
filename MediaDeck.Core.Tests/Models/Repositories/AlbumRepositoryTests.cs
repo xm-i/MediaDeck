@@ -6,6 +6,7 @@ using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Composition.Tables;
 using MediaDeck.Core.Models.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using ObservableCollections;
 using R3;
@@ -30,7 +31,9 @@ public class AlbumRepositoryTests {
 	private static AlbumRepository CreateSut(IDbContextFactory<MediaDeckDbContext> dbFactory) {
 		var dispatcherMock = new Mock<ISearchConditionNotificationDispatcher>();
 		dispatcherMock.Setup(x => x.UpdateRequest).Returns(new Subject<Action<ObservableList<ISearchCondition>>>());
-		var tabState = new TabStateModel(null!, new SearchStateModel(), new ViewerStateModel());
+		var services = new ServiceCollection();
+		MediaDeck.Composition.DIRegistration.AddGeneratedServices(services);
+		var tabState = services.BuildServiceProvider().GetRequiredService<TabStateModel>();
 		return new AlbumRepository(dbFactory, dispatcherMock.Object, tabState);
 	}
 

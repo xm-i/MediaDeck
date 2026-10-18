@@ -8,10 +8,12 @@ namespace MediaDeck.Composition.Stores.State.Model;
 [Inject(InjectServiceLifetime.Scoped)]
 [GenerateJsonConfigDto]
 public class TabStateModel(IServiceProvider serviceProvider, SearchStateModel searchState, ViewerStateModel viewerState) {
+	/// <summary>
+	/// タブ固有のDIスコープのサービスプロバイダー
+	/// </summary>
 	public IServiceProvider ServiceProvider {
 		get;
 	} = serviceProvider;
-
 	/// <summary>
 	/// タブの一意識別子
 	/// </summary>
