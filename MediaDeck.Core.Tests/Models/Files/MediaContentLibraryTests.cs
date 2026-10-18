@@ -126,6 +126,8 @@ public class MediaContentLibraryTests : IDisposable {
 
 		var uiDispatcher = new Mock<IUiDispatcher>();
 		uiDispatcher.Setup(x => x.Run(It.IsAny<Action>())).Callback<Action>(a => a());
+		uiDispatcher.Setup(x => x.RunAsync(It.IsAny<Action>())).Returns<Action>(a => { a(); return Task.CompletedTask; });
+		uiDispatcher.Setup(x => x.RunAsync(It.IsAny<Func<Task>>())).Returns<Func<Task>>(async a => await a());
 
 		using var sut = new MediaContentLibrary(filesLoaderMock.Object, new SearchConfigModel(), this._searchConditionManager, dispatcherMock.Object, uiDispatcher.Object);
 

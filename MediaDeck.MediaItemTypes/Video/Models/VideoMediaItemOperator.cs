@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using FFMpegCore;
 using FFMpegCore.Exceptions;
@@ -74,7 +75,7 @@ public partial class VideoMediaItemOperator : BaseMediaItemOperator {
 			}
 			var candidateRelativePath = this._filePathService.GetThumbnailRelativeFilePath();
 			var thumbPath = this._filePathService.GetThumbnailAbsoluteFilePath(candidateRelativePath);
-			var image = this.CreateThumbnail(filePath, videoStream.Width, videoStream.Height, this._config.ThumbnailConfig.ThumbnailSize.Value, this._config.ThumbnailConfig.ThumbnailSize.Value, metadata.Duration / 5);
+			var image = await this.CreateThumbnailAsync(filePath, videoStream.Width, videoStream.Height, this._config.ThumbnailConfig.ThumbnailSize.Value, this._config.ThumbnailConfig.ThumbnailSize.Value, metadata.Duration / 5);
 			new FileInfo(thumbPath).Directory?.Create();
 			await File.WriteAllBytesAsync(thumbPath, image);
 			thumbRelativePath = candidateRelativePath;
@@ -304,6 +305,54 @@ public partial class VideoMediaItemOperator : BaseMediaItemOperator {
 		var binary = File.ReadAllBytes(temporaryThumbPath);
 		File.Delete(temporaryThumbPath);
 		return binary;
+	}
+
+	/// <summary>
+	/// サムネイルを非同期に作成します。
+	/// </summary>
+	/// <param name="fileModel">動画ファイル</param>
+	/// <param name="width">サムネイル幅</param>
+	/// <param name="height">サムネイル高さ</param>
+	/// <param name="time">時間指定</param>
+	/// <param name="cancellationToken">キャンセレーショントークン</param>
+	/// <returns>作成されたサムネイルバイナリ</returns>
+	public async Task<byte[]> CreateThumbnailAsync(IMediaItemModel fileModel, int width, int height, TimeSpan time, CancellationToken cancellationToken = default) {
+		var metadata = await FFProbe.AnalyseAsync(fileModel.FilePath, cancellationToken: cancellationToken).ConfigureAwait(false);
+		if (metadata.PrimaryVideoStream is not { } videoStream) {
+			throw new InvalidOperationException("PrimaryVideoStream is null");
+		}
+		return await this.CreateThumbnailAsync(fileModel.FilePath, videoStream.Width, videoStream.Height, width, height, time, cancellationToken).ConfigureAwait(false);
+	}
+
+	/// <summary>
+	/// サムネイルを非同期に作成します。
+	/// </summary>
+	/// <param name="filePath">動画ファイルパス</param>
+	/// <param name="originalWidth">元動画幅</param>
+	/// <param name="originalHeight">元動画高さ</param>
+	/// <param name="width">サムネイル幅</param>
+	/// <param name="height">サムネイル高さ</param>
+	/// <param name="time">時間指定</param>
+	/// <param name="cancellationToken">キャンセレーショントークン</param>
+	/// <returns>作成されたサムネイルバイナリ</returns>
+	public async Task<byte[]> CreateThumbnailAsync(string filePath, int originalWidth, int originalHeight, int width, int height, TimeSpan time, CancellationToken cancellationToken = default) {
+		if (originalWidth / width > originalHeight / height) {
+			height = -1;
+		} else {
+			width = -1;
+		}
+
+		var uuid = Guid.NewGuid();
+		var temporaryThumbPath = Path.Combine(this._config.PathConfig.TemporaryFolderPath.Value, $"{uuid}.png");
+		try {
+			await FFMpeg.SnapshotAsync(filePath, temporaryThumbPath, new Size(width, height), time).ConfigureAwait(false);
+			var binary = await File.ReadAllBytesAsync(temporaryThumbPath, cancellationToken).ConfigureAwait(false);
+			return binary;
+		} finally {
+			if (File.Exists(temporaryThumbPath)) {
+				File.Delete(temporaryThumbPath);
+			}
+		}
 	}
 
 	/// <summary>

@@ -64,15 +64,17 @@ public abstract class BaseThumbnailPickerViewModel<TThumbnailPickerModel> : View
 			return;
 		}
 
-		using var input = new MemoryStream(bytes);
-		using var output = new MemoryStream();
-		using var image = new MagickImage(input);
-		image.AutoOrient();
-		image.Thumbnail((uint)this._config.ThumbnailConfig.ThumbnailSize.Value, (uint)this._config.ThumbnailConfig.ThumbnailSize.Value);
-		image.Format = MagickFormat.Jpg;
-		image.Write(output);
-
-		this.CandidateThumbnail.Value = output.ToArray();
+		var thumbSize = (uint)this._config.ThumbnailConfig.ThumbnailSize.Value;
+		this.CandidateThumbnail.Value = await Task.Run(() => {
+			using var input = new MemoryStream(bytes);
+			using var output = new MemoryStream();
+			using var image = new MagickImage(input);
+			image.AutoOrient();
+			image.Thumbnail(thumbSize, thumbSize);
+			image.Format = MagickFormat.Jpg;
+			image.Write(output);
+			return output.ToArray();
+		});
 	}
 
 	public virtual async Task SaveAsync() {

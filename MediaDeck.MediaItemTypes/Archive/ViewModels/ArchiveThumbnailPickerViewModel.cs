@@ -46,34 +46,45 @@ public class ArchiveThumbnailPickerViewModel : BaseThumbnailPickerViewModel<Base
 		get;
 	} = new();
 
-	public override Task RecreateThumbnailAsync() {
+	public override async Task RecreateThumbnailAsync() {
 		if (this.targetFileViewModel is null) {
-			return Task.CompletedTask;
+			return;
 		}
 		if (this.FileName.Value is null) {
 			this.CandidateThumbnail.Value = null;
-			return Task.CompletedTask;
+			return;
 		}
 
-		using var archive = ZipFile.OpenRead(this.targetFileViewModel!.FileModel.FilePath);
-		if (!archive.Entries.Any(x => x.FullName == this.FileName.Value)) {
-			this.CandidateThumbnail.Value = null;
-			return Task.CompletedTask;
-		}
+		var filePath = this.targetFileViewModel.FileModel.FilePath;
+		var fileName = this.FileName.Value;
+		var thumbSize = (uint)this._config.ThumbnailConfig.ThumbnailSize.Value;
 
 		try {
-			this.CandidateThumbnail.Value = this._ArchiveMediaItemOperator.CreateThumbnail(archive, (uint)this._config.ThumbnailConfig.ThumbnailSize.Value, (uint)this._config.ThumbnailConfig.ThumbnailSize.Value, this.FileName.Value);
+			var thumbnailBytes = await Task.Run(() => {
+				using var archive = ZipFile.OpenRead(filePath);
+				if (!archive.Entries.Any(x => x.FullName == fileName)) {
+					return null;
+				}
+				return this._ArchiveMediaItemOperator.CreateThumbnail(archive, thumbSize, thumbSize, fileName);
+			});
+			this.CandidateThumbnail.Value = thumbnailBytes;
 		} catch (Exception ex) {
-			this._logger.LogError(ex, "Failed to recreate archive thumbnail for file {FilePath} at entry {EntryName}", this.targetFileViewModel.FilePath, this.FileName.Value);
+			this._logger.LogError(ex, "Failed to recreate archive thumbnail for file {FilePath} at entry {EntryName}", this.targetFileViewModel.FilePath, fileName);
 			this.CandidateThumbnail.Value = null;
 		}
-		return Task.CompletedTask;
 	}
 
 	public override async Task LoadAsync(IMediaItemViewModel fileViewModel) {
 		await base.LoadAsync(fileViewModel);
+		var filePath = fileViewModel.FileModel.FilePath;
+		var entries = await Task.Run(() => {
+			using var archive = ZipFile.OpenRead(filePath);
+			return archive.Entries
+				.Where(x => this._mediaItemTypeService.IsTargetPath(x.Name, MediaType.Image))
+				.Select(x => x.FullName)
+				.ToList();
+		});
 		this._entries.Clear();
-		using var archive = ZipFile.OpenRead(fileViewModel.FileModel.FilePath);
-		this._entries.AddRange(archive.Entries.Where(x => this._mediaItemTypeService.IsTargetPath(x.Name, MediaType.Image)).Select(x => x.FullName).ToList());
+		this._entries.AddRange(entries);
 	}
 }

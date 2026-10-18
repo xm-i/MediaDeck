@@ -10,11 +10,10 @@ namespace MediaDeck.MediaItemTypes.Image.ViewModels;
 public class ImageThumbnailPickerViewModel(BaseThumbnailPickerModel thumbnailPickerModel, ImageMediaItemOperator ImageMediaItemOperator, IFilePickerService filePickerService, ConfigModel config) : BaseThumbnailPickerViewModel<BaseThumbnailPickerModel>(thumbnailPickerModel, filePickerService, config) {
 	private readonly ImageMediaItemOperator _ImageMediaItemOperator = ImageMediaItemOperator;
 
-	public override Task RecreateThumbnailAsync() {
+	public override async Task RecreateThumbnailAsync() {
 		if (this.targetFileViewModel is null) {
-			return Task.CompletedTask;
+			return;
 		}
-		this.CandidateThumbnail.Value = this._ImageMediaItemOperator.CreateThumbnail(this.targetFileViewModel.FileModel, (uint)this._config.ThumbnailConfig.ThumbnailSize.Value, (uint)this._config.ThumbnailConfig.ThumbnailSize.Value);
-		return Task.CompletedTask;
+		this.CandidateThumbnail.Value = await Task.Run(() => this._ImageMediaItemOperator.CreateThumbnail(this.targetFileViewModel.FileModel, (uint)this._config.ThumbnailConfig.ThumbnailSize.Value, (uint)this._config.ThumbnailConfig.ThumbnailSize.Value));
 	}
 }

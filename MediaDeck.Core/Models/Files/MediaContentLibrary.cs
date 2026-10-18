@@ -85,7 +85,7 @@ public class MediaContentLibrary : ModelBase {
 		this.SearchElapsedMilliseconds.Value = null;
 		if (isInitial) {
 			this.TotalCount.Value = null;
-			this.ClearFiles();
+			await this.ClearFilesAsync().ConfigureAwait(false);
 		}
 		var session = this._searchDisposables.Disposable as CompositeDisposable ?? new CompositeDisposable();
 		if (this._searchDisposables.Disposable != session) {
@@ -112,14 +112,14 @@ public class MediaContentLibrary : ModelBase {
 					totalLoaded++;
 
 					if (batch.Count >= batchLimit) {
-						this._uiDispatcher.Run(() => this.Files.AddRange(batch));
+						await this._uiDispatcher.RunAsync(() => this.Files.AddRange(batch)).ConfigureAwait(false);
 						batch.Clear();
 						batchLimit = incrementalLoadCount;
 					}
 				}
 
 				if (batch.Count > 0) {
-					this._uiDispatcher.Run(() => this.Files.AddRange(batch));
+					await this._uiDispatcher.RunAsync(() => this.Files.AddRange(batch)).ConfigureAwait(false);
 					batch.Clear();
 				}
 
@@ -148,10 +148,10 @@ public class MediaContentLibrary : ModelBase {
 	}
 
 	/// <summary>ファイルリストをクリアし、セッションのリソースを破棄する。</summary>
-	private void ClearFiles() {
+	private async Task ClearFilesAsync() {
 		this._searchDisposables.Disposable = new CompositeDisposable();
-		this._uiDispatcher.Run(() => {
+		await this._uiDispatcher.RunAsync(() => {
 			this.Files.Clear();
-		});
+		}).ConfigureAwait(false);
 	}
 }

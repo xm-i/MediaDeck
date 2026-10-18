@@ -67,11 +67,13 @@ public sealed partial class VideoDetailViewerPreviewControlView : VideoDetailVie
 	private void Player_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e) {
 		switch (e.PropertyName) {
 			case nameof(this.Player.Status):
-				this.btnPlayback.Content = this.Player.Status == Status.Playing ? this._iconPause : this._iconPlay;
+				this.DispatcherQueue?.TryEnqueue(() => {
+					this.btnPlayback.Content = this.Player.Status == Status.Playing ? this._iconPause : this._iconPlay;
 
-				if (this.Player.Status == Status.Playing) {
-					this.ThumbnailVisibility.Value = Visibility.Collapsed;
-				}
+					if (this.Player.Status == Status.Playing) {
+						this.ThumbnailVisibility.Value = Visibility.Collapsed;
+					}
+				});
 
 				break;
 		}

@@ -25,7 +25,7 @@ public class UiDispatcher : IUiDispatcher {
 			return;
 		}
 
-		var tcs = new TaskCompletionSource<object?>();
+		var tcs = new TaskCompletionSource<object?>(TaskCreationOptions.RunContinuationsAsynchronously);
 		var success = this._dispatcherQueue.TryEnqueue(() => {
 			try {
 				action();
@@ -38,8 +38,55 @@ public class UiDispatcher : IUiDispatcher {
 		if (success) {
 			tcs.Task.GetAwaiter().GetResult();
 		} else {
-			// キューへの追加に失敗した場合はフォールバックしてカレントスレッドで実行
-			action();
+			throw new InvalidOperationException("Failed to enqueue action to the DispatcherQueue.");
 		}
+	}
+
+	/// <inheritdoc />
+	public async Task RunAsync(Action action) {
+		if (this._dispatcherQueue == null || this._dispatcherQueue.HasThreadAccess) {
+			action();
+			return;
+		}
+
+		var tcs = new TaskCompletionSource<object?>(TaskCreationOptions.RunContinuationsAsynchronously);
+		var success = this._dispatcherQueue.TryEnqueue(() => {
+			try {
+				action();
+				tcs.SetResult(null);
+			} catch (Exception ex) {
+				tcs.SetException(ex);
+			}
+		});
+
+		if (!success) {
+			throw new InvalidOperationException("Failed to enqueue action to the DispatcherQueue.");
+		}
+
+		await tcs.Task.ConfigureAwait(false);
+	}
+
+	/// <inheritdoc />
+	public async Task RunAsync(Func<Task> action) {
+		if (this._dispatcherQueue == null || this._dispatcherQueue.HasThreadAccess) {
+			await action().ConfigureAwait(false);
+			return;
+		}
+
+		var tcs = new TaskCompletionSource<object?>(TaskCreationOptions.RunContinuationsAsynchronously);
+		var success = this._dispatcherQueue.TryEnqueue(async () => {
+			try {
+				await action().ConfigureAwait(false);
+				tcs.SetResult(null);
+			} catch (Exception ex) {
+				tcs.SetException(ex);
+			}
+		});
+
+		if (!success) {
+			throw new InvalidOperationException("Failed to enqueue action to the DispatcherQueue.");
+		}
+
+		await tcs.Task.ConfigureAwait(false);
 	}
 }

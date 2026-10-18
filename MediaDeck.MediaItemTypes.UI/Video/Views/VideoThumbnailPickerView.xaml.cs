@@ -81,7 +81,9 @@ public sealed partial class VideoThumbnailPickerView : VideoThumbnailPickerViewU
 	private void Player_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e) {
 		switch (e.PropertyName) {
 			case nameof(this.Player.Status):
-				this.btnPlayback.Content = this.Player.Status == Status.Playing ? this._iconPause : this._iconPlay;
+				this.DispatcherQueue?.TryEnqueue(() => {
+					this.btnPlayback.Content = this.Player.Status == Status.Playing ? this._iconPause : this._iconPlay;
+				});
 				break;
 		}
 	}
