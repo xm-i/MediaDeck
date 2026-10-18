@@ -9,14 +9,11 @@
 	mc:Ignorable="d" >
 	<Grid>
 		<Grid.RowDefinitions>
-			<RowDefinition Height="auto" />
 			<RowDefinition Height="*" />
-			<RowDefinition Height="auto" />
+			<RowDefinition Height="Auto" />
 		</Grid.RowDefinitions>
 
-		<local:SearchConditionManagerView Grid.Row="0" ViewModel="{x:Bind ViewModel.SearchConditionManagerViewModel, Mode=OneWay}" />
-
-		<Grid Grid.Row="1" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+		<Grid Grid.Row="0" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 			<ContentControl
 				HorizontalAlignment="Stretch"
 				VerticalAlignment="Stretch"
@@ -27,7 +24,7 @@
 		</Grid>
 
 		<!-- Filmstrip (Thumbnail List) Area -->
-		<Border Grid.Row="2"
+		<Border Grid.Row="1"
 				Background="{ThemeResource LayerFillColorDefaultBrush}"
 				BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
 				BorderThickness="0,1,0,0"

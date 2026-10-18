@@ -1,7 +1,6 @@
 using FlyleafLib.MediaPlayer;
 using MediaDeck.MediaItemTypes.UI.Base.Views;
 using MediaDeck.MediaItemTypes.Video.ViewModels;
-using Microsoft.UI.Xaml.Controls;
 
 namespace MediaDeck.MediaItemTypes.UI.Video.Views;
 
@@ -9,20 +8,21 @@ namespace MediaDeck.MediaItemTypes.UI.Video.Views;
 /// ビデオサムネイル選択ビュー。
 /// </summary>
 public sealed partial class VideoThumbnailPickerView : VideoThumbnailPickerViewUserControl {
-	private readonly SymbolIcon _iconPlay = new(Symbol.Play);
-	private readonly SymbolIcon _iconPause = new(Symbol.Pause);
 	private readonly SerialDisposable _viewModelDisposable = new();
 
+	/// <summary>
+	/// プレイヤーインスタンスを取得または設定します。
+	/// </summary>
 	public Player Player {
 		get; set;
 	}
 
+	/// <summary>
+	/// <see cref="VideoThumbnailPickerView"/> クラスの新しいインスタンスを初期化します。
+	/// </summary>
 	public VideoThumbnailPickerView() {
 		this.Player = new();
 		this.InitializeComponent();
-		this.btnPlayback.Content = this.Player.Status == Status.Playing ? this._iconPause : this._iconPlay;
-		this.Player.PropertyChanged += this.Player_PropertyChanged;
-		this.playerRootGrid.DataContext = this;
 		this.Unloaded += this.VideoThumbnailPickerView_Unloaded;
 	}
 
@@ -74,21 +74,6 @@ public sealed partial class VideoThumbnailPickerView : VideoThumbnailPickerViewU
 	}
 
 	/// <summary>
-	/// プレイヤーのプロパティ変更イベントハンドラ。
-	/// </summary>
-	/// <param name="sender">イベント発生元。</param>
-	/// <param name="e">イベント引数。</param>
-	private void Player_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e) {
-		switch (e.PropertyName) {
-			case nameof(this.Player.Status):
-				this.DispatcherQueue?.TryEnqueue(() => {
-					this.btnPlayback.Content = this.Player.Status == Status.Playing ? this._iconPause : this._iconPlay;
-				});
-				break;
-		}
-	}
-
-	/// <summary>
 	/// ビューがアンロードされた際に呼び出され、再生を一時停止します。
 	/// </summary>
 	/// <param name="sender">イベントの発生元。</param>
@@ -98,5 +83,7 @@ public sealed partial class VideoThumbnailPickerView : VideoThumbnailPickerViewU
 	}
 }
 
-public class VideoThumbnailPickerViewUserControl : UserControlBase<VideoThumbnailPickerViewModel> {
-}
+/// <summary>
+/// <see cref="VideoThumbnailPickerView"/> のジェネリック基底クラス。
+/// </summary>
+public class VideoThumbnailPickerViewUserControl : UserControlBase<VideoThumbnailPickerViewModel>;

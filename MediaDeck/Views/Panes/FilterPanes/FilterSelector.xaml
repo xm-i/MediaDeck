@@ -6,6 +6,7 @@
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:filtersVm="using:MediaDeck.ViewModels.Panes.FilterPanes"
+	xmlns:controls="using:MediaDeck.Views.Controls"
 	mc:Ignorable="d" >
 
 	<Grid>
@@ -15,33 +16,16 @@
 		</Grid.RowDefinitions>
 
 		<!-- Header -->
-		<Grid Grid.Row="0"
-			Padding="12,10"
-			Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-			BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-			BorderThickness="0,0,0,1" >
-			<Grid.ColumnDefinitions>
-				<ColumnDefinition Width="Auto" />
-				<ColumnDefinition Width="*" />
-				<ColumnDefinition Width="Auto" />
-			</Grid.ColumnDefinitions>
-			<StackPanel Grid.Column="0"
-				Orientation="Horizontal"
-				Spacing="8"
-				VerticalAlignment="Center" >
-				<FontIcon Glyph="&#xE71C;"
-					FontSize="16" />
-				<TextBlock x:Uid="Filter_Header"
-					Style="{ThemeResource BodyStrongTextBlockStyle}"
-					VerticalAlignment="Center" />
-			</StackPanel>
-			<Button Grid.Column="2"
+		<controls:PaneHeaderControl Grid.Row="0"
+			x:Uid="Filter_Header"
+			Glyph="&#xE71C;">
+			<Button
 				x:Uid="Filter_Settings"
 				Click="OpenFilterSettingsWindowButton_Click" >
 				<FontIcon Glyph="&#xE713;"
 					FontSize="14" />
 			</Button>
-		</Grid>
+		</controls:PaneHeaderControl>
 
 		<!-- Content -->
 		<Border Grid.Row="1"

@@ -6,6 +6,7 @@
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:controls="using:CommunityToolkit.WinUI.Controls"
+	xmlns:vControls="using:MediaDeck.Views.Controls"
 	mc:Ignorable="d" >
 
 	<Grid>
@@ -15,32 +16,15 @@
 		</Grid.RowDefinitions>
 
 		<!-- Header -->
-		<Grid Grid.Row="0"
-			Padding="12,10"
-			Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-			BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-			BorderThickness="0,0,0,1" >
-			<Grid.ColumnDefinitions>
-				<ColumnDefinition Width="Auto" />
-				<ColumnDefinition Width="*" />
-				<ColumnDefinition Width="Auto" />
-			</Grid.ColumnDefinitions>
-			<StackPanel Grid.Column="0"
-				Orientation="Horizontal"
-				Spacing="8"
-				VerticalAlignment="Center" >
-				<FontIcon Glyph="&#xE8B7;"
-					FontSize="16" />
-				<TextBlock x:Uid="Repository_Header"
-					Style="{ThemeResource BodyStrongTextBlockStyle}"
-					VerticalAlignment="Center" />
-			</StackPanel>
-			<controls:Segmented Grid.Column="2"
+		<vControls:PaneHeaderControl Grid.Row="0"
+			x:Uid="Repository_Header"
+			Glyph="&#xE8B7;">
+			<controls:Segmented
 				SelectionMode="Single"
 				ItemsSource="{x:Bind ViewModel.RepositoryPaneViewModels, Mode=OneWay}"
 				SelectedItem="{x:Bind ViewModel.SelectedRepositoryPane.Value, Mode=TwoWay}"
 				DisplayMemberPath="Name" />
-		</Grid>
+		</vControls:PaneHeaderControl>
 
 		<!-- Content -->
 		<Border Grid.Row="1"

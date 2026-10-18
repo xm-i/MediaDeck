@@ -1,10 +1,8 @@
 using FlyleafLib.MediaPlayer;
-
 using MediaDeck.Composition.Interfaces.MediaItemTypes.ViewModels;
 using MediaDeck.MediaItemTypes.UI.Base.Views;
-
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media.Imaging;
 
 namespace MediaDeck.MediaItemTypes.UI.Video.Views;
 
@@ -12,24 +10,20 @@ namespace MediaDeck.MediaItemTypes.UI.Video.Views;
 /// ビデオプレビュー詳細ビューのコントロール。
 /// </summary>
 public sealed partial class VideoDetailViewerPreviewControlView : VideoDetailViewerPreviewControlViewUserControl {
-	private readonly SymbolIcon _iconPlay = new(Symbol.Play);
-	private readonly SymbolIcon _iconPause = new(Symbol.Pause);
+	/// <summary>
+	/// プレイヤーインスタンスを取得します。
+	/// </summary>
 	public Player Player {
-		get; set;
+		get {
+			return this.PlayerControl.Player;
+		}
 	}
 
 	/// <summary>
-	/// サムネイルの表示状態。
+	/// <see cref="VideoDetailViewerPreviewControlView"/> クラスの新しいインスタンスを初期化します。
 	/// </summary>
-	public BindableReactiveProperty<Visibility> ThumbnailVisibility { get; } = new(Visibility.Collapsed);
-
 	public VideoDetailViewerPreviewControlView() {
-		this.Player = new();
-
 		this.InitializeComponent();
-		this.btnPlayback.Content = this.Player.Status == Status.Playing ? this._iconPause : this._iconPlay;
-		this.Player.PropertyChanged += this.Player_PropertyChanged;
-		this.rootGrid.DataContext = this;
 		this.Unloaded += this.OnUnloaded;
 	}
 
@@ -40,13 +34,18 @@ public sealed partial class VideoDetailViewerPreviewControlView : VideoDetailVie
 	/// <param name="newViewModel">新しいViewModel。</param>
 	protected override void OnViewModelChanged(IMediaItemViewModel? oldViewModel, IMediaItemViewModel? newViewModel) {
 		if (newViewModel is null) {
-			this.Player.Stop();
+			this.PlayerControl.Player.Stop();
 			return;
 		}
 
-		this.ThumbnailVisibility.Value = Visibility.Visible;
-		this.Player.Open(newViewModel.FilePath);
-		this.Player.Pause();
+		if (!string.IsNullOrEmpty(newViewModel.ThumbnailFilePath.Value)) {
+			this.PlayerControl.ThumbnailSource = new BitmapImage(new Uri(newViewModel.ThumbnailFilePath.Value));
+		} else {
+			this.PlayerControl.ThumbnailSource = null;
+		}
+
+		this.PlayerControl.Player.Open(newViewModel.FilePath);
+		this.PlayerControl.Player.Pause();
 		base.OnViewModelChanged(oldViewModel, newViewModel);
 	}
 
@@ -56,29 +55,11 @@ public sealed partial class VideoDetailViewerPreviewControlView : VideoDetailVie
 	/// <param name="sender">イベント発生元。</param>
 	/// <param name="e">イベント引数。</param>
 	private void OnUnloaded(object sender, RoutedEventArgs e) {
-		this.Player.Stop();
-	}
-
-	/// <summary>
-	/// プレイヤーのプロパティ変更イベントハンドラ。再生・一時停止ボタンの表示状態を更新します。
-	/// </summary>
-	/// <param name="sender">イベント発生元。</param>
-	/// <param name="e">イベント引数。</param>
-	private void Player_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e) {
-		switch (e.PropertyName) {
-			case nameof(this.Player.Status):
-				this.DispatcherQueue?.TryEnqueue(() => {
-					this.btnPlayback.Content = this.Player.Status == Status.Playing ? this._iconPause : this._iconPlay;
-
-					if (this.Player.Status == Status.Playing) {
-						this.ThumbnailVisibility.Value = Visibility.Collapsed;
-					}
-				});
-
-				break;
-		}
+		this.PlayerControl.Player.Stop();
 	}
 }
 
-public class VideoDetailViewerPreviewControlViewUserControl : UserControlBase<IMediaItemViewModel> {
-}
+/// <summary>
+/// <see cref="VideoDetailViewerPreviewControlView"/> のジェネリック基底クラス。
+/// </summary>
+public class VideoDetailViewerPreviewControlViewUserControl : UserControlBase<IMediaItemViewModel>;

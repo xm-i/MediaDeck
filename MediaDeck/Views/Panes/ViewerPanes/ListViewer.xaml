@@ -11,11 +11,9 @@
 	<Grid>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="Auto" />
-			<RowDefinition Height="Auto" />
 			<RowDefinition Height="*" />
 		</Grid.RowDefinitions>
-		<local:SearchConditionManagerView Grid.Row="0" ViewModel="{x:Bind ViewModel.SearchConditionManagerViewModel, Mode=OneWay}" />
-		<Border Grid.Row="1" Background="{ThemeResource SubtleFillColorSecondaryBrush}" BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}" BorderThickness="0,0,0,1" >
+		<Border Grid.Row="0" Background="{ThemeResource SubtleFillColorSecondaryBrush}" BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}" BorderThickness="0,0,0,1" >
 			<ScrollViewer x:Name="HeaderScrollViewer" HorizontalScrollMode="Disabled" HorizontalScrollBarVisibility="Hidden" VerticalScrollMode="Disabled" VerticalScrollBarVisibility="Hidden" >
 				<Grid Height="32" RightTapped="HeaderGrid_RightTapped" >
 					<Grid.ColumnDefinitions>
@@ -50,7 +48,7 @@
 				</Grid>
 			</ScrollViewer>
 		</Border>
-		<ListView x:Name="List" Grid.Row="2" ItemsSource="{x:Bind ViewModel.MediaContentLibraryViewModel.Files, Mode=OneWay}" SelectedItem="{x:Bind ViewModel.MediaContentLibraryViewModel.SelectedFile.Value, Mode=TwoWay}" SelectionMode="Extended" SelectionChanged="List_SelectionChanged" RightTapped="List_RightTapped" ScrollViewer.HorizontalScrollMode="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollMode="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" >
+		<ListView x:Name="List" Grid.Row="1" ItemsSource="{x:Bind ViewModel.MediaContentLibraryViewModel.Files, Mode=OneWay}" SelectedItem="{x:Bind ViewModel.MediaContentLibraryViewModel.SelectedFile.Value, Mode=TwoWay}" SelectionMode="Extended" SelectionChanged="List_SelectionChanged" RightTapped="List_RightTapped" ScrollViewer.HorizontalScrollMode="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollMode="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" >
 			<ListView.ItemContainerStyle>
 				<Style TargetType="ListViewItem" >
 					<Setter Property="HorizontalContentAlignment" Value="Stretch" />

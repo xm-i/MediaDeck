@@ -10,19 +10,12 @@
 	xmlns:vm="using:MediaDeck.ViewModels.Panes.ViewerPanes"
 	mc:Ignorable="d" >
 	<Grid>
-		<Grid.RowDefinitions>
-			<RowDefinition Height="auto" />
-			<RowDefinition Height="auto" />
-			<RowDefinition Height="*" />
-		</Grid.RowDefinitions>
-		<local:SearchConditionManagerView Grid.Row="0" ViewModel="{x:Bind ViewModel.SearchConditionManagerViewModel, Mode=OneWay}" />
 		<map:Map x:Name="Map"
 			Center="{x:Bind ViewModel.Center.Value, Mode=TwoWay, Converter={StaticResource LocationConverter}}"
 			MinZoomLevel="2"
 			MaxZoomLevel="21"
 			ZoomLevel="{x:Bind ViewModel.ZoomLevel.Value, Mode=TwoWay}"
 			ManipulationMode="All"
-			Grid.Row="2"
 			Loaded="Map_Loaded"
 			Unloaded="Map_Unloaded" >
 			<map:MapItemsControl ItemsSource="{x:Bind ViewModel.MapPins.Value, Mode=OneWay}"

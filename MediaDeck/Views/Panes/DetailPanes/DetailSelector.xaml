@@ -5,6 +5,7 @@
 	xmlns:local="using:MediaDeck.Views.Panes.DetailPanes"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:controls="using:MediaDeck.Views.Controls"
 	mc:Ignorable="d" >
 
 	<Grid>
@@ -14,21 +15,9 @@
 		</Grid.RowDefinitions>
 
 		<!-- Header -->
-		<Grid Grid.Row="0"
-			Padding="12,10"
-			Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-			BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-			BorderThickness="0,0,0,1" >
-			<StackPanel Orientation="Horizontal"
-				Spacing="8"
-				VerticalAlignment="Center" >
-				<FontIcon Glyph="&#xE946;"
-					FontSize="16" />
-				<TextBlock x:Uid="Details_Header"
-					Style="{ThemeResource BodyStrongTextBlockStyle}"
-					VerticalAlignment="Center" />
-			</StackPanel>
-		</Grid>
+		<controls:PaneHeaderControl Grid.Row="0"
+			x:Uid="Details_Header"
+			Glyph="&#xE946;" />
 
 		<!-- Content -->
 		<Border Grid.Row="1"

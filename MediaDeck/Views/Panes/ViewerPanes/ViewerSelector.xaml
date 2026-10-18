@@ -8,7 +8,12 @@
 	xmlns:controls="using:CommunityToolkit.WinUI.Controls"
 	mc:Ignorable="d" >
 	<Grid>
-		<controls:SwitchPresenter
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="*" />
+		</Grid.RowDefinitions>
+		<local:SearchConditionManagerView Grid.Row="0" ViewModel="{x:Bind ViewModel.SearchConditionManagerViewModel, Mode=OneWay}" />
+		<controls:SwitchPresenter Grid.Row="1"
 			Value="{x:Bind ViewModel.SelectedViewerPane.Value,Mode=OneWay}" >
 			<controls:Case Value="{x:Bind ViewModel.WrapViewerViewModel,Mode=OneWay}" >
 				<local:WrapViewer ViewModel="{x:Bind ViewModel.WrapViewerViewModel,Mode=OneWay}" />
@@ -23,6 +28,5 @@
 				<local:MapViewer ViewModel="{x:Bind ViewModel.MapViewerViewModel,Mode=OneWay}" />
 			</controls:Case>
 		</controls:SwitchPresenter>
-
 	</Grid>
 </local:ViewerSelectorUserControl>
