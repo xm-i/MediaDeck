@@ -1,21 +1,27 @@
 using CommunityToolkit.Mvvm.DependencyInjection;
 using MediaDeck.Composition.Interfaces;
+using MediaDeck.Composition.Interfaces.Services;
 using MediaDeck.Core.Stores.Config;
 using MediaDeck.ViewModels.FolderManager;
 using MediaDeck.Views.Helpers;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Windows.Storage.Pickers;
-using WinRT.Interop;
 
 namespace MediaDeck.Views.FolderManager;
 
+/// <summary>
+/// フォルダ一覧の管理（登録・削除・スキャン）を行うビュー。
+/// </summary>
 public sealed partial class FolderManagerView {
+	/// <summary>ダイアログ表示用親ウィンドウを取得または設定します。</summary>
 	public Window? ParentWindow {
 		get;
 		set;
 	}
 
+	/// <summary>
+	/// <see cref="FolderManagerView"/> クラスの新しいインスタンスを初期化します。
+	/// </summary>
 	public FolderManagerView() {
 		this.InitializeComponent();
 	}
@@ -24,18 +30,12 @@ public sealed partial class FolderManagerView {
 		if (this.ViewModel is null) {
 			return;
 		}
-		var openPicker = new FolderPicker();
-
-		var hWnd = WindowNative.GetWindowHandle(this.ParentWindow);
-		InitializeWithWindow.Initialize(openPicker, hWnd);
-		openPicker.SuggestedStartLocation = PickerLocationId.Desktop;
-		openPicker.FileTypeFilter.Add("*");
-
-		var folder = await openPicker.PickSingleFolderAsync();
-		if (folder == null) {
+		var filePickerService = Ioc.Default.GetRequiredService<IFilePickerService>();
+		var folderPath = await filePickerService.PickFolderAsync(this.ParentWindow);
+		if (string.IsNullOrWhiteSpace(folderPath)) {
 			return;
 		}
-		this.ViewModel.AddFolderCommand.Execute(folder.Path);
+		this.ViewModel.AddFolderCommand.Execute(folderPath);
 	}
 
 	private async void RemoveFolderButton_Click(object sender, RoutedEventArgs e) {
@@ -63,4 +63,7 @@ public sealed partial class FolderManagerView {
 	}
 }
 
+/// <summary>
+/// フォルダマネージャ View の基底コントロール。
+/// </summary>
 public abstract class FolderManagerViewUserControl : UserControlBase<FolderManagerViewModel>;

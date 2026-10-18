@@ -12,37 +12,47 @@ using Windows.System;
 
 namespace MediaDeck.Views.Panes.DetailPanes;
 
+/// <summary>
+/// タグ詳細表示および編集を行うビュー。
+/// </summary>
 public sealed partial class TagsDetail {
-	private IDisposable? _newTagRequestedSubscription;
-	private IDisposable? _openTagManagerRequestedSubscription;
+	private readonly CompositeDisposable _vmSubscriptions = new();
 
+	/// <summary>
+	/// <see cref="TagsDetail"/> クラスの新しいインスタンスを初期化します。
+	/// </summary>
 	public TagsDetail() {
 		this.InitializeComponent();
+		this.Loaded += (_, _) => this.SubscribeViewModel(this.ViewModel);
+		this.Unloaded += (_, _) => this._vmSubscriptions.Clear();
 	}
 
-
+	/// <inheritdoc />
 	protected override void OnViewModelChanged(DetailSelectorViewModel? oldViewModel, DetailSelectorViewModel? newViewModel) {
 		base.OnViewModelChanged(oldViewModel, newViewModel);
 
-		this._newTagRequestedSubscription?.Dispose();
-		this._newTagRequestedSubscription = newViewModel?.NewTagRequested.SubscribeAwait(async (context, ct) => {
+		this._vmSubscriptions.Clear();
+		if (this.IsLoaded && newViewModel != null) {
+			this.SubscribeViewModel(newViewModel);
+		}
+	}
+
+	private void SubscribeViewModel(DetailSelectorViewModel? vm) {
+		this._vmSubscriptions.Clear();
+		if (vm is null) {
+			return;
+		}
+
+		vm.NewTagRequested.SubscribeAwait(async (context, ct) => {
 			await this.ShowNewTagDialogAsync(context);
-		}, AwaitOperation.Drop);
+		}, AwaitOperation.Drop).AddTo(this._vmSubscriptions);
 
-		this._openTagManagerRequestedSubscription?.Dispose();
-		this._openTagManagerRequestedSubscription = newViewModel?.OpenTagManagerRequested.Subscribe(tag => {
-			var window = Ioc.Default.GetRequiredService<TagManagerWindow>();
-			window.ViewModel.SelectTag(tag.Model.TagId);
-
-			var windowManager = Ioc.Default.GetRequiredService<WindowManager>();
-			var windowService = Ioc.Default.GetRequiredService<WindowService>();
-			var parent = windowManager.GetWindowFromElement(this);
-			if (parent == null) {
-				// TODO: notify;
-				return;
-			}
-			windowService.ActivateCenteredOnMainWindow(window, parent);
-		});
+		vm.OpenTagManagerRequested.Subscribe(tag => {
+			var windowService = Ioc.Default.GetRequiredService<IWindowService>();
+			windowService.ActivateCentered<TagManagerWindow>(this, window => {
+				window.ViewModel.SelectTag(tag.Model.TagId);
+			});
+		}).AddTo(this._vmSubscriptions);
 	}
 
 	private async Task ShowNewTagDialogAsync(NewTagRequestedContext context) {
@@ -53,7 +63,8 @@ public sealed partial class TagsDetail {
 		var dialog = Ioc.Default.GetRequiredService<NewTagDialog>();
 		dialog.XamlRoot = this.XamlRoot;
 		dialog.ViewModel.TagName.Value = context.TagName;
-		dialog.ViewModel.SelectedCategory.Value = dialog.ViewModel.TagCategories.FirstOrDefault(x => x.Model == context.SelectedCategory);
+		var selectedCategory = dialog.ViewModel.TagCategories.FirstOrDefault(x => x.Model == context.SelectedCategory);
+		dialog.ViewModel.SelectedCategory.Value = selectedCategory;
 
 		var result = await dialog.ShowAsync();
 		if (result == ContentDialogResult.Primary && dialog.ViewModel.CreatedTag.Value is { }) {

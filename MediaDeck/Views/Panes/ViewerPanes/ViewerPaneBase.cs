@@ -1,10 +1,7 @@
-using System.IO;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.DependencyInjection;
-using MediaDeck.Common.Utilities;
 using MediaDeck.Composition.Interfaces;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.ViewModels;
-using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Core.Stores.Config;
 using MediaDeck.Services;
 using MediaDeck.ViewModels.Panes.ViewerPanes;
@@ -29,8 +26,7 @@ public abstract class ViewerPaneBase<T> : UserControlBase<T> where T : ViewerPan
 	private const string AddToAlbumRootTag = "AddToAlbumRoot";
 	private const string AddToAlbumItemTagPrefix = "AddToAlbum:";
 	private const string AddToAlbumCreateTag = "AddToAlbum:Create";
-	private readonly WindowService _windowService;
-	private readonly WindowManager _windowManager;
+	private readonly IWindowService _windowService;
 	private readonly IStringProvider _stringProvider;
 	private IMediaItemViewModel? _contextMenuTargetFile;
 
@@ -38,8 +34,7 @@ public abstract class ViewerPaneBase<T> : UserControlBase<T> where T : ViewerPan
 	/// <see cref="ViewerPaneBase{T}"/> クラスの新しいインスタンスを初期化します。
 	/// </summary>
 	protected ViewerPaneBase() {
-		this._windowService = Ioc.Default.GetRequiredService<WindowService>();
-		this._windowManager = Ioc.Default.GetRequiredService<WindowManager>();
+		this._windowService = Ioc.Default.GetRequiredService<IWindowService>();
 		this._stringProvider = Ioc.Default.GetRequiredService<IStringProvider>();
 	}
 
@@ -52,10 +47,10 @@ public abstract class ViewerPaneBase<T> : UserControlBase<T> where T : ViewerPan
 		if (this.ViewModel is not { } vm) {
 			return;
 		}
-		if (sender is ListBox listBox) {
+		if (sender is ListViewBase listViewBase) {
+			vm.MediaContentLibraryViewModel.SelectedFiles.Value = listViewBase.SelectedItems.Select(x => x as IMediaItemViewModel).Where(x => x is { }).ToArray()!;
+		} else if (sender is ListBox listBox) {
 			vm.MediaContentLibraryViewModel.SelectedFiles.Value = listBox.SelectedItems.Select(x => x as IMediaItemViewModel).Where(x => x is { }).ToArray()!;
-		} else if (sender is GridView gridView) {
-			vm.MediaContentLibraryViewModel.SelectedFiles.Value = gridView.SelectedItems.Select(x => x as IMediaItemViewModel).Where(x => x is { }).ToArray()!;
 		}
 	}
 
@@ -130,7 +125,7 @@ public abstract class ViewerPaneBase<T> : UserControlBase<T> where T : ViewerPan
 		if (tag is { } t && t.StartsWith(AddToAlbumItemTagPrefix, StringComparison.Ordinal) && t != AddToAlbumCreateTag) {
 			var albumPath = t[AddToAlbumItemTagPrefix.Length..];
 			if (!string.IsNullOrWhiteSpace(albumPath)) {
-				await this.ViewModel.MediaContentLibraryViewModel.AddToAlbumAsync(albumPath, targetFiles);
+				await this.ViewModel.AddToAlbumAsync(albumPath, targetFiles);
 			}
 			return;
 		}
@@ -138,23 +133,13 @@ public abstract class ViewerPaneBase<T> : UserControlBase<T> where T : ViewerPan
 		switch (tag) {
 			case "RecreateThumbnail":
 				if (targetFiles.Length > 1) {
-					var bulkWindow = Ioc.Default.GetRequiredService<BulkThumbnailRegenerationWindow>();
-					bulkWindow.ViewModel.Initialize(targetFiles);
-					var parent = this._windowManager.GetWindowFromElement(this);
-					if (parent == null) {
-						// TODO: notify
-						return;
-					}
-					this._windowService.ActivateCenteredOnMainWindow(bulkWindow, parent);
+					this._windowService.ActivateCentered<BulkThumbnailRegenerationWindow>(this, bulkWindow => {
+						bulkWindow.ViewModel.Initialize(targetFiles);
+					});
 				} else {
-					var window = Ioc.Default.GetRequiredService<ThumbnailPickerWindow>();
-					window.ViewModel.FileViewModel.Value = fvm;
-					var parent = this._windowManager.GetWindowFromElement(this);
-					if (parent == null) {
-						// TODO: notify
-						return;
-					}
-					this._windowService.ActivateCenteredOnMainWindow(window, parent);
+					this._windowService.ActivateCentered<ThumbnailPickerWindow>(this, window => {
+						window.ViewModel.FileViewModel.Value = fvm;
+					});
 				}
 				break;
 			case "RemoveFile": {
@@ -176,18 +161,15 @@ public abstract class ViewerPaneBase<T> : UserControlBase<T> where T : ViewerPan
 
 					var result = await dialog.ShowAsync();
 					if (result == ContentDialogResult.Primary) {
-						await this.ViewModel.RemoveFilesAsync(targetFiles);
-						this.ViewModel.SearchConditionManagerViewModel.Reload();
+						await this.ViewModel.DeleteFilesAndReloadAsync(targetFiles);
 					}
 					break;
 				}
 			case "UpdateMetadata":
-				this.ViewModel.MediaContentLibraryViewModel.UpdateMetadata(targetFiles);
+				this.ViewModel.UpdateMetadata(targetFiles);
 				break;
 			case "OpenFolder":
-				if (!string.IsNullOrEmpty(fvm.FilePath) && (File.Exists(fvm.FilePath) || Directory.Exists(fvm.FilePath))) {
-					ShellUtility.ShowInExplorer(fvm.FilePath);
-				}
+				this.ViewModel.ShowInExplorer(fvm);
 				break;
 		}
 	}
@@ -216,8 +198,7 @@ public abstract class ViewerPaneBase<T> : UserControlBase<T> where T : ViewerPan
 			menuFlyout.Items.Remove(sepToRemove);
 		}
 
-		var configModel = Ioc.Default.GetRequiredService<ExecutionConfigModel>();
-		var programs = configModel.GetPrograms(fvm.MediaType);
+		var programs = this.ViewModel.GetExternalPrograms(fvm.MediaType);
 
 		if (programs.Count > 0) {
 			int index = 0;
@@ -232,9 +213,7 @@ public abstract class ViewerPaneBase<T> : UserControlBase<T> where T : ViewerPan
 				item.Click += async (s, args) => {
 					var targetFiles = this.ViewModel.MediaContentLibraryViewModel.SelectedFiles.Value;
 					var filesToExecute = targetFiles is { Length: > 0 } && targetFiles.Contains(fvm) ? targetFiles : [fvm];
-					foreach (var file in filesToExecute) {
-						await file.ExecuteFileAsync(program);
-					}
+					await this.ViewModel.ExecuteFilesAsync(program, filesToExecute);
 				};
 				menuFlyout.Items.Insert(index++, item);
 			}
@@ -248,7 +227,7 @@ public abstract class ViewerPaneBase<T> : UserControlBase<T> where T : ViewerPan
 		}
 
 		addRoot.Items.Clear();
-		var paths = await this.ViewModel.MediaContentLibraryViewModel.GetRecentAlbumPathsAsync(12);
+		var paths = await this.ViewModel.GetRecentAlbumPathsAsync(12);
 		foreach (var path in paths) {
 			var item = new MenuFlyoutItem {
 				Text = path,
@@ -279,7 +258,7 @@ public abstract class ViewerPaneBase<T> : UserControlBase<T> where T : ViewerPan
 		if (result != ContentDialogResult.Primary || string.IsNullOrWhiteSpace(dialog.FullAlbumPath)) {
 			return;
 		}
-		await this.ViewModel.MediaContentLibraryViewModel.AddToAlbumAsync(dialog.FullAlbumPath, targetFiles);
+		await this.ViewModel.AddToAlbumAsync(dialog.FullAlbumPath, targetFiles);
 	}
 
 	/// <summary>
@@ -293,14 +272,7 @@ public abstract class ViewerPaneBase<T> : UserControlBase<T> where T : ViewerPan
 			return;
 		}
 		var delta = e.GetCurrentPoint(sender as UIElement).Properties.MouseWheelDelta;
-		if (this.ViewModel != null) {
-			const int step = 20;
-			this.ViewModel.ItemSize.Value = delta switch {
-				> 0 => Math.Min(500, this.ViewModel.ItemSize.Value + step),
-				< 0 => Math.Max(20, this.ViewModel.ItemSize.Value - step),
-				_ => this.ViewModel.ItemSize.Value
-			};
-		}
+		this.ViewModel?.AdjustItemSize(delta);
 		e.Handled = true;
 	}
 }

@@ -1,9 +1,6 @@
-using System.Threading.Tasks;
-
 using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.WinUI.Controls;
 
-using MediaDeck.Core.Models.Files.SearchConditions;
 using MediaDeck.ViewModels.Panes.ViewerPanes;
 using MediaDeck.Views.Dialogs;
 
@@ -11,9 +8,13 @@ using Microsoft.UI.Xaml.Controls;
 
 namespace MediaDeck.Views.Panes.ViewerPanes;
 
+/// <summary>
+/// 検索条件マネージャの View 実装。
+/// </summary>
 public sealed partial class SearchConditionManagerView {
-	private const string PropPrefix = "prop.";
-
+	/// <summary>
+	/// <see cref="SearchConditionManagerView"/> クラスの新しいインスタンスを初期化します。
+	/// </summary>
 	public SearchConditionManagerView() {
 		this.InitializeComponent();
 	}
@@ -21,7 +22,7 @@ public sealed partial class SearchConditionManagerView {
 	private void TokenizingTextBox_TokenItemAdding(TokenizingTextBox sender, TokenItemAddingEventArgs args) {
 		args.Cancel = true;
 		if (!string.IsNullOrWhiteSpace(args.TokenText)) {
-			this.ViewModel?.SearchConditionNotificationDispatcher.AddRequest.OnNext(new WordSearchCondition { Word = args.TokenText });
+			this.ViewModel?.AddWordCondition(args.TokenText);
 		}
 	}
 
@@ -30,7 +31,7 @@ public sealed partial class SearchConditionManagerView {
 		if (args.Item is not SearchConditionViewModel condition) {
 			return;
 		}
-		this.ViewModel?.SearchConditionNotificationDispatcher.RemoveRequest.OnNext(condition.SearchCondition);
+		this.ViewModel?.RemoveCondition(condition);
 	}
 
 	private void TokenizingTextBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args) {
@@ -43,42 +44,19 @@ public sealed partial class SearchConditionManagerView {
 	private async void TokenizingTextBox_TokenItemAdded(TokenizingTextBox sender, object args) {
 		// サジェストから prop. スタブが選択された場合は、未確定のスタブを除去してから
 		// 比較ダイアログを表示し、確定された PropertySearchCondition を追加する。
-		if (args is SearchConditionViewModel { SearchCondition: PropertySearchCondition { IsConfigured: false } stub }) {
-			var descriptor = MediaItemPropertyCatalog.Find(stub.PropertyName);
-			if (descriptor != null) {
-				var condition = await this.ShowPropertyDialogAndAddAsync(descriptor);
-				if (condition == null) {
-					this.ViewModel?.SearchConditionNotificationDispatcher.RemoveRequest.OnNext(stub);
-					return;
-				}
-				this.ViewModel?.SearchConditionNotificationDispatcher.UpdateRequest.OnNext(x => {
-					if (x.IndexOf(stub) is int i && i >= 0) {
-						x.RemoveAt(i);
-						x.Insert(i, condition);
-					}
-				});
-
+		if (this.ViewModel?.TryGetUnconfiguredPropertyDescriptor(args, out var stub, out var descriptor) == true) {
+			var dialog = Ioc.Default.GetRequiredService<PropertyComparisonDialog>();
+			dialog.XamlRoot = this.XamlRoot;
+			dialog.Initialize(descriptor);
+			var result = await dialog.ShowAsync();
+			if (result != ContentDialogResult.Primary) {
+				this.ViewModel?.RemoveCondition(stub);
+				return;
 			}
+			this.ViewModel?.ConfigurePropertyCondition(stub, descriptor.Name, dialog.SelectedOperator, dialog.SelectedValue);
 			return;
 		}
-		this.ViewModel?.SearchConditionNotificationDispatcher.SearchConditionChanged.OnNext(R3.Unit.Default);
-	}
-
-	private async Task<PropertySearchCondition?> ShowPropertyDialogAndAddAsync(MediaItemPropertyDescriptor descriptor) {
-		var dialog = Ioc.Default.GetRequiredService<PropertyComparisonDialog>();
-		dialog.XamlRoot = this.XamlRoot;
-		dialog.Initialize(descriptor);
-		var result = await dialog.ShowAsync();
-		if (result != ContentDialogResult.Primary) {
-			return null;
-		}
-		var condition = new PropertySearchCondition {
-			PropertyName = descriptor.Name,
-			Operator = dialog.ViewModel.SelectedOperator.Value!.Value,
-			Value = dialog.ViewModel.GetRawValueString(),
-			IsConfigured = true,
-		};
-		return condition;
+		this.ViewModel?.NotifySearchConditionChanged();
 	}
 
 	private void TokenizingTextBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args) {
@@ -86,4 +64,7 @@ public sealed partial class SearchConditionManagerView {
 	}
 }
 
+/// <summary>
+/// 検索条件マネージャ View の基底コントロール。
+/// </summary>
 public abstract class SearchConditionManagerViewUserControl : UserControlBase<SearchConditionManagerViewModel>;

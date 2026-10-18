@@ -1,3 +1,4 @@
+using System.Globalization;
 using MediaDeck.Common.Base;
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces;
@@ -6,10 +7,14 @@ using MediaDeck.Core.Primitives;
 
 namespace MediaDeck.ViewModels.Dialogs;
 
+/// <summary>
+/// プロパティ検索条件（比較演算子と値）を入力・設定するためのダイアログ ViewModel。
+/// </summary>
 [Inject(InjectServiceLifetime.Transient)]
 public class PropertyComparisonDialogViewModel : ViewModelBase {
 	private readonly IStringProvider _stringProvider;
 
+	/// <summary>対象プロパティの記述情報を取得します。</summary>
 	public MediaItemPropertyDescriptor Descriptor {
 		get {
 			return this._descriptor ?? throw new InvalidOperationException("ViewModel was not initialized.");
@@ -18,26 +23,36 @@ public class PropertyComparisonDialogViewModel : ViewModelBase {
 
 	private MediaItemPropertyDescriptor? _descriptor;
 
+	/// <summary>プロパティ名の表示テキストを取得します。</summary>
 	public string PropertyNameText {
 		get;
 		private set;
 	} = string.Empty;
 
+	/// <summary>選択可能な比較演算子の一覧を取得します。</summary>
 	public IReadOnlyList<DisplayObject<SearchTypeComparison>> OperatorItems {
 		get;
 		private set;
 	} = [];
 
+	/// <summary>現在選択されている比較演算子を取得します。</summary>
 	public ReactiveProperty<DisplayObject<SearchTypeComparison>?> SelectedOperator {
 		get;
 	}
 
-	// 型ごとの入力値バインディング用プロパティ
+	/// <summary>文字列入力値を取得します。</summary>
 	public ReactiveProperty<string> StringValue { get; } = new("");
+
+	/// <summary>数値入力値を取得します。</summary>
 	public ReactiveProperty<double> NumberValue { get; } = new(0.0);
+
+	/// <summary>日時入力値を取得します。</summary>
 	public ReactiveProperty<DateTimeOffset?> DateTimeValue { get; } = new(null);
+
+	/// <summary>列挙値入力値を取得します。</summary>
 	public ReactiveProperty<object?> EnumValue { get; } = new(null);
 
+	/// <summary>列挙型プロパティの場合の選択肢一覧を取得します。</summary>
 	public IReadOnlyList<DisplayObject<object>> EnumItems {
 		get;
 		private set;
@@ -56,6 +71,10 @@ public class PropertyComparisonDialogViewModel : ViewModelBase {
 		this.EnumValue.AddTo(this.CompositeDisposable);
 	}
 
+	/// <summary>
+	/// 対象プロパティの記述情報を受け取って ViewModel を初期化します。
+	/// </summary>
+	/// <param name="descriptor">プロパティ記述情報。</param>
 	public void Initialize(MediaItemPropertyDescriptor descriptor) {
 		this._descriptor = descriptor;
 		this.PropertyNameText = $"prop.{descriptor.Name}  ({descriptor.ValueType.Name})";
@@ -77,6 +96,48 @@ public class PropertyComparisonDialogViewModel : ViewModelBase {
 		}
 	}
 
+	/// <summary>確定後の比較演算子を取得します。</summary>
+	public SearchTypeComparison ConfirmedOperator {
+		get;
+		private set;
+	}
+
+	/// <summary>確定後の入力値を取得します。</summary>
+	public string ConfirmedValue {
+		get;
+		private set;
+	} = string.Empty;
+
+	/// <summary>
+	/// 入力値の検証を行い、確定処理を試みます。
+	/// </summary>
+	/// <param name="errorMessage">検証に失敗した場合のエラーメッセージ。</param>
+	/// <returns>入力値が有効で確定できた場合は <c>true</c>、それ以外は <c>false</c>。</returns>
+	public bool TryConfirm(out string? errorMessage) {
+		if (this.SelectedOperator.Value == null) {
+			errorMessage = this._stringProvider.GetString("PropertyComparisonDialog_Error_SelectOperator");
+			return false;
+		}
+		var raw = this.GetRawValueString();
+		if (string.IsNullOrWhiteSpace(raw)) {
+			errorMessage = this._stringProvider.GetString("PropertyComparisonDialog_Error_EnterValue");
+			return false;
+		}
+		// 入力値が型として解釈可能か Build で検証する
+		if (this.Descriptor.Build(this.SelectedOperator.Value.Value, raw) is null) {
+			errorMessage = this._stringProvider.GetString("PropertyComparisonDialog_Error_CannotParseValue", this.Descriptor.ValueType.Name);
+			return false;
+		}
+		this.ConfirmedOperator = this.SelectedOperator.Value.Value;
+		this.ConfirmedValue = raw;
+		errorMessage = null;
+		return true;
+	}
+
+	/// <summary>
+	/// 入力コントロールに応じた生の文字列値を取得します。
+	/// </summary>
+	/// <returns>入力値の文字列表現。</returns>
 	public string GetRawValueString() {
 		if (this.Descriptor.ValueType.IsEnum) {
 			return this.EnumValue.Value?.ToString() ?? string.Empty;
@@ -85,7 +146,9 @@ public class PropertyComparisonDialogViewModel : ViewModelBase {
 			return this.DateTimeValue.Value?.ToString("yyyy-MM-dd") ?? string.Empty;
 		}
 		if (IsNumericType(this.Descriptor.ValueType)) {
-			return this.NumberValue.Value.ToString();
+			return double.IsNaN(this.NumberValue.Value)
+				? string.Empty
+				: this.NumberValue.Value.ToString(CultureInfo.InvariantCulture);
 		}
 		return this.StringValue.Value ?? string.Empty;
 	}

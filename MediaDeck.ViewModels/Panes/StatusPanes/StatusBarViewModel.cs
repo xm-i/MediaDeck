@@ -84,11 +84,11 @@ public class StatusBarViewModel : ViewModelBase {
 			.AddTo(this.CompositeDisposable);
 
 		this.ZoomInCommand = new ReactiveCommand<Unit>(_ => {
-			this.ItemSize.Value = Math.Min(500, this.ItemSize.Value + 10);
+			this.ItemSize.Value = Math.Min(ViewerPaneViewModelBase.MaxItemSize, this.ItemSize.Value + 10);
 		}).AddTo(this.CompositeDisposable);
 
 		this.ZoomOutCommand = new ReactiveCommand<Unit>(_ => {
-			this.ItemSize.Value = Math.Max(50, this.ItemSize.Value - 10);
+			this.ItemSize.Value = Math.Max(ViewerPaneViewModelBase.MinItemSize, this.ItemSize.Value - 10);
 		}).AddTo(this.CompositeDisposable);
 
 		this.ShowOverlay = tabState.ViewerState.ShowOverlay

@@ -1,21 +1,36 @@
 using System.Collections.ObjectModel;
 using MediaDeck.Composition.Interfaces;
+using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Core.Models.Files;
 
 namespace MediaDeck.ViewModels.Panes.ViewerPanes;
 
+/// <summary>
+/// メディアアイテムをリスト形式（詳細表形式）で表示するビューの ViewModel。
+/// </summary>
 [Inject(InjectServiceLifetime.Transient)]
 public class ListViewerViewModel : ViewerPaneViewModelBase {
 	/// <summary>
 	/// 列ID定数。 View 側の DataTemplate キーと対応させる。
 	/// </summary>
 	public static class ColumnIds {
+		/// <summary>サムネイル列 ID。</summary>
 		public const string Thumbnail = "Thumbnail";
+
+		/// <summary>ファイル名列 ID。</summary>
 		public const string FileName = "FileName";
+
+		/// <summary>解像度列 ID。</summary>
 		public const string Resolution = "Resolution";
+
+		/// <summary>ファイルサイズ列 ID。</summary>
 		public const string FileSize = "FileSize";
+
+		/// <summary>作成日時列 ID。</summary>
 		public const string CreationTime = "CreationTime";
+
+		/// <summary>評価列 ID。</summary>
 		public const string Rate = "Rate";
 	}
 
@@ -27,13 +42,15 @@ public class ListViewerViewModel : ViewerPaneViewModelBase {
 	/// <param name="searchConditionManagerViewModel">検索条件管理ViewModel</param>
 	/// <param name="tabState">タブ状態モデル</param>
 	/// <param name="stringProvider">文字列プロバイダー</param>
+	/// <param name="executionConfig">外部実行設定モデル</param>
 	public ListViewerViewModel(
 		FilesManager filesManager,
 		MediaContentLibraryViewModel mediaContentLibraryViewModel,
 		SearchConditionManagerViewModel searchConditionManagerViewModel,
 		TabStateModel tabState,
-		IStringProvider stringProvider)
-		: base(ViewerType.List, "List", "\uE8FD", filesManager, mediaContentLibraryViewModel, searchConditionManagerViewModel, tabState) {
+		IStringProvider stringProvider,
+		ExecutionConfigModel executionConfig)
+		: base(ViewerType.List, "List", "\uE8FD", filesManager, mediaContentLibraryViewModel, searchConditionManagerViewModel, tabState, executionConfig) {
 		var viewerState = tabState.ViewerState;
 
 		this.ThumbnailColumn = new ListViewerColumn(ColumnIds.Thumbnail, "", 60, minWidth: 20, canHide: false);
@@ -88,26 +105,32 @@ public class ListViewerViewModel : ViewerPaneViewModelBase {
 			.AddTo(this.CompositeDisposable);
 	}
 
+	/// <summary>サムネイル列を取得します。</summary>
 	public ListViewerColumn ThumbnailColumn {
 		get;
 	}
 
+	/// <summary>ファイル名列を取得します。</summary>
 	public ListViewerColumn FileNameColumn {
 		get;
 	}
 
+	/// <summary>解像度列を取得します。</summary>
 	public ListViewerColumn ResolutionColumn {
 		get;
 	}
 
+	/// <summary>ファイルサイズ列を取得します。</summary>
 	public ListViewerColumn FileSizeColumn {
 		get;
 	}
 
+	/// <summary>作成日時列を取得します。</summary>
 	public ListViewerColumn CreationTimeColumn {
 		get;
 	}
 
+	/// <summary>評価列を取得します。</summary>
 	public ListViewerColumn RateColumn {
 		get;
 	}
