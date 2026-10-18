@@ -81,7 +81,7 @@ public sealed partial class ListViewer {
 	/// ヘッダー右クリックで列表示ON/OFFメニューを表示する。
 	/// </summary>
 	private void HeaderGrid_RightTapped(object sender, RightTappedRoutedEventArgs e) {
-		if (this.ViewModel?.ListViewerViewModel is not { } listVm) {
+		if (this.ViewModel is not { } listVm) {
 			return;
 		}
 		if (sender is not FrameworkElement element) {

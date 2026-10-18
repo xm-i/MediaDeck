@@ -18,11 +18,11 @@ public sealed partial class AlbumRepository {
 		if (this.ViewModel is not { } vm) {
 			return;
 		}
-		vm.AlbumRepositoryViewModel.SetRepositoryConditionCommand.Execute(Unit.Default);
+		vm.SetRepositoryConditionCommand.Execute(Unit.Default);
 	}
 }
 
 /// <summary>
 /// AlbumRepository の基底クラス。UserControlBase を介して ViewModel プロパティを提供します。
 /// </summary>
-public abstract class AlbumRepositoryUserControl : UserControlBase<RepositorySelectorViewModel>;
+public abstract class AlbumRepositoryUserControl : UserControlBase<AlbumRepositoryViewModel>;

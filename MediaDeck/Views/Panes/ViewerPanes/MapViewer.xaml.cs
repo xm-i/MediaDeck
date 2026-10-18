@@ -23,13 +23,12 @@ public sealed partial class MapViewer {
 				if (this.Map is not { } map) {
 					return;
 				}
-				if (this.ViewModel is not { }) {
+				if (this.ViewModel is not { } mapVm) {
 					return;
 				}
 				var leftTop = map.ViewToLocation(new(0, 0));
 				var rightBottom = map.ViewToLocation(new(map.ActualWidth, map.ActualHeight));
 
-				var mapVm = this.ViewModel.MapViewerViewModel;
 				mapVm.BoundsNorthWest.Value = new MediaDeckLocation(leftTop.Latitude, leftTop.Longitude);
 				mapVm.BoundsSouthEast.Value = new MediaDeckLocation(rightBottom.Latitude, rightBottom.Longitude);
 
@@ -55,8 +54,8 @@ public sealed partial class MapViewer {
 
 		// 初期状態で全アイテムが入るように調整
 		// Files が空でない場合は即座に、空の場合は最初の更新を待つ
-		if (vm.MapViewerViewModel.MediaContentLibraryViewModel.Files.Count > 0) {
-			vm.MapViewerViewModel.FitToItems(this.Map.ActualWidth, this.Map.ActualHeight);
+		if (vm.MediaContentLibraryViewModel.Files.Count > 0) {
+			vm.FitToItems(this.Map.ActualWidth, this.Map.ActualHeight);
 		}
 
 		this.SubscribeFiles(vm);
@@ -77,12 +76,12 @@ public sealed partial class MapViewer {
 	/// </summary>
 	/// <param name="oldViewModel">古いViewModel。</param>
 	/// <param name="newViewModel">新しいViewModel。</param>
-	protected override void OnViewModelChanged(ViewerSelectorViewModel? oldViewModel, ViewerSelectorViewModel? newViewModel) {
+	protected override void OnViewModelChanged(MapViewerViewModel? oldViewModel, MapViewerViewModel? newViewModel) {
 		base.OnViewModelChanged(oldViewModel, newViewModel);
 		if (this.Map.IsLoaded) {
 			this.SubscribeFiles(newViewModel);
-			if (newViewModel?.MapViewerViewModel.MediaContentLibraryViewModel.Files.Count > 0) {
-				newViewModel.MapViewerViewModel.FitToItems(this.Map.ActualWidth, this.Map.ActualHeight);
+			if (newViewModel?.MediaContentLibraryViewModel.Files.Count > 0) {
+				newViewModel.FitToItems(this.Map.ActualWidth, this.Map.ActualHeight);
 			}
 		}
 	}
@@ -91,8 +90,8 @@ public sealed partial class MapViewer {
 	/// ファイルコレクションの変更を購読します。古い購読は自動的に破棄されます。
 	/// </summary>
 	/// <param name="vm">ViewModel。</param>
-	private void SubscribeFiles(ViewerSelectorViewModel? vm) {
-		if (vm?.MapViewerViewModel?.MediaContentLibraryViewModel?.Files is { } files) {
+	private void SubscribeFiles(MapViewerViewModel? vm) {
+		if (vm?.MediaContentLibraryViewModel?.Files is { } files) {
 			this._filesSubscription.Disposable = Observable.FromEvent<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>(
 				h => (s, e) => h(e),
 				h => files.CollectionChanged += h,
@@ -117,7 +116,7 @@ public sealed partial class MapViewer {
 			return;
 		}
 		var pinVm = (MapPinViewModel)((FrameworkElement)sender).DataContext;
-		vm.MapViewerViewModel.SelectPin(pinVm);
+		vm.SelectPin(pinVm);
 	}
 
 	/// <summary>

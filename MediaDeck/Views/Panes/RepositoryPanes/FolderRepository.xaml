@@ -15,10 +15,10 @@
 		</Grid.RowDefinitions>
 		<CheckBox Grid.Row="0"
 			x:Uid="FolderRepository_IncludeSubDirectories"
-			IsChecked="{x:Bind ViewModel.FolderRepositoryViewModel.IncludeSubDirectories.Value,Mode=TwoWay}" />
+			IsChecked="{x:Bind ViewModel.IncludeSubDirectories.Value,Mode=TwoWay}" />
 		<TreeView Grid.Row="1"
-			ItemsSource="{x:Bind ViewModel.FolderRepositoryViewModel.RootFolder.Value.ChildFolders, Mode=OneWay}"
-			SelectedItem="{x:Bind ViewModel.FolderRepositoryViewModel.SelectedFolder.Value,Mode=TwoWay}" >
+			ItemsSource="{x:Bind ViewModel.RootFolder.Value.ChildFolders, Mode=OneWay}"
+			SelectedItem="{x:Bind ViewModel.SelectedFolder.Value,Mode=TwoWay}" >
 			<TreeView.ItemTemplate>
 				<DataTemplate x:DataType="objects:FolderObject" >
 					<TreeViewItem AutomationProperties.Name="{x:Bind FolderName}"

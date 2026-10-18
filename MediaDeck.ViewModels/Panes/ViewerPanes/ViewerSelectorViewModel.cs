@@ -22,10 +22,10 @@ public class ViewerSelectorViewModel : ViewModelBase {
 			detailViewerViewModel,
 			mapViewerViewModel
 		];
-		this.WrapViewerViewModel = wrapViewerViewModel;
-		this.ListViewerViewModel = listViewerViewModel;
-		this.DetailViewerViewModel = detailViewerViewModel;
-		this.MapViewerViewModel = mapViewerViewModel;
+		this.WrapViewerViewModel = wrapViewerViewModel.AddTo(this.CompositeDisposable);
+		this.ListViewerViewModel = listViewerViewModel.AddTo(this.CompositeDisposable);
+		this.DetailViewerViewModel = detailViewerViewModel.AddTo(this.CompositeDisposable);
+		this.MapViewerViewModel = mapViewerViewModel.AddTo(this.CompositeDisposable);
 
 		this.SelectedViewerPane.Value = this.ViewerPaneViewModels.FirstOrDefault(x => x.ViewerType == tabState.ViewerState.ActiveViewer.Value) ?? wrapViewerViewModel;
 

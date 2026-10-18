@@ -47,7 +47,7 @@ public sealed partial class WrapViewer {
 	/// </summary>
 	/// <param name="oldViewModel">古いViewModel。</param>
 	/// <param name="newViewModel">新しいViewModel。</param>
-	protected override void OnViewModelChanged(ViewerSelectorViewModel? oldViewModel, ViewerSelectorViewModel? newViewModel) {
+	protected override void OnViewModelChanged(WrapViewerViewModel? oldViewModel, WrapViewerViewModel? newViewModel) {
 		base.OnViewModelChanged(oldViewModel, newViewModel);
 		if (this.IsLoaded) {
 			this.SubscribeViewModel(newViewModel);
@@ -58,7 +58,7 @@ public sealed partial class WrapViewer {
 	/// ViewModelのプロパティ変更を購読します。古い購読は自動的に破棄されます。
 	/// </summary>
 	/// <param name="viewModel">購読対象のViewModel。</param>
-	private void SubscribeViewModel(ViewerSelectorViewModel? viewModel) {
+	private void SubscribeViewModel(WrapViewerViewModel? viewModel) {
 		this._viewModelDisposable.Disposable = viewModel?.ItemSize
 			.Subscribe(_ => this.UpdateItemWidth());
 	}

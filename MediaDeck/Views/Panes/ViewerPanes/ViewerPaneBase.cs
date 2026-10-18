@@ -20,7 +20,12 @@ using Windows.UI.Core;
 
 namespace MediaDeck.Views.Panes.ViewerPanes;
 
-public class ViewerPaneBase : UserControlBase<ViewerSelectorViewModel> {
+/// <summary>
+/// 各種メディアビューアペインの基底クラス。
+/// 選択変更、ダブルタップ実行、コンテキストメニュー、Ctrl+ホイールによるズームなどの共通UI動作を提供します。
+/// </summary>
+/// <typeparam name="T">ビューアの ViewModel 型。</typeparam>
+public abstract class ViewerPaneBase<T> : UserControlBase<T> where T : ViewerPaneViewModelBase {
 	private const string AddToAlbumRootTag = "AddToAlbumRoot";
 	private const string AddToAlbumItemTagPrefix = "AddToAlbum:";
 	private const string AddToAlbumCreateTag = "AddToAlbum:Create";
@@ -29,12 +34,20 @@ public class ViewerPaneBase : UserControlBase<ViewerSelectorViewModel> {
 	private readonly IStringProvider _stringProvider;
 	private IMediaItemViewModel? _contextMenuTargetFile;
 
-	public ViewerPaneBase() {
+	/// <summary>
+	/// <see cref="ViewerPaneBase{T}"/> クラスの新しいインスタンスを初期化します。
+	/// </summary>
+	protected ViewerPaneBase() {
 		this._windowService = Ioc.Default.GetRequiredService<WindowService>();
 		this._windowManager = Ioc.Default.GetRequiredService<WindowManager>();
 		this._stringProvider = Ioc.Default.GetRequiredService<IStringProvider>();
 	}
 
+	/// <summary>
+	/// リストコントロールの選択項目変更ハンドラ。
+	/// </summary>
+	/// <param name="sender">イベント発生元。</param>
+	/// <param name="e">イベント引数。</param>
 	protected virtual void List_SelectionChanged(object sender, SelectionChangedEventArgs e) {
 		if (this.ViewModel is not { } vm) {
 			return;
@@ -46,6 +59,11 @@ public class ViewerPaneBase : UserControlBase<ViewerSelectorViewModel> {
 		}
 	}
 
+	/// <summary>
+	/// ファイルアイテムのダブルタップハンドラ。既定のプログラムまたは関連付けで実行します。
+	/// </summary>
+	/// <param name="sender">イベント発生元。</param>
+	/// <param name="e">イベント引数。</param>
 	protected async void File_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e) {
 		if (sender is not Grid grid) {
 			return;
@@ -56,6 +74,11 @@ public class ViewerPaneBase : UserControlBase<ViewerSelectorViewModel> {
 		await fileViewModel.ExecuteFileAsync();
 	}
 
+	/// <summary>
+	/// ファイルアイテムの右タップハンドラ。コンテキストメニューを表示します。
+	/// </summary>
+	/// <param name="sender">イベント発生元。</param>
+	/// <param name="e">イベント引数。</param>
 	protected void List_RightTapped(object sender, RightTappedRoutedEventArgs e) {
 		if (sender is not FrameworkElement parentControl) {
 			return;
@@ -78,7 +101,11 @@ public class ViewerPaneBase : UserControlBase<ViewerSelectorViewModel> {
 		menuFlyout.ShowAt(element, e.GetPosition(element));
 	}
 
-
+	/// <summary>
+	/// コンテキストメニュー項目のクリックハンドラ。
+	/// </summary>
+	/// <param name="sender">イベント発生元。</param>
+	/// <param name="e">イベント引数。</param>
 	protected async void MenuFlyoutItem_Click(object sender, RoutedEventArgs e) {
 		if (this.ViewModel is null) {
 			return;
@@ -149,7 +176,7 @@ public class ViewerPaneBase : UserControlBase<ViewerSelectorViewModel> {
 
 					var result = await dialog.ShowAsync();
 					if (result == ContentDialogResult.Primary) {
-						await this.ViewModel.SelectedViewerPane.Value.RemoveFilesAsync(targetFiles);
+						await this.ViewModel.RemoveFilesAsync(targetFiles);
 						this.ViewModel.SearchConditionManagerViewModel.Reload();
 					}
 					break;
@@ -165,6 +192,11 @@ public class ViewerPaneBase : UserControlBase<ViewerSelectorViewModel> {
 		}
 	}
 
+	/// <summary>
+	/// ファイルコンテキストメニュー展開前の処理。動的な外部プログラム項目などを構築します。
+	/// </summary>
+	/// <param name="sender">イベント発生元。</param>
+	/// <param name="e">イベント引数。</param>
 	protected async void FileContextMenu_Opening(object sender, object e) {
 		if (sender is not MenuFlyout menuFlyout || this.ViewModel is null) {
 			return;
@@ -250,6 +282,11 @@ public class ViewerPaneBase : UserControlBase<ViewerSelectorViewModel> {
 		await this.ViewModel.MediaContentLibraryViewModel.AddToAlbumAsync(dialog.FullAlbumPath, targetFiles);
 	}
 
+	/// <summary>
+	/// Ctrl + マウスホイールによるアイテムサイズ変更ハンドラ。
+	/// </summary>
+	/// <param name="sender">イベント発生元。</param>
+	/// <param name="e">イベント引数。</param>
 	protected void HandleListPointerWheelChanged(object sender, PointerRoutedEventArgs e) {
 		var ctrlKeyState = InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.Control);
 		if (!ctrlKeyState.HasFlag(CoreVirtualKeyStates.Down)) {
@@ -267,3 +304,23 @@ public class ViewerPaneBase : UserControlBase<ViewerSelectorViewModel> {
 		e.Handled = true;
 	}
 }
+
+/// <summary>
+/// WrapViewer の基底クラス。UserControlBase を介して WrapViewerViewModel を提供します。
+/// </summary>
+public abstract class WrapViewerUserControl : ViewerPaneBase<WrapViewerViewModel>;
+
+/// <summary>
+/// ListViewer の基底クラス。UserControlBase を介して ListViewerViewModel を提供します。
+/// </summary>
+public abstract class ListViewerUserControl : ViewerPaneBase<ListViewerViewModel>;
+
+/// <summary>
+/// DetailViewer の基底クラス。UserControlBase を介して DetailViewerViewModel を提供します。
+/// </summary>
+public abstract class DetailViewerUserControl : ViewerPaneBase<DetailViewerViewModel>;
+
+/// <summary>
+/// MapViewer の基底クラス。UserControlBase を介して MapViewerViewModel を提供します。
+/// </summary>
+public abstract class MapViewerUserControl : ViewerPaneBase<MapViewerViewModel>;

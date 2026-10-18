@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<local:ViewerPaneBase x:Class="MediaDeck.Views.Panes.ViewerPanes.ListViewer"
+<local:ListViewerUserControl x:Class="MediaDeck.Views.Panes.ViewerPanes.ListViewer"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:local="using:MediaDeck.Views.Panes.ViewerPanes"
@@ -20,32 +20,32 @@
 				<Grid Height="32" RightTapped="HeaderGrid_RightTapped" >
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="{Binding ItemSize.Value, Mode=OneWay, Converter={StaticResource DoubleToGridLengthConverter}}" MinWidth="{Binding ItemSize.Value, Mode=OneWay}" />
-						<ColumnDefinition Width="{Binding ListViewerViewModel.FileNameColumn.EffectiveWidth.Value, Mode=OneWay, Converter={StaticResource DoubleToGridLengthConverter}}" MinWidth="{Binding ListViewerViewModel.FileNameColumn.EffectiveMinWidth.Value, Mode=OneWay}" />
-						<ColumnDefinition Width="{Binding ListViewerViewModel.ResolutionColumn.EffectiveWidth.Value, Mode=OneWay, Converter={StaticResource DoubleToGridLengthConverter}}" MinWidth="{Binding ListViewerViewModel.ResolutionColumn.EffectiveMinWidth.Value, Mode=OneWay}" />
-						<ColumnDefinition Width="{Binding ListViewerViewModel.FileSizeColumn.EffectiveWidth.Value, Mode=OneWay, Converter={StaticResource DoubleToGridLengthConverter}}" MinWidth="{Binding ListViewerViewModel.FileSizeColumn.EffectiveMinWidth.Value, Mode=OneWay}" />
-						<ColumnDefinition Width="{Binding ListViewerViewModel.CreationTimeColumn.EffectiveWidth.Value, Mode=OneWay, Converter={StaticResource DoubleToGridLengthConverter}}" MinWidth="{Binding ListViewerViewModel.CreationTimeColumn.EffectiveMinWidth.Value, Mode=OneWay}" />
-						<ColumnDefinition Width="{Binding ListViewerViewModel.RateColumn.EffectiveWidth.Value, Mode=OneWay, Converter={StaticResource DoubleToGridLengthConverter}}" MinWidth="{Binding ListViewerViewModel.RateColumn.EffectiveMinWidth.Value, Mode=OneWay}" />
+						<ColumnDefinition Width="{Binding FileNameColumn.EffectiveWidth.Value, Mode=OneWay, Converter={StaticResource DoubleToGridLengthConverter}}" MinWidth="{Binding FileNameColumn.EffectiveMinWidth.Value, Mode=OneWay}" />
+						<ColumnDefinition Width="{Binding ResolutionColumn.EffectiveWidth.Value, Mode=OneWay, Converter={StaticResource DoubleToGridLengthConverter}}" MinWidth="{Binding ResolutionColumn.EffectiveMinWidth.Value, Mode=OneWay}" />
+						<ColumnDefinition Width="{Binding FileSizeColumn.EffectiveWidth.Value, Mode=OneWay, Converter={StaticResource DoubleToGridLengthConverter}}" MinWidth="{Binding FileSizeColumn.EffectiveMinWidth.Value, Mode=OneWay}" />
+						<ColumnDefinition Width="{Binding CreationTimeColumn.EffectiveWidth.Value, Mode=OneWay, Converter={StaticResource DoubleToGridLengthConverter}}" MinWidth="{Binding CreationTimeColumn.EffectiveMinWidth.Value, Mode=OneWay}" />
+						<ColumnDefinition Width="{Binding RateColumn.EffectiveWidth.Value, Mode=OneWay, Converter={StaticResource DoubleToGridLengthConverter}}" MinWidth="{Binding RateColumn.EffectiveMinWidth.Value, Mode=OneWay}" />
 					</Grid.ColumnDefinitions>
 					<Grid Grid.Column="0" />
-					<Grid Grid.Column="1" Visibility="{Binding ListViewerViewModel.FileNameColumn.IsVisible.Value, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" >
+					<Grid Grid.Column="1" Visibility="{Binding FileNameColumn.IsVisible.Value, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" >
 						<TextBlock x:Uid="Viewer_ColumnFileName" FontWeight="SemiBold" VerticalAlignment="Center" Margin="8,0,8,0" TextTrimming="CharacterEllipsis" />
-						<primitives:Thumb Tag="{Binding ListViewerViewModel.FileNameColumn, Mode=OneWay}" Width="6" HorizontalAlignment="Right" DragDelta="HeaderResizer_DragDelta" PointerEntered="HeaderResizer_PointerEntered" PointerExited="HeaderResizer_PointerExited" />
+						<primitives:Thumb Tag="{Binding FileNameColumn, Mode=OneWay}" Width="6" HorizontalAlignment="Right" DragDelta="HeaderResizer_DragDelta" PointerEntered="HeaderResizer_PointerEntered" PointerExited="HeaderResizer_PointerExited" />
 					</Grid>
-					<Grid Grid.Column="2" Visibility="{Binding ListViewerViewModel.ResolutionColumn.IsVisible.Value, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" >
+					<Grid Grid.Column="2" Visibility="{Binding ResolutionColumn.IsVisible.Value, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" >
 						<TextBlock x:Uid="Viewer_ColumnResolution" FontWeight="SemiBold" VerticalAlignment="Center" Margin="8,0,8,0" TextTrimming="CharacterEllipsis" />
-						<primitives:Thumb Tag="{Binding ListViewerViewModel.ResolutionColumn, Mode=OneWay}" Width="6" HorizontalAlignment="Right" DragDelta="HeaderResizer_DragDelta" PointerEntered="HeaderResizer_PointerEntered" PointerExited="HeaderResizer_PointerExited" />
+						<primitives:Thumb Tag="{Binding ResolutionColumn, Mode=OneWay}" Width="6" HorizontalAlignment="Right" DragDelta="HeaderResizer_DragDelta" PointerEntered="HeaderResizer_PointerEntered" PointerExited="HeaderResizer_PointerExited" />
 					</Grid>
-					<Grid Grid.Column="3" Visibility="{Binding ListViewerViewModel.FileSizeColumn.IsVisible.Value, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" >
+					<Grid Grid.Column="3" Visibility="{Binding FileSizeColumn.IsVisible.Value, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" >
 						<TextBlock x:Uid="Viewer_ColumnSize" FontWeight="SemiBold" VerticalAlignment="Center" Margin="8,0,8,0" TextTrimming="CharacterEllipsis" />
-						<primitives:Thumb Tag="{Binding ListViewerViewModel.FileSizeColumn, Mode=OneWay}" Width="6" HorizontalAlignment="Right" DragDelta="HeaderResizer_DragDelta" PointerEntered="HeaderResizer_PointerEntered" PointerExited="HeaderResizer_PointerExited" />
+						<primitives:Thumb Tag="{Binding FileSizeColumn, Mode=OneWay}" Width="6" HorizontalAlignment="Right" DragDelta="HeaderResizer_DragDelta" PointerEntered="HeaderResizer_PointerEntered" PointerExited="HeaderResizer_PointerExited" />
 					</Grid>
-					<Grid Grid.Column="4" Visibility="{Binding ListViewerViewModel.CreationTimeColumn.IsVisible.Value, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" >
+					<Grid Grid.Column="4" Visibility="{Binding CreationTimeColumn.IsVisible.Value, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" >
 						<TextBlock x:Uid="Viewer_ColumnCreationTime" FontWeight="SemiBold" VerticalAlignment="Center" Margin="8,0,8,0" TextTrimming="CharacterEllipsis" />
-						<primitives:Thumb Tag="{Binding ListViewerViewModel.CreationTimeColumn, Mode=OneWay}" Width="6" HorizontalAlignment="Right" DragDelta="HeaderResizer_DragDelta" PointerEntered="HeaderResizer_PointerEntered" PointerExited="HeaderResizer_PointerExited" />
+						<primitives:Thumb Tag="{Binding CreationTimeColumn, Mode=OneWay}" Width="6" HorizontalAlignment="Right" DragDelta="HeaderResizer_DragDelta" PointerEntered="HeaderResizer_PointerEntered" PointerExited="HeaderResizer_PointerExited" />
 					</Grid>
-					<Grid Grid.Column="5" Visibility="{Binding ListViewerViewModel.RateColumn.IsVisible.Value, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" >
+					<Grid Grid.Column="5" Visibility="{Binding RateColumn.IsVisible.Value, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" >
 						<TextBlock x:Uid="Viewer_ColumnRate" FontWeight="SemiBold" VerticalAlignment="Center" Margin="8,0,8,0" TextTrimming="CharacterEllipsis" />
-						<primitives:Thumb Tag="{Binding ListViewerViewModel.RateColumn, Mode=OneWay}" Width="6" HorizontalAlignment="Right" DragDelta="HeaderResizer_DragDelta" PointerEntered="HeaderResizer_PointerEntered" PointerExited="HeaderResizer_PointerExited" />
+						<primitives:Thumb Tag="{Binding RateColumn, Mode=OneWay}" Width="6" HorizontalAlignment="Right" DragDelta="HeaderResizer_DragDelta" PointerEntered="HeaderResizer_PointerEntered" PointerExited="HeaderResizer_PointerExited" />
 					</Grid>
 				</Grid>
 			</ScrollViewer>
@@ -81,19 +81,19 @@
 							<Border Width="{Binding DataContext.ItemSize.Value, Mode=OneWay, ElementName=List}" >
 								<ContentControl Margin="4" Content="{x:Bind}" ContentTemplateSelector="{StaticResource MediaItemThumbnailControlTplSel}" Height="{Binding DataContext.ItemSize.Value, Mode=OneWay, ElementName=List}" Width="{Binding DataContext.ItemSize.Value, Mode=OneWay, ElementName=List}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
 							</Border>
-							<Border Width="{Binding DataContext.ListViewerViewModel.FileNameColumn.EffectiveWidth.Value, Mode=OneWay, ElementName=List}" Visibility="{Binding DataContext.ListViewerViewModel.FileNameColumn.IsVisible.Value, Mode=OneWay, ElementName=List, Converter={StaticResource BoolToVisibilityConverter}}" >
+							<Border Width="{Binding DataContext.FileNameColumn.EffectiveWidth.Value, Mode=OneWay, ElementName=List}" Visibility="{Binding DataContext.FileNameColumn.IsVisible.Value, Mode=OneWay, ElementName=List, Converter={StaticResource BoolToVisibilityConverter}}" >
 								<TextBlock Text="{x:Bind FilePath}" VerticalAlignment="Center" Margin="8,0,8,0" TextTrimming="CharacterEllipsis" />
 							</Border>
-							<Border Width="{Binding DataContext.ListViewerViewModel.ResolutionColumn.EffectiveWidth.Value, Mode=OneWay, ElementName=List}" Visibility="{Binding DataContext.ListViewerViewModel.ResolutionColumn.IsVisible.Value, Mode=OneWay, ElementName=List, Converter={StaticResource BoolToVisibilityConverter}}" >
+							<Border Width="{Binding DataContext.ResolutionColumn.EffectiveWidth.Value, Mode=OneWay, ElementName=List}" Visibility="{Binding DataContext.ResolutionColumn.IsVisible.Value, Mode=OneWay, ElementName=List, Converter={StaticResource BoolToVisibilityConverter}}" >
 								<TextBlock Text="{x:Bind FileModel.Resolution}" VerticalAlignment="Center" Margin="8,0,8,0" />
 							</Border>
-							<Border Width="{Binding DataContext.ListViewerViewModel.FileSizeColumn.EffectiveWidth.Value, Mode=OneWay, ElementName=List}" Visibility="{Binding DataContext.ListViewerViewModel.FileSizeColumn.IsVisible.Value, Mode=OneWay, ElementName=List, Converter={StaticResource BoolToVisibilityConverter}}" >
+							<Border Width="{Binding DataContext.FileSizeColumn.EffectiveWidth.Value, Mode=OneWay, ElementName=List}" Visibility="{Binding DataContext.FileSizeColumn.IsVisible.Value, Mode=OneWay, ElementName=List, Converter={StaticResource BoolToVisibilityConverter}}" >
 								<TextBlock Text="{x:Bind FileModel.FileSize, Converter={StaticResource FileSizeConverter}}" VerticalAlignment="Center" Margin="8,0,8,0" />
 							</Border>
-							<Border Width="{Binding DataContext.ListViewerViewModel.CreationTimeColumn.EffectiveWidth.Value, Mode=OneWay, ElementName=List}" Visibility="{Binding DataContext.ListViewerViewModel.CreationTimeColumn.IsVisible.Value, Mode=OneWay, ElementName=List, Converter={StaticResource BoolToVisibilityConverter}}" >
+							<Border Width="{Binding DataContext.CreationTimeColumn.EffectiveWidth.Value, Mode=OneWay, ElementName=List}" Visibility="{Binding DataContext.CreationTimeColumn.IsVisible.Value, Mode=OneWay, ElementName=List, Converter={StaticResource BoolToVisibilityConverter}}" >
 								<TextBlock Text="{x:Bind FileModel.CreationTime}" VerticalAlignment="Center" Margin="8,0,8,0" />
 							</Border>
-							<Border Width="{Binding DataContext.ListViewerViewModel.RateColumn.EffectiveWidth.Value, Mode=OneWay, ElementName=List}" Visibility="{Binding DataContext.ListViewerViewModel.RateColumn.IsVisible.Value, Mode=OneWay, ElementName=List, Converter={StaticResource BoolToVisibilityConverter}}" >
+							<Border Width="{Binding DataContext.RateColumn.EffectiveWidth.Value, Mode=OneWay, ElementName=List}" Visibility="{Binding DataContext.RateColumn.IsVisible.Value, Mode=OneWay, ElementName=List, Converter={StaticResource BoolToVisibilityConverter}}" >
 								<TextBlock Text="{x:Bind FileModel.Rate}" VerticalAlignment="Center" Margin="8,0,8,0" />
 							</Border>
 						</StackPanel>
@@ -109,7 +109,4 @@
 			</ListView.Footer>
 		</ListView>
 	</Grid>
-</local:ViewerPaneBase>
-
-
-
+</local:ListViewerUserControl>

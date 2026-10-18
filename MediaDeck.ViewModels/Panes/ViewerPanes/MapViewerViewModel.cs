@@ -8,12 +8,15 @@ namespace MediaDeck.ViewModels.Panes.ViewerPanes;
 
 [Inject(InjectServiceLifetime.Transient)]
 public class MapViewerViewModel : ViewerPaneViewModelBase {
-	private readonly MediaContentLibraryViewModel _mediaContentLibraryViewModel;
 	private readonly ILocationFactory _locationFactory;
 
-	public MapViewerViewModel(MediaContentLibraryViewModel mediaContentLibraryViewModel, FilesManager filesManager, ILocationFactory locationFactory)
-		: base(ViewerType.Map, "Map", "\uE800", filesManager) {
-		this._mediaContentLibraryViewModel = mediaContentLibraryViewModel;
+	public MapViewerViewModel(
+		FilesManager filesManager,
+		MediaContentLibraryViewModel mediaContentLibraryViewModel,
+		SearchConditionManagerViewModel searchConditionManagerViewModel,
+		TabStateModel tabState,
+		ILocationFactory locationFactory)
+		: base(ViewerType.Map, "Map", "\uE800", filesManager, mediaContentLibraryViewModel, searchConditionManagerViewModel, tabState) {
 		this._locationFactory = locationFactory;
 
 		this.Center = new BindableReactiveProperty<ILocation>(this._locationFactory.Create(35, 135));
@@ -22,12 +25,6 @@ public class MapViewerViewModel : ViewerPaneViewModelBase {
 		mediaContentLibraryViewModel.SelectedFiles
 			.Subscribe(selectedFiles => this.UpdatePinStates(selectedFiles))
 			.AddTo(this.CompositeDisposable);
-	}
-
-	public MediaContentLibraryViewModel MediaContentLibraryViewModel {
-		get {
-			return this._mediaContentLibraryViewModel;
-		}
 	}
 
 	/// <summary>
@@ -70,7 +67,7 @@ public class MapViewerViewModel : ViewerPaneViewModelBase {
 			return;
 		}
 		// ピンに含まれるメディアをすべて選択状態にする
-		this._mediaContentLibraryViewModel.SelectedFiles.Value = pinVm.Items.ToArray();
+		this.MediaContentLibraryViewModel.SelectedFiles.Value = pinVm.Items.ToArray();
 	}
 
 	/// <summary>
@@ -102,7 +99,7 @@ public class MapViewerViewModel : ViewerPaneViewModelBase {
 
 		var list = new List<MapPinViewModel>();
 
-		foreach (var item in this._mediaContentLibraryViewModel.Files) {
+		foreach (var item in this.MediaContentLibraryViewModel.Files) {
 			if (item.Location is not { } location) {
 				continue;
 			}
@@ -137,7 +134,7 @@ public class MapViewerViewModel : ViewerPaneViewModelBase {
 		}
 
 		this.MapPins.Value = list.ToArray();
-		this.UpdatePinStates(this._mediaContentLibraryViewModel.SelectedFiles.Value);
+		this.UpdatePinStates(this.MediaContentLibraryViewModel.SelectedFiles.Value);
 	}
 
 	/// <summary>
@@ -146,7 +143,7 @@ public class MapViewerViewModel : ViewerPaneViewModelBase {
 	/// <param name="mapWidth">地図コントロールの幅</param>
 	/// <param name="mapHeight">地図コントロールの高さ</param>
 	public void FitToItems(double mapWidth, double mapHeight) {
-		var locations = this._mediaContentLibraryViewModel.Files
+		var locations = this.MediaContentLibraryViewModel.Files
 			.Select(x => x.Location)
 			.Where(x => x is { })
 			.ToList();

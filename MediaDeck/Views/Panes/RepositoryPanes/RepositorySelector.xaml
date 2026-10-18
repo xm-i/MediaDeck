@@ -48,11 +48,11 @@
 			<controls:SwitchPresenter
 				Value="{x:Bind ViewModel.SelectedRepositoryPane.Value,Mode=OneWay}" >
 				<controls:Case Value="{x:Bind ViewModel.FolderRepositoryViewModel,Mode=OneWay}" >
-					<local:FolderRepository ViewModel="{x:Bind ViewModel,Mode=OneWay}"
+					<local:FolderRepository ViewModel="{x:Bind ViewModel.FolderRepositoryViewModel,Mode=OneWay}"
 						Padding="8" />
 				</controls:Case>
 				<controls:Case Value="{x:Bind ViewModel.AlbumRepositoryViewModel,Mode=OneWay}" >
-					<local:AlbumRepository ViewModel="{x:Bind ViewModel,Mode=OneWay}"
+					<local:AlbumRepository ViewModel="{x:Bind ViewModel.AlbumRepositoryViewModel,Mode=OneWay}"
 						Padding="8" />
 				</controls:Case>
 			</controls:SwitchPresenter>
