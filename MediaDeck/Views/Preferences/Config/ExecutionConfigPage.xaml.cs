@@ -1,37 +1,20 @@
 using MediaDeck.ViewModels.Preferences.Config;
 
-using Microsoft.UI.Xaml.Navigation;
-
 namespace MediaDeck.Views.Preferences.Config;
 
 /// <summary>
-/// 外部プログラム実行設定ページ
+/// 外部プログラム実行設定ページ。
 /// </summary>
-public sealed partial class ExecutionConfigPage {
+public sealed partial class ExecutionConfigPage : ExecutionConfigPageBase {
 	/// <summary>
-	/// コンストラクタ
+	/// <see cref="ExecutionConfigPage"/> クラスの新しいインスタンスを初期化します。
 	/// </summary>
 	public ExecutionConfigPage() {
 		this.InitializeComponent();
 	}
-
-	/// <summary>
-	/// ナビゲート時に ViewModel を受け取り、DataContext にも設定します。
-	/// </summary>
-	protected override void OnNavigatedTo(NavigationEventArgs e) {
-		if (e.Parameter is not ExecutionConfigPageViewModel vm) {
-			throw new InvalidOperationException("ViewModel is not passed.");
-		}
-		this.ViewModel = vm;
-		this.DataContext = vm;
-		base.OnNavigatedTo(e);
-	}
-
-	/// <summary>
-	/// ビューモデル
-	/// </summary>
-	public ExecutionConfigPageViewModel? ViewModel {
-		get;
-		set;
-	}
 }
+
+/// <summary>
+/// ExecutionConfigPage の基底クラス。PageBase を介して ViewModel プロパティを提供します。
+/// </summary>
+public abstract class ExecutionConfigPageBase : PageBase<ExecutionConfigPageViewModel>;

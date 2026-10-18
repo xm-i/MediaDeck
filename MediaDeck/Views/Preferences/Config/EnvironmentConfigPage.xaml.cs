@@ -1,30 +1,20 @@
 using MediaDeck.ViewModels.Preferences.Config;
 
-using Microsoft.UI.Xaml.Navigation;
-
 namespace MediaDeck.Views.Preferences.Config;
 
-public sealed partial class EnvironmentConfigPage {
+/// <summary>
+/// 環境設定ページ。
+/// </summary>
+public sealed partial class EnvironmentConfigPage : EnvironmentConfigPageBase {
+	/// <summary>
+	/// <see cref="EnvironmentConfigPage"/> クラスの新しいインスタンスを初期化します。
+	/// </summary>
 	public EnvironmentConfigPage() {
 		this.InitializeComponent();
 	}
-
-	/// <summary>
-	/// ナビゲート時に ViewModel を受け取ります。
-	/// </summary>
-	protected override void OnNavigatedTo(NavigationEventArgs e) {
-		if (e.Parameter is not EnvironmentConfigPageViewModel vm) {
-			throw new InvalidOperationException("ViewModel is not passed.");
-		}
-		this.ViewModel = vm;
-		base.OnNavigatedTo(e);
-	}
-
-	/// <summary>
-	/// ビューモデル
-	/// </summary>
-	public EnvironmentConfigPageViewModel? ViewModel {
-		get;
-		set;
-	}
 }
+
+/// <summary>
+/// EnvironmentConfigPage の基底クラス。PageBase を介して ViewModel プロパティを提供します。
+/// </summary>
+public abstract class EnvironmentConfigPageBase : PageBase<EnvironmentConfigPageViewModel>;

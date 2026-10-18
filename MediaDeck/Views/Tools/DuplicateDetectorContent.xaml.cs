@@ -1,30 +1,19 @@
 using MediaDeck.Composition.Interfaces.MediaItemTypes.ViewModels;
 using MediaDeck.ViewModels.Tools;
-
 using Microsoft.UI.Xaml;
 
 namespace MediaDeck.Views.Tools;
 
-public sealed partial class DuplicateDetectorContent {
+/// <summary>
+/// 重複ファイル検出コンテンツのビュー。
+/// </summary>
+public sealed partial class DuplicateDetectorContent : DuplicateDetectorContentUserControl {
+	/// <summary>
+	/// <see cref="DuplicateDetectorContent"/> クラスの新しいインスタンスを初期化します。
+	/// </summary>
 	public DuplicateDetectorContent() {
 		this.InitializeComponent();
 	}
-
-	public DuplicateDetectorViewModel ViewModel {
-		get {
-			return (DuplicateDetectorViewModel)this.GetValue(ViewModelProperty);
-		}
-
-		set {
-			this.SetValue(ViewModelProperty, value);
-		}
-	}
-
-	public static readonly DependencyProperty ViewModelProperty =
-		DependencyProperty.Register(nameof(ViewModel),
-			typeof(DuplicateDetectorViewModel),
-			typeof(DuplicateDetectorContent),
-			new(null));
 
 	private async void OnOpenFileClick(object sender, RoutedEventArgs e) {
 		if (sender is FrameworkElement { DataContext: IMediaItemViewModel fileViewModel }) {
@@ -38,3 +27,8 @@ public sealed partial class DuplicateDetectorContent {
 		}
 	}
 }
+
+/// <summary>
+/// DuplicateDetectorContent の基底クラス。UserControlBase を介して ViewModel プロパティを提供します。
+/// </summary>
+public abstract class DuplicateDetectorContentUserControl : UserControlBase<DuplicateDetectorViewModel>;

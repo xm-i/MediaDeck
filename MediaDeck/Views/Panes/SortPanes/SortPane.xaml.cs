@@ -10,12 +10,15 @@ using Microsoft.UI.Xaml;
 
 namespace MediaDeck.Views.Panes.SortPanes;
 
+/// <summary>
+/// ソートペインのビュー。
+/// </summary>
 public sealed partial class SortPane {
+	/// <summary>
+	/// <see cref="SortPane"/> クラスの新しいインスタンスを初期化します。
+	/// </summary>
 	public SortPane() {
 		this.InitializeComponent();
-		this.Loaded += (_, _) => {
-			this.Bindings.Update();
-		};
 	}
 
 	private void OpenSortSettingsWindowButton_Click(object sender, RoutedEventArgs e) {

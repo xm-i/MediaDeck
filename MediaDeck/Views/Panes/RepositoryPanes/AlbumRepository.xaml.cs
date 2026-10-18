@@ -3,12 +3,15 @@ using Microsoft.UI.Xaml.Input;
 
 namespace MediaDeck.Views.Panes.RepositoryPanes;
 
+/// <summary>
+/// アルバムリポジトリペインのビュー。
+/// </summary>
 public sealed partial class AlbumRepository {
+	/// <summary>
+	/// <see cref="AlbumRepository"/> クラスの新しいインスタンスを初期化します。
+	/// </summary>
 	public AlbumRepository() {
 		this.InitializeComponent();
-		this.Loaded += (_, _) => {
-			this.Bindings.Update();
-		};
 	}
 
 	private void TreeViewItem_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e) {
@@ -19,4 +22,7 @@ public sealed partial class AlbumRepository {
 	}
 }
 
+/// <summary>
+/// AlbumRepository の基底クラス。UserControlBase を介して ViewModel プロパティを提供します。
+/// </summary>
 public abstract class AlbumRepositoryUserControl : UserControlBase<RepositorySelectorViewModel>;

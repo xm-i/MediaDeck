@@ -1,31 +1,20 @@
 using MediaDeck.ViewModels.Preferences.Config;
 
-using Microsoft.UI.Xaml.Navigation;
-
 namespace MediaDeck.Views.Preferences.Config;
 
-public sealed partial class SearchConfigPage {
+/// <summary>
+/// 検索設定ページ。
+/// </summary>
+public sealed partial class SearchConfigPage : SearchConfigPageBase {
+	/// <summary>
+	/// <see cref="SearchConfigPage"/> クラスの新しいインスタンスを初期化します。
+	/// </summary>
 	public SearchConfigPage() {
 		this.InitializeComponent();
 	}
-
-	/// <summary>
-	/// ナビゲート時に ViewModel を受け取り、DataContext にも設定します。
-	/// </summary>
-	protected override void OnNavigatedTo(NavigationEventArgs e) {
-		if (e.Parameter is not SearchConfigPageViewModel vm) {
-			throw new InvalidOperationException("ViewModel is not passed.");
-		}
-		this.ViewModel = vm;
-		this.DataContext = vm;
-		base.OnNavigatedTo(e);
-	}
-
-	/// <summary>
-	/// ビューモデル
-	/// </summary>
-	public SearchConfigPageViewModel? ViewModel {
-		get;
-		set;
-	}
 }
+
+/// <summary>
+/// SearchConfigPage の基底クラス。PageBase を介して ViewModel プロパティを提供します。
+/// </summary>
+public abstract class SearchConfigPageBase : PageBase<SearchConfigPageViewModel>;

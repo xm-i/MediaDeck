@@ -21,7 +21,6 @@ public sealed partial class FilterSelector {
 			return;
 		}
 		this.ViewModel.UIReadyCommand.Execute(Unit.Default);
-		this.Bindings.Update();
 		this.SyncListSelectionFromViewModel(this.ViewModel.SelectedConditions.Value);
 		this._selectedConditionsSubscription?.Dispose();
 		this._selectedConditionsSubscription = this.ViewModel.SelectedConditions
