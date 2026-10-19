@@ -37,6 +37,13 @@ public interface ITagModel {
 	}
 
 	/// <summary>
+	/// 新規作成（未採番）のタグかどうかを取得します。
+	/// </summary>
+	public bool IsNew {
+		get;
+	}
+
+	/// <summary>
 	/// タグ名
 	/// </summary>
 	public string TagName {
@@ -61,12 +68,15 @@ public interface ITagModel {
 	}
 
 	/// <summary>
-	/// 使用回数
+	/// 読み仮名 (Ruby)
 	/// </summary>
 	public string? Ruby {
 		get; set;
 	}
 
+	/// <summary>
+	/// 使用回数
+	/// </summary>
 	public ReactiveProperty<int> UsageCount {
 		get;
 	}
@@ -79,5 +89,8 @@ public interface ITagModel {
 		set;
 	}
 
+	/// <summary>
+	/// 既存のタグエンティティからモデルを初期化します。
+	/// </summary>
 	public void Initialize(MediaDeck.Composition.Tables.Tag tag, ITagCategoryModel category, ITagModelFactory factory);
 }

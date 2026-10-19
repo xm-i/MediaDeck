@@ -76,4 +76,26 @@ public class TagModelTests {
 		var (model, _, _, _) = CreateInitializedModel();
 		model.UsageCount.Value.ShouldBe(0);
 	}
+
+	[Fact]
+	public void IsNew_ShouldBeTrue_WhenNotInitialized() {
+		var model = new TagModel();
+		model.IsNew.ShouldBeTrue();
+	}
+
+	[Fact]
+	public void IsNew_ShouldBeFalse_WhenInitializedWithTag() {
+		var (model, _, _, _) = CreateInitializedModel();
+		model.IsNew.ShouldBeFalse();
+	}
+
+	[Fact]
+	public void SetTagCategory_SetsIsDirty() {
+		var (model, _, _, _) = CreateInitializedModel();
+		var newCategoryMock = new Mock<ITagCategoryModel>();
+
+		model.TagCategory = newCategoryMock.Object;
+		model.IsDirty.ShouldBeTrue();
+		model.TagCategory.ShouldBe(newCategoryMock.Object);
+	}
 }

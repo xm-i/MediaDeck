@@ -10,7 +10,6 @@ public class TagCategoryViewModel : ViewModelBase {
 	public TagCategoryViewModel(ITagCategoryModel tagCategory, ITagsManager tagsManager, ITagModelFactory tagModelFactory) {
 		this._tagsManager = tagsManager;
 		this.Model = tagCategory;
-		this.TagCategoryId = tagCategory.TagCategoryId;
 		this.TagCategoryName.Value = tagCategory.TagCategoryName;
 		this.Detail.Value = tagCategory.Detail;
 		this.Tags = tagCategory.Tags.CreateViewWithDisposal(x => new TagViewModel(this, x, tagsManager, tagModelFactory)).AddTo(this.CompositeDisposable);
@@ -28,7 +27,9 @@ public class TagCategoryViewModel : ViewModelBase {
 	}
 
 	public int? TagCategoryId {
-		get;
+		get {
+			return this.Model.TagCategoryId;
+		}
 	}
 
 	public ISynchronizedView<ITagModel, TagViewModel> Tags {
@@ -72,6 +73,9 @@ public class TagCategoryViewModel : ViewModelBase {
 		this.Model.Detail = this.Detail.Value;
 		foreach (var tag in this.Tags) {
 			tag.SyncToModel();
+		}
+		if (this.SelectedTag.Value is { } selected && selected.TagCategory.Value != this) {
+			this.SelectedTag.Value = null;
 		}
 	}
 

@@ -155,17 +155,14 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 
 	public async Task DeleteTagAsync(ITagModel tagModel) {
 		this._tags.Remove(tagModel);
-		// remove from category
-		var categoryModel = this._tagCategories.FirstOrDefault(x => x.TagCategoryId == tagModel.TagCategoryId);
-		categoryModel?.RemoveTag(tagModel);
+		// 所属カテゴリから除去する（未保存の新規カテゴリは ID が null で未分類と区別できないため、ID ではなく全カテゴリを対象にする）
+		foreach (var categoryModel in this._tagCategories) {
+			categoryModel.RemoveTag(tagModel);
+		}
 
-		// DBに存在する（IDが初期化されている）場合は、保存時に削除するためリストに保持
-		try {
-			if (tagModel.TagId > 0) {
-				this._pendingDeleteTags.Add(tagModel);
-			}
-		} catch (InvalidOperationException) {
-			// ID未初期化（新規追加かつ未保存）の場合は無視
+		// DBに存在する（採番済みの）タグは、保存時に削除するためリストに保持
+		if (!tagModel.IsNew) {
+			this._pendingDeleteTags.Add(tagModel);
 		}
 
 		await Task.CompletedTask;
@@ -191,54 +188,53 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 				await db.SaveChangesAsync();
 			}
 
+			// 3. カテゴリの保存（新規カテゴリはここで採番し、後続のタグ保存で ID を参照できるようにする）
 			foreach (var category in this._tagCategories) {
 				if (category == this.NoCategory) {
-					// システムカテゴリ自体の保存（エンティティ作成）は不要だが、
-					// 属するタグの保存処理へ進むため、ここでは continue せずにフラグ等で制御するか、
-					// カテゴリ保存処理をスキップする。
-				} else {
-					int? dbCategoryId = category.TagCategoryId;
-					if (dbCategoryId == null) {
-						// 新規カテゴリーの作成
-						var entity = new TagCategory {
-							TagCategoryName = category.TagCategoryName,
-							Detail = category.Detail,
-							Tags = []
-						};
-						await db.TagCategories.AddAsync(entity);
-						await db.SaveChangesAsync();
-						category.TagCategoryId = entity.TagCategoryId;
-						dbCategoryId = entity.TagCategoryId;
-					} else if (category.IsDirty) {
-						// 既存カテゴリーの更新
-						var entity = await db.TagCategories.FirstOrDefaultAsync(x => x.TagCategoryId == dbCategoryId);
-						if (entity != null) {
-							entity.TagCategoryName = category.TagCategoryName;
-							entity.Detail = category.Detail;
-							db.TagCategories.Update(entity);
-						}
+					// システム定義の未分類カテゴリは DB エンティティを持たない
+					continue;
+				}
+				if (category.TagCategoryId == null) {
+					// 新規カテゴリーの作成
+					var entity = new TagCategory {
+						TagCategoryName = category.TagCategoryName,
+						Detail = category.Detail,
+						Tags = []
+					};
+					await db.TagCategories.AddAsync(entity);
+					await db.SaveChangesAsync();
+					category.TagCategoryId = entity.TagCategoryId;
+				} else if (category.IsDirty) {
+					// 既存カテゴリーの更新
+					var categoryId = category.TagCategoryId;
+					var entity = await db.TagCategories.FirstOrDefaultAsync(x => x.TagCategoryId == categoryId);
+					if (entity != null) {
+						entity.TagCategoryName = category.TagCategoryName;
+						entity.Detail = category.Detail;
+						db.TagCategories.Update(entity);
 					}
 				}
+			}
 
-				var currentCategoryId = category.TagCategoryId;
-				// カテゴリーに属するタグの保存
+			// 4. タグの保存（所属カテゴリは TagCategory 参照を正とする）
+			foreach (var category in this._tagCategories) {
 				foreach (var tag in category.Tags) {
 					if (!tag.IsDirty) {
 						continue;
 					}
 
+					var targetCategoryId = this.ResolveTargetCategory(tag).TagCategoryId;
+
 					Tag? tagEntity = null;
-					try {
+					if (!tag.IsNew) {
 						var tagId = tag.TagId;
 						tagEntity = await db.Tags.Include(x => x.TagAliases).FirstOrDefaultAsync(x => x.TagId == tagId);
-					} catch (InvalidOperationException) {
-						// ID が未初期化の場合は新規作成とみなす
 					}
 
 					if (tagEntity == null) {
 						// 新規タグの作成
 						tagEntity = new Tag {
-							TagCategoryId = currentCategoryId,
+							TagCategoryId = targetCategoryId,
 							TagName = tag.TagName,
 							Ruby = tag.Ruby,
 							Detail = tag.Detail,
@@ -249,12 +245,13 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 						tag.TagId = tagEntity.TagId;
 					} else {
 						// 既存タグの更新
-						tagEntity.TagCategoryId = tag.TagCategoryId;
+						tagEntity.TagCategoryId = targetCategoryId;
 						tagEntity.TagName = tag.TagName;
 						tagEntity.Ruby = tag.Ruby;
 						tagEntity.Detail = tag.Detail;
 						db.Tags.Update(tagEntity);
 					}
+					tag.TagCategoryId = targetCategoryId;
 
 					// 別名の更新 (一括削除して再追加)
 					db.TagAliases.RemoveRange(tagEntity.TagAliases);
@@ -272,6 +269,32 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 			await db.SaveChangesAsync();
 			await transaction.CommitAsync();
 
+			// 5. カテゴリ移動をインメモリのカテゴリ別リストへ反映
+			var tagsToMove = new List<(ITagModel Tag, ITagCategoryModel OldCategory, ITagCategoryModel NewCategory)>();
+			foreach (var category in this._tagCategories) {
+				foreach (var tag in category.Tags) {
+					var targetCategory = this.ResolveTargetCategory(tag);
+					if (targetCategory != category) {
+						tagsToMove.Add((tag, category, targetCategory));
+					}
+				}
+			}
+			foreach (var (tag, oldCategory, newCategory) in tagsToMove) {
+				oldCategory.RemoveTag(tag);
+				newCategory.AddTag(tag);
+				tag.TagCategory = newCategory;
+			}
+
+			// 6. カテゴリ側にのみ存在するタグ（新規作成分）を全タグリスト (this._tags) へ反映
+			var knownTags = this._tags.ToHashSet();
+			foreach (var category in this._tagCategories) {
+				foreach (var tag in category.Tags) {
+					if (knownTags.Add(tag)) {
+						this._tags.Add(tag);
+					}
+				}
+			}
+
 			// フラグのリセット
 			foreach (var category in this._tagCategories) {
 				category.IsDirty = false;
@@ -283,12 +306,21 @@ public class TagsManager(IDbContextFactory<MediaDeckDbContext> dbFactory, ITagMo
 			// 完了後にリストをクリア
 			this._pendingDeleteTags.Clear();
 			this._pendingDeleteCategories.Clear();
-
-			// TODO: 全タグリスト (this.Tags) との整合性も必要に応じて整える
 		} catch {
 			await transaction.RollbackAsync();
 			throw;
 		}
+	}
+
+	/// <summary>
+	/// タグの保存先となるカテゴリを解決します。
+	/// タグの <see cref="ITagModel.TagCategory"/> 参照を正とし、管理対象外（削除済み等）の場合は未分類カテゴリを返します。
+	/// </summary>
+	/// <param name="tag">対象のタグ</param>
+	/// <returns>保存先のカテゴリ</returns>
+	private ITagCategoryModel ResolveTargetCategory(ITagModel tag) {
+		var category = tag.TagCategory;
+		return this._tagCategories.Contains(category) ? category : this.NoCategory;
 	}
 
 	public async Task ReloadAsync() {

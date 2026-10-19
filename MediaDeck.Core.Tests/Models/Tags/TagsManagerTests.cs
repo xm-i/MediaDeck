@@ -41,6 +41,11 @@ public class TagsManagerTests {
 			model.Initialize(c, mock.Object);
 			return model;
 		});
+		mock.Setup(f => f.CreateCategory()).Returns(() => {
+			var model = new TagCategoryModel();
+			model.Initialize(null, mock.Object);
+			return model;
+		});
 		mock.Setup(f => f.Create(It.IsAny<Tag>(), It.IsAny<ITagCategoryModel>())).Returns((Tag t, ITagCategoryModel c) => {
 			var model = new TagModel();
 			model.Initialize(t, c, mock.Object);
@@ -394,5 +399,159 @@ public class TagsManagerTests {
 		manager.Tags.Any(x => x.TagName == "ModifiedTagName").ShouldBeFalse();
 		manager.TagCategories.Any(x => x.TagCategoryId == 2).ShouldBeTrue();
 		manager.Tags.First(x => x.TagId == 1).TagName.ShouldBe("Tag1");
+	}
+
+	/// <summary>
+	/// SaveAsyncが新規作成されたタグをデータベースに保存し、manager.Tagsコレクションにも反映することを検証します。
+	/// </summary>
+	[Fact]
+	public async Task SaveAsync_ShouldAddNewlyCreatedTagsToTagsCollection() {
+		var dbName = nameof(this.SaveAsync_ShouldAddNewlyCreatedTagsToTagsCollection);
+		var dbFactory = this.CreateInMemoryDbFactory(dbName);
+		await this.SeedDatabaseAsync(dbFactory);
+		var tagModelFactoryMock = new Mock<ITagModelFactory>();
+		this.SetupFactoryMock(tagModelFactoryMock);
+		var manager = new TagsManager(dbFactory, tagModelFactoryMock.Object);
+		await manager.InitializeAsync();
+
+		var category = manager.TagCategories.First(x => x.TagCategoryId == 1);
+		var initialCount = manager.Tags.Count;
+
+		// 新規タグを追加
+		var newTag = new TagModel {
+			TagCategory = category,
+			TagCategoryId = category.TagCategoryId,
+			TagName = "BrandNewTag",
+			Detail = "BrandNewDetail",
+			TagAliases = []
+		};
+		category.AddTag(newTag);
+		newTag.IsNew.ShouldBeTrue();
+
+		// 保存前は manager.Tags にまだ含まれていない
+		manager.Tags.ShouldNotContain(newTag);
+
+		// 保存実行
+		await manager.SaveAsync();
+
+		// 保存後は manager.Tags に反映され、IsNew が false、TagId が設定されている
+		manager.Tags.Count.ShouldBe(initialCount + 1);
+		manager.Tags.ShouldContain(newTag);
+		newTag.IsNew.ShouldBeFalse();
+		newTag.TagId.ShouldBeGreaterThan(0);
+
+		// DBにも保存されている
+		await using var db = await dbFactory.CreateDbContextAsync();
+		var dbTag = await db.Tags.FirstOrDefaultAsync(x => x.TagName == "BrandNewTag");
+		dbTag.ShouldNotBeNull();
+		dbTag.TagId.ShouldBe(newTag.TagId);
+		dbTag.Detail.ShouldBe("BrandNewDetail");
+	}
+
+	/// <summary>
+	/// DeleteTagAsyncが未採番（IsNew == true）のタグに対して例外をスローせず正常に削除することを検証します。
+	/// </summary>
+	[Fact]
+	public async Task DeleteTagAsync_WithNewTag_ShouldNotThrowException() {
+		var dbName = nameof(this.DeleteTagAsync_WithNewTag_ShouldNotThrowException);
+		var dbFactory = this.CreateInMemoryDbFactory(dbName);
+		await this.SeedDatabaseAsync(dbFactory);
+		var tagModelFactoryMock = new Mock<ITagModelFactory>();
+		this.SetupFactoryMock(tagModelFactoryMock);
+		var manager = new TagsManager(dbFactory, tagModelFactoryMock.Object);
+		await manager.InitializeAsync();
+
+		var category = manager.TagCategories.First(x => x.TagCategoryId == 1);
+		var newTag = new TagModel {
+			TagCategory = category,
+			TagCategoryId = category.TagCategoryId,
+			TagName = "UnsavedNewTag",
+			Detail = "",
+			TagAliases = []
+		};
+		category.AddTag(newTag);
+		newTag.IsNew.ShouldBeTrue();
+
+		category.Tags.ShouldContain(newTag);
+
+		// 未採番のタグを削除しても例外がスローされない
+		await manager.DeleteTagAsync(newTag);
+		category.Tags.ShouldNotContain(newTag);
+
+		// 保存を実行しても問題なく完了する
+		await manager.SaveAsync();
+	}
+
+	/// <summary>
+	/// SaveAsyncがタグの所属カテゴリ変更（カテゴリ移動）を正しく反映することを検証します。
+	/// </summary>
+	[Fact]
+	public async Task SaveAsync_ShouldHandleCategoryMove() {
+		var dbName = nameof(this.SaveAsync_ShouldHandleCategoryMove);
+		var dbFactory = this.CreateInMemoryDbFactory(dbName);
+		await this.SeedDatabaseAsync(dbFactory);
+		var tagModelFactoryMock = new Mock<ITagModelFactory>();
+		this.SetupFactoryMock(tagModelFactoryMock);
+		var manager = new TagsManager(dbFactory, tagModelFactoryMock.Object);
+		await manager.InitializeAsync();
+
+		var cat1 = manager.TagCategories.First(x => x.TagCategoryId == 1);
+		var cat2 = manager.TagCategories.First(x => x.TagCategoryId == 2);
+		var tag1 = cat1.Tags.First(x => x.TagId == 1);
+
+		// カテゴリを2に変更
+		tag1.TagCategory = cat2;
+		tag1.TagCategoryId = cat2.TagCategoryId;
+
+		await manager.SaveAsync();
+
+		// メモリ上のカテゴリ移動が反映されている
+		cat1.Tags.ShouldNotContain(tag1);
+		cat2.Tags.ShouldContain(tag1);
+		tag1.TagCategory.ShouldBe(cat2);
+		tag1.TagCategoryId.ShouldBe(2);
+
+		// DBにも反映されている
+		await using var db = await dbFactory.CreateDbContextAsync();
+		var dbTag = await db.Tags.FirstAsync(x => x.TagId == 1);
+		dbTag.TagCategoryId.ShouldBe(2);
+	}
+
+	/// <summary>
+	/// 未保存の新規カテゴリへタグを移動してSaveAsyncを実行した際、新規カテゴリの採番IDでタグが保存されることを検証します。
+	/// </summary>
+	[Fact]
+	public async Task SaveAsync_ShouldHandleMoveToNewlyCreatedCategory() {
+		var dbName = nameof(this.SaveAsync_ShouldHandleMoveToNewlyCreatedCategory);
+		var dbFactory = this.CreateInMemoryDbFactory(dbName);
+		await this.SeedDatabaseAsync(dbFactory);
+		var tagModelFactoryMock = new Mock<ITagModelFactory>();
+		this.SetupFactoryMock(tagModelFactoryMock);
+		var manager = new TagsManager(dbFactory, tagModelFactoryMock.Object);
+		await manager.InitializeAsync();
+
+		var cat1 = manager.TagCategories.First(x => x.TagCategoryId == 1);
+		var tag1 = cat1.Tags.First(x => x.TagId == 1);
+
+		// 未保存の新規カテゴリを追加（この時点では TagCategoryId == null）
+		var newCat = manager.AddTagCategory();
+		newCat.TagCategoryName = "NewCategory";
+
+		// 既存タグの所属先を新規カテゴリへ変更（TagCategoryId はまだ null）
+		tag1.TagCategoryId = newCat.TagCategoryId;
+		tag1.TagCategory = newCat;
+
+		await manager.SaveAsync();
+
+		// 新規カテゴリが採番され、タグもそのカテゴリへ移動している
+		newCat.TagCategoryId.ShouldNotBeNull();
+		cat1.Tags.ShouldNotContain(tag1);
+		newCat.Tags.ShouldContain(tag1);
+		tag1.TagCategory.ShouldBe(newCat);
+		tag1.TagCategoryId.ShouldBe(newCat.TagCategoryId);
+
+		await using var db = await dbFactory.CreateDbContextAsync();
+		var dbTag = await db.Tags.FirstAsync(x => x.TagId == 1);
+		dbTag.TagCategoryId.ShouldBe(newCat.TagCategoryId);
 	}
 }

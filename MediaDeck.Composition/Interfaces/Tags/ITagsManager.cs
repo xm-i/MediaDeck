@@ -9,9 +9,6 @@ public interface ITagsManager {
 	/// <summary>
 	/// タグカテゴリーのリスト
 	/// </summary>
-	/// <summary>
-	/// タグカテゴリーのリスト
-	/// </summary>
 	public IReadOnlyObservableList<ITagCategoryModel> TagCategories {
 		get;
 	}
@@ -23,9 +20,6 @@ public interface ITagsManager {
 		get;
 	}
 
-	/// <summary>
-	/// 全タグのリスト
-	/// </summary>
 	/// <summary>
 	/// 全タグのリスト
 	/// </summary>

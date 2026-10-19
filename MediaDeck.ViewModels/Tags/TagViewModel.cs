@@ -107,6 +107,7 @@ public class TagViewModel : ViewModelBase {
 		this.Model.Ruby = string.IsNullOrEmpty(this.Ruby.Value) ? null : this.Ruby.Value;
 		this.Model.Detail = this.Detail.Value;
 		this.Model.TagCategoryId = this.TagCategory.Value.TagCategoryId;
+		this.Model.TagCategory = this.TagCategory.Value.Model;
 		this.Model.TagAliases = this.TagAliases.Select(x => {
 			var alias = x.Model;
 			alias.Alias = x.Alias.Value;

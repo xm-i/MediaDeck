@@ -40,6 +40,15 @@ public class TagModel : ITagModel {
 	}
 
 	/// <summary>
+	/// 新規作成（未採番）のタグかどうかを取得します。
+	/// </summary>
+	public bool IsNew {
+		get {
+			return !this._tagId.HasValue;
+		}
+	}
+
+	/// <summary>
 	/// 変更フラグ
 	/// </summary>
 	public bool IsDirty {
@@ -95,6 +104,9 @@ public class TagModel : ITagModel {
 
 		[MemberNotNull(nameof(_tagCategory))]
 		set {
+			if (this._tagCategory != value) {
+				this.IsDirty = true;
+			}
 			this._tagCategory = value;
 			this._isInitialized = true;
 		}
