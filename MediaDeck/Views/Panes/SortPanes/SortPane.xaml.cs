@@ -22,14 +22,7 @@ public sealed partial class SortPane {
 	}
 
 	private void OpenSortSettingsWindowButton_Click(object sender, RoutedEventArgs e) {
-		var window = Ioc.Default.GetRequiredService<SortManagerWindow>();
-		var windowManager = Ioc.Default.GetRequiredService<WindowManager>();
-		var parent = windowManager.GetWindowFromElement(this);
-		if (parent == null) {
-			// TODO: notify
-			return;
-		}
-		Ioc.Default.GetRequiredService<WindowService>().ActivateCenteredOnMainWindow(window, parent);
+		Ioc.Default.GetRequiredService<IWindowService>().ActivateCentered<SortManagerWindow>(this);
 	}
 
 	private void CurrentCondition_SelectionChanged(object sender, Microsoft.UI.Xaml.Controls.SelectionChangedEventArgs e) {

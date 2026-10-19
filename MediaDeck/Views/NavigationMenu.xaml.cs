@@ -12,13 +12,11 @@ using Microsoft.UI.Xaml.Controls;
 namespace MediaDeck.Views;
 
 public sealed partial class NavigationMenu {
-	private readonly WindowService _windowService;
-	private readonly WindowManager _windowManager;
+	private readonly IWindowService _windowService;
 
 	public NavigationMenu() {
 		this.InitializeComponent();
-		this._windowService = Ioc.Default.GetRequiredService<WindowService>();
-		this._windowManager = Ioc.Default.GetRequiredService<WindowManager>();
+		this._windowService = Ioc.Default.GetRequiredService<IWindowService>();
 		this.Loaded += this.NavigationMenu_Loaded;
 	}
 
@@ -48,34 +46,30 @@ public sealed partial class NavigationMenu {
 			return;
 		}
 
-		Window? window = selectedItem.Tag?.ToString() switch {
-			"TagManager" => Ioc.Default.GetRequiredService<TagManagerWindow>(),
-			"FolderManager" => Ioc.Default.GetRequiredService<FolderManagerWindow>(),
-			"DuplicateDetector" => Ioc.Default.GetRequiredService<DuplicateDetectorWindow>(),
-			"Config" => Ioc.Default.GetRequiredService<ConfigWindow>(),
-			"About" => Ioc.Default.GetRequiredService<AboutWindow>(),
-			"License" => Ioc.Default.GetRequiredService<LicenseWindow>(),
-			_ => null
-		};
-
-		if (window != null) {
-			var parent = this._windowManager.GetWindowFromElement(this);
-			if (parent == null) {
-				// TODO: notify
-				return;
-			}
-			this._windowService.ActivateCenteredOnMainWindow(window, parent);
+		switch (selectedItem.Tag?.ToString()) {
+			case "TagManager":
+				this._windowService.ActivateCentered<TagManagerWindow>(this);
+				break;
+			case "FolderManager":
+				this._windowService.ActivateCentered<FolderManagerWindow>(this);
+				break;
+			case "DuplicateDetector":
+				this._windowService.ActivateCentered<DuplicateDetectorWindow>(this);
+				break;
+			case "Config":
+				this._windowService.ActivateCentered<ConfigWindow>(this);
+				break;
+			case "About":
+				this._windowService.ActivateCentered<AboutWindow>(this);
+				break;
+			case "License":
+				this._windowService.ActivateCentered<LicenseWindow>(this);
+				break;
 		}
 	}
 
 	private void SyncNotificationButton_Click(object sender, RoutedEventArgs e) {
-		var window = Ioc.Default.GetRequiredService<FileChangeSyncWindow>();
-		var parent = this._windowManager.GetWindowFromElement(this);
-		if (parent == null) {
-			// TODO: notify
-			return;
-		}
-		this._windowService.ActivateCenteredOnMainWindow(window, parent);
+		this._windowService.ActivateCentered<FileChangeSyncWindow>(this);
 	}
 }
 

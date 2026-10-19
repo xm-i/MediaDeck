@@ -55,14 +55,7 @@ public sealed partial class FilterSelector {
 	}
 
 	private void OpenFilterSettingsWindowButton_Click(object sender, RoutedEventArgs e) {
-		var window = Ioc.Default.GetRequiredService<FilterManagerWindow>();
-		var windowManager = Ioc.Default.GetRequiredService<WindowManager>();
-		var parent = windowManager.GetWindowFromElement(this);
-		if (parent == null) {
-			// TODO: notify
-			return;
-		}
-		Ioc.Default.GetRequiredService<WindowService>().ActivateCenteredOnMainWindow(window, parent);
+		Ioc.Default.GetRequiredService<IWindowService>().ActivateCentered<FilterManagerWindow>(this);
 	}
 
 	protected override void OnViewModelChanged(FilterSelectorViewModel? oldViewModel, FilterSelectorViewModel? newViewModel) {
