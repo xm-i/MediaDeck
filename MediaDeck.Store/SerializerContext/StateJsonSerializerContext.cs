@@ -35,6 +35,7 @@ namespace MediaDeck.Store.SerializerContext;
 [JsonSerializable(typeof(AlbumSearchConditionForJson))]
 [JsonSerializable(typeof(TagAliasModelForJson))]
 [JsonSerializable(typeof(TagCategoryModelForJson))]
+[JsonSerializable(typeof(ListViewerColumnStateModelForJson))]
 [JsonSerializable(typeof(DefaultTabStateModelForJson))]
 public partial class StateJsonSerializerContext : JsonSerializerContext {
 	static StateJsonSerializerContext() {

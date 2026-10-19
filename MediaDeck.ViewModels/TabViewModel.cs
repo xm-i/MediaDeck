@@ -120,16 +120,19 @@ public class TabViewModel : ViewModelBase {
 		this.TabState.ViewerState.ShowInfo.Skip(1).Subscribe(v => defaultViewer.ShowInfo.Value = v).AddTo(this.CompositeDisposable);
 
 		// ListViewer 列設定の同期
-		this.TabState.ViewerState.ListFileNameColumnWidth.Skip(1).Subscribe(v => defaultViewer.ListFileNameColumnWidth.Value = v).AddTo(this.CompositeDisposable);
-		this.TabState.ViewerState.ListResolutionColumnWidth.Skip(1).Subscribe(v => defaultViewer.ListResolutionColumnWidth.Value = v).AddTo(this.CompositeDisposable);
-		this.TabState.ViewerState.ListFileSizeColumnWidth.Skip(1).Subscribe(v => defaultViewer.ListFileSizeColumnWidth.Value = v).AddTo(this.CompositeDisposable);
-		this.TabState.ViewerState.ListCreationTimeColumnWidth.Skip(1).Subscribe(v => defaultViewer.ListCreationTimeColumnWidth.Value = v).AddTo(this.CompositeDisposable);
-		this.TabState.ViewerState.ListRateColumnWidth.Skip(1).Subscribe(v => defaultViewer.ListRateColumnWidth.Value = v).AddTo(this.CompositeDisposable);
-		this.TabState.ViewerState.ListFileNameColumnVisible.Skip(1).Subscribe(v => defaultViewer.ListFileNameColumnVisible.Value = v).AddTo(this.CompositeDisposable);
-		this.TabState.ViewerState.ListResolutionColumnVisible.Skip(1).Subscribe(v => defaultViewer.ListResolutionColumnVisible.Value = v).AddTo(this.CompositeDisposable);
-		this.TabState.ViewerState.ListFileSizeColumnVisible.Skip(1).Subscribe(v => defaultViewer.ListFileSizeColumnVisible.Value = v).AddTo(this.CompositeDisposable);
-		this.TabState.ViewerState.ListCreationTimeColumnVisible.Skip(1).Subscribe(v => defaultViewer.ListCreationTimeColumnVisible.Value = v).AddTo(this.CompositeDisposable);
-		this.TabState.ViewerState.ListRateColumnVisible.Skip(1).Subscribe(v => defaultViewer.ListRateColumnVisible.Value = v).AddTo(this.CompositeDisposable);
+		void SyncColumn(ListViewerColumnStateModel col) {
+			var defaultCol = defaultViewer.GetOrCreateColumnState(col.ColumnId, col.Width.Value, col.IsVisible.Value);
+			col.Width.Skip(1).Subscribe(v => defaultCol.Width.Value = v).AddTo(this.CompositeDisposable);
+			col.IsVisible.Skip(1).Subscribe(v => defaultCol.IsVisible.Value = v).AddTo(this.CompositeDisposable);
+		}
+
+		foreach (var col in this.TabState.ViewerState.ListColumns) {
+			SyncColumn(col);
+		}
+		this.TabState.ViewerState.ListColumns.ObserveAdd()
+			.Subscribe(e => SyncColumn(e.Value))
+			.AddTo(this.CompositeDisposable);
+
 		// リポジトリの同期
 		this.TabState.ActiveRepository.Skip(1).Subscribe(v => appState.DefaultTabState.ActiveRepository.Value = v).AddTo(this.CompositeDisposable);
 		// Splitterの同期

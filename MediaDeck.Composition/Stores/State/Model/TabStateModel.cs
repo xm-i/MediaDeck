@@ -77,31 +77,10 @@ public class TabStateModel(IServiceProvider serviceProvider, SearchStateModel se
 	/// </summary>
 	/// <param name="defaultTab">デフォルトのタブ状態モデル</param>
 	public void ApplyDefaultState(DefaultTabStateModel defaultTab) {
-		var defaultSearch = defaultTab.SearchState;
-		var defaultViewer = defaultTab.ViewerState;
-
-		this.SearchState.CurrentSortCondition.Value = defaultSearch.CurrentSortCondition.Value;
-		this.SearchState.SortDirection.Value = defaultSearch.SortDirection.Value;
-		this.SearchState.CurrentFilteringConditions.Value = [.. defaultSearch.CurrentFilteringConditions.Value];
-		this.ViewerState.ItemSize.Value = defaultViewer.ItemSize.Value;
-		this.ViewerState.ActiveViewer.Value = defaultViewer.ActiveViewer.Value;
-		this.ViewerState.ShowOverlay.Value = defaultViewer.ShowOverlay.Value;
-		this.ViewerState.ShowInfo.Value = defaultViewer.ShowInfo.Value;
-
-		// ListViewer 列設定
-		this.ViewerState.ListFileNameColumnWidth.Value = defaultViewer.ListFileNameColumnWidth.Value;
-		this.ViewerState.ListResolutionColumnWidth.Value = defaultViewer.ListResolutionColumnWidth.Value;
-		this.ViewerState.ListFileSizeColumnWidth.Value = defaultViewer.ListFileSizeColumnWidth.Value;
-		this.ViewerState.ListCreationTimeColumnWidth.Value = defaultViewer.ListCreationTimeColumnWidth.Value;
-		this.ViewerState.ListRateColumnWidth.Value = defaultViewer.ListRateColumnWidth.Value;
-		this.ViewerState.ListFileNameColumnVisible.Value = defaultViewer.ListFileNameColumnVisible.Value;
-		this.ViewerState.ListResolutionColumnVisible.Value = defaultViewer.ListResolutionColumnVisible.Value;
-		this.ViewerState.ListFileSizeColumnVisible.Value = defaultViewer.ListFileSizeColumnVisible.Value;
-		this.ViewerState.ListCreationTimeColumnVisible.Value = defaultViewer.ListCreationTimeColumnVisible.Value;
-		this.ViewerState.ListRateColumnVisible.Value = defaultViewer.ListRateColumnVisible.Value;
+		this.SearchState.CopyFrom(defaultTab.SearchState);
+		this.ViewerState.CopyFrom(defaultTab.ViewerState);
 
 		this.ActiveRepository.Value = defaultTab.ActiveRepository.Value;
-
 		this.LeftPaneWidth.Value = defaultTab.LeftPaneWidth.Value;
 		this.RightPaneWidth.Value = defaultTab.RightPaneWidth.Value;
 		this.RepositoryPaneHeight.Value = defaultTab.RepositoryPaneHeight.Value;

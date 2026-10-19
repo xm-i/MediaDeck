@@ -27,7 +27,9 @@ public class ViewerSelectorViewModel : ViewModelBase {
 		this.DetailViewerViewModel = detailViewerViewModel.AddTo(this.CompositeDisposable);
 		this.MapViewerViewModel = mapViewerViewModel.AddTo(this.CompositeDisposable);
 
-		this.SelectedViewerPane.Value = this.ViewerPaneViewModels.FirstOrDefault(x => x.ViewerType == tabState.ViewerState.ActiveViewer.Value) ?? wrapViewerViewModel;
+		var initialViewer = this.ViewerPaneViewModels.FirstOrDefault(x => x.ViewerType == tabState.ViewerState.ActiveViewer.Value) ?? wrapViewerViewModel;
+		this.SelectedViewerPane.Value = initialViewer;
+		initialViewer.IsSelected.Value = true;
 
 		this.ItemSize = tabState.ViewerState.ItemSize.ToTwoWayBindableReactiveProperty(tabState.ViewerState.ItemSize.Value, this.CompositeDisposable).AddTo(this.CompositeDisposable);
 

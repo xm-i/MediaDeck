@@ -37,4 +37,14 @@ public class SearchStateModel {
 	public ReactiveProperty<ListSortDirection> SortDirection {
 		get;
 	} = new(ListSortDirection.Ascending);
+
+	/// <summary>
+	/// 別の <see cref="SearchStateModel"/> から設定値をコピーします。
+	/// </summary>
+	/// <param name="source">コピー元のモデル</param>
+	public void CopyFrom(SearchStateModel source) {
+		this.CurrentSortCondition.Value = source.CurrentSortCondition.Value;
+		this.SortDirection.Value = source.SortDirection.Value;
+		this.CurrentFilteringConditions.Value = [.. source.CurrentFilteringConditions.Value];
+	}
 }
