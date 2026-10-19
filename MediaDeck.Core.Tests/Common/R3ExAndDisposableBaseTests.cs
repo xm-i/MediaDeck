@@ -65,18 +65,22 @@ public class R3ExAndDisposableBaseTests {
 #endif
 
 	/// <summary>
-	/// DetailSelectorModel が ModelBase を継承し、Dispose 時に ReactiveProperty が破棄されることを検証します。
+	/// DetailSelectorModel が ModelBase を継承し、Dispose 時に子モデルも含めて破棄されることを検証します。
 	/// </summary>
 	[Fact]
 	public void DetailSelectorModel_InheritsModelBase_AndDisposesPropertiesOnDispose() {
 		var mockTagsManager = new Moq.Mock<MediaDeck.Composition.Interfaces.Tags.ITagsManager>();
-		var model = new DetailSelectorModel(mockTagsManager.Object);
+		var propertiesModel = new PropertiesDetailModel();
+		var tagsModel = new TagsDetailModel(mockTagsManager.Object);
+		var model = new DetailSelectorModel(propertiesModel, tagsModel);
 		model.ShouldBeAssignableTo<ModelBase>();
 
 		model.Dispose();
 
 		// Dispose済み状態であることを検証
 		model.DisposeState.ShouldBe(MediaDeck.Composition.Enum.DisposeState.Disposed);
+		propertiesModel.DisposeState.ShouldBe(MediaDeck.Composition.Enum.DisposeState.Disposed);
+		tagsModel.DisposeState.ShouldBe(MediaDeck.Composition.Enum.DisposeState.Disposed);
 	}
 
 	private sealed class MockDisposableItem(int id) : IDisposable {

@@ -1,6 +1,7 @@
 using MediaDeck.Common.Base;
 using MediaDeck.Common.Extensions;
 using MediaDeck.Composition.Interfaces.Tags;
+using MediaDeck.Core.Models.Tags;
 
 namespace MediaDeck.ViewModels.Tags;
 
@@ -83,23 +84,12 @@ public class TagCategoryViewModel : ViewModelBase {
 		this.Tags.AttachFilter((tag, tagVm) => {
 			var text = this.FilterText.Value ?? "";
 			if (text.Length == 0) {
-				return true;
-			}
-			if (tag.TagName.Contains(text) ||
-				(tag.Ruby?.Contains(text) ?? false) ||
-				(tag.Romaji?.Contains(text, StringComparison.CurrentCultureIgnoreCase) ?? false)) {
 				tagVm.RepresentativeText.Value = null;
 				return true;
 			}
-			var result =
-				tag
-					.TagAliases
-					.FirstOrDefault(x =>
-						x.Alias.Contains(text, StringComparison.CurrentCultureIgnoreCase) ||
-						(x.Ruby?.Contains(text) ?? false) ||
-						(x.Romaji?.Contains(text, StringComparison.CurrentCultureIgnoreCase) ?? false));
-			tagVm.RepresentativeText.Value = result?.Alias;
-			return result != null;
+			var result = tag.MatchesFilter(text, out var repText);
+			tagVm.RepresentativeText.Value = repText;
+			return result;
 		});
 	}
 }

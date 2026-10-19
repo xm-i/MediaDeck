@@ -25,8 +25,8 @@
 			<ScrollViewer Padding="12"
 				Visibility="{x:Bind ViewModel.TargetFiles.Value, Mode=OneWay, Converter={StaticResource NullToCollapseConverter}}" >
 				<StackPanel Spacing="16" >
-					<local:PropertiesDetail ViewModel="{x:Bind ViewModel,Mode=OneWay}" />
-					<local:TagsDetail ViewModel="{x:Bind ViewModel,Mode=OneWay}" />
+					<local:PropertiesDetail ViewModel="{x:Bind ViewModel.PropertiesViewModel, Mode=OneWay}" />
+					<local:TagsDetail ViewModel="{x:Bind ViewModel.TagsViewModel, Mode=OneWay}" />
 				</StackPanel>
 			</ScrollViewer>
 		</Border>

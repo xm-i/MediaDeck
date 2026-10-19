@@ -1,19 +1,26 @@
 using MediaDeck.Common.Base;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.Models;
-using MediaDeck.Composition.Interfaces.Tags;
-using MediaDeck.Composition.Tables.Metadata;
-using MediaDeck.Core.Primitives;
 
 namespace MediaDeck.Core.Models.Files;
 
 /// <summary>
-/// 詳細セレクタのビジネスロジックを管理するモデル
+/// 詳細セレクタの親モデル。プロパティ詳細とタグ詳細の調停を行います。
 /// </summary>
 [Inject(InjectServiceLifetime.Scoped)]
 public class DetailSelectorModel : ModelBase {
-	private readonly SerialDisposable _propertyChangedSubscription = new();
-	private readonly ITagsManager _tagsManager;
-	private readonly ObservableList<ValueCountPair<ITagModel>> _tags = [];
+	/// <summary>
+	/// プロパティ詳細モデル
+	/// </summary>
+	public PropertiesDetailModel PropertiesModel {
+		get;
+	}
+
+	/// <summary>
+	/// タグ詳細モデル
+	/// </summary>
+	public TagsDetailModel TagsModel {
+		get;
+	}
 
 	/// <summary>
 	/// TargetFilesの中身の変更を通知するためのSubject
@@ -23,216 +30,22 @@ public class DetailSelectorModel : ModelBase {
 	} = new();
 
 	/// <summary>
-	/// タグリスト
-	/// </summary>
-	public ObservableList<ValueCountPair<ITagModel>> Tags {
-		get {
-			return this._tags;
-		}
-	}
-
-	/// <summary>
-	/// TagsManagerへのアクセス
-	/// </summary>
-	public ITagsManager TagsManager {
-		get {
-			return this._tagsManager;
-		}
-	}
-
-	/// <summary>
-	/// タグカテゴリ
-	/// </summary>
-	public IReadOnlyObservableList<ITagCategoryModel> TagCategories {
-		get {
-			return this._tagsManager.TagCategories;
-		}
-	}
-
-	/// <summary>
-	/// タグ候補
-	/// </summary>
-	public IReadOnlyObservableList<ITagModel> TagModels {
-		get {
-			return this._tagsManager.Tags;
-		}
-	}
-
-	/// <summary>
-	/// プロパティ一覧
-	/// </summary>
-	public ReactiveProperty<FileProperty[]> Properties {
-		get;
-	} = new([]);
-
-	/// <summary>
-	/// 評価
-	/// </summary>
-	public ReactiveProperty<double> Rate {
-		get;
-	} = new();
-
-	/// <summary>
-	/// 使用回数
-	/// </summary>
-	public ReactiveProperty<double> UsageCount {
-		get;
-	} = new();
-
-	/// <summary>
-	/// 代表ファイルのパス 複数選択時は空文字
-	/// </summary>
-	public ReactiveProperty<string> RepresentativeFilePath {
-		get;
-	} = new(string.Empty);
-
-	/// <summary>
-	/// 説明
-	/// </summary>
-	public ReactiveProperty<string> Description {
-		get;
-	} = new(string.Empty);
-
-	/// <summary>
-	/// メタデータ
-	/// </summary>
-	public ReactiveProperty<MediaMetadata?> Metadata {
-		get;
-	} = new();
-
-	/// <summary>
 	/// <see cref="DetailSelectorModel"/> の新しいインスタンスを初期化します。
 	/// </summary>
-	/// <param name="tagsManager">タグマネージャー</param>
-	public DetailSelectorModel(ITagsManager tagsManager) {
-		this._tagsManager = tagsManager;
-		this._propertyChangedSubscription.AddTo(this.CompositeDisposable);
+	/// <param name="propertiesModel">プロパティ詳細モデル</param>
+	/// <param name="tagsModel">タグ詳細モデル</param>
+	public DetailSelectorModel(PropertiesDetailModel propertiesModel, TagsDetailModel tagsModel) {
+		this.PropertiesModel = propertiesModel.AddTo(this.CompositeDisposable);
+		this.TagsModel = tagsModel.AddTo(this.CompositeDisposable);
 		this.ContentChanged.AddTo(this.CompositeDisposable);
-		this.Properties.AddTo(this.CompositeDisposable);
-		this.Rate.AddTo(this.CompositeDisposable);
-		this.UsageCount.AddTo(this.CompositeDisposable);
-		this.RepresentativeFilePath.AddTo(this.CompositeDisposable);
-		this.Description.AddTo(this.CompositeDisposable);
-		this.Metadata.AddTo(this.CompositeDisposable);
 	}
 
 	/// <summary>
-	/// TargetFilesから各種状態を算出してプロパティを更新する
+	/// TargetFilesから各種状態を算出して子モデルを一括更新します。
 	/// </summary>
+	/// <param name="files">対象ファイル群</param>
 	public void Refresh(IMediaItemModel[] files) {
-		if (files.Length > 0) {
-			this.Properties.Value =
-				files
-					.SelectMany(x => x.Properties)
-					.GroupBy(x => x.Title)
-					.Select(x => new FileProperty(x.Key,
-						x.GroupBy(g => g.Value).Select(g => new ValueCountPair<string?>(g.Key, g.Count()))))
-					.ToArray();
-			this.Rate.Value = files.Average(x => x.Rate);
-			this.UsageCount.Value = files.Average(x => x.UsageCount);
-			this.RefreshTags(files);
-		} else {
-			this.Properties.Value = [];
-			this.Rate.Value = 0;
-			this.UsageCount.Value = 0;
-			this._tags.Clear();
-		}
-
-		if (files.Length == 1) {
-			this.RepresentativeFilePath.Value = files[0].FilePath;
-			this.Description.Value = files[0].Description;
-			this.Metadata.Value = files[0].Metadata;
-		} else {
-			this.RepresentativeFilePath.Value = string.Empty;
-			this.Description.Value = string.Empty;
-			this.Metadata.Value = null;
-		}
-
-		this._propertyChangedSubscription.Disposable =
-			files
-				.Select(m => m.Changed)
-				.Merge()
-				.Subscribe(_ => {
-					this.Refresh(files);
-				});
-	}
-
-
-	/// <summary>
-	/// タグリストを再計算して更新する
-	/// </summary>
-	public void RefreshTags(IMediaItemModel[] files) {
-		this._tags.Clear();
-		this._tags.AddRange(files
-			.SelectMany(x => x.Tags)
-			.GroupBy(x => x.TagId)
-			.Select(x => new ValueCountPair<ITagModel>(x.First(), x.Count())));
-	}
-
-	/// <summary>
-	/// ファイルにタグを追加する
-	/// </summary>
-	public async Task AddTagAsync(IMediaItemModel[] files, ITagModel tag) {
-		await this._tagsManager.AddTagAsync(files, tag);
-		this.RefreshTags(files);
-	}
-
-	/// <summary>
-	/// ファイルからタグを削除する
-	/// </summary>
-	public async Task RemoveTagAsync(IMediaItemModel[] files, int tagId) {
-		await this._tagsManager.RemoveTagAsync(files, tagId);
-		this.RefreshTags(files);
-	}
-
-	/// <summary>
-	/// タグを名前で検索する
-	/// </summary>
-	public Task<ITagModel?> FindTagByNameAsync(string tagName) {
-		return this._tagsManager.FindTagByNameAsync(tagName);
-	}
-
-	/// <summary>
-	/// 説明を更新する
-	/// </summary>
-	public async Task UpdateDescriptionAsync(IMediaItemModel file, string description) {
-		await file.UpdateDescriptionAsync(description);
-	}
-
-	/// <summary>
-	/// 評価を更新する
-	/// </summary>
-	public async Task UpdateRateAsync(IMediaItemModel[] files, int rate) {
-		foreach (var file in files) {
-			await file.UpdateRateAsync(rate);
-		}
-	}
-
-	/// <summary>
-	/// タグ候補のフィルタリング条件に一致するか判定する
-	/// </summary>
-	/// <param name="tag">判定対象のタグ</param>
-	/// <param name="text">検索テキスト</param>
-	/// <param name="representativeText">一致したエイリアスのテキスト（直接一致の場合はnull）</param>
-	/// <returns>フィルタ条件に一致する場合true</returns>
-	public static bool MatchesTagFilter(ITagModel tag, string text, out string? representativeText) {
-		representativeText = null;
-		if (string.IsNullOrEmpty(text)) {
-			return false;
-		}
-		if (tag.TagName.Contains(text) ||
-			(tag.Ruby?.Contains(text) ?? false) ||
-			(tag.Romaji?.Contains(text, StringComparison.CurrentCultureIgnoreCase) ?? false)) {
-			return true;
-		}
-		var result =
-			tag
-				.TagAliases
-				.FirstOrDefault(x =>
-					x.Alias.Contains(text, StringComparison.CurrentCultureIgnoreCase) ||
-					(x.Ruby?.Contains(text) ?? false) ||
-					(x.Romaji?.Contains(text, StringComparison.CurrentCultureIgnoreCase) ?? false));
-		representativeText = result?.Alias;
-		return result != null;
+		this.PropertiesModel.Refresh(files);
+		this.TagsModel.Refresh(files);
 	}
 }

@@ -28,7 +28,7 @@ public sealed partial class TagsDetail {
 	}
 
 	/// <inheritdoc />
-	protected override void OnViewModelChanged(DetailSelectorViewModel? oldViewModel, DetailSelectorViewModel? newViewModel) {
+	protected override void OnViewModelChanged(TagsDetailViewModel? oldViewModel, TagsDetailViewModel? newViewModel) {
 		base.OnViewModelChanged(oldViewModel, newViewModel);
 
 		this._vmSubscriptions.Clear();
@@ -37,7 +37,7 @@ public sealed partial class TagsDetail {
 		}
 	}
 
-	private void SubscribeViewModel(DetailSelectorViewModel? vm) {
+	private void SubscribeViewModel(TagsDetailViewModel? vm) {
 		this._vmSubscriptions.Clear();
 		if (vm is null) {
 			return;
@@ -91,7 +91,6 @@ public sealed partial class TagsDetail {
 		}
 	}
 
-
 	private void TagGrid_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e) {
 		if (this.TagListBox.SelectedItem is not ValueCountPair<TagViewModel> tag) {
 			return;
@@ -105,3 +104,8 @@ public sealed partial class TagsDetail {
 		}
 	}
 }
+
+/// <summary>
+/// TagsDetail の基底クラス。UserControlBase を介して ViewModel プロパティを提供します。
+/// </summary>
+public abstract class TagsDetailUserControl : UserControlBase<TagsDetailViewModel>;

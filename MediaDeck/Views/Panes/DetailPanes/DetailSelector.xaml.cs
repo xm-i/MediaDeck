@@ -12,12 +12,6 @@ public sealed partial class DetailSelector {
 	public DetailSelector() {
 		this.InitializeComponent();
 	}
-
-	/// <inheritdoc/>
-	protected override void OnViewModelChanged(DetailSelectorViewModel? oldViewModel, DetailSelectorViewModel? newViewModel) {
-		base.OnViewModelChanged(oldViewModel, newViewModel);
-		this.ViewModel?.LoadTagCandidatesCommand.Execute(Unit.Default);
-	}
 }
 
 /// <summary>

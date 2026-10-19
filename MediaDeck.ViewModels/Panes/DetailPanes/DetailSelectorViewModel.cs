@@ -1,122 +1,34 @@
 using MediaDeck.Common.Base;
-using MediaDeck.Common.Extensions;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.Models;
-using MediaDeck.Composition.Interfaces.Notifications;
-using MediaDeck.Composition.Interfaces.Tags;
-using MediaDeck.Composition.Tables.Metadata;
 using MediaDeck.Core.Models.Files;
-using MediaDeck.Core.Models.Files.SearchConditions;
-using MediaDeck.Core.Primitives;
-using MediaDeck.ViewModels.Tags;
 
 namespace MediaDeck.ViewModels.Panes.DetailPanes;
 
-public record NewTagRequestedContext(string TagName, ITagCategoryModel? SelectedCategory);
-
+/// <summary>
+/// 詳細ペインのセレクター（親コンテナ）ViewModel。
+/// プロパティ詳細とタグ詳細の調停を行います。
+/// </summary>
 [Inject(InjectServiceLifetime.Scoped)]
 public class DetailSelectorViewModel : ViewModelBase {
-	public Subject<NewTagRequestedContext> NewTagRequested {
-		get;
-	} = new();
-
-	public Subject<TagViewModel> OpenTagManagerRequested {
-		get;
-	} = new();
-
 	private readonly DetailSelectorModel _model;
-	private readonly System.Collections.Concurrent.ConcurrentDictionary<int, TagCategoryViewModel> _categoryViewModels = new();
 
-	public ITagModelFactory TagModelFactory {
+	/// <summary>
+	/// プロパティ詳細 ViewModel
+	/// </summary>
+	public PropertiesDetailViewModel PropertiesViewModel {
 		get;
 	}
 
-	public DetailSelectorViewModel(DetailSelectorModel model,
-		ISearchConditionNotificationDispatcher searchConditionNotificationDispatcher,
-		ITagModelFactory tagModelFactory) {
-		this._model = model;
-		this.TagModelFactory = tagModelFactory;
-		this.RepresentativeFilePath = model.RepresentativeFilePath.ToBindableReactiveProperty(string.Empty).AddTo(this.CompositeDisposable);
-		this.Properties = model.Properties.ToBindableReactiveProperty([]).AddTo(this.CompositeDisposable);
-		this.Rate = model.Rate.ToBindableReactiveProperty().AddTo(this.CompositeDisposable);
-		this.Description = model.Description.ToBindableReactiveProperty(string.Empty).AddTo(this.CompositeDisposable);
-		this.UsageCount = model.UsageCount.ToBindableReactiveProperty().AddTo(this.CompositeDisposable);
-		this.Metadata = model.Metadata.ToBindableReactiveProperty().AddTo(this.CompositeDisposable);
-		this._model.AddTo(this.CompositeDisposable);
-
-		this.TagCandidates = model.TagModels.CreateViewWithDisposal(x => {
-			var categoryViewModel = this.GetCategoryViewModel(x.TagCategory, model.TagsManager, tagModelFactory);
-			return new TagViewModel(categoryViewModel, x, model.TagsManager, tagModelFactory);
-		}).AddTo(this.CompositeDisposable);
-		this.FilteredTagCandidates = this.TagCandidates.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current).AddTo(this.CompositeDisposable);
-
-		this.Tags = model.Tags.CreateViewWithDisposal(x => {
-			var categoryViewModel = this.GetCategoryViewModel(x.Value.TagCategory, model.TagsManager, tagModelFactory);
-			return new ValueCountPair<TagViewModel>(new TagViewModel(categoryViewModel, x.Value, model.TagsManager, tagModelFactory), x.Count);
-		})
-			.ToNotifyCollectionChangedWithDisposal(SynchronizationContextCollectionEventDispatcher.Current).AddTo(this.CompositeDisposable);
-
-		Observable.Merge(this.TargetFiles.Where(x => x != null).Select(_ => Unit.Default),
-				model.ContentChanged.AsObservable())
-			.Subscribe(_ => this._model.Refresh(this.TargetFileModels))
-			.AddTo(this.CompositeDisposable);
-
-		this.UpdateRateCommand.SubscribeAwait(async (x, ct) => {
-			if (!double.IsInteger(x) || this.TargetFiles.Value is null) {
-				return;
-			}
-			await model.UpdateRateAsync(this.TargetFileModels, (int)x);
-		}, AwaitOperation.Drop).AddTo(this.CompositeDisposable);
-
-		this.RefreshFilteredTagCandidatesCommand.Subscribe(_ => this.RefreshTagCandidateFilter())
-			.AddTo(this.CompositeDisposable);
-
-		this.UpdateDescriptionCommand.SubscribeAwait(async (_, ct) => {
-			await model.UpdateDescriptionAsync(this.TargetFileModels.First(), this.Description.Value);
-		}, AwaitOperation.Drop).AddTo(this.CompositeDisposable);
-
-		this.RemoveTagCommand.SubscribeAwait(async (x, ct) => {
-			await model.RemoveTagAsync(this.TargetFileModels, x.Value.Model.TagId);
-		}, AwaitOperation.Drop).AddTo(this.CompositeDisposable);
-
-		this.AddTagCommand.SubscribeAwait(async (_, ct) => {
-			if (string.IsNullOrEmpty(this.Text.Value)) {
-				return;
-			}
-
-			var tag = await model.FindTagByNameAsync(this.Text.Value);
-			if (tag is null) {
-				this.NewTagRequested.OnNext(new NewTagRequestedContext(this.Text.Value, model.TagCategories.FirstOrDefault()));
-				return;
-			}
-
-			await model.AddTagAsync(this.TargetFileModels, tag);
-			this.Text.Value = string.Empty;
-		}, AwaitOperation.Drop).AddTo(this.CompositeDisposable);
-
-		this.AddSpecificTagCommand.SubscribeAwait(async (tagViewModel, ct) => {
-			await model.AddTagAsync(this.TargetFileModels, tagViewModel.Model);
-			this.Text.Value = string.Empty;
-		}, AwaitOperation.Drop).AddTo(this.CompositeDisposable);
-
-		this.SearchTaggedFilesCommand.Subscribe(x => {
-			searchConditionNotificationDispatcher.UpdateRequest.OnNext(conditions => {
-				conditions.Clear();
-				var condition = new TagSearchCondition(this._model.TagsManager) {
-					TagId = x.Value.Model.TagId
-				};
-				conditions.Add(condition);
-			});
-		}).AddTo(this.CompositeDisposable);
-
-		this.OpenTagManagerCommand.Subscribe(x => {
-			this.OpenTagManagerRequested.OnNext(x.Value);
-		}).AddTo(this.CompositeDisposable);
-	}
-
-	public BindableReactiveProperty<string> RepresentativeFilePath {
+	/// <summary>
+	/// タグ詳細 ViewModel
+	/// </summary>
+	public TagsDetailViewModel TagsViewModel {
 		get;
 	}
 
+	/// <summary>
+	/// 選択対象ファイル群
+	/// </summary>
 	public BindableReactiveProperty<IMediaItemModel[]?> TargetFiles {
 		get;
 	} = new();
@@ -127,113 +39,29 @@ public class DetailSelectorViewModel : ViewModelBase {
 		}
 	}
 
-	public BindableReactiveProperty<string> Text {
-		get;
-	} = new(string.Empty);
-
-	public ISynchronizedView<ITagModel, TagViewModel> TagCandidates {
-		get;
-	}
-
-	public INotifyCollectionChangedSynchronizedViewList<TagViewModel> FilteredTagCandidates {
-		get;
-	}
-
-	public ReactiveCommand LoadTagCandidatesCommand {
-		get;
-	} = new();
-
-	public ReactiveCommand RefreshFilteredTagCandidatesCommand {
-		get;
-	} = new();
-
-	public INotifyCollectionChangedSynchronizedViewList<ValueCountPair<TagViewModel>> Tags {
-		get;
-	}
-
-	public ReactiveCommand<ValueCountPair<TagViewModel>> SearchTaggedFilesCommand {
-		get;
-	} = new();
-
-	public ReactiveCommand<ValueCountPair<TagViewModel>> OpenTagManagerCommand {
-		get;
-	} = new();
-
-	public BindableReactiveProperty<FileProperty[]> Properties {
-		get;
-	}
-
-	public BindableReactiveProperty<double> Rate {
-		get;
-	}
-
-	public BindableReactiveProperty<string> Description {
-		get;
-	}
-
-	public BindableReactiveProperty<double> UsageCount {
-		get;
-	}
-
-	public BindableReactiveProperty<MediaMetadata?> Metadata {
-		get;
-	}
-
-	public ReactiveCommand UpdateDescriptionCommand {
-		get;
-	} = new();
-
-	public ReactiveCommand<ValueCountPair<TagViewModel>> RemoveTagCommand {
-		get;
-	} = new();
-
-	public ReactiveCommand AddTagCommand {
-		get;
-	} = new();
-
-	public ReactiveCommand<TagViewModel> AddSpecificTagCommand {
-		get;
-	} = new();
-
-	public ReactiveCommand<double> UpdateRateCommand {
-		get;
-	} = new();
-
-	public ITagsManager GetTagsManager() {
-		return this._model.TagsManager;
-	}
-
-	public async Task OnNewTagCreated(ITagModel tag) {
-		await this._model.AddTagAsync(this.TargetFileModels, tag);
-		this.Text.Value = string.Empty;
-	}
-
-	private void RefreshTagCandidateFilter() {
-		this.TagCandidates.AttachFilter((m, vm) => {
-			var result = DetailSelectorModel.MatchesTagFilter(m, this.Text.Value, out var representativeText);
-			vm.RepresentativeText.Value = representativeText ?? string.Empty;
-			return result;
-		});
-	}
-
-	private TagCategoryViewModel GetCategoryViewModel(ITagCategoryModel category, ITagsManager tagsManager, ITagModelFactory factory) {
-		// ConcurrentDictionaryのキーはnotnull制約があるため、IDがnull(未設定)の場合はint.MinValueをキーとして使用します。
-		// このマジックナンバーはキャッシュ管理のためだけに内部で使用され、外部（モデルやUI）には影響しません。
-		var key = category.TagCategoryId ?? int.MinValue;
-		return this._categoryViewModels.GetOrAdd(key, _ => new TagCategoryViewModel(category, tagsManager, factory));
-	}
-
 	/// <summary>
-	/// リソースを破棄します。
+	/// <see cref="DetailSelectorViewModel"/> クラスの新しいインスタンスを初期化します。
 	/// </summary>
-	/// <param name="disposing">マネージドリソースを破棄するかどうか</param>
-	protected override void Dispose(bool disposing) {
-		if (disposing) {
-			foreach (var categoryVm in this._categoryViewModels.Values) {
-				categoryVm.Dispose();
-			}
-			this._categoryViewModels.Clear();
-		}
-		base.Dispose(disposing);
+	/// <param name="model">詳細セレクターモデル</param>
+	/// <param name="propertiesViewModel">プロパティ詳細 ViewModel</param>
+	/// <param name="tagsViewModel">タグ詳細 ViewModel</param>
+	public DetailSelectorViewModel(
+		DetailSelectorModel model,
+		PropertiesDetailViewModel propertiesViewModel,
+		TagsDetailViewModel tagsViewModel) {
+		this._model = model.AddTo(this.CompositeDisposable);
+		this.PropertiesViewModel = propertiesViewModel.AddTo(this.CompositeDisposable);
+		this.TagsViewModel = tagsViewModel.AddTo(this.CompositeDisposable);
+		this.TargetFiles.AddTo(this.CompositeDisposable);
+
+		// TargetFiles の変更を子 ViewModel へ同期
+		this.TargetFiles.Subscribe(files => {
+			this.PropertiesViewModel.TargetFiles.Value = files;
+			this.TagsViewModel.TargetFiles.Value = files;
+		}).AddTo(this.CompositeDisposable);
+
+		this._model.ContentChanged
+			.Subscribe(_ => this._model.Refresh(this.TargetFileModels))
+			.AddTo(this.CompositeDisposable);
 	}
 }
