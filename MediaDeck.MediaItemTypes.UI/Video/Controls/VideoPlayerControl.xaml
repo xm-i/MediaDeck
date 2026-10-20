@@ -46,7 +46,8 @@
 						<ColumnDefinition Width="Auto" />
 					</Grid.ColumnDefinitions>
 
-					<Slider IsTabStop="False" Grid.Column="0" Margin="10,0,10,0"
+					<Slider x:Name="sliderProgress"
+						IsTabStop="False" Grid.Column="0" Margin="10,0,10,0"
 						VerticalAlignment="Center"
 						IsThumbToolTipEnabled="False"
 						Value="{Binding Player.CurTime, Mode=TwoWay, Converter={StaticResource TicksToSeconds}}"

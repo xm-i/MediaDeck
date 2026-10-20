@@ -1,6 +1,7 @@
 using FlyleafLib.MediaPlayer;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 
 namespace MediaDeck.MediaItemTypes.UI.Video.Controls;
@@ -92,6 +93,10 @@ public sealed partial class VideoPlayerControl : UserControl, IDisposable {
 		this.Loaded += this.OnLoaded;
 		this.Unloaded += this.OnUnloaded;
 		this.UpdateButtonState();
+
+		this.sliderProgress.AddHandler(UIElement.PointerPressedEvent, new PointerEventHandler(this.OnSliderPointerAction), handledEventsToo: true);
+		this.sliderProgress.AddHandler(UIElement.PointerWheelChangedEvent, new PointerEventHandler(this.OnSliderPointerAction), handledEventsToo: true);
+		this.sliderProgress.AddHandler(UIElement.KeyDownEvent, new KeyEventHandler(this.OnSliderKeyAction), handledEventsToo: true);
 	}
 
 	private void OnLoaded(object sender, RoutedEventArgs e) {
@@ -138,6 +143,24 @@ public sealed partial class VideoPlayerControl : UserControl, IDisposable {
 		} else {
 			this.ThumbnailVisibility = Visibility.Collapsed;
 		}
+	}
+
+	/// <summary>
+	/// シークバーのポインター操作（クリック・ドラッグ・ホイール操作）時の処理。サムネイルを非表示にします。
+	/// </summary>
+	/// <param name="sender">イベント発生元。</param>
+	/// <param name="e">ポインターイベント引数。</param>
+	private void OnSliderPointerAction(object sender, PointerRoutedEventArgs e) {
+		this.ThumbnailVisibility = Visibility.Collapsed;
+	}
+
+	/// <summary>
+	/// シークバーのキー操作時の処理。サムネイルを非表示にします。
+	/// </summary>
+	/// <param name="sender">イベント発生元。</param>
+	/// <param name="e">キーイベント引数。</param>
+	private void OnSliderKeyAction(object sender, KeyRoutedEventArgs e) {
+		this.ThumbnailVisibility = Visibility.Collapsed;
 	}
 
 	private void OnUnloaded(object sender, RoutedEventArgs e) {
