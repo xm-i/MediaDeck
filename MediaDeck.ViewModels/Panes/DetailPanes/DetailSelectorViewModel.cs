@@ -33,6 +33,13 @@ public class DetailSelectorViewModel : ViewModelBase {
 		get;
 	} = new();
 
+	/// <summary>
+	/// ファイルが選択されているかどうか。
+	/// </summary>
+	public BindableReactiveProperty<bool> HasSelectedFiles {
+		get;
+	}
+
 	private IMediaItemModel[] TargetFileModels {
 		get {
 			return this.TargetFiles.Value ?? Array.Empty<IMediaItemModel>();
@@ -53,6 +60,11 @@ public class DetailSelectorViewModel : ViewModelBase {
 		this.PropertiesViewModel = propertiesViewModel.AddTo(this.CompositeDisposable);
 		this.TagsViewModel = tagsViewModel.AddTo(this.CompositeDisposable);
 		this.TargetFiles.AddTo(this.CompositeDisposable);
+
+		this.HasSelectedFiles = this.TargetFiles
+			.Select(files => files is { Length: > 0 })
+			.ToBindableReactiveProperty(this.TargetFiles.Value is { Length: > 0 })
+			.AddTo(this.CompositeDisposable);
 
 		// TargetFiles の変更を子 ViewModel へ同期
 		this.TargetFiles.Subscribe(files => {

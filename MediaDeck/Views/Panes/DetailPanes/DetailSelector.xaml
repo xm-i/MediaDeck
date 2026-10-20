@@ -22,13 +22,40 @@
 		<!-- Content -->
 		<Border Grid.Row="1"
 			Background="{ThemeResource LayerFillColorDefaultBrush}" >
-			<ScrollViewer Padding="12"
-				Visibility="{x:Bind ViewModel.TargetFiles.Value, Mode=OneWay, Converter={StaticResource NullToCollapseConverter}}" >
-				<StackPanel Spacing="16" >
-					<local:PropertiesDetail ViewModel="{x:Bind ViewModel.PropertiesViewModel, Mode=OneWay}" />
-					<local:TagsDetail ViewModel="{x:Bind ViewModel.TagsViewModel, Mode=OneWay}" />
+			<Grid>
+				<!-- 選択時: 詳細情報 -->
+				<ScrollViewer Padding="12"
+					Visibility="{x:Bind ViewModel.HasSelectedFiles.Value, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" >
+					<StackPanel Spacing="16" >
+						<local:PropertiesDetail ViewModel="{x:Bind ViewModel.PropertiesViewModel, Mode=OneWay}" />
+						<local:TagsDetail ViewModel="{x:Bind ViewModel.TagsViewModel, Mode=OneWay}" />
+					</StackPanel>
+				</ScrollViewer>
+
+				<!-- 未選択時: プレースホルダー表示 -->
+				<StackPanel HorizontalAlignment="Center"
+					VerticalAlignment="Center"
+					Spacing="8"
+					Padding="16"
+					Visibility="{x:Bind ViewModel.HasSelectedFiles.Value, Mode=OneWay, Converter={StaticResource InvertBoolToVisibilityConverter}}" >
+					<FontIcon Glyph="&#xE946;"
+						FontSize="40"
+						Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+						HorizontalAlignment="Center" />
+					<TextBlock x:Uid="Details_NoSelection"
+						HorizontalAlignment="Center"
+						TextAlignment="Center"
+						TextWrapping="Wrap"
+						Style="{ThemeResource BodyTextBlockStyle}"
+						Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+					<TextBlock x:Uid="Details_NoSelectionHint"
+						HorizontalAlignment="Center"
+						TextAlignment="Center"
+						TextWrapping="Wrap"
+						Style="{ThemeResource CaptionTextBlockStyle}"
+						Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
 				</StackPanel>
-			</ScrollViewer>
+			</Grid>
 		</Border>
 	</Grid>
 </local:DetailSelectorUserControl>

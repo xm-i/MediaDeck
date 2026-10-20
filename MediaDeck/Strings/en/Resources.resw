@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
@@ -315,6 +315,12 @@
   <!-- Details Pane -->
   <data name="Details_Header.Text" xml:space="preserve">
     <value>Details</value>
+  </data>
+  <data name="Details_NoSelection.Text" xml:space="preserve">
+    <value>No items selected</value>
+  </data>
+  <data name="Details_NoSelectionHint.Text" xml:space="preserve">
+    <value>Select an item to view its details.</value>
   </data>
   <data name="Details_Rating.Text" xml:space="preserve">
     <value>Rating</value>
