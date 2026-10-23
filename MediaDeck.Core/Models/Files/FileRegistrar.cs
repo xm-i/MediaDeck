@@ -97,6 +97,8 @@ public class FileRegistrar : ServiceBase {
 	/// <param name="folder">スキャン対象のフォルダーモデル</param>
 	public async Task ScanFolderAsync(FolderModel folder) {
 		folder.IsScanning.Value = true;
+		folder.RemainingCount.Value = 0;
+		folder.TotalCount.Value = 0;
 		var enqueued = false;
 
 		try {
@@ -123,8 +125,8 @@ public class FileRegistrar : ServiceBase {
 					.ToList();
 			}).ConfigureAwait(false);
 
-			folder.TotalCount.Value = files.Count;
 			folder.RemainingCount.Value = files.Count;
+			folder.TotalCount.Value = files.Count;
 
 			if (files.Count == 0) {
 				folder.IsScanning.Value = false;
@@ -148,6 +150,9 @@ public class FileRegistrar : ServiceBase {
 		}
 	}
 
+	/// <summary>
+	/// 登録キューから順次ファイルを取り出し、メディアアイテムとしての登録処理を実行します。
+	/// </summary>
 	private async Task RegisterFilesAsync() {
 		while (this.TryDequeue(out var filePath)) {
 			try {

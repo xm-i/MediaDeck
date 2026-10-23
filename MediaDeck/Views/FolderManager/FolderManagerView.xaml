@@ -67,7 +67,7 @@
 								<StackPanel Grid.Column="1"
 									Grid.Row="1"
 									Margin="0,4,0,0"
-									Visibility="{x:Bind IsScanning.Value, Mode=OneWay}" >
+									Visibility="{x:Bind IsScanning.Value, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" >
 									<ProgressBar
 										Value="{x:Bind ProcessedCount.Value, Mode=OneWay, Converter={StaticResource LongToDoubleConverter}}"
 										Maximum="{x:Bind TotalCount.Value, Mode=OneWay, Converter={StaticResource LongToDoubleConverter}}"
@@ -226,7 +226,7 @@
 									Height="4" />
 								<TextBlock FontSize="12"
 									Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-									Visibility="{x:Bind ViewModel.SelectedFolder.Value.IsScanning.Value, Mode=OneWay}" >
+									Visibility="{x:Bind ViewModel.SelectedFolder.Value.IsScanning.Value, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" >
 									<Run x:Uid="FolderManager_Scanning" />
 								</TextBlock>
 							</StackPanel>

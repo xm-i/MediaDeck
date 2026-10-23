@@ -3,17 +3,26 @@ using MediaDeck.Core.Models.FolderManager;
 
 namespace MediaDeck.ViewModels.FolderManager;
 
+/// <summary>
+/// フォルダー管理画面のViewModelを表します。
+/// </summary>
 [Inject(InjectServiceLifetime.Transient)]
 public class FolderManagerViewModel : ViewModelBase {
 	private readonly FolderManagerModel _folderManager;
 
+	/// <summary>
+	/// 登録フォルダー項目のリストを取得します。
+	/// </summary>
 	public INotifyCollectionChangedSynchronizedViewList<FolderViewModel> Folders {
 		get;
 	}
 
+	/// <summary>
+	/// 現在選択されているフォルダー項目を取得または設定します。
+	/// </summary>
 	public BindableReactiveProperty<FolderViewModel?> SelectedFolder {
 		get;
-	} = new();
+	}
 
 	/// <summary>
 	/// 登録フォルダ一覧が空であるかどうかを取得します。
@@ -36,25 +45,51 @@ public class FolderManagerViewModel : ViewModelBase {
 		get;
 	}
 
+	/// <summary>
+	/// フォルダーを追加するコマンドを取得します。
+	/// </summary>
 	public ReactiveCommand<string> AddFolderCommand {
 		get;
-	} = new();
+	}
 
+	/// <summary>
+	/// フォルダーを削除するコマンドを取得します。
+	/// </summary>
 	public ReactiveCommand<FolderViewModel> RemoveFolderCommand {
 		get;
-	} = new();
+	}
 
+	/// <summary>
+	/// すべてのフォルダーをスキャンするコマンドを取得します。
+	/// </summary>
 	public ReactiveCommand ScanCommand {
 		get;
-	} = new();
+	}
 
+	/// <summary>
+	/// 選択されたフォルダーをスキャンするコマンドを取得します。
+	/// </summary>
 	public ReactiveCommand<FolderViewModel> ScanSelectedFolderCommand {
 		get;
-	} = new();
+	}
 
+	/// <summary>
+	/// <see cref="FolderManagerViewModel"/> クラスの新しいインスタンスを初期化します。
+	/// </summary>
+	/// <param name="folderManager">フォルダー管理モデル</param>
 	public FolderManagerViewModel(FolderManagerModel folderManager) {
 		this._folderManager = folderManager;
-		this.Folders = this._folderManager.Folders.CreateView(x => new FolderViewModel(x)).ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
+
+		this.SelectedFolder = new BindableReactiveProperty<FolderViewModel?>().AddTo(this.CompositeDisposable);
+		this.AddFolderCommand = new ReactiveCommand<string>().AddTo(this.CompositeDisposable);
+		this.RemoveFolderCommand = new ReactiveCommand<FolderViewModel>().AddTo(this.CompositeDisposable);
+		this.ScanCommand = new ReactiveCommand().AddTo(this.CompositeDisposable);
+		this.ScanSelectedFolderCommand = new ReactiveCommand<FolderViewModel>().AddTo(this.CompositeDisposable);
+
+		this.Folders = this._folderManager.Folders
+			.CreateView(x => new FolderViewModel(x))
+			.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
+		this.Folders.AddTo(this.CompositeDisposable);
 
 		this.IsEmpty = this._folderManager.Folders
 			.ObserveCountChanged()
