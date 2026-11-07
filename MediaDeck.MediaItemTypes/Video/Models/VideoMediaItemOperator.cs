@@ -75,7 +75,7 @@ public partial class VideoMediaItemOperator : BaseMediaItemOperator {
 			}
 			var candidateRelativePath = this._filePathService.GetThumbnailRelativeFilePath();
 			var thumbPath = this._filePathService.GetThumbnailAbsoluteFilePath(candidateRelativePath);
-			var image = await this.CreateThumbnailAsync(filePath, videoStream.Width, videoStream.Height, this._config.ThumbnailConfig.ThumbnailSize.Value, this._config.ThumbnailConfig.ThumbnailSize.Value, metadata.Duration / 5);
+			var image = await this.CreateThumbnailAsync(filePath, videoStream.Width.GetValueOrDefault(), videoStream.Height.GetValueOrDefault(), this._config.ThumbnailConfig.ThumbnailSize.Value, this._config.ThumbnailConfig.ThumbnailSize.Value, metadata.Duration / 5);
 			new FileInfo(thumbPath).Directory?.Create();
 			await File.WriteAllBytesAsync(thumbPath, image);
 			thumbRelativePath = candidateRelativePath;
@@ -217,7 +217,7 @@ public partial class VideoMediaItemOperator : BaseMediaItemOperator {
 		if (mediaAnalysis.PrimaryVideoStream is { } video) {
 			AddEntryIfNotNull(entries, "VideoCodec", video.CodecName);
 			AddEntryIfNotNull(entries, "Resolution", $"{video.Width}x{video.Height}");
-			AddEntryIfNotNull(entries, "FrameRate", $"{video.FrameRate} fps");
+			AddEntryIfNotNull(entries, "FrameRate", $"{video.AverageFrameRate} fps");
 		}
 
 		if (mediaAnalysis.PrimaryAudioStream is { } audio) {
@@ -278,7 +278,7 @@ public partial class VideoMediaItemOperator : BaseMediaItemOperator {
 		if (metadata.PrimaryVideoStream is not { } videoStream) {
 			throw new Exception("PrimaryVideoStream is null");
 		}
-		return this.CreateThumbnail(fileModel.FilePath, videoStream.Width, videoStream.Height, width, height, time);
+		return this.CreateThumbnail(fileModel.FilePath, videoStream.Width.GetValueOrDefault(), videoStream.Height.GetValueOrDefault(), width, height, time);
 	}
 
 	/// <summary>
@@ -300,7 +300,7 @@ public partial class VideoMediaItemOperator : BaseMediaItemOperator {
 
 		var uuid = Guid.NewGuid();
 		var temporaryThumbPath = Path.Combine(this._config.PathConfig.TemporaryFolderPath.Value, $"{uuid}.png");
-		FFMpeg.Snapshot(filePath, temporaryThumbPath, new Size(width, height), time);
+		FFMpeg.Snapshot(filePath, temporaryThumbPath, new Size(width, height), time).ProcessSynchronously();
 
 		var binary = File.ReadAllBytes(temporaryThumbPath);
 		File.Delete(temporaryThumbPath);
@@ -321,7 +321,7 @@ public partial class VideoMediaItemOperator : BaseMediaItemOperator {
 		if (metadata.PrimaryVideoStream is not { } videoStream) {
 			throw new InvalidOperationException("PrimaryVideoStream is null");
 		}
-		return await this.CreateThumbnailAsync(fileModel.FilePath, videoStream.Width, videoStream.Height, width, height, time, cancellationToken).ConfigureAwait(false);
+		return await this.CreateThumbnailAsync(fileModel.FilePath, videoStream.Width.GetValueOrDefault(), videoStream.Height.GetValueOrDefault(), width, height, time, cancellationToken).ConfigureAwait(false);
 	}
 
 	/// <summary>
@@ -345,7 +345,7 @@ public partial class VideoMediaItemOperator : BaseMediaItemOperator {
 		var uuid = Guid.NewGuid();
 		var temporaryThumbPath = Path.Combine(this._config.PathConfig.TemporaryFolderPath.Value, $"{uuid}.png");
 		try {
-			await FFMpeg.SnapshotAsync(filePath, temporaryThumbPath, new Size(width, height), time).ConfigureAwait(false);
+			await FFMpeg.Snapshot(filePath, temporaryThumbPath, new Size(width, height), time).ProcessAsynchronously().ConfigureAwait(false);
 			var binary = await File.ReadAllBytesAsync(temporaryThumbPath, cancellationToken).ConfigureAwait(false);
 			return binary;
 		} finally {

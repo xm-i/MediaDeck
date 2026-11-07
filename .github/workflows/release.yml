@@ -15,10 +15,10 @@ jobs:
         include:
           - runtime: win-x64
             platform: x64
-            ffmpeg_url: https://github.com/BtbN/FFmpeg-Builds/releases/download/autobuild-2026-02-28-12-59/ffmpeg-n8.0.1-66-g27b8d1a017-win64-lgpl-shared-8.0.zip
+            ffmpeg_url: https://github.com/FFmpeg-Builds/FFmpeg-Builds/releases/download/autobuild-2026-11-07-12-47/ffmpeg-n9.0.2-48-gd4070a14ce-win64-lgpl-shared-9.0.zip
           - runtime: win-arm64
             platform: ARM64
-            ffmpeg_url: https://github.com/BtbN/FFmpeg-Builds/releases/download/autobuild-2026-02-28-12-59/ffmpeg-n8.0.1-66-g27b8d1a017-winarm64-lgpl-shared-8.0.zip
+            ffmpeg_url: https://github.com/FFmpeg-Builds/FFmpeg-Builds/releases/download/autobuild-2026-11-07-12-47/ffmpeg-n9.0.2-48-gd4070a14ce-winarm64-lgpl-shared-9.0.zip
 
     steps:
       - name: Checkout code

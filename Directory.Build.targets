@@ -8,28 +8,28 @@
     <PackageReference Update="CommunityToolkit.WinUI.Controls.Sizers" Version="8.2.251219" />
     <PackageReference Update="CommunityToolkit.WinUI.Controls.TokenizingTextBox" Version="8.2.251219" />
     <PackageReference Update="CommunityToolkit.WinUI.Converters" Version="8.2.251219" />
-    <PackageReference Update="FFMpegCore" Version="5.4.0" />
-    <PackageReference Update="Flyleaf.FFmpeg.Bindings" Version="8.1.0" />
-    <PackageReference Update="FlyleafLib.Controls.WinUI" Version="1.3.4" />
-    <PackageReference Update="Magick.NET-Q16-AnyCPU" Version="14.15.0" />
+    <PackageReference Update="FFMpegCore" Version="6.0.0" />
+
+    <PackageReference Update="FlyleafLib.Controls.WinUI" Version="1.4.16" />
+    <PackageReference Update="Magick.NET-Q16-AnyCPU" Version="15.1.0" />
     <PackageReference Update="MetadataExtractor" Version="2.9.3" />
-    <PackageReference Update="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.9" />
-    <PackageReference Update="SQLitePCLRaw.lib.e_sqlite3" Version="2.1.12" />
+    <PackageReference Update="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.14" />
+    <PackageReference Update="SQLitePCLRaw.lib.e_sqlite3" Version="3.53.3" />
     <PackageReference Update="Microsoft.Extensions.DependencyInjection" Version="10.0.14" />
     <PackageReference Update="Microsoft.Extensions.Logging" Version="10.0.14" />
-    <PackageReference Update="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.1839" />
-    <PackageReference Update="Microsoft.WindowsAppSDK" Version="2.2.0" />
+    <PackageReference Update="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.2957" />
+    <PackageReference Update="Microsoft.WindowsAppSDK" Version="2.6.5" />
     <PackageReference Update="ObservableCollections" Version="3.3.4" />
     <PackageReference Update="ObservableCollections.R3" Version="3.3.4" />
     <PackageReference Update="R3" Version="1.3.1" />
     <PackageReference Update="R3Extensions.WinUI3" Version="1.3.1" />
     <PackageReference Update="System.Interactive" Version="7.0.1" />
-    <PackageReference Update="System.Reactive" Version="6.1.0" />
-    <PackageReference Update="Serilog" Version="4.3.1" />
+    <PackageReference Update="System.Reactive" Version="7.0.0" />
+    <PackageReference Update="Serilog" Version="4.4.0" />
     <PackageReference Update="Serilog.Enrichers.Thread" Version="4.0.0" />
     <PackageReference Update="Serilog.Extensions.Logging" Version="10.0.0" />
     <PackageReference Update="Serilog.Sinks.Debug" Version="3.0.0" />
     <PackageReference Update="Serilog.Sinks.File" Version="7.0.0" />
-    <PackageReference Update="XAML.MapControl.WinUI" Version="17.1.0" />
+    <PackageReference Update="XAML.MapControl.WinUI" Version="17.2.0" />
   </ItemGroup>
 </Project>

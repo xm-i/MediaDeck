@@ -232,7 +232,7 @@ public partial class App {
 #if DEBUG
 					LogOutput = ":debug",
 					LogLevel = FlyleafLib.LogLevel.Debug,
-					FFmpegLogLevel = Flyleaf.FFmpeg.LogLevel.Warn,
+					FFmpegLogLevel = Flyleaf.FFmpeg.LogLevel.Warning,
 #endif
 					UIRefresh = false,
 					FFmpegPath = this._configStore.Config.PathConfig.FFMpegFolderPath.Value,
