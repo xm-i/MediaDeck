@@ -561,6 +561,25 @@
   <data name="TabRenameDialog_Name.PlaceholderText" xml:space="preserve">
     <value>名前を入力してください</value>
   </data>
+  <!-- ウィンドウ閉じる確認ダイアログ -->
+  <data name="CloseWindowDialog.Title" xml:space="preserve">
+    <value>ウィンドウを閉じる</value>
+  </data>
+  <data name="CloseWindowDialog.PrimaryButtonText" xml:space="preserve">
+    <value>別のウィンドウに移動</value>
+  </data>
+  <data name="CloseWindowDialog.SecondaryButtonText" xml:space="preserve">
+    <value>移動せず閉じる</value>
+  </data>
+  <data name="CloseWindowDialog.CloseButtonText" xml:space="preserve">
+    <value>キャンセル</value>
+  </data>
+  <data name="CloseWindowDialog_MessageFormat" xml:space="preserve">
+    <value>このウィンドウには {0} 個のタブが開いています。これらのタブを別のウィンドウに移動しますか？ 移動しない場合、これらのタブは閉じられます。</value>
+  </data>
+  <data name="CloseWindowDialog_TargetWindowHeader.Text" xml:space="preserve">
+    <value>移動先ウィンドウ:</value>
+  </data>
   <!-- プロパティ比較ダイアログ -->
   <data name="PropertyComparisonDialog.Title" xml:space="preserve">
     <value>プロパティ比較条件</value>

@@ -561,6 +561,25 @@
   <data name="TabRenameDialog_Name.PlaceholderText" xml:space="preserve">
     <value>Enter a name</value>
   </data>
+  <!-- Close Window Confirmation Dialog -->
+  <data name="CloseWindowDialog.Title" xml:space="preserve">
+    <value>Close Window</value>
+  </data>
+  <data name="CloseWindowDialog.PrimaryButtonText" xml:space="preserve">
+    <value>Move to Another Window</value>
+  </data>
+  <data name="CloseWindowDialog.SecondaryButtonText" xml:space="preserve">
+    <value>Close without Moving</value>
+  </data>
+  <data name="CloseWindowDialog.CloseButtonText" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="CloseWindowDialog_MessageFormat" xml:space="preserve">
+    <value>There are {0} tabs open in this window. Do you want to move these tabs to another window? If not, these tabs will be closed.</value>
+  </data>
+  <data name="CloseWindowDialog_TargetWindowHeader.Text" xml:space="preserve">
+    <value>Destination Window:</value>
+  </data>
   <!-- Property Comparison Dialog -->
   <data name="PropertyComparisonDialog.Title" xml:space="preserve">
     <value>Property Comparison Condition</value>

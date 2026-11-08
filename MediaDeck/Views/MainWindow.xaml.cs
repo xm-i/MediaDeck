@@ -17,6 +17,7 @@ public sealed partial class MainWindow : Window {
 	private readonly MainWindowViewModel _viewModel;
 	private readonly CompositeDisposable _disposable = new();
 	private readonly IStringProvider _stringProvider;
+	private bool _isClosingConfirmed = false;
 
 	public MainWindow(MainWindowViewModel viewModel, IConfigStore configStore, IStringProvider stringProvider) {
 		this._viewModel = viewModel;
@@ -57,8 +58,45 @@ public sealed partial class MainWindow : Window {
 		}).AddTo(this._disposable);
 
 		this.Closed += (s, e) => this._disposable.Dispose();
+		this.AppWindow.Closing += this.AppWindow_Closing;
 
 		this._viewModel.WindowActivatedCommand.Execute(Unit.Default);
+	}
+
+	private async void AppWindow_Closing(Microsoft.UI.Windowing.AppWindow sender, Microsoft.UI.Windowing.AppWindowClosingEventArgs args) {
+		if (this._isClosingConfirmed) {
+			return;
+		}
+
+		var windowManager = Ioc.Default.GetRequiredService<WindowManager>();
+		var otherWindows = windowManager.GetOtherWindows(this._viewModel.WindowId);
+
+		// 他にウィンドウがない、またはタブが0個の場合は確認せずそのまま閉じる
+		if (otherWindows.Count == 0 || ((System.Collections.Generic.IReadOnlyCollection<TabViewModel>)this._viewModel.Tabs).Count == 0) {
+			return;
+		}
+
+		// 非同期ダイアログで確認するため、一旦クローズをキャンセル
+		args.Cancel = true;
+
+		var dialog = Ioc.Default.GetRequiredService<CloseWindowDialog>();
+		dialog.XamlRoot = this.Content.XamlRoot;
+		dialog.Initialize(((System.Collections.Generic.IReadOnlyCollection<TabViewModel>)this._viewModel.Tabs).Count, otherWindows);
+
+		var result = await dialog.ShowAsync();
+
+		if (result == ContentDialogResult.Primary) {
+			// 別のウィンドウに移動（マージ）
+			var targetWindowId = dialog.SelectedTargetWindowId ?? otherWindows[0].WindowId;
+			this._viewModel.MoveAllTabsToWindow(targetWindowId);
+			this._isClosingConfirmed = true;
+			this.Close();
+		} else if (result == ContentDialogResult.Secondary) {
+			// 移動せず閉じる（タブを破棄）
+			this._isClosingConfirmed = true;
+			this.Close();
+		}
+		// Cancel の場合は何もしない（ウィンドウは開いたまま維持）
 	}
 
 	private void MainTabView_TabCloseRequested(TabView sender, TabViewTabCloseRequestedEventArgs args) {

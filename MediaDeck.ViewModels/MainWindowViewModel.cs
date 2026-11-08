@@ -162,6 +162,27 @@ public class MainWindowViewModel : ViewModelBase {
 		}
 	}
 
+	/// <summary>
+	/// このウィンドウのすべてのタブを指定したターゲットウィンドウへ移動（マージ）します。
+	/// 移動されたタブは <see cref="RootStateModel.Tabs"/> に維持されたまま、ターゲットウィンドウのタブリストに追加されます。
+	/// </summary>
+	/// <param name="targetWindowId">移動先のウィンドウID</param>
+	public void MoveAllTabsToWindow(Guid targetWindowId) {
+		var targetWindow = this._rootState.Windows.FirstOrDefault(w => w.WindowId == targetWindowId);
+		if (targetWindow == null) {
+			return;
+		}
+
+		var tabIdsToMove = this._windowState.TabIds.ToList();
+		this._windowState.TabIds.Clear();
+
+		foreach (var tabId in tabIdsToMove) {
+			if (!targetWindow.TabIds.Contains(tabId)) {
+				targetWindow.TabIds.Add(tabId);
+			}
+		}
+	}
+
 	protected override void Dispose(bool disposing) {
 		if (disposing) {
 			foreach (var tab in this.Tabs) {
