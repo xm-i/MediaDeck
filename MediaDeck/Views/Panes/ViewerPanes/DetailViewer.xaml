@@ -34,15 +34,24 @@
 				SelectedItem="{x:Bind ViewModel.MediaContentLibraryViewModel.SelectedFile.Value, Mode=TwoWay}"
 				SelectionMode="Single"
 				SelectionChanged="List_SelectionChanged"
+				BringIntoViewRequested="List_BringIntoViewRequested"
+				SizeChanged="List_SizeChanged"
+				ShowsScrollingPlaceholders="False"
 				ScrollViewer.HorizontalScrollMode="Auto"
 				ScrollViewer.HorizontalScrollBarVisibility="Auto"
 				ScrollViewer.VerticalScrollMode="Disabled"
 				ScrollViewer.VerticalScrollBarVisibility="Hidden"
 				HorizontalAlignment="Stretch"
 				Padding="12,0,12,12">
+				<ListView.ItemContainerTransitions>
+					<TransitionCollection />
+				</ListView.ItemContainerTransitions>
 				<ListView.ItemsPanel>
 					<ItemsPanelTemplate>
-						<ItemsStackPanel Orientation="Horizontal" />
+						<ItemsWrapGrid x:Name="WrapGrid"
+							Orientation="Vertical"
+							MaximumRowsOrColumns="1"
+							Loaded="WrapGrid_Loaded" />
 					</ItemsPanelTemplate>
 				</ListView.ItemsPanel>
 				<ListView.ItemContainerStyle>
@@ -50,13 +59,18 @@
 				</ListView.ItemContainerStyle>
 				<ListView.ItemTemplate>
 					<DataTemplate x:DataType="vmIf:IMediaItemViewModel" >
-						<Grid DoubleTapped="File_DoubleTapped" CornerRadius="4" Background="{ThemeResource ControlFillColorDefaultBrush}">
+						<Grid DoubleTapped="File_DoubleTapped"
+							Width="{Binding DataContext.ItemSize.Value, Mode=OneWay, ElementName=List}"
+							Height="{Binding DataContext.ItemSize.Value, Mode=OneWay, ElementName=List}"
+							CornerRadius="4"
+							Background="{ThemeResource ControlFillColorDefaultBrush}">
 							<ContentControl
 								Content="{x:Bind}"
 								ContentTemplateSelector="{StaticResource MediaItemThumbnailControlTplSel}"
+								Width="{Binding DataContext.ItemSize.Value, Mode=OneWay, ElementName=List}"
 								Height="{Binding DataContext.ItemSize.Value, Mode=OneWay, ElementName=List}"
 								HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
-							
+
 							<!-- Missing File Overlay -->
 							<Grid Background="{ThemeResource SystemControlBackgroundBaseMediumBrush}"
 								  Opacity="0.8"
