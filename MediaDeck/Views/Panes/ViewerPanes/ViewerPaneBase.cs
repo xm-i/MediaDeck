@@ -49,8 +49,10 @@ public abstract class ViewerPaneBase<T> : UserControlBase<T> where T : ViewerPan
 		}
 		if (sender is ListViewBase listViewBase) {
 			vm.MediaContentLibraryViewModel.SelectedFiles.Value = listViewBase.SelectedItems.Select(x => x as IMediaItemViewModel).Where(x => x is { }).ToArray()!;
+			vm.MediaContentLibraryViewModel.SelectedFile.Value = listViewBase.SelectedItem as IMediaItemViewModel;
 		} else if (sender is ListBox listBox) {
 			vm.MediaContentLibraryViewModel.SelectedFiles.Value = listBox.SelectedItems.Select(x => x as IMediaItemViewModel).Where(x => x is { }).ToArray()!;
+			vm.MediaContentLibraryViewModel.SelectedFile.Value = listBox.SelectedItem as IMediaItemViewModel;
 		}
 	}
 

@@ -14,13 +14,11 @@
 		</Grid.RowDefinitions>
 
 		<Grid Grid.Row="0" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-			<ContentControl
+			<ContentControl x:Name="PreviewContentControl"
 				HorizontalAlignment="Stretch"
 				VerticalAlignment="Stretch"
 				HorizontalContentAlignment="Stretch"
-				VerticalContentAlignment="Stretch"
-				Content="{x:Bind ViewModel.SelectedFile.Value, Mode=OneWay}"
-				ContentTemplateSelector="{StaticResource MediaItemDetailTplSel}" />
+				VerticalContentAlignment="Stretch" />
 		</Grid>
 
 		<!-- Filmstrip (Thumbnail List) Area -->

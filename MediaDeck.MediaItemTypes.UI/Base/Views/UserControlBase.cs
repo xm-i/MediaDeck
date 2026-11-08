@@ -56,9 +56,13 @@ public abstract class UserControlBase<T> : UserControl, INotifyPropertyChanged w
 		if (d is UserControlBase<T> control) {
 			var newValue = e.NewValue as T;
 
-			// DataContext を同期する
+			// DataContext を同期する（null 時はローカル値を設定せず継承状態を維持/回復させる）
 			if (!ReferenceEquals(control.DataContext, newValue)) {
-				control.DataContext = newValue;
+				if (newValue == null) {
+					control.ClearValue(FrameworkElement.DataContextProperty);
+				} else {
+					control.DataContext = newValue;
+				}
 			}
 
 			// プロパティ変更通知を発火する

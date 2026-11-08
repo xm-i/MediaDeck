@@ -33,6 +33,15 @@ public class MediaContentLibraryViewModel : ViewModelBase {
 				await mediaContentLibrary.LoadMoreAsync(ct).ConfigureAwait(false);
 			}, AwaitOperation.Drop)
 			.AddTo(this.CompositeDisposable);
+		this.SelectedFile = new BindableReactiveProperty<IMediaItemViewModel?>(null).AddTo(this.CompositeDisposable);
+		this.SelectedFiles = new BindableReactiveProperty<IMediaItemViewModel[]>([]).AddTo(this.CompositeDisposable);
+
+		this.Files.CollectionChanged += (s, e) => {
+			if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Reset) {
+				this.SelectedFile.Value = null;
+				this.SelectedFiles.Value = [];
+			}
+		};
 	}
 
 	public ReactiveCommand LoadMoreCommand {
@@ -67,13 +76,13 @@ public class MediaContentLibraryViewModel : ViewModelBase {
 		}
 	}
 
-	public BindableReactiveProperty<IMediaItemViewModel> SelectedFile {
+	public BindableReactiveProperty<IMediaItemViewModel?> SelectedFile {
 		get;
-	} = new();
+	}
 
 	public BindableReactiveProperty<IMediaItemViewModel[]> SelectedFiles {
 		get;
-	} = new([]);
+	}
 
 	public BindableReactiveProperty<long?> SearchElapsedMilliseconds {
 		get;

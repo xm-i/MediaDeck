@@ -1,4 +1,5 @@
 using CommunityToolkit.WinUI;
+using MediaDeck.Composition.Interfaces.MediaItemTypes.ViewModels;
 using MediaDeck.ViewModels.Panes.ViewerPanes;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
@@ -68,6 +69,7 @@ public sealed partial class DetailViewer {
 		this.DetachScrollViewerWheelInterceptor();
 		this.StopScrollAnimation();
 		this._viewModelDisposable.Disposable = null;
+		this.UpdatePreview(null);
 		this._isInitialLoaded = false;
 		this._scrollViewer = null;
 		this._wrapGrid = null;
@@ -135,12 +137,13 @@ public sealed partial class DetailViewer {
 	}
 
 	/// <summary>
-	/// ViewModel の ItemSize 変更を購読します。
+	/// ViewModel の ItemSize および SelectedFile 変更を購読します。
 	/// </summary>
 	/// <param name="viewModel">購読対象の ViewModel。</param>
 	private void SubscribeViewModel(DetailViewerViewModel? viewModel) {
 		if (viewModel == null) {
 			this._viewModelDisposable.Disposable = null;
+			this.UpdatePreview(null);
 			return;
 		}
 
@@ -149,12 +152,38 @@ public sealed partial class DetailViewer {
 			.Subscribe(_ => this.OnItemSizeChanged())
 			.AddTo(cd);
 
+		viewModel.SelectedFile
+			.Subscribe(this.UpdatePreview)
+			.AddTo(cd);
+
 		viewModel.MediaContentLibraryViewModel.Files.CollectionChanged += this.OnFilesCollectionChanged;
 		Disposable.Create(() => {
 			viewModel.MediaContentLibraryViewModel.Files.CollectionChanged -= this.OnFilesCollectionChanged;
 		}).AddTo(cd);
 
 		this._viewModelDisposable.Disposable = cd;
+	}
+
+	/// <summary>
+	/// 上部プレビュー領域の表示アイテムを更新します。
+	/// WinUI 3 の ContentControl / ContentTemplateSelector キャッシュ不具合（Content=null 遷移時の無効化）を回避するため、
+	/// セレクターからテンプレートを解決して明示的に ContentTemplate と Content を同期設定します。
+	/// </summary>
+	/// <param name="file">選択されたファイル ViewModel。null の場合はプレビューをクリアします。</param>
+	private void UpdatePreview(IMediaItemViewModel? file) {
+		if (file == null) {
+			this.PreviewContentControl.Content = null;
+			this.PreviewContentControl.ContentTemplate = null;
+			return;
+		}
+
+		var selector = (Application.Current.Resources.TryGetValue("MediaItemDetailTplSel", out var appRes) ? appRes as DataTemplateSelector : null)
+			?? (this.Resources.TryGetValue("MediaItemDetailTplSel", out var res) ? res as DataTemplateSelector : null);
+
+		var template = selector?.SelectTemplate(file, this.PreviewContentControl);
+
+		this.PreviewContentControl.ContentTemplate = template;
+		this.PreviewContentControl.Content = file;
 	}
 
 	private void OnFilesCollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {

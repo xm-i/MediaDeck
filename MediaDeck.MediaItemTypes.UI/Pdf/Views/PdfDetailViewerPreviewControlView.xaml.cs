@@ -7,6 +7,15 @@ public sealed partial class PdfDetailViewerPreviewControlView : PdfDetailViewerP
 	public PdfDetailViewerPreviewControlView() {
 		this.InitializeComponent();
 	}
+
+	/// <inheritdoc/>
+	protected override void OnViewModelChanged(IMediaItemViewModel? oldViewModel, IMediaItemViewModel? newViewModel) {
+		base.OnViewModelChanged(oldViewModel, newViewModel);
+		if (newViewModel == null) {
+			this.PreviewImage.Source = null;
+		}
+		this.Bindings.Update();
+	}
 }
 
 public class PdfDetailViewerPreviewControlViewUserControl : UserControlBase<IMediaItemViewModel> {
