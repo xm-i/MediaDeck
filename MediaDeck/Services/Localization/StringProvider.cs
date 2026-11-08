@@ -13,6 +13,9 @@ public class StringProvider : IStringProvider {
 	private readonly ResourceMap _resourceMap;
 	private readonly ResourceContext _context;
 
+	/// <summary>
+	/// <see cref="StringProvider"/> クラスの新しいインスタンスを初期化します。
+	/// </summary>
 	public StringProvider() {
 		var manager = new ResourceManager();
 		this._resourceMap = manager.MainResourceMap.GetSubtree("Resources");
@@ -26,19 +29,26 @@ public class StringProvider : IStringProvider {
 		}
 	}
 
+	/// <inheritdoc />
 	public string GetString(string key) {
 		if (string.IsNullOrEmpty(key)) {
 			return string.Empty;
 		}
 
 		try {
-			var candidate = this._resourceMap.GetValue(key, this._context);
+			// Windows App SDK の ResourceManager では、.resw の "A.B" は "A/B" として PRI に格納されるため、
+			// ドットが含まれている場合はスラッシュに正規化して検索する
+			var lookupKey = key.Contains('.') ? key.Replace('.', '/') : key;
+			var candidate = this._resourceMap.TryGetValue(lookupKey, this._context)
+				?? (lookupKey != key ? this._resourceMap.TryGetValue(key, this._context) : null);
+
 			return candidate?.ValueAsString ?? key;
 		} catch {
 			return key;
 		}
 	}
 
+	/// <inheritdoc />
 	public string GetString(string key, params object?[] args) {
 		var format = this.GetString(key);
 		if (args == null || args.Length == 0) {
