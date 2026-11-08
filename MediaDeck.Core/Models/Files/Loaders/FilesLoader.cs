@@ -67,6 +67,7 @@ public class FilesLoader(IDbContextFactory<MediaDeckDbContext> dbFactory, SortSe
 		query = this.SortSelector.SetSortConditions(query);
 
 		query = query
+			.AsSplitQuery()
 			.Include(mf => mf.MediaItemTags)
 			.ThenInclude(mft => mft.Tag)
 			.ThenInclude(t => t.TagCategory)
