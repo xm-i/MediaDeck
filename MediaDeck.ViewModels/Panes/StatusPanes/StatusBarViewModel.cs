@@ -53,6 +53,13 @@ public class StatusBarViewModel : ViewModelBase {
 	}
 
 	/// <summary>
+	/// OverlayおよびInfoの表示切り替えが可能かどうか（WrapViewerが選択されているかどうか）
+	/// </summary>
+	public BindableReactiveProperty<bool> CanToggleOverlayAndInfo {
+		get;
+	}
+
+	/// <summary>
 	/// アイテムのサイズを拡大するコマンド
 	/// </summary>
 	public ReactiveCommand<Unit> ZoomInCommand {
@@ -97,6 +104,11 @@ public class StatusBarViewModel : ViewModelBase {
 
 		this.ShowInfo = tabState.ViewerState.ShowInfo
 			.ToTwoWayBindableReactiveProperty(tabState.ViewerState.ShowInfo.Value, this.CompositeDisposable)
+			.AddTo(this.CompositeDisposable);
+
+		this.CanToggleOverlayAndInfo = tabState.ViewerState.ActiveViewer
+			.Select(x => x == ViewerType.Wrap)
+			.ToBindableReactiveProperty(tabState.ViewerState.ActiveViewer.Value == ViewerType.Wrap)
 			.AddTo(this.CompositeDisposable);
 	}
 }

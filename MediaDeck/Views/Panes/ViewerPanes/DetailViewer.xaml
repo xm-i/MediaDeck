@@ -62,12 +62,11 @@
 							Height="{Binding DataContext.ItemSize.Value, Mode=OneWay, ElementName=List}"
 							CornerRadius="4"
 							Background="{ThemeResource ControlFillColorDefaultBrush}">
-							<ContentControl
-								Content="{x:Bind}"
-								ContentTemplateSelector="{StaticResource MediaItemThumbnailControlTplSel}"
+							<Image
+								Source="{x:Bind ThumbnailFilePath.Value, Mode=OneWay}"
 								Width="{Binding DataContext.ItemSize.Value, Mode=OneWay, ElementName=List}"
 								Height="{Binding DataContext.ItemSize.Value, Mode=OneWay, ElementName=List}"
-								HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
+								Stretch="Uniform" />
 
 							<!-- Missing File Overlay -->
 							<Grid Background="{ThemeResource SystemControlBackgroundBaseMediumBrush}"

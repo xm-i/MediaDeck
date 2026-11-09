@@ -77,7 +77,7 @@
 					<Grid DoubleTapped="File_DoubleTapped" >
 						<StackPanel Orientation="Horizontal" >
 							<Border Width="{Binding DataContext.ItemSize.Value, Mode=OneWay, ElementName=List}" >
-								<ContentControl Margin="4" Content="{x:Bind}" ContentTemplateSelector="{StaticResource MediaItemThumbnailControlTplSel}" Height="{Binding DataContext.ItemSize.Value, Mode=OneWay, ElementName=List}" Width="{Binding DataContext.ItemSize.Value, Mode=OneWay, ElementName=List}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
+								<Image Margin="4" Source="{x:Bind ThumbnailFilePath.Value, Mode=OneWay}" Height="{Binding DataContext.ItemSize.Value, Mode=OneWay, ElementName=List}" Width="{Binding DataContext.ItemSize.Value, Mode=OneWay, ElementName=List}" Stretch="Uniform" />
 							</Border>
 							<Border Width="{Binding DataContext.FileNameColumn.EffectiveWidth.Value, Mode=OneWay, ElementName=List}" Visibility="{Binding DataContext.FileNameColumn.IsVisible.Value, Mode=OneWay, ElementName=List, Converter={StaticResource BoolToVisibilityConverter}}" >
 								<TextBlock Text="{x:Bind FilePath}" VerticalAlignment="Center" Margin="8,0,8,0" TextTrimming="CharacterEllipsis" />

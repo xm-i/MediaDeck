@@ -57,10 +57,31 @@
 				</StackPanel>
 			</StackPanel>
 
-			<Grid Grid.Row="1"/>
+			<StackPanel Grid.Column="2"
+				Orientation="Horizontal"
+				VerticalAlignment="Center"
+				Spacing="8"
+				Visibility="{x:Bind ViewModel.CanToggleOverlayAndInfo.Value, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" >
+				<ToggleButton MinWidth="96"
+					Height="30"
+					IsChecked="{x:Bind ViewModel.ShowOverlay.Value, Mode=TwoWay}" >
+					<StackPanel Orientation="Horizontal" Spacing="6" >
+						<FontIcon Glyph="&#xE71E;" FontSize="14" />
+						<TextBlock x:Uid="StatusBar_Overlay" VerticalAlignment="Center" />
+					</StackPanel>
+				</ToggleButton>
+				<ToggleButton MinWidth="80"
+					Height="30"
+					IsChecked="{x:Bind ViewModel.ShowInfo.Value, Mode=TwoWay}" >
+					<StackPanel Orientation="Horizontal" Spacing="6" >
+						<FontIcon Glyph="&#xE946;" FontSize="14" />
+						<TextBlock x:Uid="StatusBar_Info" VerticalAlignment="Center" />
+					</StackPanel>
+				</ToggleButton>
+			</StackPanel>
 
 			<controls:Segmented x:Name="ViewerModeSegmented"
-				Grid.Column="2"
+				Grid.Column="3"
 				SelectionMode="Single"
 				ItemsSource="{x:Bind ViewModel.ViewerSelector.ViewerPaneViewModels, Mode=OneWay}"
 				SelectedItem="{x:Bind ViewModel.ViewerSelector.SelectedViewerPane.Value, Mode=OneWay}"
@@ -73,29 +94,7 @@
 				</controls:Segmented.ItemTemplate>
 			</controls:Segmented>
 
-				<StackPanel Grid.Column="3"
-					Orientation="Horizontal"
-					VerticalAlignment="Center"
-					Spacing="8" >
-					<ToggleButton MinWidth="96"
-						Height="30"
-						IsChecked="{x:Bind ViewModel.ShowOverlay.Value, Mode=TwoWay}" >
-						<StackPanel Orientation="Horizontal" Spacing="6" >
-							<FontIcon Glyph="&#xE71E;" FontSize="14" />
-							<TextBlock x:Uid="StatusBar_Overlay" VerticalAlignment="Center" />
-						</StackPanel>
-					</ToggleButton>
-					<ToggleButton MinWidth="80"
-						Height="30"
-						IsChecked="{x:Bind ViewModel.ShowInfo.Value, Mode=TwoWay}" >
-						<StackPanel Orientation="Horizontal" Spacing="6" >
-							<FontIcon Glyph="&#xE946;" FontSize="14" />
-							<TextBlock x:Uid="StatusBar_Info" VerticalAlignment="Center" />
-						</StackPanel>
-					</ToggleButton>
-				</StackPanel>
-
-				<StackPanel Grid.Column="4"
+			<StackPanel Grid.Column="4"
 				Orientation="Horizontal"
 				VerticalAlignment="Center"
 				Spacing="12" >
