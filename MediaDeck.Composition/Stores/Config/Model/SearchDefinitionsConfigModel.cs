@@ -37,7 +37,8 @@ public class SearchDefinitionsConfigModel {
 			(stringProvider.GetString("Sort_ModifiedTime"), [SortItemKey.ModifiedTime]),
 			(stringProvider.GetString("Sort_Rate"), [SortItemKey.Rate]),
 			(stringProvider.GetString("Sort_UsageCount"), [SortItemKey.UsageCount]),
-			(stringProvider.GetString("Sort_FileSize"), [SortItemKey.FileSize])
+			(stringProvider.GetString("Sort_FileSize"), [SortItemKey.FileSize]),
+			(stringProvider.GetString("Sort_Random"), [SortItemKey.Random])
 		];
 		this.SortConditions = [
 			.. sc.Select(x => {

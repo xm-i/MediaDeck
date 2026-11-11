@@ -26,6 +26,7 @@ public class SortItemFactoryTests {
 	[InlineData(SortItemKey.Resolution)]
 	[InlineData(SortItemKey.UsageCount)]
 	[InlineData(SortItemKey.Duration)]
+	[InlineData(SortItemKey.Random)]
 	public void Create_ValidKey_ReturnsSortItemWithCorrectKey(SortItemKey key) {
 		// Arrange
 		var obj = new SortItemObject { SortItemKey = key, Direction = ListSortDirection.Ascending };
@@ -64,5 +65,21 @@ public class SortItemFactoryTests {
 
 		// Act & Assert
 		Should.Throw<ArgumentException>(() => SortItemFactory.Create(obj));
+	}
+	/// <summary>
+	///     SortItemKey.Random の場合、指定したシード値を持つ RandomSortItem が生成されることを確認します。
+	/// </summary>
+	[Fact]
+	public void Create_RandomKey_ReturnsRandomSortItemWithSeed() {
+		// Arrange
+		var obj = new SortItemObject { SortItemKey = SortItemKey.Random, Direction = ListSortDirection.Ascending };
+
+		// Act
+		var result = SortItemFactory.Create(obj, seed: 12345);
+
+		// Assert
+		result.ShouldBeOfType<RandomSortItem>();
+		var randomItem = (RandomSortItem)result;
+		randomItem.Seed.ShouldBe(12345);
 	}
 }

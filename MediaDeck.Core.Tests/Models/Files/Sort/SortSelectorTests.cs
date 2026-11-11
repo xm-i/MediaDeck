@@ -201,4 +201,57 @@ public class SortSelectorTests {
 		// Assert
 		Assert.False(notified);
 	}
+
+	/// <summary>
+	/// ソート条件にRandomが含まれている場合、IsRandomSortがtrueを返すことを確認します。
+	/// </summary>
+	[Fact]
+	public void IsRandomSort_ReturnsTrue_WhenSortItemKeyIsRandom() {
+		// Arrange
+		var sortObject = this._searchDefinitions.AddSortCondition();
+		var item = sortObject.AddSortItemObject();
+		item.SortItemKey = SortItemKey.Random;
+
+		this._tabState.SearchState.CurrentSortCondition.Value = sortObject.Id;
+		var selector = new SortSelector(this._tabState, this._searchDefinitions, new SearchConditionNotificationDispatcher());
+
+		// Act & Assert
+		Assert.True(selector.IsRandomSort);
+	}
+
+	/// <summary>
+	/// ソート条件にRandomが含まれていない場合、IsRandomSortがfalseを返すことを確認します。
+	/// </summary>
+	[Fact]
+	public void IsRandomSort_ReturnsFalse_WhenSortItemKeyIsNotRandom() {
+		// Arrange
+		var sortObject = this._searchDefinitions.AddSortCondition();
+		var item = sortObject.AddSortItemObject();
+		item.SortItemKey = SortItemKey.FilePath;
+
+		this._tabState.SearchState.CurrentSortCondition.Value = sortObject.Id;
+		var selector = new SortSelector(this._tabState, this._searchDefinitions, new SearchConditionNotificationDispatcher());
+
+		// Act & Assert
+		Assert.False(selector.IsRandomSort);
+
+	}
+	/// <summary>
+	/// RandomSeed が初期化され、RegenerateRandomSeed により更新されることを確認します。
+	/// </summary>
+	[Fact]
+	public void RandomSeed_InitializedAndRegenerated() {
+		// Arrange
+		var selector = new SortSelector(this._tabState, this._searchDefinitions, new SearchConditionNotificationDispatcher());
+		var initialSeed = selector.RandomSeed;
+
+		// Assert: 0 以外の正のシード値が設定されていること
+		Assert.True(initialSeed > 0);
+
+		// Act
+		selector.RegenerateRandomSeed();
+
+		// Assert: 再生成でシード値が有効な値であること
+		Assert.True(selector.RandomSeed > 0);
+	}
 }

@@ -11,5 +11,9 @@ public enum SortItemKey {
 	Rate,
 	Resolution,
 	UsageCount,
-	Duration
+	Duration,
+	/// <summary>
+	/// ランダム
+	/// </summary>
+	Random
 }

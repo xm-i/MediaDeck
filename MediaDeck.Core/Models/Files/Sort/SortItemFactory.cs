@@ -11,8 +11,9 @@ public static class SortItemFactory {
 	/// ソート項目オブジェクトからソート項目インスタンスを生成します。
 	/// </summary>
 	/// <param name="sortItemObject">ソート項目オブジェクト</param>
+	/// <param name="seed">ランダムソート用シード値（省略時は1）</param>
 	/// <returns>生成されたソート項目インスタンス</returns>
-	public static ISortItem Create(SortItemObject sortItemObject) {
+	public static ISortItem Create(SortItemObject sortItemObject, int seed = 1) {
 		return sortItemObject.SortItemKey switch {
 			SortItemKey.FilePath => new SortItem(sortItemObject.SortItemKey, mf => (object?)mf.FilePath, sortItemObject.Direction),
 			SortItemKey.CreationTime => new SortItem(sortItemObject.SortItemKey, mf => (object?)mf.CreationTime, sortItemObject.Direction),
@@ -25,6 +26,7 @@ public static class SortItemFactory {
 			SortItemKey.Resolution => new SortItem(sortItemObject.SortItemKey, mf => (object?)((long)mf.Width * mf.Height), sortItemObject.Direction),
 			SortItemKey.UsageCount => new SortItem(sortItemObject.SortItemKey, mf => (object?)mf.UsageCount, sortItemObject.Direction),
 			SortItemKey.Duration => new SortItem(sortItemObject.SortItemKey, mf => (object?)(mf.VideoFile != null ? mf.VideoFile.Duration : null), sortItemObject.Direction),
+			SortItemKey.Random => new RandomSortItem(seed, sortItemObject.SortItemKey, sortItemObject.Direction),
 			_ => throw new ArgumentException(),
 		};
 	}
