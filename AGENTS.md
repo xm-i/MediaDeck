@@ -7,7 +7,7 @@
 - **コミュニケーション**: AIアシスタントとのチャットおよびすべての回答（実装プラン `implementation_plan.md` 等を含む）は**「日本語」**で行うこと。
 
 ## 2. 技術スタック
-- **言語・フレームワーク**: C#, .NET 10, WinUI 3 (Windows App SDK)
+- **言語・フレームワーク**: C#, .NET 11, WinUI 3 (Windows App SDK)
 - **アーキテクチャ**: MVVMパターン
 - **データベース**: SQLite (Entity Framework Core)
 - **主要なライブラリ**: Magick.NET, MetadataExtractor, FFMpegCore, Pdfium.Net.SDK

@@ -30,7 +30,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '10.0.x'
+          dotnet-version: '11.0.x'
 
       # mspdbcmf.exe はシンボルパッケージ生成に必要。MSVC C++ ビルドツールに含まれる。
       - name: Install MSVC C++ Build Tools

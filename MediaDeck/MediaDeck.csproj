@@ -3,7 +3,7 @@
     <!-- VS Code や Roslyn 言語サーバーでのプロジェクトロード時に、WindowsAppSDKSelfContained が有効な状態で Platform が未指定または AnyCPU だとエラーが発生するのを防ぐため、デフォルトのプラットフォームを x64 に設定する -->
     <Platform Condition=" '$(Platform)' == '' or '$(Platform)' == 'AnyCPU' ">x64</Platform>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net10.0-windows10.0.26100.0</TargetFramework>
+    <TargetFramework>net11.0-windows10.0.26100.0</TargetFramework>
     <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
     <RootNamespace>MediaDeck</RootNamespace>
     <ApplicationManifest>app.manifest</ApplicationManifest>

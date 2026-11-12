@@ -4,7 +4,7 @@
 
 <h1 align="center">MediaDeck</h1>
 
-[![.NET](https://img.shields.io/badge/.NET-10.0-512bd4.svg)](https://dotnet.microsoft.com/download/dotnet/10.0)
+[![.NET](https://img.shields.io/badge/.NET-11.0-512bd4.svg)](https://dotnet.microsoft.com/download/dotnet/11.0)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
   Windows向けの高機能メディア管理アプリケーションです。画像、動画、PDF、アーカイブファイルなどを一元管理し、高度な検索、タグ付け、メタデータ管理機能を提供します。
@@ -90,7 +90,7 @@ MediaDeck.exe --base C:\MediaDeckData
 
 ### 技術スタック
 
-- **フレームワーク**: .NET 10 / WinUI 3 (Windows App SDK)
+- **フレームワーク**: .NET 11 / WinUI 3 (Windows App SDK)
 - **アーキテクチャ**: MVVM パターン
 - **リアクティブ・状態管理**: [R3](https://github.com/Cysharp/R3)
 - **データベース**: SQLite (Entity Framework Core)
