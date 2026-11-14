@@ -38,7 +38,6 @@ public class TagsDetailViewModel : ViewModelBase {
 	} = new();
 
 	private readonly TagsDetailModel _model;
-	private readonly System.Collections.Concurrent.ConcurrentDictionary<int, TagCategoryViewModel> _categoryViewModels = new();
 
 	/// <summary>
 	/// タグモデルファクトリ
@@ -153,16 +152,17 @@ public class TagsDetailViewModel : ViewModelBase {
 		this.AddTagCommand.AddTo(this.CompositeDisposable);
 		this.AddSpecificTagCommand.AddTo(this.CompositeDisposable);
 
-		this.TagCandidates = model.TagModels.CreateViewWithDisposal(x => {
-			var categoryViewModel = this.GetCategoryViewModel(x.TagCategory, model.TagsManager, tagModelFactory);
-			return new TagViewModel(categoryViewModel, x, model.TagsManager, tagModelFactory);
-		}).AddTo(this.CompositeDisposable);
-		this.FilteredTagCandidates = this.TagCandidates.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current).AddTo(this.CompositeDisposable);
+		this.TagCandidates = model.TagModels
+			.CreateViewWithDisposal(x => new TagViewModel(null, x, model.TagsManager, tagModelFactory))
+			.AddTo(this.CompositeDisposable);
+		this.FilteredTagCandidates = this.TagCandidates
+			.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current)
+			.AddTo(this.CompositeDisposable);
 
-		this.Tags = model.Tags.CreateViewWithDisposal(x => {
-			var categoryViewModel = this.GetCategoryViewModel(x.Value.TagCategory, model.TagsManager, tagModelFactory);
-			return new ValueCountPair<TagViewModel>(new TagViewModel(categoryViewModel, x.Value, model.TagsManager, tagModelFactory), x.Count);
-		}).ToNotifyCollectionChangedWithDisposal(SynchronizationContextCollectionEventDispatcher.Current).AddTo(this.CompositeDisposable);
+		this.Tags = model.Tags
+			.CreateViewWithDisposal(x => new ValueCountPair<TagViewModel>(new TagViewModel(null, x.Value, model.TagsManager, tagModelFactory), x.Count))
+			.ToNotifyCollectionChangedWithDisposal(SynchronizationContextCollectionEventDispatcher.Current)
+			.AddTo(this.CompositeDisposable);
 
 		this.TargetFiles
 			.Where(x => x != null)
@@ -233,25 +233,5 @@ public class TagsDetailViewModel : ViewModelBase {
 			vm.RepresentativeText.Value = representativeText ?? string.Empty;
 			return result;
 		});
-	}
-
-	private TagCategoryViewModel GetCategoryViewModel(ITagCategoryModel category, ITagsManager tagsManager, ITagModelFactory factory) {
-		// ConcurrentDictionaryのキーはnotnull制約があるため、IDがnull(未設定)の場合はint.MinValueをキーとして使用します。
-		var key = category.TagCategoryId ?? int.MinValue;
-		return this._categoryViewModels.GetOrAdd(key, _ => new TagCategoryViewModel(category, tagsManager, factory));
-	}
-
-	/// <summary>
-	/// リソースを破棄します。
-	/// </summary>
-	/// <param name="disposing">マネージドリソースを破棄するかどうか</param>
-	protected override void Dispose(bool disposing) {
-		if (disposing) {
-			foreach (var categoryVm in this._categoryViewModels.Values) {
-				categoryVm.Dispose();
-			}
-			this._categoryViewModels.Clear();
-		}
-		base.Dispose(disposing);
 	}
 }

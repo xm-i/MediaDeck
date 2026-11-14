@@ -26,14 +26,14 @@ public class TagFilterCreatorViewModel : ViewModelBase, IFilterCreatorViewModel 
 	/// </summary>
 	public BindableReactiveProperty<string> TagName {
 		get;
-	} = new();
+	}
 
 	/// <summary>
 	/// 検索条件として指定のタグを含むものを検索するか、含まないものを検索するかを選択する。
 	/// </summary>
 	public BindableReactiveProperty<DisplayObject<SearchTypeInclude>> SearchType {
 		get;
-	} = new();
+	}
 
 	/// <summary>
 	/// 含む/含まないの選択候補
@@ -49,14 +49,21 @@ public class TagFilterCreatorViewModel : ViewModelBase, IFilterCreatorViewModel 
 		get;
 	}
 
+	/// <summary>
+	/// <see cref="TagFilterCreatorViewModel"/> クラスの新しいインスタンスを初期化します。
+	/// </summary>
+	/// <param name="target">追加先のフィルター条件編集 ViewModel</param>
+	/// <param name="stringProvider">文字列リソースプロバイダー</param>
 	public TagFilterCreatorViewModel(ReactiveProperty<FilteringConditionEditorViewModel?> target, IStringProvider stringProvider) {
 		this._stringProvider = stringProvider;
+		this.TagName = new BindableReactiveProperty<string>(string.Empty).AddTo(this.CompositeDisposable);
+		this.SearchType = new BindableReactiveProperty<DisplayObject<SearchTypeInclude>>().AddTo(this.CompositeDisposable);
 		this.SearchTypeList = [
 			new DisplayObject<SearchTypeInclude>(this._stringProvider.GetString("FilterCreator_Include"), SearchTypeInclude.Include),
 			new DisplayObject<SearchTypeInclude>(this._stringProvider.GetString("FilterCreator_Exclude"), SearchTypeInclude.Exclude)
 		];
 		this.SearchType.Value = this.SearchTypeList.First();
-		this.AddFilterCommand = this.TagName.Select(x => !string.IsNullOrEmpty(x)).ToReactiveCommand();
+		this.AddFilterCommand = this.TagName.Select(x => !string.IsNullOrEmpty(x)).ToReactiveCommand().AddTo(this.CompositeDisposable);
 		this.AddFilterCommand.Subscribe(_ => {
 			var filter = new TagFilterItemObject {
 				TagName = this.TagName.Value,

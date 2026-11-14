@@ -70,6 +70,7 @@ public class R3ExAndDisposableBaseTests {
 	[Fact]
 	public void DetailSelectorModel_InheritsModelBase_AndDisposesPropertiesOnDispose() {
 		var mockTagsManager = new Moq.Mock<MediaDeck.Composition.Interfaces.Tags.ITagsManager>();
+		mockTagsManager.Setup(x => x.Tags).Returns(new ObservableCollections.ObservableList<MediaDeck.Composition.Interfaces.Tags.ITagModel>());
 		var propertiesModel = new PropertiesDetailModel();
 		var tagsModel = new TagsDetailModel(mockTagsManager.Object);
 		var model = new DetailSelectorModel(propertiesModel, tagsModel);

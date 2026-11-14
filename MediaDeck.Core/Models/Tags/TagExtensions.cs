@@ -19,15 +19,15 @@ public static class TagExtensions {
 			return false;
 		}
 
-		if (tag.TagName.Contains(text) ||
-			(tag.Ruby?.Contains(text) ?? false) ||
+		if (tag.TagName.Contains(text, StringComparison.CurrentCultureIgnoreCase) ||
+			(tag.Ruby?.Contains(text, StringComparison.CurrentCultureIgnoreCase) ?? false) ||
 			(tag.Romaji?.Contains(text, StringComparison.CurrentCultureIgnoreCase) ?? false)) {
 			return true;
 		}
 
 		var result = tag.TagAliases.FirstOrDefault(x =>
 			x.Alias.Contains(text, StringComparison.CurrentCultureIgnoreCase) ||
-			(x.Ruby?.Contains(text) ?? false) ||
+			(x.Ruby?.Contains(text, StringComparison.CurrentCultureIgnoreCase) ?? false) ||
 			(x.Romaji?.Contains(text, StringComparison.CurrentCultureIgnoreCase) ?? false));
 
 		representativeText = result?.Alias;

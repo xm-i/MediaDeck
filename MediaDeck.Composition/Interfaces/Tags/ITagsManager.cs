@@ -28,10 +28,35 @@ public interface ITagsManager {
 	}
 
 	/// <summary>
-	/// 新規タグカテゴリーを追加する
+	/// タグの内容や所属カテゴリーが更新されたことを通知するストリーム
 	/// </summary>
+	public Observable<ITagModel> TagChanged {
+		get;
+	}
+
+	/// <summary>
+	/// 新規タグカテゴリーを即座に作成し、データベースに保存する
+	/// </summary>
+	/// <param name="name">カテゴリー名</param>
+	/// <param name="detail">説明</param>
 	/// <returns>作成されたタグカテゴリー</returns>
-	public ITagCategoryModel AddTagCategory();
+	public Task<ITagCategoryModel> CreateTagCategoryAsync(string name = "", string detail = "");
+
+	/// <summary>
+	/// タグカテゴリーを更新し、データベースに保存する
+	/// </summary>
+	/// <param name="categoryModel">更新対象のカテゴリーモデル</param>
+	/// <param name="name">新しいカテゴリー名</param>
+	/// <param name="detail">新しい説明</param>
+	/// <returns>タスク</returns>
+	public Task UpdateTagCategoryAsync(ITagCategoryModel categoryModel, string name, string detail);
+
+	/// <summary>
+	/// タグカテゴリをシステムから完全に削除する
+	/// </summary>
+	/// <param name="categoryModel">削除するタグカテゴリのモデル</param>
+	/// <returns>タスク</returns>
+	public Task DeleteTagCategoryAsync(ITagCategoryModel categoryModel);
 
 	/// <summary>
 	/// 名前でタグを検索する
@@ -52,6 +77,25 @@ public interface ITagsManager {
 	public Task<ITagModel?> CreateTagImmediatelyAsync(int? tagCategoryId, string tagName, string? ruby, string detail, IEnumerable<ITagAliasModel> aliases);
 
 	/// <summary>
+	/// タグの内容を更新し、データベースに保存する
+	/// </summary>
+	/// <param name="tagModel">更新対象のタグモデル</param>
+	/// <param name="targetCategory">所属先のカテゴリーモデル</param>
+	/// <param name="tagName">タグ名</param>
+	/// <param name="ruby">読み</param>
+	/// <param name="detail">詳細</param>
+	/// <param name="aliases">別名リスト</param>
+	/// <returns>タスク</returns>
+	public Task UpdateTagAsync(ITagModel tagModel, ITagCategoryModel targetCategory, string tagName, string? ruby, string detail, IEnumerable<ITagAliasModel> aliases);
+
+	/// <summary>
+	/// タグをシステムから完全に削除する
+	/// </summary>
+	/// <param name="tagModel">削除するタグのモデル</param>
+	/// <returns>タスク</returns>
+	public Task DeleteTagAsync(ITagModel tagModel);
+
+	/// <summary>
 	/// ファイルにタグを追加する
 	/// </summary>
 	/// <param name="fileModels">対象ファイル</param>
@@ -66,32 +110,6 @@ public interface ITagsManager {
 	/// <param name="tagId">削除するタグのID</param>
 	/// <returns>タスク</returns>
 	public Task RemoveTagAsync(IMediaItemModel[] fileModels, int tagId);
-
-	/// <summary>
-	/// タグカテゴリをシステムから完全に削除する
-	/// </summary>
-	/// <param name="categoryModel">削除するタグカテゴリのモデル</param>
-	/// <returns>タスク</returns>
-	public Task DeleteTagCategoryAsync(ITagCategoryModel categoryModel);
-
-	/// <summary>
-	/// タグをシステムから完全に削除する
-	/// </summary>
-	/// <param name="tagModel">削除するタグのモデル</param>
-	/// <returns>タスク</returns>
-	public Task DeleteTagAsync(ITagModel tagModel);
-
-	/// <summary>
-	/// 変更を全て保存する
-	/// </summary>
-	/// <returns>タスク</returns>
-	public Task SaveAsync();
-
-	/// <summary>
-	/// データを再読み込みし、全ての変更（未保存の追加、更新、削除）を破棄します。
-	/// </summary>
-	/// <returns>タスク</returns>
-	public Task ReloadAsync();
 
 	/// <summary>
 	/// データを初期化（ロード）する

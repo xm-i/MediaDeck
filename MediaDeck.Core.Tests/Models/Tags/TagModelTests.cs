@@ -2,10 +2,14 @@ using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Composition.Tables;
 using MediaDeck.Core.Models.Tags;
 using Moq;
+using R3;
 using Shouldly;
 
 namespace MediaDeck.Core.Tests.Models.Tags;
 
+/// <summary>
+/// <see cref="TagModel"/> の単体テスト。
+/// </summary>
 public class TagModelTests {
 	private static (TagModel model, Tag tag, Mock<ITagCategoryModel> categoryMock, Mock<ITagModelFactory> factoryMock) CreateInitializedModel() {
 		var tag = new Tag {
@@ -21,81 +25,70 @@ public class TagModelTests {
 		var categoryMock = new Mock<ITagCategoryModel>();
 		var factoryMock = new Mock<ITagModelFactory>();
 
-		var model = new TagModel();
-		model.Initialize(tag, categoryMock.Object, factoryMock.Object);
+		var model = new TagModel(tag, categoryMock.Object, factoryMock.Object);
 		return (model, tag, categoryMock, factoryMock);
 	}
 
 	[Fact]
-	public void Initialize_SetsAllProperties() {
-		var (model, _, _, _) = CreateInitializedModel();
+	public void Constructor_SetsAllProperties() {
+		using var model = CreateInitializedModel().model;
 
 		model.TagId.ShouldBe(1);
 		model.TagCategoryId.ShouldBe(1);
 		model.TagName.ShouldBe("TestTag");
 		model.Detail.ShouldBe("TestDetail");
 		model.Ruby.ShouldBe("てすとたぐ");
-		model.Romaji.ShouldNotBeNullOrEmpty();
-		model.IsDirty.ShouldBeFalse();
+		model.Romaji.ShouldBe("tesutotagu");
 	}
 
 	[Fact]
-	public void Properties_BeforeInitialize_ThrowInvalidOperationException() {
-		var model = new TagModel();
-		Should.Throw<InvalidOperationException>(() => _ = model.TagId);
-		Should.Throw<InvalidOperationException>(() => _ = model.TagCategoryId);
-		Should.Throw<InvalidOperationException>(() => _ = model.TagName);
-		Should.Throw<InvalidOperationException>(() => _ = model.Detail);
+	public void SetTagName_UpdatesRomaji() {
+		using var model = CreateInitializedModel().model;
+		model.Ruby = null;
+		model.TagName = "カタカナ";
+
+		model.TagName.ShouldBe("カタカナ");
+		model.Romaji.ShouldBe("katakana");
 	}
 
 	[Fact]
-	public void SetTagName_SetsIsDirty() {
-		var (model, _, _, _) = CreateInitializedModel();
+	public void SetRuby_UpdatesRomaji() {
+		using var model = CreateInitializedModel().model;
+		model.Ruby = "あたらしい";
 
-		model.TagName = "NewName";
-		model.IsDirty.ShouldBeTrue();
-		model.TagName.ShouldBe("NewName");
+		model.Ruby.ShouldBe("あたらしい");
+		model.Romaji.ShouldBe("atarashii");
 	}
 
 	[Fact]
-	public void SetTagCategoryId_SetsIsDirty() {
-		var (model, _, _, _) = CreateInitializedModel();
+	public void NotifyChanged_EmitsChangedObservable() {
+		using var model = CreateInitializedModel().model;
+		var notified = false;
+		using var sub = model.Changed.Subscribe(_ => notified = true);
 
-		model.TagCategoryId = 99;
-		model.IsDirty.ShouldBeTrue();
+		model.NotifyChanged();
+
+		notified.ShouldBeTrue();
 	}
 
 	[Fact]
 	public void TagAliases_IsEmptyAfterInit() {
-		var (model, _, _, _) = CreateInitializedModel();
+		using var model = CreateInitializedModel().model;
 		model.TagAliases.Count.ShouldBe(0);
 	}
 
 	[Fact]
 	public void UsageCount_DefaultIsZero() {
-		var (model, _, _, _) = CreateInitializedModel();
+		using var model = CreateInitializedModel().model;
 		model.UsageCount.Value.ShouldBe(0);
 	}
 
 	[Fact]
-	public void IsNew_ShouldBeTrue_WhenNotInitialized() {
-		var model = new TagModel();
-		model.IsNew.ShouldBeTrue();
-	}
-
-	[Fact]
-	public void IsNew_ShouldBeFalse_WhenInitializedWithTag() {
-		var (model, _, _, _) = CreateInitializedModel();
-		model.IsNew.ShouldBeFalse();
-	}
-
-	[Fact]
-	public void SetTagCategory_SetsIsDirty() {
-		var (model, _, _, _) = CreateInitializedModel();
+	public void SetTagCategory_UpdatesCategory() {
+		using var model = CreateInitializedModel().model;
 		var newCategoryMock = new Mock<ITagCategoryModel>();
 
 		model.TagCategory = newCategoryMock.Object;
-		model.IsDirty.ShouldBeTrue();
 		model.TagCategory.ShouldBe(newCategoryMock.Object);
 	}
 }

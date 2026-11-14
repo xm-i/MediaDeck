@@ -4,27 +4,41 @@ using Shouldly;
 
 namespace MediaDeck.Core.Tests.Models.Tags;
 
+/// <summary>
+/// <see cref="TagAliasModel"/> の単体テスト。
+/// </summary>
 public class TagAliasModelTests {
 	[Fact]
-	public void Initialize_SetsAllProperties() {
-		var model = new TagAliasModel();
+	public void Constructor_SetsAllProperties() {
 		var alias = new TagAlias { TagAliasId = 5, TagId = 3, Alias = "テスト", Ruby = "てすと" };
-
-		model.Initialize(alias);
+		using var model = new TagAliasModel(alias);
 
 		model.TagAliasId.ShouldBe(5);
 		model.TagId.ShouldBe(3);
 		model.Alias.ShouldBe("テスト");
 		model.Ruby.ShouldBe("てすと");
-		model.Romaji.ShouldNotBeNullOrEmpty();
+		model.Romaji.ShouldBe("tesuto");
 	}
 
 	[Fact]
-	public void Properties_BeforeInitialize_ThrowInvalidOperationException() {
-		var model = new TagAliasModel();
-		Should.Throw<InvalidOperationException>(() => _ = model.TagAliasId);
-		Should.Throw<InvalidOperationException>(() => _ = model.TagId);
-		Should.Throw<InvalidOperationException>(() => _ = model.Alias);
-		Should.Throw<InvalidOperationException>(() => _ = model.Romaji);
+	public void SetAlias_RecalculatesRomaji_WhenRubyIsEmpty() {
+		using var model = new TagAliasModel {
+			Alias = "サンプル"
+		};
+
+		model.Romaji.ShouldBe("sanpuru");
+	}
+
+	[Fact]
+	public void SetRuby_RecalculatesRomaji() {
+		using var model = new TagAliasModel {
+			Alias = "漢字",
+			Ruby = "かんじ"
+		};
+
+		model.Romaji.ShouldBe("kanji");
+
+		model.Ruby = "べつめい";
+		model.Romaji.ShouldBe("betsumei");
 	}
 }

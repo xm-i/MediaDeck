@@ -63,8 +63,8 @@ public sealed partial class TagsDetail {
 		var dialog = Ioc.Default.GetRequiredService<NewTagDialog>();
 		dialog.XamlRoot = this.XamlRoot;
 		dialog.ViewModel.TagName.Value = context.TagName;
-		var selectedCategory = dialog.ViewModel.TagCategories.FirstOrDefault(x => x.Model == context.SelectedCategory);
-		dialog.ViewModel.SelectedCategory.Value = selectedCategory;
+		var defaultCategory = dialog.ViewModel.TagCategories.FirstOrDefault();
+		dialog.ViewModel.SelectedCategory.Value = context.SelectedCategory ?? defaultCategory;
 
 		var result = await dialog.ShowAsync();
 		if (result == ContentDialogResult.Primary && dialog.ViewModel.CreatedTag.Value is { }) {

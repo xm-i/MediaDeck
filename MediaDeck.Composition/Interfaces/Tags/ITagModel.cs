@@ -3,15 +3,7 @@ namespace MediaDeck.Composition.Interfaces.Tags;
 /// <summary>
 /// タグのモデルクラスのインターフェース
 /// </summary>
-
-public interface ITagModel {
-	/// <summary>
-	/// 変更フラグ
-	/// </summary>
-	public bool IsDirty {
-		get;
-		set;
-	}
+public interface ITagModel : IDisposable {
 	/// <summary>
 	/// タグID
 	/// </summary>
@@ -34,13 +26,6 @@ public interface ITagModel {
 	public ITagCategoryModel TagCategory {
 		get;
 		set;
-	}
-
-	/// <summary>
-	/// 新規作成（未採番）のタグかどうかを取得します。
-	/// </summary>
-	public bool IsNew {
-		get;
 	}
 
 	/// <summary>
@@ -71,7 +56,8 @@ public interface ITagModel {
 	/// 読み仮名 (Ruby)
 	/// </summary>
 	public string? Ruby {
-		get; set;
+		get;
+		set;
 	}
 
 	/// <summary>
@@ -90,7 +76,14 @@ public interface ITagModel {
 	}
 
 	/// <summary>
-	/// 既存のタグエンティティからモデルを初期化します。
+	/// プロパティ等の変更通知ストリーム
 	/// </summary>
-	public void Initialize(MediaDeck.Composition.Tables.Tag tag, ITagCategoryModel category, ITagModelFactory factory);
+	public Observable<Unit> Changed {
+		get;
+	}
+
+	/// <summary>
+	/// 変更通知を発火します。
+	/// </summary>
+	public void NotifyChanged();
 }

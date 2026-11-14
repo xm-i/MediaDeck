@@ -680,6 +680,9 @@
   <data name="TagManager_Tags.Text" xml:space="preserve">
     <value>タグ</value>
   </data>
+  <data name="TagManager_AddTag.ToolTipService.ToolTip" xml:space="preserve">
+    <value>新しいタグを追加します</value>
+  </data>
   <data name="TagManager_SearchTags.PlaceholderText" xml:space="preserve">
     <value>タグを検索...</value>
   </data>

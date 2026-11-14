@@ -1,6 +1,6 @@
+using MediaDeck.Composition.Interfaces;
 using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Composition.Tables;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace MediaDeck.Core.Models.Tags;
 
@@ -8,52 +8,35 @@ namespace MediaDeck.Core.Models.Tags;
 /// タグ関連モデルのファクトリ実装クラス
 /// </summary>
 [Inject(InjectServiceLifetime.Singleton, typeof(ITagModelFactory))]
-public class TagModelFactory(IServiceProvider serviceProvider)
-	: ITagModelFactory {
-	private readonly IServiceProvider _serviceProvider = serviceProvider;
-
-	/// <summary>
-	/// タグモデルを作成します。
-	/// </summary>
+public class TagModelFactory(IStringProvider? stringProvider = null) : ITagModelFactory {
+	/// <inheritdoc />
 	public ITagModel Create(Tag tag, ITagCategoryModel category) {
-		var model = this._serviceProvider.GetRequiredService<ITagModel>();
-		model.Initialize(tag, category, this);
-		return model;
+		return new TagModel(tag, category, this);
 	}
 
-	/// <summary>
-	/// タグカテゴリーモデルを作成します。
-	/// </summary>
+	/// <inheritdoc />
 	public ITagCategoryModel CreateCategory(TagCategory? tagCategory) {
-		var model = this._serviceProvider.GetRequiredService<ITagCategoryModel>();
-		model.Initialize(tagCategory, this);
-		return model;
+		return new TagCategoryModel(tagCategory, this, stringProvider);
 	}
 
-	/// <summary>
-	/// 新しいタグカテゴリーモデルを作成します。
-	/// </summary>
+	/// <inheritdoc />
 	public ITagCategoryModel CreateCategory() {
-		var model = this._serviceProvider.GetRequiredService<ITagCategoryModel>();
-		model.Initialize(null, this);
-		return model;
+		return new TagCategoryModel(null, this, stringProvider) {
+			TagCategoryName = string.Empty,
+			Detail = string.Empty
+		};
 	}
 
-	/// <summary>
-	/// タグ別名モデルを作成します。
-	/// </summary>
+	/// <inheritdoc />
 	public ITagAliasModel CreateAlias(TagAlias tagAlias) {
-		var model = this._serviceProvider.GetRequiredService<ITagAliasModel>();
-		model.Initialize(tagAlias);
-		return model;
+		return new TagAliasModel(tagAlias);
 	}
 
-	/// <summary>
-	/// 新しいタグ別名モデルを作成します。
-	/// </summary>
+	/// <inheritdoc />
 	public ITagAliasModel CreateAlias() {
-		var model = this._serviceProvider.GetRequiredService<ITagAliasModel>();
-		model.Initialize(new TagAlias { Alias = string.Empty, Ruby = string.Empty });
-		return model;
+		return new TagAliasModel(new TagAlias {
+			Alias = string.Empty,
+			Ruby = null
+		});
 	}
 }

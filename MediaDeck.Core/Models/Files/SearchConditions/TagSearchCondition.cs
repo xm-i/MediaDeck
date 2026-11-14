@@ -1,27 +1,40 @@
 using System.Linq.Expressions;
 using GenJsonConfig.Attributes;
-using MediaDeck.Common.Utilities;
 using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Composition.Tables;
+using MediaDeck.Core.Models.Tags;
 
 namespace MediaDeck.Core.Models.Files.SearchConditions;
 
+/// <summary>
+/// タグによるメディアアイテムの検索条件
+/// </summary>
 [GenerateJsonConfigDto]
 [JsonConfigDerivedType("tag")]
 [Inject(InjectServiceLifetime.Transient)]
 public class TagSearchCondition : ISearchCondition {
 	private readonly ITagsManager _tagsManager;
 
+	/// <summary>
+	/// <see cref="TagSearchCondition"/> クラスの新しいインスタンスを初期化します。
+	/// </summary>
+	/// <param name="tagsManager">タグマネージャー</param>
 	public TagSearchCondition(ITagsManager tagsManager) {
 		this._tagsManager = tagsManager;
 	}
 
+	/// <summary>
+	/// 検索対象のタグID
+	/// </summary>
 	public int TagId {
 		get;
 		set;
 	}
 
+	/// <summary>
+	/// サジェストで一致したエイリアス表示用テキスト
+	/// </summary>
 	public string? RepresentativeText {
 		get;
 		set;
@@ -29,10 +42,12 @@ public class TagSearchCondition : ISearchCondition {
 
 	private ITagModel TargetTag {
 		get {
-			return field ??= this._tagsManager.Tags.FirstOrDefault(t => t.TagId == this.TagId) ?? throw new InvalidOperationException($"Tag with Id {this.TagId} not found.");
+			return this._tagsManager.Tags.FirstOrDefault(t => t.TagId == this.TagId)
+				?? throw new InvalidOperationException($"Tag with Id {this.TagId} not found.");
 		}
 	}
 
+	/// <inheritdoc />
 	public string DisplayText {
 		get {
 			try {
@@ -47,31 +62,17 @@ public class TagSearchCondition : ISearchCondition {
 		}
 	}
 
+	/// <inheritdoc />
 	public Expression<Func<MediaItem, bool>>? WherePredicate {
 		get {
-			Expression<Func<MediaItem, bool>> exp1 =
-				MediaItem => MediaItem.MediaItemTags.Select(x => x.TagId).Contains(this.TagId);
-			var exp = exp1.Body;
-			var visitor = new ParameterVisitor(exp1.Parameters);
-
-			return Expression.Lambda<Func<MediaItem, bool>>(exp,
-				visitor.Parameters);
+			return mediaItem => mediaItem.MediaItemTags.Select(x => x.TagId).Contains(this.TagId);
 		}
 	}
 
+	/// <inheritdoc />
 	public bool IsMatchForSuggest(string searchWord) {
-		if (this.TargetTag.TagName.Contains(searchWord) ||
-			(this.TargetTag.Ruby?.Contains(searchWord) ?? false) ||
-			(this.TargetTag.Romaji?.Contains(searchWord, StringComparison.CurrentCultureIgnoreCase) ?? false)) {
-			this.RepresentativeText = null;
-			return true;
-		}
-		var result = this.TargetTag.TagAliases
-			.FirstOrDefault(x =>
-				x.Alias.Contains(searchWord, StringComparison.CurrentCultureIgnoreCase) ||
-				(x.Ruby?.Contains(searchWord) ?? false) ||
-				(x.Romaji?.Contains(searchWord, StringComparison.CurrentCultureIgnoreCase) ?? false));
-		this.RepresentativeText = result?.Alias;
-		return result != null;
+		var result = this.TargetTag.MatchesFilter(searchWord, out var representativeText);
+		this.RepresentativeText = representativeText;
+		return result;
 	}
 }

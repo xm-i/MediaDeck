@@ -20,46 +20,7 @@
 		<!-- カスタムタイトルバー -->
 		<controls:WindowTitleBar x:Name="AppTitleBar" Grid.Row="0" Title="{x:Bind Title}" />
 
-		<Grid Grid.Row="1" Padding="12" >
-			<Grid.RowDefinitions>
-				<RowDefinition Height="*" />
-				<RowDefinition Height="12" />
-				<RowDefinition Height="Auto" />
-			</Grid.RowDefinitions>
-
-			<local:TagManagerView Grid.Row="0"
-				ViewModel="{x:Bind ViewModel, Mode=OneWay}" />
-
-			<StackPanel Grid.Row="2"
-				Orientation="Horizontal"
-				HorizontalAlignment="Right"
-				Spacing="12" >
-				<Button Command="{x:Bind ViewModel.CancelCommand}" >
-					<StackPanel Orientation="Horizontal"
-						Spacing="6" >
-						<FontIcon Glyph="&#xE106;"
-							FontSize="12" />
-						<TextBlock x:Uid="Common_Cancel" />
-					</StackPanel>
-				</Button>
-				<Button Command="{x:Bind ViewModel.ApplyCommand}" >
-					<StackPanel Orientation="Horizontal"
-						Spacing="6" >
-						<FontIcon Glyph="&#xE73E;"
-							FontSize="12" />
-						<TextBlock x:Uid="Common_Apply" />
-					</StackPanel>
-				</Button>
-				<Button Command="{x:Bind ViewModel.SaveCommand}"
-					Style="{StaticResource AccentButtonStyle}" >
-					<StackPanel Orientation="Horizontal"
-						Spacing="6" >
-						<FontIcon Glyph="&#xE74E;"
-							FontSize="12" />
-						<TextBlock x:Uid="Common_Save" />
-					</StackPanel>
-				</Button>
-			</StackPanel>
-		</Grid>
+		<local:TagManagerView Grid.Row="1"
+			ViewModel="{x:Bind ViewModel, Mode=OneWay}" />
 	</Grid>
 </Window>

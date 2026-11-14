@@ -1,20 +1,9 @@
-using GenJsonConfig.Attributes;
-using MediaDeck.Composition.Tables;
-
 namespace MediaDeck.Composition.Interfaces.Tags;
 
 /// <summary>
 /// タグカテゴリーのモデルクラスのインターフェース
 /// </summary>
-[GenerateJsonConfigDto]
-public interface ITagCategoryModel {
-	/// <summary>
-	/// 変更フラグ
-	/// </summary>
-	public bool IsDirty {
-		get;
-		set;
-	}
+public interface ITagCategoryModel : IDisposable {
 	/// <summary>
 	/// タグカテゴリーID
 	/// </summary>
@@ -47,6 +36,18 @@ public interface ITagCategoryModel {
 	}
 
 	/// <summary>
+	/// プロパティ等の変更通知ストリーム
+	/// </summary>
+	public Observable<Unit> Changed {
+		get;
+	}
+
+	/// <summary>
+	/// 変更通知を発火します。
+	/// </summary>
+	public void NotifyChanged();
+
+	/// <summary>
 	/// タグを追加する
 	/// </summary>
 	/// <param name="tag">タグ</param>
@@ -68,6 +69,4 @@ public interface ITagCategoryModel {
 	/// 全てのタグをクリアする
 	/// </summary>
 	public void ClearTags();
-
-	public void Initialize(TagCategory? tagCategory, ITagModelFactory factory);
 }

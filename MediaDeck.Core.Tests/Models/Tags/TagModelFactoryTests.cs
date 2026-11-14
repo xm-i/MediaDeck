@@ -1,4 +1,4 @@
-using MediaDeck.Composition.Interfaces.Tags;
+using MediaDeck.Composition.Interfaces;
 using MediaDeck.Composition.Tables;
 using MediaDeck.Core.Models.Tags;
 using Moq;
@@ -6,92 +6,98 @@ using Shouldly;
 
 namespace MediaDeck.Core.Tests.Models.Tags;
 
+/// <summary>
+/// <see cref="TagModelFactory"/> の単体テスト。
+/// </summary>
 public class TagModelFactoryTests {
-	private static (TagModelFactory factory, Mock<IServiceProvider> spMock) CreateSut() {
-		var spMock = new Mock<IServiceProvider>();
-		var factory = new TagModelFactory(spMock.Object);
-		return (factory, spMock);
+	private static TagModelFactory CreateSut() {
+		var spMock = new Mock<IStringProvider>();
+		spMock.Setup(x => x.GetString("TagCategory_Unassigned_Name")).Returns("Unassigned");
+		spMock.Setup(x => x.GetString("TagCategory_Unassigned_Detail")).Returns("Unassigned Detail");
+		return new TagModelFactory(spMock.Object);
 	}
 
-	/// <summary>
-	///     Createがサービスプロバイダーからモデルを取得し、Initializeを呼ぶことを確認します。
-	/// </summary>
 	[Fact]
-	public void Create_ResolvesTagModelAndInitializes() {
-		var (factory, spMock) = CreateSut();
-		var tagModelMock = new Mock<ITagModel>();
-		spMock.Setup(x => x.GetService(typeof(ITagModel))).Returns(tagModelMock.Object);
+	public void Create_CreatesInitializedTagModel() {
+		var factory = CreateSut();
+		using var category = factory.CreateCategory();
+		var tag = new Tag {
+			TagId = 1,
+			TagName = "Test",
+			Ruby = "てすと",
+			TagCategoryId = null,
+			TagCategory = null!,
+			MediaItemTags = [],
+			TagAliases = [new TagAlias { TagId = 1, TagAliasId = 0, Alias = "エイリアス", Ruby = "えいりあす" }],
+			Detail = "Detail"
+		};
 
-		var categoryMock = new Mock<ITagCategoryModel>();
-		var tag = new Tag { TagId = 1, TagName = "Test", TagCategoryId = 1, TagCategory = null!, MediaItemTags = [], TagAliases = [], Detail = "" };
+		using var result = factory.Create(tag, category);
 
-		var result = factory.Create(tag, categoryMock.Object);
-
-		result.ShouldBe(tagModelMock.Object);
-		tagModelMock.Verify(x => x.Initialize(tag, categoryMock.Object, factory), Times.Once);
+		result.TagId.ShouldBe(1);
+		result.TagName.ShouldBe("Test");
+		result.Detail.ShouldBe("Detail");
+		result.TagCategory.ShouldBe(category);
+		result.TagAliases.Count.ShouldBe(1);
+		result.TagAliases[0].Alias.ShouldBe("エイリアス");
 	}
 
-	/// <summary>
-	///     CreateCategoryがサービスプロバイダーからモデルを取得し、Initializeを呼ぶことを確認します。
-	/// </summary>
 	[Fact]
-	public void CreateCategory_WithTagCategory_ResolvesAndInitializes() {
-		var (factory, spMock) = CreateSut();
-		var categoryModelMock = new Mock<ITagCategoryModel>();
-		spMock.Setup(x => x.GetService(typeof(ITagCategoryModel))).Returns(categoryModelMock.Object);
+	public void CreateCategory_WithTagCategory_CreatesInitializedCategoryModel() {
+		var factory = CreateSut();
+		var tagCategory = new TagCategory { TagCategoryId = 1, TagCategoryName = "Cat", Detail = "CatDetail", Tags = [] };
 
-		var tagCategory = new TagCategory { TagCategoryId = 1, TagCategoryName = "Cat", Detail = "", Tags = [] };
+		using var result = factory.CreateCategory(tagCategory);
 
-		var result = factory.CreateCategory(tagCategory);
-
-		result.ShouldBe(categoryModelMock.Object);
-		categoryModelMock.Verify(x => x.Initialize(tagCategory, factory), Times.Once);
+		result.TagCategoryId.ShouldBe(1);
+		result.TagCategoryName.ShouldBe("Cat");
+		result.Detail.ShouldBe("CatDetail");
 	}
 
-	/// <summary>
-	///     CreateCategory(null)を呼んだ場合もInitialize(null, factory)が呼ばれることを確認します。
-	/// </summary>
 	[Fact]
-	public void CreateCategory_WithNull_InitializesWithNull() {
-		var (factory, spMock) = CreateSut();
-		var categoryModelMock = new Mock<ITagCategoryModel>();
-		spMock.Setup(x => x.GetService(typeof(ITagCategoryModel))).Returns(categoryModelMock.Object);
+	public void CreateCategory_WithNull_UsesStringProvider() {
+		var factory = CreateSut();
 
-		var result = factory.CreateCategory();
+		using var result = factory.CreateCategory(null);
 
-		result.ShouldBe(categoryModelMock.Object);
-		categoryModelMock.Verify(x => x.Initialize(null, factory), Times.Once);
+		result.TagCategoryId.ShouldBeNull();
+		result.TagCategoryName.ShouldBe("Unassigned");
+		result.Detail.ShouldBe("Unassigned Detail");
 	}
 
-	/// <summary>
-	///     CreateAliasがTagAliasでInitializeされることを確認します。
-	/// </summary>
 	[Fact]
-	public void CreateAlias_WithTagAlias_ResolvesAndInitializes() {
-		var (factory, spMock) = CreateSut();
-		var aliasModelMock = new Mock<ITagAliasModel>();
-		spMock.Setup(x => x.GetService(typeof(ITagAliasModel))).Returns(aliasModelMock.Object);
+	public void CreateCategory_NoArgs_CreatesEmptyCategoryModel() {
+		var factory = CreateSut();
 
-		var alias = new TagAlias { TagAliasId = 1, TagId = 1, Alias = "A1", Ruby = "R1" };
+		using var result = factory.CreateCategory();
 
-		var result = factory.CreateAlias(alias);
-
-		result.ShouldBe(aliasModelMock.Object);
-		aliasModelMock.Verify(x => x.Initialize(alias), Times.Once);
+		result.TagCategoryId.ShouldBeNull();
+		result.TagCategoryName.ShouldBe(string.Empty);
+		result.Detail.ShouldBe(string.Empty);
 	}
 
-	/// <summary>
-	///     CreateAlias()（引数なし）が空のTagAliasでInitializeされることを確認します。
-	/// </summary>
 	[Fact]
-	public void CreateAlias_NoArgs_InitializesWithEmptyAlias() {
-		var (factory, spMock) = CreateSut();
-		var aliasModelMock = new Mock<ITagAliasModel>();
-		spMock.Setup(x => x.GetService(typeof(ITagAliasModel))).Returns(aliasModelMock.Object);
+	public void CreateAlias_WithTagAlias_CreatesInitializedAliasModel() {
+		var factory = CreateSut();
+		var alias = new TagAlias { TagAliasId = 1, TagId = 2, Alias = "A1", Ruby = "あいち" };
 
-		var result = factory.CreateAlias();
+		using var result = factory.CreateAlias(alias);
 
-		result.ShouldBe(aliasModelMock.Object);
-		aliasModelMock.Verify(x => x.Initialize(It.Is<TagAlias>(a => a.Alias == string.Empty && a.Ruby == string.Empty)), Times.Once);
+		result.TagAliasId.ShouldBe(1);
+		result.TagId.ShouldBe(2);
+		result.Alias.ShouldBe("A1");
+		result.Ruby.ShouldBe("あいち");
+		result.Romaji.ShouldBe("aichi");
+	}
+
+	[Fact]
+	public void CreateAlias_NoArgs_CreatesEmptyAliasModel() {
+		var factory = CreateSut();
+
+		using var result = factory.CreateAlias();
+
+		result.Alias.ShouldBe(string.Empty);
+		result.Ruby.ShouldBeNull();
+		result.Romaji.ShouldBe(string.Empty);
 	}
 }

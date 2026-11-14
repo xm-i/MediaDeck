@@ -18,6 +18,8 @@
 				<RowDefinition Height="16" />
 				<RowDefinition Height="Auto" />
 				<RowDefinition Height="16" />
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="16" />
 				<RowDefinition Height="*" />
 				<RowDefinition Height="8" />
 				<RowDefinition Height="Auto" />
@@ -31,7 +33,7 @@
 				<TextBox
 					Text="{x:Bind ViewModel.TagName.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
 					x:Uid="TagManager_TagNameInput" />
-				
+
 				<TextBlock x:Uid="TagManager_Ruby"
 					FontWeight="SemiBold"
 					Margin="0,8,0,0" />
@@ -56,8 +58,21 @@
 				</ComboBox>
 			</StackPanel>
 
+			<!-- 詳細説明 -->
+			<StackPanel Grid.Row="4"
+				Spacing="6" >
+				<TextBlock x:Uid="TagManager_Detail"
+					FontWeight="SemiBold" />
+				<TextBox
+					Text="{x:Bind ViewModel.Detail.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+					x:Uid="TagManager_DetailInput"
+					AcceptsReturn="True"
+					TextWrapping="Wrap"
+					Height="60" />
+			</StackPanel>
+
 			<!-- エイリアス一覧 -->
-			<Grid Grid.Row="4" >
+			<Grid Grid.Row="6" >
 				<Grid.RowDefinitions>
 					<RowDefinition Height="Auto" />
 					<RowDefinition Height="8" />
@@ -110,13 +125,13 @@
 			</Grid>
 
 			<!-- ボタンエリア -->
-			<Grid Grid.Row="6">
+			<Grid Grid.Row="8">
 				<Grid.ColumnDefinitions>
 					<ColumnDefinition Width="Auto" />
 					<ColumnDefinition Width="*" />
 					<ColumnDefinition Width="Auto" />
 				</Grid.ColumnDefinitions>
-				
+
 				<!-- エイリアス追加ボタン -->
 				<Button Grid.Column="0"
 					Command="{x:Bind ViewModel.AddTagAliasCommand, Mode=OneWay}" >
@@ -129,7 +144,7 @@
 				</Button>
 
 				<!-- タグ削除ボタン -->
-				<Button Grid.Column="2" 
+				<Button Grid.Column="2"
 					Click="DeleteTagButton_Click" >
 					<StackPanel Orientation="Horizontal" Spacing="6">
 						<FontIcon Glyph="&#xE74D;" FontSize="12" Foreground="{ThemeResource SystemFillColorCriticalBrush}" />

@@ -1,8 +1,10 @@
 using System.Diagnostics.CodeAnalysis;
 using MediaDeck.Common.Base;
+using MediaDeck.Common.Extensions;
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Interfaces.Notifications;
+using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Core.Models.Files;
 using MediaDeck.Core.Models.Files.SearchConditions;
 
@@ -19,7 +21,11 @@ public class SearchConditionManagerViewModel : ViewModelBase {
 	/// </summary>
 	/// <param name="mediaContentLibrary">メディアコンテンツライブラリ。</param>
 	/// <param name="searchConditionNotificationDispatcher">検索条件通知ディスパッチャ。</param>
-	public SearchConditionManagerViewModel(MediaContentLibrary mediaContentLibrary, ISearchConditionNotificationDispatcher searchConditionNotificationDispatcher) {
+	/// <param name="tagsManager">タグマネージャー。</param>
+	public SearchConditionManagerViewModel(
+		MediaContentLibrary mediaContentLibrary,
+		ISearchConditionNotificationDispatcher searchConditionNotificationDispatcher,
+		ITagsManager tagsManager) {
 		this.SearchConditions =
 			mediaContentLibrary
 				.SearchConditions
@@ -29,7 +35,7 @@ public class SearchConditionManagerViewModel : ViewModelBase {
 				.AddTo(this.CompositeDisposable);
 
 		this.SearchConditionCandidates = mediaContentLibrary.SearchConditionCandidates
-			.CreateView(x => new SearchConditionViewModel(x).AddTo(this.CompositeDisposable))
+			.CreateViewWithDisposal(x => new SearchConditionViewModel(x))
 			.AddTo(this.CompositeDisposable);
 		this.FilteredSearchConditionCandidates = this.SearchConditionCandidates
 			.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current)
@@ -38,6 +44,19 @@ public class SearchConditionManagerViewModel : ViewModelBase {
 
 		this.RefreshCommand = new ReactiveCommand().AddTo(this.CompositeDisposable);
 		this.RefreshCommand.Subscribe(_ => this.Reload()).AddTo(this.CompositeDisposable);
+
+		tagsManager.TagChanged?
+			.ObserveOnCurrentSynchronizationContext()
+			.Subscribe(tag => {
+				RefreshTagDisplayTexts(this.SearchConditions, tag.TagId);
+				RefreshTagDisplayTexts(this.SearchConditionCandidates.Unfiltered.Select(x => x.View), tag.TagId);
+			})
+			.AddTo(this.CompositeDisposable);
+
+		tagsManager.Tags.ObserveChanged()
+			.ObserveOnCurrentSynchronizationContext()
+			.Subscribe(_ => RefreshTagDisplayTexts(this.SearchConditions))
+			.AddTo(this.CompositeDisposable);
 	}
 
 	/// <summary>適用中の検索条件一覧を取得します。</summary>
@@ -65,9 +84,24 @@ public class SearchConditionManagerViewModel : ViewModelBase {
 	/// </summary>
 	/// <param name="word">フィルタリング単語。</param>
 	public void RefreshSearchTokenCandidates(string word) {
-		this.SearchConditionCandidates.AttachFilter(x => {
-			return x.IsMatchForSuggest(word);
+		this.SearchConditionCandidates.AttachFilter((model, vm) => {
+			var matched = model.IsMatchForSuggest(word);
+			vm.RefreshDisplayText();
+			return matched;
 		});
+	}
+
+	/// <summary>
+	/// 指定した一覧内のタグ検索条件の表示テキストを最新化します。
+	/// </summary>
+	/// <param name="viewModels">更新対象の ViewModel 列挙。</param>
+	/// <param name="targetTagId">対象タグID（全タグ更新時は null）。</param>
+	private static void RefreshTagDisplayTexts(IEnumerable<SearchConditionViewModel> viewModels, int? targetTagId = null) {
+		foreach (var vm in viewModels) {
+			if (vm.SearchCondition is TagSearchCondition tagCondition && (targetTagId == null || tagCondition.TagId == targetTagId.Value)) {
+				vm.RefreshDisplayText();
+			}
+		}
 	}
 
 	/// <summary>手動リロードを実行する（Dispatcher 経由で検索を発火する）。</summary>

@@ -84,4 +84,27 @@ public class TagsDetailModelTests : IDisposable {
 
 		this._tagsManagerMock.Verify(x => x.RemoveTagAsync(It.IsAny<IMediaItemModel[]>(), 1), Times.Once);
 	}
+
+	[Fact]
+	public void SystemTagRemoval_UpdatesCurrentFilesAndTagsList() {
+		var tagsList = new ObservableList<ITagModel>();
+		this._tagsManagerMock.Setup(x => x.Tags).Returns(tagsList);
+		using var sut = new TagsDetailModel(this._tagsManagerMock.Object);
+
+		var tagMock = new Mock<ITagModel>();
+		tagMock.SetupGet(x => x.TagId).Returns(10);
+		tagsList.Add(tagMock.Object);
+
+		var fileTags = new List<ITagModel> { tagMock.Object };
+		var fileMock = new Mock<IMediaItemModel>();
+		fileMock.SetupGet(x => x.Tags).Returns(fileTags);
+
+		sut.Refresh([fileMock.Object]);
+		sut.Tags.Count.ShouldBe(1);
+
+		tagsList.Remove(tagMock.Object);
+
+		fileTags.ShouldBeEmpty();
+		sut.Tags.Count.ShouldBe(0);
+	}
 }

@@ -2,6 +2,7 @@
 <local:SearchConditionManagerViewUserControl  x:Class="MediaDeck.Views.Panes.ViewerPanes.SearchConditionManagerView"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:local="using:MediaDeck.Views.Panes.ViewerPanes"
+	xmlns:vm="using:MediaDeck.ViewModels.Panes.ViewerPanes"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -23,19 +24,19 @@
 				<SymbolIconSource Symbol="Find"/>
 			</controls:TokenizingTextBox.QueryIcon>
 			<controls:TokenizingTextBox.TokenItemTemplate>
-				<DataTemplate>
-					<TextBlock Text="{Binding DisplayText}" />
+				<DataTemplate x:DataType="vm:SearchConditionViewModel">
+					<TextBlock Text="{x:Bind DisplayText.Value, Mode=OneWay}" />
 				</DataTemplate>
 			</controls:TokenizingTextBox.TokenItemTemplate>
 			<controls:TokenizingTextBox.SuggestedItemTemplate>
-				<DataTemplate>
+				<DataTemplate x:DataType="vm:SearchConditionViewModel">
 					<StackPanel Orientation="Horizontal"
 						Spacing="12"
 						Padding="8,4" >
 						<FontIcon Glyph="&#xE12B;"
 							FontSize="14"
 							Opacity="0.6" />
-						<TextBlock Text="{Binding DisplayText}"
+						<TextBlock Text="{x:Bind DisplayText.Value, Mode=OneWay}"
 							VerticalAlignment="Center" />
 					</StackPanel>
 				</DataTemplate>

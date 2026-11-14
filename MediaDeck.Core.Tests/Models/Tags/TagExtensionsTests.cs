@@ -11,6 +11,7 @@ namespace MediaDeck.Core.Tests.Models.Tags;
 public class TagExtensionsTests {
 	[Theory]
 	[InlineData("test", true, null, "testtag")] // タグ名一致
+	[InlineData("TEST", true, null, "testtag")] // タグ名大文字小文字無視一致
 	[InlineData("alias", true, "TestAlias", "tag")] // エイリアス一致
 	[InlineData("ruby", true, "TestAlias", "tag")] // ルビ一致
 	[InlineData("romaji", true, "TestAlias", "tag")] // ローマ字一致

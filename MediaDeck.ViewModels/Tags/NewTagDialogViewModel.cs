@@ -3,34 +3,40 @@ using MediaDeck.Composition.Interfaces.Tags;
 
 namespace MediaDeck.ViewModels.Tags;
 
+/// <summary>
+/// 新規タグ作成ダイアログの ViewModel クラス。
+/// </summary>
 [Inject(InjectServiceLifetime.Transient)]
 public class NewTagDialogViewModel : ViewModelBase {
 	/// <summary>
 	/// <see cref="NewTagDialogViewModel"/> クラスの新しいインスタンスを初期化します。
 	/// </summary>
 	/// <param name="tagsManager">タグマネージャー</param>
-	/// <param name="tagModelFactory">タグモデルファクトリー</param>
-	public NewTagDialogViewModel(ITagsManager tagsManager, ITagModelFactory tagModelFactory) {
-		this.TagName = new BindableReactiveProperty<string>("").AddTo(this.CompositeDisposable);
-		this.Ruby = new BindableReactiveProperty<string>("").AddTo(this.CompositeDisposable);
-		this.Detail = new BindableReactiveProperty<string>("").AddTo(this.CompositeDisposable);
-		this.SelectedCategory = new BindableReactiveProperty<TagCategoryViewModel?>().AddTo(this.CompositeDisposable);
+	public NewTagDialogViewModel(ITagsManager tagsManager) {
+		this.TagName = new BindableReactiveProperty<string>(string.Empty).AddTo(this.CompositeDisposable);
+		this.Ruby = new BindableReactiveProperty<string>(string.Empty).AddTo(this.CompositeDisposable);
+		this.Detail = new BindableReactiveProperty<string>(string.Empty).AddTo(this.CompositeDisposable);
+		this.SelectedCategory = new BindableReactiveProperty<ITagCategoryModel?>().AddTo(this.CompositeDisposable);
 		this.Result = new BindableReactiveProperty<DialogResult>(DialogResult.None).AddTo(this.CompositeDisposable);
 		this.CreatedTag = new BindableReactiveProperty<ITagModel?>().AddTo(this.CompositeDisposable);
 		this.ConfirmCommand = new ReactiveCommand().AddTo(this.CompositeDisposable);
 		this.CancelCommand = new ReactiveCommand().AddTo(this.CompositeDisposable);
 
-		this.TagCategories = tagsManager.TagCategories.Select(x => new TagCategoryViewModel(x, tagsManager, tagModelFactory).AddTo(this.CompositeDisposable)).ToArray();
-		this.SelectedCategory.Value = this.TagCategories.FirstOrDefault();
+		this.TagCategories = tagsManager.TagCategories.ToArray();
+		var defaultCategory = this.TagCategories.FirstOrDefault();
+		this.SelectedCategory.Value = defaultCategory;
+
 		this.ConfirmCommand.SubscribeAwait(async (_, ct) => {
 			// タグを作成
-			this.CreatedTag.Value = await tagsManager.CreateTagImmediatelyAsync(this.SelectedCategory.Value?.Model.TagCategoryId,
+			this.CreatedTag.Value = await tagsManager.CreateTagImmediatelyAsync(
+				this.SelectedCategory.Value?.TagCategoryId,
 				this.TagName.Value,
 				this.Ruby.Value,
 				this.Detail.Value,
 				[]);
 			this.Result.Value = DialogResult.Confirmed;
 		}, AwaitOperation.Drop).AddTo(this.CompositeDisposable);
+
 		this.CancelCommand.Subscribe(_ => {
 			this.Result.Value = DialogResult.Canceled;
 		}).AddTo(this.CompositeDisposable);
@@ -60,7 +66,7 @@ public class NewTagDialogViewModel : ViewModelBase {
 	/// <summary>
 	/// 選択中のタグカテゴリー
 	/// </summary>
-	public BindableReactiveProperty<TagCategoryViewModel?> SelectedCategory {
+	public BindableReactiveProperty<ITagCategoryModel?> SelectedCategory {
 		get;
 	}
 
@@ -81,10 +87,9 @@ public class NewTagDialogViewModel : ViewModelBase {
 	/// <summary>
 	/// タグカテゴリー一覧
 	/// </summary>
-	public TagCategoryViewModel[] TagCategories {
+	public ITagCategoryModel[] TagCategories {
 		get;
-		private set;
-	} = [];
+	}
 
 	/// <summary>
 	/// 確定コマンド
@@ -101,8 +106,16 @@ public class NewTagDialogViewModel : ViewModelBase {
 	}
 }
 
+/// <summary>
+/// ダイアログの処理結果を表します。
+/// </summary>
 public enum DialogResult {
+	/// <summary>未確定</summary>
 	None,
+
+	/// <summary>確定</summary>
 	Confirmed,
+
+	/// <summary>キャンセル</summary>
 	Canceled
 }

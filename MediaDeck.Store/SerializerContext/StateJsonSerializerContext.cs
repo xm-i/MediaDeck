@@ -4,7 +4,6 @@ using MediaDeck.Composition.Interfaces.Notifications;
 using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Core.Models.Files.Filter.FilterItemObjects;
 using MediaDeck.Core.Models.Files.SearchConditions;
-using MediaDeck.Core.Models.Tags;
 using MediaDeck.Store.Converters;
 
 namespace MediaDeck.Store.SerializerContext;
@@ -33,8 +32,6 @@ namespace MediaDeck.Store.SerializerContext;
 [JsonSerializable(typeof(FolderGroupFilterItemObjectForJson))]
 [JsonSerializable(typeof(PropertySearchConditionForJson))]
 [JsonSerializable(typeof(AlbumSearchConditionForJson))]
-[JsonSerializable(typeof(TagAliasModelForJson))]
-[JsonSerializable(typeof(TagCategoryModelForJson))]
 [JsonSerializable(typeof(ListViewerColumnStateModelForJson))]
 [JsonSerializable(typeof(DefaultTabStateModelForJson))]
 public partial class StateJsonSerializerContext : JsonSerializerContext {

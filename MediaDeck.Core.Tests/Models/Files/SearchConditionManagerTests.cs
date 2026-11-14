@@ -40,8 +40,9 @@ public class SearchConditionManagerTests {
 		dispatcherMock.Setup(x => x.RemoveRequest).Returns(removeSubject);
 		dispatcherMock.Setup(x => x.UpdateRequest).Returns(updateSubject);
 
+		var tags = new ObservableList<ITagModel>();
 		var tagsManagerMock = new Mock<ITagsManager>();
-		tagsManagerMock.Setup(x => x.Tags).Returns(new ObservableList<ITagModel>());
+		tagsManagerMock.Setup(x => x.Tags).Returns(tags);
 
 		// FolderRepositoryにInMemory DBを渡して空のルートフォルダを返す状態にする
 		var dbFactory = CreateInMemoryDbFactory(testName);
@@ -55,7 +56,7 @@ public class SearchConditionManagerTests {
 		folderRepo.RootFolder.Value = new FolderObject(null, "", []);
 
 		var manager = new SearchConditionManager(dispatcherMock.Object, tagsManagerMock.Object, folderRepo, tabState);
-		return new SearchConditionManagerTestContext(manager, folderRepo, addSubject, removeSubject, updateSubject, folderUpdateSubject);
+		return new SearchConditionManagerTestContext(manager, folderRepo, tags, addSubject, removeSubject, updateSubject, folderUpdateSubject);
 	}
 
 	/// <summary>
@@ -108,9 +109,53 @@ public class SearchConditionManagerTests {
 		context.Manager.SearchConditionCandidates.OfType<PropertySearchCondition>().ShouldNotBeEmpty();
 	}
 
+	/// <summary>
+	///     タグ追加時に候補が更新され、さらにタグ内容編集後も最新のDisplayText・サジェスト判定に追従することを確認します。
+	/// </summary>
+	[Fact]
+	public void Candidates_ReflectAddedAndEditedTag() {
+		using var context = CreateSut(nameof(Candidates_ReflectAddedAndEditedTag));
+		using var tag = new MediaDeck.Core.Models.Tags.TagModel {
+			TagId = 42,
+			TagName = string.Empty
+		};
+
+		// 新規タグ追加（空名）
+		context.Tags.Add(tag);
+		var tagCandidate = context.Manager.SearchConditionCandidates
+			.OfType<TagSearchCondition>()
+			.FirstOrDefault(x => x.TagId == 42);
+		tagCandidate.ShouldNotBeNull();
+		tagCandidate.DisplayText.ShouldBe("TagName=");
+
+		// 編集後（タグ名と別名を更新）
+		tag.TagName = "風景";
+		tag.Ruby = "ふうけい";
+		using var alias = new MediaDeck.Core.Models.Tags.TagAliasModel {
+			Alias = "絶景",
+			Ruby = "ぜっけい"
+		};
+		tag.TagAliases = [alias];
+
+		tagCandidate.IsMatchForSuggest("fuukei").ShouldBeTrue();
+		tagCandidate.DisplayText.ShouldBe("TagName=風景");
+
+		tagCandidate.IsMatchForSuggest("zekkei").ShouldBeTrue();
+		tagCandidate.DisplayText.ShouldBe("TagName=風景 (絶景)");
+
+		// 再度タグ名一致に戻ると代表テキストが解除される
+		tagCandidate.IsMatchForSuggest("風景").ShouldBeTrue();
+		tagCandidate.DisplayText.ShouldBe("TagName=風景");
+
+		// タグ削除で候補からも除去される
+		context.Tags.Remove(tag);
+		context.Manager.SearchConditionCandidates.OfType<TagSearchCondition>().ShouldNotContain(x => x.TagId == 42);
+	}
+
 	private sealed class SearchConditionManagerTestContext(
 		SearchConditionManager manager,
 		FolderRepository folderRepository,
+		ObservableList<ITagModel> tags,
 		Subject<ISearchCondition> addSubject,
 		Subject<ISearchCondition> removeSubject,
 		Subject<Action<ObservableList<ISearchCondition>>> updateSubject,
@@ -118,6 +163,10 @@ public class SearchConditionManagerTests {
 		public SearchConditionManager Manager {
 			get;
 		} = manager;
+
+		public ObservableList<ITagModel> Tags {
+			get;
+		} = tags;
 
 		public Subject<ISearchCondition> AddSubject {
 			get;

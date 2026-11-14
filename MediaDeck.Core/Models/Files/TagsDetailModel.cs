@@ -13,6 +13,7 @@ public class TagsDetailModel : ModelBase {
 	private readonly SerialDisposable _propertyChangedSubscription = new();
 	private readonly ITagsManager _tagsManager;
 	private readonly ObservableList<ValueCountPair<ITagModel>> _tags = [];
+	private IMediaItemModel[] _currentFiles = [];
 
 	/// <summary>
 	/// タグリスト
@@ -57,6 +58,21 @@ public class TagsDetailModel : ModelBase {
 	public TagsDetailModel(ITagsManager tagsManager) {
 		this._tagsManager = tagsManager;
 		this._propertyChangedSubscription.AddTo(this.CompositeDisposable);
+
+		this._tagsManager.Tags.ObserveRemove()
+			.Subscribe(removeEvent => {
+				var removedTagId = removeEvent.Value.TagId;
+				var updated = false;
+				foreach (var file in this._currentFiles) {
+					if (file.Tags.RemoveAll(t => t.TagId == removedTagId) > 0) {
+						updated = true;
+					}
+				}
+				if (updated) {
+					this.Refresh(this._currentFiles);
+				}
+			})
+			.AddTo(this.CompositeDisposable);
 	}
 
 	/// <summary>
@@ -64,6 +80,7 @@ public class TagsDetailModel : ModelBase {
 	/// </summary>
 	/// <param name="files">対象ファイル群</param>
 	public void Refresh(IMediaItemModel[] files) {
+		this._currentFiles = files;
 		this._tags.Clear();
 		if (files.Length > 0) {
 			this._tags.AddRange(files
