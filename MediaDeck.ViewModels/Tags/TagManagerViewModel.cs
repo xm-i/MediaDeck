@@ -16,9 +16,16 @@ public class TagManagerViewModel : ViewModelBase {
 	/// <param name="tagModelFactory">タグモデルファクトリー</param>
 	public TagManagerViewModel(ITagsManager tagsManager, ITagModelFactory tagModelFactory) {
 		this.SelectedTagCategory = new BindableReactiveProperty<TagCategoryViewModel?>().AddTo(this.CompositeDisposable);
+		this.CanEditSelectedCategory = this.SelectedTagCategory
+			.Select(x => x is { IsEditable: true })
+			.ToBindableReactiveProperty(false)
+			.AddTo(this.CompositeDisposable);
+		this.AddTagCategoryRequested = new Subject<Unit>().AddTo(this.CompositeDisposable);
+		this.EditTagCategoryRequested = new Subject<TagCategoryViewModel>().AddTo(this.CompositeDisposable);
 		this.LoadCommand = new ReactiveCommand().AddTo(this.CompositeDisposable);
 		this.AddTagCategoryCommand = new ReactiveCommand().AddTo(this.CompositeDisposable);
-		this.DeleteTagCategoryCommand = new ReactiveCommand().AddTo(this.CompositeDisposable);
+		this.EditTagCategoryCommand = new ReactiveCommand<TagCategoryViewModel?>().AddTo(this.CompositeDisposable);
+		this.DeleteTagCategoryCommand = new ReactiveCommand<TagCategoryViewModel?>().AddTo(this.CompositeDisposable);
 		this.AddTagCommand = new ReactiveCommand().AddTo(this.CompositeDisposable);
 		this.DeleteTagCommand = new ReactiveCommand().AddTo(this.CompositeDisposable);
 
@@ -29,19 +36,25 @@ public class TagManagerViewModel : ViewModelBase {
 			.ToNotifyCollectionChangedWithDisposal(SynchronizationContextCollectionEventDispatcher.Current)
 			.AddTo(this.CompositeDisposable);
 
-		this.AddTagCategoryCommand.SubscribeAwait(async (_, ct) => {
-			var createdCategory = await tagsManager.CreateTagCategoryAsync();
-			var createdVm = this.TagCategories.FirstOrDefault(x => x.Model == createdCategory);
-			if (createdVm != null) {
-				this.SelectedTagCategory.Value = createdVm;
-			}
-		}, AwaitOperation.Drop).AddTo(this.CompositeDisposable);
+		this.AddTagCategoryCommand.Subscribe(_ => {
+			this.AddTagCategoryRequested.OnNext(Unit.Default);
+		}).AddTo(this.CompositeDisposable);
 
-		this.DeleteTagCategoryCommand.SubscribeAwait(async (_, ct) => {
-			var category = this.SelectedTagCategory.Value;
-			if (category != null && category.IsDeletable) {
+		this.EditTagCategoryCommand.Subscribe(parameter => {
+			var target = parameter ?? this.SelectedTagCategory.Value;
+			if (target is { IsEditable: true }) {
+				this.EditTagCategoryRequested.OnNext(target);
+			}
+		}).AddTo(this.CompositeDisposable);
+
+		this.DeleteTagCategoryCommand.SubscribeAwait(async (parameter, ct) => {
+			var category = parameter ?? this.SelectedTagCategory.Value;
+			if (category is { IsDeletable: true }) {
+				var wasSelected = this.SelectedTagCategory.Value == category;
 				await tagsManager.DeleteTagCategoryAsync(category.Model);
-				this.SelectedTagCategory.Value = null;
+				if (wasSelected) {
+					this.SelectedTagCategory.Value = null;
+				}
 			}
 		}, AwaitOperation.Drop).AddTo(this.CompositeDisposable);
 
@@ -87,6 +100,27 @@ public class TagManagerViewModel : ViewModelBase {
 	}
 
 	/// <summary>
+	/// 選択中のタグカテゴリーが編集・削除可能かどうかを取得します。
+	/// </summary>
+	public BindableReactiveProperty<bool> CanEditSelectedCategory {
+		get;
+	}
+
+	/// <summary>
+	/// タグカテゴリー新規追加ダイアログの表示リクエストを取得します。
+	/// </summary>
+	public Subject<Unit> AddTagCategoryRequested {
+		get;
+	}
+
+	/// <summary>
+	/// タグカテゴリー編集ダイアログの表示リクエストを取得します。
+	/// </summary>
+	public Subject<TagCategoryViewModel> EditTagCategoryRequested {
+		get;
+	}
+
+	/// <summary>
 	/// データを読み込むコマンドを取得します。
 	/// </summary>
 	public ReactiveCommand LoadCommand {
@@ -101,9 +135,16 @@ public class TagManagerViewModel : ViewModelBase {
 	}
 
 	/// <summary>
-	/// 選択中のタグカテゴリーを削除するコマンドを取得します。
+	/// タグカテゴリーを編集するコマンドを取得します。
 	/// </summary>
-	public ReactiveCommand DeleteTagCategoryCommand {
+	public ReactiveCommand<TagCategoryViewModel?> EditTagCategoryCommand {
+		get;
+	}
+
+	/// <summary>
+	/// タグカテゴリーを削除するコマンドを取得します。
+	/// </summary>
+	public ReactiveCommand<TagCategoryViewModel?> DeleteTagCategoryCommand {
 		get;
 	}
 
@@ -119,6 +160,17 @@ public class TagManagerViewModel : ViewModelBase {
 	/// </summary>
 	public ReactiveCommand DeleteTagCommand {
 		get;
+	}
+
+	/// <summary>
+	/// 指定したタグカテゴリーを選択状態にします。
+	/// </summary>
+	/// <param name="category">選択するタグカテゴリーモデル</param>
+	public void SelectTagCategory(ITagCategoryModel category) {
+		var categoryVm = this.TagCategories.FirstOrDefault(x => x.Model == category);
+		if (categoryVm != null) {
+			this.SelectedTagCategory.Value = categoryVm;
+		}
 	}
 
 	/// <summary>

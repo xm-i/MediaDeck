@@ -659,23 +659,23 @@
   <data name="TagManager_AddTagCategory.ToolTipService.ToolTip" xml:space="preserve">
     <value>新しいタグカテゴリを追加</value>
   </data>
-  <data name="TagManager_CategoryName.Text" xml:space="preserve">
-    <value>カテゴリ名</value>
+  <data name="TagManager_EditTagCategory.ToolTipService.ToolTip" xml:space="preserve">
+    <value>選択中のタグカテゴリを編集</value>
   </data>
-  <data name="TagManager_CategoryNameInput.PlaceholderText" xml:space="preserve">
-    <value>カテゴリ名を入力</value>
+  <data name="TagManager_DeleteTagCategory.ToolTipService.ToolTip" xml:space="preserve">
+    <value>選択中のタグカテゴリを削除</value>
+  </data>
+  <data name="TagManager_EditCategoryMenu.Text" xml:space="preserve">
+    <value>編集</value>
+  </data>
+  <data name="TagManager_DeleteCategoryMenu.Text" xml:space="preserve">
+    <value>削除</value>
   </data>
   <data name="TagManager_Detail.Text" xml:space="preserve">
     <value>詳細</value>
   </data>
   <data name="TagManager_DetailInput.PlaceholderText" xml:space="preserve">
     <value>詳細を入力</value>
-  </data>
-  <data name="TagManager_DeleteCategory.Text" xml:space="preserve">
-    <value>カテゴリを削除</value>
-  </data>
-  <data name="TagManager_DeleteCategory.ToolTipService.ToolTip" xml:space="preserve">
-    <value>このタグカテゴリを削除します</value>
   </data>
   <data name="TagManager_Tags.Text" xml:space="preserve">
     <value>タグ</value>
@@ -1269,6 +1269,33 @@
   <data name="NewTagDialog_DescriptionInput.PlaceholderText" xml:space="preserve">
     <value>説明を入力</value>
   </data>
+  <data name="TagCategoryEditDialog.CloseButtonText" xml:space="preserve">
+    <value>キャンセル</value>
+  </data>
+  <data name="TagCategoryEditDialog_CreateTitle" xml:space="preserve">
+    <value>新しいカテゴリの追加</value>
+  </data>
+  <data name="TagCategoryEditDialog_EditTitle" xml:space="preserve">
+    <value>カテゴリの編集</value>
+  </data>
+  <data name="TagCategoryEditDialog_CreateButton" xml:space="preserve">
+    <value>追加</value>
+  </data>
+  <data name="TagCategoryEditDialog_SaveButton" xml:space="preserve">
+    <value>保存</value>
+  </data>
+  <data name="TagCategoryEditDialog_NameLabel.Text" xml:space="preserve">
+    <value>カテゴリ名</value>
+  </data>
+  <data name="TagCategoryEditDialog_NameInput.PlaceholderText" xml:space="preserve">
+    <value>カテゴリ名を入力</value>
+  </data>
+  <data name="TagCategoryEditDialog_DetailLabel.Text" xml:space="preserve">
+    <value>説明（任意）</value>
+  </data>
+  <data name="TagCategoryEditDialog_DetailInput.PlaceholderText" xml:space="preserve">
+    <value>説明を入力</value>
+  </data>
   <!-- サムネイル一括再生成 / サムネイル選択 -->
   <data name="BulkThumbnailRegeneration_WindowTitle" xml:space="preserve">
     <value>サムネイル一括再生成</value>
@@ -1386,7 +1413,7 @@
 
   <!-- TagManager Dialogs -->
   <data name="TagManager_DeleteCategoryConfirmation_Title" xml:space="preserve">
-    <value>このカテゴリを削除しますか？</value>
+    <value>カテゴリ「{0}」を削除しますか？</value>
   </data>
   <data name="TagManager_DeleteCategoryConfirmation_Content" xml:space="preserve">
     <value>カテゴリに含まれるタグは「未設定」に移動します。この操作は元に戻せません。</value>

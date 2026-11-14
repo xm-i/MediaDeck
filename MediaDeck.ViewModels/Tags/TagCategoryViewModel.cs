@@ -10,8 +10,6 @@ namespace MediaDeck.ViewModels.Tags;
 /// </summary>
 public class TagCategoryViewModel : ViewModelBase {
 	private readonly ITagsManager _tagsManager;
-	private bool _isSyncingFromModel;
-	private bool _hasUnsavedChanges;
 
 	/// <summary>
 	/// <see cref="TagCategoryViewModel"/> クラスの新しいインスタンスを初期化します。
@@ -45,24 +43,6 @@ public class TagCategoryViewModel : ViewModelBase {
 		tagCategory.Changed?.Subscribe(_ => {
 			this.SyncFromModel();
 		}).AddTo(this.CompositeDisposable);
-
-		if (this.IsDeletable) {
-			var changedStream = this.TagCategoryName.Skip(1)
-				.ToUnit()
-				.Merge(this.Detail.Skip(1).ToUnit())
-				.Where(_ => !this._isSyncingFromModel);
-
-			changedStream.Subscribe(_ => {
-				this._hasUnsavedChanges = true;
-			}).AddTo(this.CompositeDisposable);
-
-			changedStream.ThrottleLast(TimeSpan.FromMilliseconds(300))
-				.ObserveOnCurrentSynchronizationContext()
-				.SubscribeAwait(async (_, ct) => {
-					await this.SaveChangesAsync();
-				}, AwaitOperation.Sequential)
-				.AddTo(this.CompositeDisposable);
-		}
 	}
 
 	/// <summary>
@@ -92,6 +72,15 @@ public class TagCategoryViewModel : ViewModelBase {
 	/// このカテゴリが削除可能かどうか（システム定義の未分類カテゴリ以外は削除可能）
 	/// </summary>
 	public bool IsDeletable {
+		get {
+			return this.Model != this._tagsManager.NoCategory;
+		}
+	}
+
+	/// <summary>
+	/// このカテゴリが編集可能かどうか（システム定義の未分類カテゴリ以外は編集可能）
+	/// </summary>
+	public bool IsEditable {
 		get {
 			return this.Model != this._tagsManager.NoCategory;
 		}
@@ -133,27 +122,12 @@ public class TagCategoryViewModel : ViewModelBase {
 	}
 
 	private void SyncFromModel() {
-		this._isSyncingFromModel = true;
-		try {
-			if (this.TagCategoryName.Value != this.Model.TagCategoryName) {
-				this.TagCategoryName.Value = this.Model.TagCategoryName;
-			}
-			if (this.Detail.Value != this.Model.Detail) {
-				this.Detail.Value = this.Model.Detail;
-			}
-		} finally {
-			this._isSyncingFromModel = false;
+		if (this.TagCategoryName.Value != this.Model.TagCategoryName) {
+			this.TagCategoryName.Value = this.Model.TagCategoryName;
 		}
-	}
-
-	private async Task SaveChangesAsync() {
-		if (!this.IsDeletable || !this._tagsManager.TagCategories.Contains(this.Model)) {
-			this._hasUnsavedChanges = false;
-			return;
+		if (this.Detail.Value != this.Model.Detail) {
+			this.Detail.Value = this.Model.Detail;
 		}
-
-		this._hasUnsavedChanges = false;
-		await this._tagsManager.UpdateTagCategoryAsync(this.Model, this.TagCategoryName.Value, this.Detail.Value);
 	}
 
 	private void RefreshTagCandidateFilter() {
@@ -167,16 +141,5 @@ public class TagCategoryViewModel : ViewModelBase {
 			tagVm.RepresentativeText.Value = repText;
 			return result;
 		});
-	}
-
-	/// <inheritdoc />
-	protected override void Dispose(bool disposing) {
-		if (disposing) {
-			if (this._hasUnsavedChanges && this.IsDeletable && this._tagsManager.TagCategories.Contains(this.Model)) {
-				this._hasUnsavedChanges = false;
-				_ = this._tagsManager.UpdateTagCategoryAsync(this.Model, this.TagCategoryName.Value, this.Detail.Value);
-			}
-		}
-		base.Dispose(disposing);
 	}
 }

@@ -659,23 +659,23 @@
   <data name="TagManager_AddTagCategory.ToolTipService.ToolTip" xml:space="preserve">
     <value>Add new tag category</value>
   </data>
-  <data name="TagManager_CategoryName.Text" xml:space="preserve">
-    <value>Category Name</value>
+  <data name="TagManager_EditTagCategory.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Edit selected tag category</value>
   </data>
-  <data name="TagManager_CategoryNameInput.PlaceholderText" xml:space="preserve">
-    <value>Enter category name</value>
+  <data name="TagManager_DeleteTagCategory.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Delete selected tag category</value>
+  </data>
+  <data name="TagManager_EditCategoryMenu.Text" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="TagManager_DeleteCategoryMenu.Text" xml:space="preserve">
+    <value>Delete</value>
   </data>
   <data name="TagManager_Detail.Text" xml:space="preserve">
     <value>Detail</value>
   </data>
   <data name="TagManager_DetailInput.PlaceholderText" xml:space="preserve">
     <value>Enter detail</value>
-  </data>
-  <data name="TagManager_DeleteCategory.Text" xml:space="preserve">
-    <value>Delete Category</value>
-  </data>
-  <data name="TagManager_DeleteCategory.ToolTipService.ToolTip" xml:space="preserve">
-    <value>Delete this tag category</value>
   </data>
   <data name="TagManager_Tags.Text" xml:space="preserve">
     <value>Tags</value>
@@ -1269,6 +1269,33 @@
   <data name="NewTagDialog_DescriptionInput.PlaceholderText" xml:space="preserve">
     <value>Enter description</value>
   </data>
+  <data name="TagCategoryEditDialog.CloseButtonText" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="TagCategoryEditDialog_CreateTitle" xml:space="preserve">
+    <value>Add New Category</value>
+  </data>
+  <data name="TagCategoryEditDialog_EditTitle" xml:space="preserve">
+    <value>Edit Category</value>
+  </data>
+  <data name="TagCategoryEditDialog_CreateButton" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="TagCategoryEditDialog_SaveButton" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="TagCategoryEditDialog_NameLabel.Text" xml:space="preserve">
+    <value>Category Name</value>
+  </data>
+  <data name="TagCategoryEditDialog_NameInput.PlaceholderText" xml:space="preserve">
+    <value>Enter category name</value>
+  </data>
+  <data name="TagCategoryEditDialog_DetailLabel.Text" xml:space="preserve">
+    <value>Description (Optional)</value>
+  </data>
+  <data name="TagCategoryEditDialog_DetailInput.PlaceholderText" xml:space="preserve">
+    <value>Enter description</value>
+  </data>
   <!-- Bulk Thumbnail Regeneration / Thumbnail Picker -->
   <data name="BulkThumbnailRegeneration_WindowTitle" xml:space="preserve">
     <value>Bulk Thumbnail Regeneration</value>
@@ -1386,7 +1413,7 @@
 
   <!-- TagManager Dialogs -->
   <data name="TagManager_DeleteCategoryConfirmation_Title" xml:space="preserve">
-    <value>Are you sure you want to delete this category?</value>
+    <value>Are you sure you want to delete category "{0}"?</value>
   </data>
   <data name="TagManager_DeleteCategoryConfirmation_Content" xml:space="preserve">
     <value>Tags in this category will be moved to 'Unset'. This action cannot be undone.</value>
