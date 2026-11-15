@@ -134,8 +134,11 @@
   <data name="NavMenu_Config.Text" xml:space="preserve">
     <value>設定</value>
   </data>
-  <data name="NavMenu_SyncNotification.ToolTipService.ToolTip" xml:space="preserve">
-    <value>未処理のファイル変更があります。</value>
+  <data name="NavMenu_SyncNotificationFormat" xml:space="preserve">
+    <value>ファイル変更 ({0}件)</value>
+  </data>
+  <data name="NavMenu_SyncNotification_ToolTipFormat" xml:space="preserve">
+    <value>未処理のファイル変更が {0} 件あります。クリックして確認します。</value>
   </data>
   <data name="NavMenu_Help.Title" xml:space="preserve">
     <value>ヘルプ</value>

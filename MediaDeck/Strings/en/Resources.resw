@@ -134,8 +134,11 @@
   <data name="NavMenu_Config.Text" xml:space="preserve">
     <value>Settings</value>
   </data>
-  <data name="NavMenu_SyncNotification.ToolTipService.ToolTip" xml:space="preserve">
-    <value>There are unprocessed file changes.</value>
+  <data name="NavMenu_SyncNotificationFormat" xml:space="preserve">
+    <value>File Changes ({0})</value>
+  </data>
+  <data name="NavMenu_SyncNotification_ToolTipFormat" xml:space="preserve">
+    <value>Unprocessed file changes: {0}. Click to review.</value>
   </data>
 
   <!-- Settings window -->

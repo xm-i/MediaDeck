@@ -93,23 +93,29 @@
 			</Button>
 
 			<Button
-				x:Uid="NavMenu_SyncNotification"
+				x:Name="SyncNotificationButton"
 				VerticalAlignment="Center"
-				Padding="8,4"
+				Padding="10,4"
 				Click="SyncNotificationButton_Click"
+				ToolTipService.ToolTip="{x:Bind ViewModel.SyncNotificationToolTip.Value, Mode=OneWay}"
 				Visibility="{x:Bind ViewModel.HasUnprocessedChanges.Value, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
 				Style="{ThemeResource AccentButtonStyle}" >
-				<Button.Content>
-					<Grid>
-						<FontIcon FontFamily="Segoe Fluent Icons"
-							Glyph="&#xE89A;" />
-					</Grid>
-				</Button.Content>
-				<Button.RenderTransform>
-					<ScaleTransform x:Name="NotificationIconTransform"
-						CenterX="16"
-						CenterY="16" />
-				</Button.RenderTransform>
+				<StackPanel Orientation="Horizontal"
+					Spacing="6"
+					VerticalAlignment="Center" >
+					<FontIcon FontFamily="Segoe Fluent Icons"
+						Glyph="&#xE89A;"
+						FontSize="14"
+						RenderTransformOrigin="0.5,0.5" >
+						<FontIcon.RenderTransform>
+							<ScaleTransform x:Name="NotificationIconTransform" />
+						</FontIcon.RenderTransform>
+					</FontIcon>
+					<TextBlock Text="{x:Bind ViewModel.SyncNotificationLabel.Value, Mode=OneWay}"
+						FontSize="12"
+						FontWeight="SemiBold"
+						VerticalAlignment="Center" />
+				</StackPanel>
 			</Button>
 		</StackPanel>
 	</Grid>

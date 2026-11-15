@@ -20,6 +20,20 @@ public class NavigationMenuViewModel : ViewModelBase {
 	}
 
 	/// <summary>
+	/// ファイル変更通知ボタンに表示するラベルテキスト
+	/// </summary>
+	public BindableReactiveProperty<string> SyncNotificationLabel {
+		get;
+	}
+
+	/// <summary>
+	/// ファイル変更通知ボタンのツールチップテキスト
+	/// </summary>
+	public BindableReactiveProperty<string> SyncNotificationToolTip {
+		get;
+	}
+
+	/// <summary>
 	/// 利用可能なアプリケーション更新が存在するかどうか
 	/// </summary>
 	public BindableReactiveProperty<bool> HasAvailableUpdate {
@@ -52,14 +66,19 @@ public class NavigationMenuViewModel : ViewModelBase {
 		IStringProvider stringProvider) {
 		this._stringProvider = stringProvider;
 
+		this.HasUnprocessedChanges = new BindableReactiveProperty<bool>(false).AddTo(this.CompositeDisposable);
+		this.SyncNotificationLabel = new BindableReactiveProperty<string>(string.Empty).AddTo(this.CompositeDisposable);
+		this.SyncNotificationToolTip = new BindableReactiveProperty<string>(string.Empty).AddTo(this.CompositeDisposable);
+
+		this.ApplyUnprocessedChanges(fileChangeMonitorService.Tracker.UnprocessedChanges.Count);
+
 		var unprocessedChangesObservable = fileChangeMonitorService.Tracker.UnprocessedChanges.ObserveCountChanged();
 		if (SynchronizationContext.Current != null) {
 			unprocessedChangesObservable = unprocessedChangesObservable.ObserveOnCurrentSynchronizationContext();
 		}
 
-		this.HasUnprocessedChanges = unprocessedChangesObservable
-			.Select(count => count > 0)
-			.ToBindableReactiveProperty(fileChangeMonitorService.Tracker.UnprocessedChanges.Count > 0)
+		unprocessedChangesObservable
+			.Subscribe(this.ApplyUnprocessedChanges)
 			.AddTo(this.CompositeDisposable);
 
 		this.HasAvailableUpdate = new BindableReactiveProperty<bool>(false).AddTo(this.CompositeDisposable);
@@ -76,6 +95,22 @@ public class NavigationMenuViewModel : ViewModelBase {
 		updateObservable
 			.Subscribe(this.ApplyAvailableUpdate)
 			.AddTo(this.CompositeDisposable);
+	}
+
+	/// <summary>
+	/// 未処理のファイル変更件数をナビゲーションメニューの通知プロパティへ反映します。
+	/// </summary>
+	/// <param name="count">未処理のファイル変更件数</param>
+	private void ApplyUnprocessedChanges(int count) {
+		if (count > 0) {
+			this.HasUnprocessedChanges.Value = true;
+			this.SyncNotificationLabel.Value = this._stringProvider.GetString("NavMenu_SyncNotificationFormat", count);
+			this.SyncNotificationToolTip.Value = this._stringProvider.GetString("NavMenu_SyncNotification_ToolTipFormat", count);
+		} else {
+			this.HasUnprocessedChanges.Value = false;
+			this.SyncNotificationLabel.Value = string.Empty;
+			this.SyncNotificationToolTip.Value = string.Empty;
+		}
 	}
 
 	/// <summary>
