@@ -5,6 +5,10 @@
     },
     "MediaDeck (Unpackaged)": {
       "commandName": "Project"
+    },
+    "MediaDeck (Unpackaged/Profile2)": {
+      "commandName": "Project",
+      "commandLineArgs": " --base C:\\test\\tt"
     }
   }
 }
