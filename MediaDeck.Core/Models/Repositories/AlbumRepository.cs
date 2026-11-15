@@ -151,6 +151,85 @@ public class AlbumRepository : RepositoryBase {
 	}
 
 	/// <summary>
+	/// 指定 Path のアルバム（配下のサブアルバムを含む）を新しい Path にリネームします。
+	/// </summary>
+	/// <param name="oldPath">変更前のアルバムパス。</param>
+	/// <param name="newPath">変更後のアルバムパス。</param>
+	/// <returns>リネーム処理の結果。</returns>
+	public async Task<AlbumRenameResult> RenameAlbumAsync(string oldPath, string newPath) {
+		oldPath = NormalizePath(oldPath);
+		newPath = NormalizePath(newPath);
+
+		if (string.Equals(oldPath, newPath, StringComparison.Ordinal)) {
+			return AlbumRenameResult.Success;
+		}
+
+		var oldPrefix = $"{oldPath}{AlbumObject.Separator}";
+		if (newPath.StartsWith(oldPrefix, StringComparison.OrdinalIgnoreCase)) {
+			return AlbumRenameResult.InvalidDestinationUnderSource;
+		}
+
+		await using var db = await this._dbFactory.CreateDbContextAsync();
+		var allAlbums = await db.Albums.ToListAsync();
+
+		var targets = allAlbums
+			.Where(a => string.Equals(a.Path, oldPath, StringComparison.OrdinalIgnoreCase)
+				|| a.Path.StartsWith(oldPrefix, StringComparison.OrdinalIgnoreCase))
+			.ToList();
+
+		if (targets.Count == 0) {
+			await this.Load();
+			return AlbumRenameResult.NotFound;
+		}
+
+		var targetSet = targets.ToHashSet();
+		var otherPaths = allAlbums
+			.Where(a => !targetSet.Contains(a))
+			.Select(a => a.Path)
+			.ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+		var newPrefix = $"{newPath}{AlbumObject.Separator}";
+		if (!string.Equals(oldPath, newPath, StringComparison.OrdinalIgnoreCase)) {
+			if (otherPaths.Contains(newPath)) {
+				return AlbumRenameResult.DuplicatePath;
+			}
+
+			var newDirectChildrenCount = otherPaths
+				.Where(p => p.StartsWith(newPrefix, StringComparison.OrdinalIgnoreCase))
+				.Select(p => {
+					var rest = p[newPrefix.Length..];
+					var slashIndex = rest.IndexOf(AlbumObject.Separator);
+					return slashIndex >= 0 ? rest[..slashIndex] : rest;
+				})
+				.Distinct(StringComparer.OrdinalIgnoreCase)
+				.Count();
+			if (newDirectChildrenCount >= 2) {
+				return AlbumRenameResult.DuplicatePath;
+			}
+		}
+
+		var updates = new List<(Album Album, string UpdatedPath)>(targets.Count);
+		foreach (var album in targets) {
+			var updatedPath = string.Equals(album.Path, oldPath, StringComparison.OrdinalIgnoreCase)
+				? newPath
+				: $"{newPath}{album.Path[oldPath.Length..]}";
+			if (otherPaths.Contains(updatedPath)) {
+				return AlbumRenameResult.DuplicatePath;
+			}
+			updates.Add((album, updatedPath));
+		}
+
+		foreach (var (album, updatedPath) in updates) {
+			album.Path = updatedPath;
+		}
+
+		await db.SaveChangesAsync();
+		await this.Load();
+		AlbumNotifications.AlbumUpdated.OnNext(this);
+		return AlbumRenameResult.Success;
+	}
+
+	/// <summary>
 	/// 指定したメディアアイテム群を、指定 Path のアルバムへ追加する。
 	/// アルバムが存在しなければ新規作成する。
 	/// </summary>

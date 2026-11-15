@@ -271,4 +271,125 @@ public class AlbumRepositoryTests {
 		deletedParentAfterChildRemoved.ShouldBeTrue();
 		sut.RootAlbum.Value.ChildAlbums.ShouldBeEmpty();
 	}
+
+	/// <summary>
+	/// RenameAlbumAsync で単アルバムをリネームすると DB とツリーが更新され、メディアとの紐付けが維持され、他インスタンスにも通知されることを確認します。
+	/// </summary>
+	[Fact]
+	public async Task RenameAlbumAsync_SingleAlbum_RenamesAndNotifiesOthers() {
+		var dbFactory = CreateInMemoryDbFactory(nameof(RenameAlbumAsync_SingleAlbum_RenamesAndNotifiesOthers));
+
+		await using (var db = await dbFactory.CreateDbContextAsync()) {
+			db.MediaItems.Add(new MediaItem {
+				MediaItemId = 1,
+				FilePath = "/test.jpg",
+				DirectoryPath = "/",
+				MediaType = MediaType.Image,
+				Description = "",
+				IsUnderFolderGroup = false,
+				ThumbnailFileName = "",
+				FileSize = 100,
+			});
+			await db.SaveChangesAsync();
+		}
+
+		using var sut1 = CreateSut(dbFactory);
+		using var sut2 = CreateSut(dbFactory);
+		await sut1.AddItemsAsync("OldAlbum", [1]);
+		await sut2.Load();
+
+		var result = await sut1.RenameAlbumAsync("OldAlbum", "NewAlbum");
+
+		result.ShouldBe(AlbumRenameResult.Success);
+		sut1.RootAlbum.Value.ChildAlbums.Length.ShouldBe(1);
+		sut1.RootAlbum.Value.ChildAlbums[0].AlbumPath.ShouldBe("NewAlbum");
+		sut1.RootAlbum.Value.ChildAlbums[0].FileCount.ShouldBe(1);
+
+		await using (var db = await dbFactory.CreateDbContextAsync()) {
+			var albums = await db.Albums.Include(a => a.MediaItemAlbums).ToListAsync();
+			albums.Count.ShouldBe(1);
+			albums[0].Path.ShouldBe("NewAlbum");
+			albums[0].MediaItemAlbums.Count.ShouldBe(1);
+		}
+
+		for (var i = 0; i < 100 && sut2.RootAlbum.Value.ChildAlbums[0].AlbumPath != "NewAlbum"; i++) {
+			await Task.Delay(20);
+		}
+		sut2.RootAlbum.Value.ChildAlbums[0].AlbumPath.ShouldBe("NewAlbum");
+	}
+
+	/// <summary>
+	/// RenameAlbumAsync で親ノードをリネームすると配下の全サブアルバムのプレフィックスも一括更新されることを確認します。
+	/// </summary>
+	[Fact]
+	public async Task RenameAlbumAsync_ParentAndChildAlbums_RenamesPrefix() {
+		var dbFactory = CreateInMemoryDbFactory(nameof(RenameAlbumAsync_ParentAndChildAlbums_RenamesPrefix));
+		using var sut = CreateSut(dbFactory);
+
+		await sut.GetOrCreateAsync("Travel/2024");
+		await sut.GetOrCreateAsync("Travel/2025/Summer");
+
+		var result = await sut.RenameAlbumAsync("Travel", "Trip");
+
+		result.ShouldBe(AlbumRenameResult.Success);
+		sut.RootAlbum.Value.ChildAlbums.Length.ShouldBe(1);
+		sut.RootAlbum.Value.ChildAlbums[0].AlbumName.ShouldBe("Trip");
+
+		await using (var db = await dbFactory.CreateDbContextAsync()) {
+			var paths = await db.Albums.Select(a => a.Path).OrderBy(p => p).ToListAsync();
+			paths.ShouldBe(["Trip/2024", "Trip/2025/Summer"]);
+		}
+	}
+
+	/// <summary>
+	/// RenameAlbumAsync で既存パスまたは既存親グループと重複する場合は DuplicatePath を返し DB を変更しないことを確認します。
+	/// </summary>
+	[Fact]
+	public async Task RenameAlbumAsync_DuplicatePath_ReturnsDuplicatePath() {
+		var dbFactory = CreateInMemoryDbFactory(nameof(RenameAlbumAsync_DuplicatePath_ReturnsDuplicatePath));
+		using var sut = CreateSut(dbFactory);
+
+		await sut.GetOrCreateAsync("AlbumA");
+		await sut.GetOrCreateAsync("AlbumB");
+		await sut.GetOrCreateAsync("Group/One");
+		await sut.GetOrCreateAsync("Group/Two");
+
+		(await sut.RenameAlbumAsync("AlbumA", "albumB")).ShouldBe(AlbumRenameResult.DuplicatePath);
+		(await sut.RenameAlbumAsync("AlbumA", "Group")).ShouldBe(AlbumRenameResult.DuplicatePath);
+		(await sut.RenameAlbumAsync("AlbumA", "Group/Three")).ShouldBe(AlbumRenameResult.Success);
+	}
+
+	/// <summary>
+	/// RenameAlbumAsync で変更元自身の配下へ移動しようとした場合は InvalidDestinationUnderSource を返すことを確認します。
+	/// </summary>
+	[Fact]
+	public async Task RenameAlbumAsync_DestinationUnderSource_ReturnsInvalidDestinationUnderSource() {
+		var dbFactory = CreateInMemoryDbFactory(nameof(RenameAlbumAsync_DestinationUnderSource_ReturnsInvalidDestinationUnderSource));
+		using var sut = CreateSut(dbFactory);
+
+		await sut.GetOrCreateAsync("Travel/2024");
+		await sut.GetOrCreateAsync("Travel/2025");
+
+		var result = await sut.RenameAlbumAsync("Travel", "Travel/Sub");
+
+		result.ShouldBe(AlbumRenameResult.InvalidDestinationUnderSource);
+	}
+
+	/// <summary>
+	/// RenameAlbumAsync で大文字・小文字のみの変更が正常に反映されることを確認します。
+	/// </summary>
+	[Fact]
+	public async Task RenameAlbumAsync_CaseOnlyChange_UpdatesCasing() {
+		var dbFactory = CreateInMemoryDbFactory(nameof(RenameAlbumAsync_CaseOnlyChange_UpdatesCasing));
+		using var sut = CreateSut(dbFactory);
+
+		await sut.GetOrCreateAsync("travel");
+		await sut.GetOrCreateAsync("travel/2024");
+
+		var result = await sut.RenameAlbumAsync("travel", "Travel");
+
+		result.ShouldBe(AlbumRenameResult.Success);
+		sut.RootAlbum.Value.ChildAlbums[0].AlbumPath.ShouldBe("Travel");
+		sut.RootAlbum.Value.ChildAlbums[0].ChildAlbums[0].AlbumPath.ShouldBe("Travel/2024");
+	}
 }

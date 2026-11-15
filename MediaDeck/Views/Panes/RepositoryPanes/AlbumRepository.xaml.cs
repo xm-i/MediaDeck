@@ -38,6 +38,12 @@ public sealed partial class AlbumRepository {
 		await this.CreateAlbumAsync();
 	}
 
+	private async void RenameAlbumMenuItem_Click(object sender, RoutedEventArgs e) {
+		if (sender is FrameworkElement { Tag: AlbumObject album }) {
+			await this.RenameAlbumAsync(album);
+		}
+	}
+
 	private async void DeleteAlbumMenuItem_Click(object sender, RoutedEventArgs e) {
 		if (sender is FrameworkElement { Tag: AlbumObject album }) {
 			await this.ConfirmAndDeleteAlbumAsync(album);
@@ -95,6 +101,26 @@ public sealed partial class AlbumRepository {
 			if (result == ContentDialogResult.Primary && !string.IsNullOrWhiteSpace(dialog.FullAlbumPath)) {
 				await vm.CreateAlbumAsync(dialog.FullAlbumPath);
 			}
+		} finally {
+			this._isDialogOpen = false;
+		}
+	}
+
+	/// <summary>
+	/// アルバム名変更ダイアログを表示し、指定されたアルバムをリネームします。
+	/// </summary>
+	/// <param name="album">リネーム対象のアルバムオブジェクト。</param>
+	private async Task RenameAlbumAsync(AlbumObject album) {
+		if (this.ViewModel is not { } vm || this.XamlRoot is null || this._isDialogOpen) {
+			return;
+		}
+		this._isDialogOpen = true;
+		try {
+			var dialog = Ioc.Default.GetRequiredService<RenameAlbumDialog>();
+			dialog.XamlRoot = this.XamlRoot;
+			dialog.Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style;
+			dialog.Initialize(album.AlbumPath, newPath => vm.RenameAlbumAsync(album, newPath));
+			await dialog.ShowAsync();
 		} finally {
 			this._isDialogOpen = false;
 		}

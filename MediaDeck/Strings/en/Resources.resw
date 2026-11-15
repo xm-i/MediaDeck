@@ -313,6 +313,9 @@
   <data name="AlbumRepository_ContextCreateAlbum.Text" xml:space="preserve">
     <value>Create New Album...</value>
   </data>
+  <data name="AlbumRepository_ContextRenameAlbum.Text" xml:space="preserve">
+    <value>Rename...</value>
+  </data>
   <data name="AlbumRepository_ContextDeleteAlbum.Text" xml:space="preserve">
     <value>Delete Album...</value>
   </data>
@@ -592,6 +595,40 @@
   </data>
   <data name="NewAlbumDialog_PathPlaceholder.PlaceholderText" xml:space="preserve">
     <value>Travel/2024</value>
+  </data>
+  <!-- Rename Album Dialog -->
+  <data name="RenameAlbumDialog.Title" xml:space="preserve">
+    <value>Rename Album</value>
+  </data>
+  <data name="RenameAlbumDialog.PrimaryButtonText" xml:space="preserve">
+    <value>Rename</value>
+  </data>
+  <data name="RenameAlbumDialog.CloseButtonText" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="RenameAlbumDialog_NameLabel.Text" xml:space="preserve">
+    <value>Album Name (Required)</value>
+  </data>
+  <data name="RenameAlbumDialog_NamePlaceholder.PlaceholderText" xml:space="preserve">
+    <value>e.g. Travel</value>
+  </data>
+  <data name="RenameAlbumDialog_PathLabel.Text" xml:space="preserve">
+    <value>Album Path (Optional. e.g. Travel/2024)</value>
+  </data>
+  <data name="RenameAlbumDialog_PathPlaceholder.PlaceholderText" xml:space="preserve">
+    <value>Travel/2024</value>
+  </data>
+  <data name="RenameAlbumDialog_Error_EmptyName" xml:space="preserve">
+    <value>Please enter an album name.</value>
+  </data>
+  <data name="RenameAlbumDialog_Error_UnderSource" xml:space="preserve">
+    <value>Cannot move an album under itself.</value>
+  </data>
+  <data name="RenameAlbumDialog_Error_Duplicate" xml:space="preserve">
+    <value>An album with the same path already exists.</value>
+  </data>
+  <data name="RenameAlbumDialog_Error_NotFound" xml:space="preserve">
+    <value>The target album could not be found.</value>
   </data>
   <!-- Tab Rename Dialog -->
   <data name="TabRenameDialog.Title" xml:space="preserve">

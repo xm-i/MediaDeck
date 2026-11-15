@@ -93,4 +93,18 @@ public class AlbumRepositoryViewModel : RepositoryViewModelBase {
 			this.SelectedAlbum.Value = null;
 		}
 	}
+
+	/// <summary>
+	/// 指定されたアルバムを新しいパスにリネームします。
+	/// </summary>
+	/// <param name="album">リネーム対象のアルバムオブジェクト。</param>
+	/// <param name="newPath">変更後のアルバムパス。</param>
+	/// <returns>リネーム処理の結果。</returns>
+	public async Task<AlbumRenameResult> RenameAlbumAsync(AlbumObject album, string newPath) {
+		var result = await this.AlbumRepository.RenameAlbumAsync(album.AlbumPath, newPath);
+		if (result == AlbumRenameResult.Success && ReferenceEquals(this.SelectedAlbum.Value, album)) {
+			this.SelectedAlbum.Value = null;
+		}
+		return result;
+	}
 }

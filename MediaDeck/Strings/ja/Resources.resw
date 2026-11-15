@@ -313,6 +313,9 @@
   <data name="AlbumRepository_ContextCreateAlbum.Text" xml:space="preserve">
     <value>アルバムを新規作成...</value>
   </data>
+  <data name="AlbumRepository_ContextRenameAlbum.Text" xml:space="preserve">
+    <value>名前を変更...</value>
+  </data>
   <data name="AlbumRepository_ContextDeleteAlbum.Text" xml:space="preserve">
     <value>アルバムを削除...</value>
   </data>
@@ -592,6 +595,40 @@
   </data>
   <data name="NewAlbumDialog_PathPlaceholder.PlaceholderText" xml:space="preserve">
     <value>旅行/2024</value>
+  </data>
+  <!-- アルバム名変更ダイアログ -->
+  <data name="RenameAlbumDialog.Title" xml:space="preserve">
+    <value>アルバム名を変更</value>
+  </data>
+  <data name="RenameAlbumDialog.PrimaryButtonText" xml:space="preserve">
+    <value>変更</value>
+  </data>
+  <data name="RenameAlbumDialog.CloseButtonText" xml:space="preserve">
+    <value>キャンセル</value>
+  </data>
+  <data name="RenameAlbumDialog_NameLabel.Text" xml:space="preserve">
+    <value>アルバム名（必須）</value>
+  </data>
+  <data name="RenameAlbumDialog_NamePlaceholder.PlaceholderText" xml:space="preserve">
+    <value>北海道</value>
+  </data>
+  <data name="RenameAlbumDialog_PathLabel.Text" xml:space="preserve">
+    <value>アルバムパス（任意。例: 旅行/2024）</value>
+  </data>
+  <data name="RenameAlbumDialog_PathPlaceholder.PlaceholderText" xml:space="preserve">
+    <value>旅行/2024</value>
+  </data>
+  <data name="RenameAlbumDialog_Error_EmptyName" xml:space="preserve">
+    <value>アルバム名を入力してください。</value>
+  </data>
+  <data name="RenameAlbumDialog_Error_UnderSource" xml:space="preserve">
+    <value>変更元アルバムの配下に移動することはできません。</value>
+  </data>
+  <data name="RenameAlbumDialog_Error_Duplicate" xml:space="preserve">
+    <value>同じ名前のアルバムが既に存在します。</value>
+  </data>
+  <data name="RenameAlbumDialog_Error_NotFound" xml:space="preserve">
+    <value>対象のアルバムが見つかりませんでした。</value>
   </data>
   <!-- タブ名変更ダイアログ -->
   <data name="TabRenameDialog.Title" xml:space="preserve">
