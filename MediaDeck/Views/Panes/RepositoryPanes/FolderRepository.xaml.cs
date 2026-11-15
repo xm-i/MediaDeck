@@ -1,5 +1,8 @@
+using CommunityToolkit.Mvvm.DependencyInjection;
+using MediaDeck.Services;
 using MediaDeck.ViewModels.Panes.RepositoryPanes;
-
+using MediaDeck.Views.FolderManager;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Input;
 
 namespace MediaDeck.Views.Panes.RepositoryPanes;
@@ -20,6 +23,15 @@ public sealed partial class FolderRepository {
 			return;
 		}
 		vm.SetRepositoryConditionCommand.Execute(Unit.Default);
+	}
+
+	/// <summary>
+	/// フォルダ管理ウィンドウを開きます。
+	/// </summary>
+	/// <param name="sender">イベント発生元。</param>
+	/// <param name="e">イベント引数。</param>
+	private void OpenFolderManagerButton_Click(object sender, RoutedEventArgs e) {
+		Ioc.Default.GetRequiredService<IWindowService>().ActivateCentered<FolderManagerWindow>(this);
 	}
 }
 

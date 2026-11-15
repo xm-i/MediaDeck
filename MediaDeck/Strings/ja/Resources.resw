@@ -277,8 +277,26 @@
   <data name="Repository_Header.Text" xml:space="preserve">
     <value>リポジトリ</value>
   </data>
+  <data name="Repository_FolderManager.ToolTipService.ToolTip" xml:space="preserve">
+    <value>フォルダ管理</value>
+  </data>
   <data name="FolderRepository_IncludeSubDirectories.Content" xml:space="preserve">
     <value>サブディレクトリを含める</value>
+  </data>
+  <data name="FolderRepository_EmptyNoFoldersTitle.Text" xml:space="preserve">
+    <value>フォルダが登録されていません</value>
+  </data>
+  <data name="FolderRepository_EmptyNoFoldersDescription.Text" xml:space="preserve">
+    <value>フォルダ管理から管理対象のフォルダを追加してください。</value>
+  </data>
+  <data name="FolderRepository_EmptyNoMediaTitle.Text" xml:space="preserve">
+    <value>表示できるメディアがありません</value>
+  </data>
+  <data name="FolderRepository_EmptyNoMediaDescription.Text" xml:space="preserve">
+    <value>フォルダ管理から登録フォルダをスキャンしてください。</value>
+  </data>
+  <data name="FolderRepository_OpenFolderManager.Text" xml:space="preserve">
+    <value>フォルダ管理を開く</value>
   </data>
   <data name="AlbumRepository_IncludeSubAlbums.Content" xml:space="preserve">
     <value>サブアルバムを含める</value>

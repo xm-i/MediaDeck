@@ -18,28 +18,44 @@
 		<!-- Header -->
 		<vControls:PaneHeaderControl Grid.Row="0"
 			x:Uid="Repository_Header"
-			Glyph="&#xE8B7;">
-			<controls:Segmented
-				SelectionMode="Single"
-				ItemsSource="{x:Bind ViewModel.RepositoryPaneViewModels, Mode=OneWay}"
-				SelectedItem="{x:Bind ViewModel.SelectedRepositoryPane.Value, Mode=TwoWay}"
-				DisplayMemberPath="Name" />
+			Glyph="&#xE8B7;" >
+			<Button
+				x:Uid="Repository_FolderManager"
+				Click="OpenFolderManagerButton_Click" >
+				<FontIcon Glyph="&#xE713;"
+					FontSize="14" />
+			</Button>
 		</vControls:PaneHeaderControl>
 
 		<!-- Content -->
 		<Border Grid.Row="1"
 			Background="{ThemeResource LayerFillColorDefaultBrush}" >
-			<controls:SwitchPresenter
-				Value="{x:Bind ViewModel.SelectedRepositoryPane.Value,Mode=OneWay}" >
-				<controls:Case Value="{x:Bind ViewModel.FolderRepositoryViewModel,Mode=OneWay}" >
-					<local:FolderRepository ViewModel="{x:Bind ViewModel.FolderRepositoryViewModel,Mode=OneWay}"
-						Padding="8" />
-				</controls:Case>
-				<controls:Case Value="{x:Bind ViewModel.AlbumRepositoryViewModel,Mode=OneWay}" >
-					<local:AlbumRepository ViewModel="{x:Bind ViewModel.AlbumRepositoryViewModel,Mode=OneWay}"
-						Padding="8" />
-				</controls:Case>
-			</controls:SwitchPresenter>
+			<Grid>
+				<Grid.RowDefinitions>
+					<RowDefinition Height="Auto" />
+					<RowDefinition Height="*" />
+				</Grid.RowDefinitions>
+
+				<controls:Segmented Grid.Row="0"
+					Margin="8,8,8,0"
+					HorizontalAlignment="Stretch"
+					SelectionMode="Single"
+					ItemsSource="{x:Bind ViewModel.RepositoryPaneViewModels, Mode=OneWay}"
+					SelectedItem="{x:Bind ViewModel.SelectedRepositoryPane.Value, Mode=TwoWay}"
+					DisplayMemberPath="Name" />
+
+				<controls:SwitchPresenter Grid.Row="1"
+					Value="{x:Bind ViewModel.SelectedRepositoryPane.Value,Mode=OneWay}" >
+					<controls:Case Value="{x:Bind ViewModel.FolderRepositoryViewModel,Mode=OneWay}" >
+						<local:FolderRepository ViewModel="{x:Bind ViewModel.FolderRepositoryViewModel,Mode=OneWay}"
+							Padding="8" />
+					</controls:Case>
+					<controls:Case Value="{x:Bind ViewModel.AlbumRepositoryViewModel,Mode=OneWay}" >
+						<local:AlbumRepository ViewModel="{x:Bind ViewModel.AlbumRepositoryViewModel,Mode=OneWay}"
+							Padding="8" />
+					</controls:Case>
+				</controls:SwitchPresenter>
+			</Grid>
 		</Border>
 	</Grid>
 </local:RepositorySelectorUserControl>

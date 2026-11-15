@@ -277,8 +277,26 @@
   <data name="Repository_Header.Text" xml:space="preserve">
     <value>Repository</value>
   </data>
+  <data name="Repository_FolderManager.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Folder Manager</value>
+  </data>
   <data name="FolderRepository_IncludeSubDirectories.Content" xml:space="preserve">
     <value>Include Subdirectories</value>
+  </data>
+  <data name="FolderRepository_EmptyNoFoldersTitle.Text" xml:space="preserve">
+    <value>No folders registered</value>
+  </data>
+  <data name="FolderRepository_EmptyNoFoldersDescription.Text" xml:space="preserve">
+    <value>Add folders to manage in Folder Manager.</value>
+  </data>
+  <data name="FolderRepository_EmptyNoMediaTitle.Text" xml:space="preserve">
+    <value>No media found</value>
+  </data>
+  <data name="FolderRepository_EmptyNoMediaDescription.Text" xml:space="preserve">
+    <value>Scan your registered folders in Folder Manager.</value>
+  </data>
+  <data name="FolderRepository_OpenFolderManager.Text" xml:space="preserve">
+    <value>Open Folder Manager</value>
   </data>
   <data name="AlbumRepository_IncludeSubAlbums.Content" xml:space="preserve">
     <value>Include Sub Albums</value>
