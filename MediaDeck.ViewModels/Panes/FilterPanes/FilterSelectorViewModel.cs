@@ -14,7 +14,10 @@ public class FilterSelectorViewModel : ViewModelBase {
 	/// コンストラクタ
 	/// </summary>
 	public FilterSelectorViewModel(FilterSelector model) {
-		this.FilteringConditions = model.FilteringConditions.CreateView(x => new FilteringConditionViewModel(x).AddTo(this.CompositeDisposable)).ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
+		this.FilteringConditions = model.FilteringConditions
+			.CreateViewWithDisposal(x => new FilteringConditionViewModel(x))
+			.ToNotifyCollectionChangedWithDisposal(SynchronizationContextCollectionEventDispatcher.Current)
+			.AddTo(this.CompositeDisposable);
 
 		this.SelectedConditions = model.CurrentFilteringConditions.ToTwoWayReactiveProperty(
 			m => this.FilteringConditions.Where(fc => m.Contains(fc.Model)).ToArray(),

@@ -30,8 +30,7 @@ public class SplashScreenViewModel : ViewModelBase {
 	public SplashScreenViewModel(IStringProvider? stringProvider = null) {
 		var initialMessage = stringProvider?.GetString("Splash_Starting") ?? "起動しています...";
 		this._statusMessage = new ReactiveProperty<string>(initialMessage).AddTo(this.CompositeDisposable);
-		this.StatusMessage = this._statusMessage.ObserveOnCurrentSynchronizationContext().ToBindableReactiveProperty<string>();
-		this.StatusMessage.AddTo(this.CompositeDisposable);
+		this.StatusMessage = this._statusMessage.ObserveOnCurrentSynchronizationContext().ToBindableReactiveProperty<string>().AddTo(this.CompositeDisposable);
 
 		// バージョン情報の取得
 		var version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;

@@ -1,4 +1,5 @@
 using MediaDeck.Common.Base;
+using MediaDeck.Common.Extensions;
 using MediaDeck.Composition.Interfaces;
 using MediaDeck.Core.Models.Files.Filter;
 using MediaDeck.ViewModels.Filters.FilterItemCreators;
@@ -86,7 +87,10 @@ public class FilterManagerViewModel : ViewModelBase {
 			this.Save();
 		}).AddTo(this.CompositeDisposable);
 
-		this.FilteringConditions = filterManager.FilteringConditions.CreateView(x => new FilteringConditionEditorViewModel(x)).ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
+		this.FilteringConditions = filterManager.FilteringConditions
+			.CreateViewWithDisposal(x => new FilteringConditionEditorViewModel(x))
+			.ToNotifyCollectionChangedWithDisposal(SynchronizationContextCollectionEventDispatcher.Current)
+			.AddTo(this.CompositeDisposable);
 
 		this.FilterCreatorViewModels = [
 			new ExistsFilterCreatorViewModel(this.CurrentCondition, stringProvider).AddTo(this.CompositeDisposable),

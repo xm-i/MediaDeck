@@ -99,7 +99,7 @@ public class DuplicateDetectorViewModel : ViewModelBase {
 		this._detector = detector;
 		this._MediaItemTypeService = MediaItemTypeService;
 
-		this.DuplicateGroups = this._detector.DuplicateGroups.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
+		this.DuplicateGroups = this._detector.DuplicateGroups.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current).AddTo(this.CompositeDisposable);
 
 		this.IsDetecting = this._detector.IsDetecting.ToBindableReactiveProperty().AddTo(this.CompositeDisposable);
 		this.IsCompleted = this._detector.IsCompleted.ToBindableReactiveProperty().AddTo(this.CompositeDisposable);

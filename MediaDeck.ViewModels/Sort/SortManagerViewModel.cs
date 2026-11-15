@@ -1,4 +1,5 @@
 using MediaDeck.Common.Base;
+using MediaDeck.Common.Extensions;
 using MediaDeck.Core.Models.Files.Sort;
 
 namespace MediaDeck.ViewModels.Sort;
@@ -28,7 +29,10 @@ public class SortManagerViewModel : ViewModelBase {
 			this.Load();
 		})
 			.AddTo(this.CompositeDisposable);
-		this.SortConditions = this._sortManager.SortConditions.CreateView(x => new SortConditionEditorViewModel(x)).ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
+		this.SortConditions = this._sortManager.SortConditions
+			.CreateViewWithDisposal(x => new SortConditionEditorViewModel(x))
+			.ToNotifyCollectionChangedWithDisposal(SynchronizationContextCollectionEventDispatcher.Current)
+			.AddTo(this.CompositeDisposable);
 	}
 
 	private readonly SortManager _sortManager;

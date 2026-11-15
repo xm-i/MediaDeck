@@ -1,4 +1,5 @@
 using MediaDeck.Common.Base;
+using MediaDeck.Common.Extensions;
 using MediaDeck.Composition.Interfaces;
 using MediaDeck.Composition.Stores.Config.Model;
 
@@ -42,8 +43,9 @@ public class ScanConfigPageViewModel : ViewModelBase, IConfigPageViewModel {
 		this.TargetExtensions =
 			this._scanConfig
 				.TargetExtensions
-				.CreateView(x => new ExtensionConfigViewModel(x, scanConfig))
-				.ToNotifyCollectionChanged();
+				.CreateViewWithDisposal(x => new ExtensionConfigViewModel(x, scanConfig))
+				.ToNotifyCollectionChangedWithDisposal()
+				.AddTo(this.CompositeDisposable);
 	}
 
 	/// <summary>

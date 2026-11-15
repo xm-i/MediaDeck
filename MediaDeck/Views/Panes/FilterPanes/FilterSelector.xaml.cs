@@ -9,22 +9,34 @@ namespace MediaDeck.Views.Panes.FilterPanes;
 
 public sealed partial class FilterSelector {
 	private bool _isSyncingSelection;
-	private IDisposable? _selectedConditionsSubscription;
+	private readonly CompositeDisposable _vmSubscriptions = new();
 
 	public FilterSelector() {
 		this.InitializeComponent();
 		this.Loaded += this.FilterSelector_Loaded;
+		this.Unloaded += (_, _) => {
+			this._vmSubscriptions.Clear();
+		};
 	}
 
 	private void FilterSelector_Loaded(object sender, RoutedEventArgs e) {
-		if (this.ViewModel == null) {
+		this.SubscribeViewModel(this.ViewModel);
+	}
+
+	/// <summary>
+	/// ViewModel の選択状態同期および購読を開始します。
+	/// </summary>
+	/// <param name="vm">購読対象の ViewModel。</param>
+	private void SubscribeViewModel(FilterSelectorViewModel? vm) {
+		this._vmSubscriptions.Clear();
+		if (vm == null) {
 			return;
 		}
-		this.ViewModel.UIReadyCommand.Execute(Unit.Default);
-		this.SyncListSelectionFromViewModel(this.ViewModel.SelectedConditions.Value);
-		this._selectedConditionsSubscription?.Dispose();
-		this._selectedConditionsSubscription = this.ViewModel.SelectedConditions
-			.Subscribe(this.SyncListSelectionFromViewModel);
+		vm.UIReadyCommand.Execute(Unit.Default);
+		this.SyncListSelectionFromViewModel(vm.SelectedConditions.Value);
+		vm.SelectedConditions
+			.Subscribe(this.SyncListSelectionFromViewModel)
+			.AddTo(this._vmSubscriptions);
 	}
 
 	private void SyncListSelectionFromViewModel(FilteringConditionViewModel[]? selected) {
@@ -58,10 +70,13 @@ public sealed partial class FilterSelector {
 		Ioc.Default.GetRequiredService<IWindowService>().ActivateCentered<FilterManagerWindow>(this);
 	}
 
+	/// <inheritdoc />
 	protected override void OnViewModelChanged(FilterSelectorViewModel? oldViewModel, FilterSelectorViewModel? newViewModel) {
 		base.OnViewModelChanged(oldViewModel, newViewModel);
-		this._selectedConditionsSubscription?.Dispose();
-		this._selectedConditionsSubscription = null;
+		this._vmSubscriptions.Clear();
+		if (this.IsLoaded && newViewModel != null) {
+			this.SubscribeViewModel(newViewModel);
+		}
 	}
 
 	private void FilteringConditionListBox_ItemClick(object sender, ItemClickEventArgs e) {

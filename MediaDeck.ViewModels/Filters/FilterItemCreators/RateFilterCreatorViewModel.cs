@@ -62,12 +62,13 @@ public class RateFilterCreatorViewModel : ViewModelBase, IFilterCreatorViewModel
 			new DisplayObject<SearchTypeComparison>(this._stringProvider.GetString("FilterCreator_Comparison_LessThanOrEqual"), SearchTypeComparison.LessThanOrEqual),
 			new DisplayObject<SearchTypeComparison>(this._stringProvider.GetString("FilterCreator_Comparison_LessThan"), SearchTypeComparison.LessThan)
 		];
-		this.RateText = new ReactiveProperty<string?>().ToBindableReactiveProperty().EnableValidation(() => this.RateText);
+		this.RateText = new BindableReactiveProperty<string?>().EnableValidation(() => this.RateText).AddTo(this.CompositeDisposable);
 		this.SearchType.Value = this.SearchTypeList.First(x => x.Value == SearchTypeComparison.GreaterThanOrEqual);
 		this.AddFilterCommand =
 			this.RateText.Select(string.IsNullOrEmpty)
 				.CombineLatest(this.RateText.ErrorsChangedAsObservable().Select(_ => this.RateText.HasErrors), (x, x2) => !x && !x2)
-				.ToReactiveCommand();
+				.ToReactiveCommand()
+				.AddTo(this.CompositeDisposable);
 
 		this.AddFilterCommand
 			.Subscribe(vm => {

@@ -17,15 +17,16 @@ public class SortSelectorViewModel : ViewModelBase {
 	/// </summary>
 	public SortSelectorViewModel(SortSelector model, IStateStore stateStore) {
 		this._stateStore = stateStore;
-		this.SortConditions = model.SortConditions.CreateView(x => new SortConditionViewModel(x).AddTo(this.CompositeDisposable)).ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
-		this.CurrentCondition.Value = this.SortConditions.FirstOrDefault(c => c.Model == model.CurrentSortCondition.Value);
+		this.SortConditions = model.SortConditions
+			.CreateViewWithDisposal(x => new SortConditionViewModel(x))
+			.ToNotifyCollectionChangedWithDisposal(SynchronizationContextCollectionEventDispatcher.Current)
+			.AddTo(this.CompositeDisposable);
 		this.CurrentCondition = model.CurrentSortCondition.ToTwoWayBindableReactiveProperty(
 			x => this.SortConditions.FirstOrDefault(c => c.Model == x),
 			x => x?.Model,
-			null,
+			this.SortConditions.FirstOrDefault(c => c.Model == model.CurrentSortCondition.Value),
 			this.CompositeDisposable);
-		this.Direction.Value = model.Direction.Value;
-		this.Direction = model.Direction.ToTwoWayBindableReactiveProperty(disposables: this.CompositeDisposable);
+		this.Direction = model.Direction.ToTwoWayBindableReactiveProperty(model.Direction.Value, this.CompositeDisposable);
 	}
 
 	private readonly IStateStore _stateStore;
@@ -35,7 +36,7 @@ public class SortSelectorViewModel : ViewModelBase {
 	/// </summary>
 	public BindableReactiveProperty<SortConditionViewModel?> CurrentCondition {
 		get;
-	} = new();
+	}
 
 	/// <summary>
 	/// ソート条件
@@ -49,7 +50,7 @@ public class SortSelectorViewModel : ViewModelBase {
 	/// </summary>
 	public BindableReactiveProperty<ListSortDirection> Direction {
 		get;
-	} = new();
+	}
 
 	protected override void Dispose(bool disposing) {
 		base.Dispose(disposing);

@@ -9,12 +9,12 @@ namespace MediaDeck.ViewModels.Sort;
 public class SortConditionEditorViewModel : ViewModelBase {
 	public SortConditionEditorViewModel(SortObject model) {
 		this.Model = model;
-		this.DisplayName = this.Model.DisplayName.ToBindableReactiveProperty(null!);
+		this.DisplayName = this.Model.DisplayName.ToBindableReactiveProperty(null!).AddTo(this.CompositeDisposable);
 		this.DisplayName.Subscribe(x => {
 			this.Model.DisplayName.Value = x;
 		}).AddTo(this.CompositeDisposable);
 
-		this.SortItemObjects = this.Model.SortItemObjects.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
+		this.SortItemObjects = this.Model.SortItemObjects.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current).AddTo(this.CompositeDisposable);
 
 		this.AddSortItemCommand.Subscribe(x => {
 			if (x is not { } sortItemKey) {

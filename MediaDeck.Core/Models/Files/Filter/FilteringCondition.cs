@@ -19,10 +19,10 @@ public class FilteringCondition : ModelBase {
 	/// <param name="filterObject">復元用フィルターオブジェクト</param>
 	public FilteringCondition(FilterObject filterObject) {
 		this.FilterObject = filterObject;
-		this.DisplayName = filterObject.DisplayName.ToReadOnlyReactiveProperty();
+		this.DisplayName = filterObject.DisplayName.ToReadOnlyReactiveProperty().AddTo(this.CompositeDisposable);
 		this.FilterItemObjects = this.FilterObject.FilterItemObjects;
 
-		this._filterItems = this.FilterItemObjects.CreateView(FilterItemFactory.Create);
+		this._filterItems = this.FilterItemObjects.CreateView(FilterItemFactory.Create).AddTo(this.CompositeDisposable);
 
 		this.FilterItemObjects.ObserveChanged()
 			.Subscribe(_ => {

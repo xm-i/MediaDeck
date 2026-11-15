@@ -48,7 +48,7 @@ public class MainWindowViewModel : ViewModelBase {
 				setValue = true;
 				return tabViewModel.TabState.TabId;
 			},
-			SynchronizationContextCollectionEventDispatcher.Current);
+			SynchronizationContextCollectionEventDispatcher.Current).AddTo(this.CompositeDisposable);
 
 		this.SelectedTab = this._windowState.SelectedTabId.ToTwoWayBindableReactiveProperty(
 			x => x.HasValue ? this.Tabs.FirstOrDefault(t => t.TabState.TabId == x.Value) : null,

@@ -91,13 +91,13 @@ public class EnvironmentConfigPageViewModel : ViewModelBase, IConfigPageViewMode
 		var initialTheme = Array.Find(this.ThemeOptions, x => x.Theme == currentTheme)
 						  ?? this.ThemeOptions[0];
 
-		this.SelectedTheme = new BindableReactiveProperty<ThemeOption>(initialTheme);
+		this.SelectedTheme = new BindableReactiveProperty<ThemeOption>(initialTheme).AddTo(this.CompositeDisposable);
 
 		var currentSystemBackdrop = environmentConfig.SystemBackdrop.Value;
 		var initialSystemBackdrop = Array.Find(this.SystemBackdropOptions, x => x.Backdrop == currentSystemBackdrop)
 								 ?? this.SystemBackdropOptions[0];
 
-		this.SelectedSystemBackdrop = new BindableReactiveProperty<SystemBackdropOption>(initialSystemBackdrop);
+		this.SelectedSystemBackdrop = new BindableReactiveProperty<SystemBackdropOption>(initialSystemBackdrop).AddTo(this.CompositeDisposable);
 		this.AppDataDirectoryPath = appPathProvider.BaseDirectory;
 
 		// ViewModel の選択変更を Model に反映

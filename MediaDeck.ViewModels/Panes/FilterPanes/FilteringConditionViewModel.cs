@@ -28,8 +28,8 @@ public class FilteringConditionViewModel : ViewModelBase {
 
 	public FilteringConditionViewModel(FilteringCondition model) {
 		this.Model = model;
-		this.DisplayName = this.Model.DisplayName.ToBindableReactiveProperty(null!);
+		this.DisplayName = this.Model.DisplayName.ToBindableReactiveProperty(null!).AddTo(this.CompositeDisposable);
 
-		this.FilterItems = this.Model.FilterItemObjects.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
+		this.FilterItems = this.Model.FilterItemObjects.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current).AddTo(this.CompositeDisposable);
 	}
 }

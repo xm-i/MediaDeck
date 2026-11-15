@@ -1,4 +1,5 @@
 using MediaDeck.Common.Base;
+using MediaDeck.Common.Extensions;
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces;
 using MediaDeck.Composition.Interfaces.MediaItemTypes;
@@ -49,8 +50,9 @@ public class ExecutionConfigPageViewModel : ViewModelBase, IConfigPageViewModel 
 		this.ExecutionPrograms =
 			this._executionConfig
 				.ExecutionPrograms
-				.CreateView(x => mediaItemTypeService.CreateExecutionConfigViewModel(x))
-				.ToNotifyCollectionChanged();
+				.CreateViewWithDisposal(x => mediaItemTypeService.CreateExecutionConfigViewModel(x))
+				.ToNotifyCollectionChangedWithDisposal()
+				.AddTo(this.CompositeDisposable);
 	}
 
 	/// <summary>

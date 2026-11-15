@@ -55,7 +55,7 @@ public class LanguageConfigPageViewModel : ViewModelBase, IConfigPageViewModel {
 		var initial = Array.Find(this.LanguageOptions, x => x.Tag == currentTag)
 					  ?? this.LanguageOptions[0];
 
-		this.SelectedLanguage = new BindableReactiveProperty<LanguageOption>(initial);
+		this.SelectedLanguage = new BindableReactiveProperty<LanguageOption>(initial).AddTo(this.CompositeDisposable);
 
 		// ViewModel の選択変更を Model に反映
 		this.SelectedLanguage

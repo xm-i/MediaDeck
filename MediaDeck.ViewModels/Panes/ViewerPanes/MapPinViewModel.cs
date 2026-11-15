@@ -85,7 +85,7 @@ public class MapPinViewModel : ViewModelBase {
 	/// <param name="rect">表示領域</param>
 	public MapPinViewModel(IMediaItemViewModel core, Rectangle rect) {
 		this.Core = core;
-		this.Model = new MapPin(core.FileModel, rect);
+		this.Model = new MapPin(core.FileModel, rect).AddTo(this.CompositeDisposable);
 		this.Location = this.Model.Location;
 
 		this.AddItem(core);
@@ -96,9 +96,6 @@ public class MapPinViewModel : ViewModelBase {
 
 		this.IsSelected = this.PinState.Select(x => x == MediaDeck.Core.Models.Maps.PinState.Selected).ToReadOnlyReactiveProperty().AddTo(this.CompositeDisposable);
 		this.IsIndeterminate = this.PinState.Select(x => x == MediaDeck.Core.Models.Maps.PinState.Indeterminate).ToReadOnlyReactiveProperty().AddTo(this.CompositeDisposable);
-
-		// モデルのライフサイクル管理
-		this.Model.AddTo(this.CompositeDisposable);
 	}
 
 	/// <summary>

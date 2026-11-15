@@ -1,4 +1,5 @@
 using MediaDeck.Common.Base;
+using MediaDeck.Common.Extensions;
 using MediaDeck.Core.Models.FolderManager;
 
 namespace MediaDeck.ViewModels.FolderManager;
@@ -87,9 +88,9 @@ public class FolderManagerViewModel : ViewModelBase {
 		this.ScanSelectedFolderCommand = new ReactiveCommand<FolderViewModel>().AddTo(this.CompositeDisposable);
 
 		this.Folders = this._folderManager.Folders
-			.CreateView(x => new FolderViewModel(x))
-			.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
-		this.Folders.AddTo(this.CompositeDisposable);
+			.CreateViewWithDisposal(x => new FolderViewModel(x))
+			.ToNotifyCollectionChangedWithDisposal(SynchronizationContextCollectionEventDispatcher.Current)
+			.AddTo(this.CompositeDisposable);
 
 		this.IsEmpty = this._folderManager.Folders
 			.ObserveCountChanged()
