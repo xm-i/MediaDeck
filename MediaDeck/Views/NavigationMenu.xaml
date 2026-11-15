@@ -59,6 +59,10 @@
 				<MenuFlyoutItem x:Uid="NavMenu_License"
 					Click="MenuFlyoutItem_Click"
 					Tag="License" />
+				<MenuFlyoutSeparator />
+				<MenuFlyoutItem x:Uid="NavMenu_Feedback"
+					Click="MenuFlyoutItem_Click"
+					Tag="Feedback" />
 			</MenuBarItem>
 		</MenuBar>
 

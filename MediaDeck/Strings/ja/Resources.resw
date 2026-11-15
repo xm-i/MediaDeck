@@ -146,6 +146,9 @@
   <data name="NavMenu_License.Text" xml:space="preserve">
     <value>ライセンス情報</value>
   </data>
+  <data name="NavMenu_Feedback.Text" xml:space="preserve">
+    <value>フィードバックを送信</value>
+  </data>
   <data name="AboutWindow_Title" xml:space="preserve">
     <value>MediaDeck について</value>
   </data>
@@ -1501,5 +1504,82 @@
   </data>
   <data name="StateStore_SaveError_Title" xml:space="preserve">
     <value>保存エラー</value>
+  </data>
+
+  <!-- フィードバックウィンドウ -->
+  <data name="FeedbackWindow_Title" xml:space="preserve">
+    <value>フィードバックを送信</value>
+  </data>
+  <data name="Feedback_HeaderDescription.Text" xml:space="preserve">
+    <value>不具合の報告や機能のご要望、ご意見をお送りください。送信いただいた内容は今後の開発・改善の参考にさせていただきます。</value>
+  </data>
+  <data name="Feedback_ErrorInfoBar.Title" xml:space="preserve">
+    <value>送信エラー</value>
+  </data>
+  <data name="Feedback_CategoryComboBox.Header" xml:space="preserve">
+    <value>種別</value>
+  </data>
+  <data name="Feedback_Category_BugReport" xml:space="preserve">
+    <value>バグ報告</value>
+  </data>
+  <data name="Feedback_Category_FeatureRequest" xml:space="preserve">
+    <value>機能要望</value>
+  </data>
+  <data name="Feedback_Category_Other" xml:space="preserve">
+    <value>質問・その他</value>
+  </data>
+  <data name="Feedback_TitleTextBox.Header" xml:space="preserve">
+    <value>件名 *</value>
+  </data>
+  <data name="Feedback_TitleTextBox.PlaceholderText" xml:space="preserve">
+    <value>概要を簡潔に入力してください</value>
+  </data>
+  <data name="Feedback_DescriptionTextBox.Header" xml:space="preserve">
+    <value>詳細内容 *</value>
+  </data>
+  <data name="Feedback_DescriptionTextBox.PlaceholderText" xml:space="preserve">
+    <value>発生した状況や再現手順、ご要望の詳細などをご記入ください</value>
+  </data>
+  <data name="Feedback_ContactTextBox.Header" xml:space="preserve">
+    <value>返信先・連絡先（任意）</value>
+  </data>
+  <data name="Feedback_ContactTextBox.PlaceholderText" xml:space="preserve">
+    <value>メールアドレスやX(Twitter)/GitHubアカウントなど</value>
+  </data>
+  <data name="Feedback_ScreenshotLabel.Text" xml:space="preserve">
+    <value>スクリーンショット（任意）</value>
+  </data>
+  <data name="Feedback_PickScreenshotButton.Text" xml:space="preserve">
+    <value>画像を選択</value>
+  </data>
+  <data name="Feedback_ClearScreenshotButton.Text" xml:space="preserve">
+    <value>削除</value>
+  </data>
+  <data name="Feedback_IncludeEnvironmentCheckBox.Content" xml:space="preserve">
+    <value>環境情報を添付する（アプリバージョン、OS等）</value>
+  </data>
+  <data name="Feedback_IncludeLogsCheckBox.Content" xml:space="preserve">
+    <value>直近のログを添付する（最大100行）</value>
+  </data>
+  <data name="Feedback_RefreshLogsButton.Text" xml:space="preserve">
+    <value>再読み込み</value>
+  </data>
+  <data name="Feedback_SubmittingText.Text" xml:space="preserve">
+    <value>送信中...</value>
+  </data>
+  <data name="Feedback_CancelButton.Content" xml:space="preserve">
+    <value>キャンセル</value>
+  </data>
+  <data name="Feedback_SubmitButton.Text" xml:space="preserve">
+    <value>送信</value>
+  </data>
+  <data name="Feedback_SubmitSuccess_Title" xml:space="preserve">
+    <value>送信完了</value>
+  </data>
+  <data name="Feedback_SubmitSuccess_Message" xml:space="preserve">
+    <value>フィードバックを送信しました。ご協力ありがとうございます。</value>
+  </data>
+  <data name="Feedback_SubmitError_Message" xml:space="preserve">
+    <value>フィードバックの送信に失敗しました。ネットワーク接続をご確認のうえ、時間をおいて再度お試しください。</value>
   </data>
 </root>

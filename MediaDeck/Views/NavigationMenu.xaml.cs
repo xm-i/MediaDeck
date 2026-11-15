@@ -65,6 +65,9 @@ public sealed partial class NavigationMenu {
 			case "License":
 				this._windowService.ActivateCentered<LicenseWindow>(this);
 				break;
+			case "Feedback":
+				this._windowService.ActivateCentered<FeedbackWindow>(this);
+				break;
 		}
 	}
 
