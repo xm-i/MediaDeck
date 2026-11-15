@@ -1582,4 +1582,70 @@
   <data name="Feedback_SubmitError_Message" xml:space="preserve">
     <value>Failed to send feedback. Please check your network connection and try again later.</value>
   </data>
+  <data name="NavMenu_UpdateAvailableFormat" xml:space="preserve">
+    <value>Update (v{0})</value>
+  </data>
+  <data name="NavMenu_UpdateNotification_ToolTipFormat" xml:space="preserve">
+    <value>A new version (v{0}) is available. Click to view details.</value>
+  </data>
+  <data name="UpdateNotificationWindow_Title" xml:space="preserve">
+    <value>Update Available</value>
+  </data>
+  <data name="UpdateNotification_Heading.Text" xml:space="preserve">
+    <value>A new version of MediaDeck is available</value>
+  </data>
+  <data name="UpdateNotification_VersionTransitionFormat" xml:space="preserve">
+    <value>Current: v{0}  →  Latest: v{1}</value>
+  </data>
+  <data name="UpdateNotification_PublishedAtFormat" xml:space="preserve">
+    <value>Released: {0}</value>
+  </data>
+  <data name="UpdateNotification_ReleaseNotesLabel.Text" xml:space="preserve">
+    <value>Release Notes</value>
+  </data>
+  <data name="UpdateNotification_NoReleaseNotes" xml:space="preserve">
+    <value>No release notes available.</value>
+  </data>
+  <data name="UpdateNotification_OpenDownloadPageButton.Text" xml:space="preserve">
+    <value>Open Download Page</value>
+  </data>
+  <data name="UpdateNotification_CloseButton.Content" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="About_UpdateHeader.Text" xml:space="preserve">
+    <value>Updates</value>
+  </data>
+  <data name="About_CheckForUpdates.Text" xml:space="preserve">
+    <value>Check for Updates</value>
+  </data>
+  <data name="About_ViewUpdateDetails.Text" xml:space="preserve">
+    <value>View Update Details</value>
+  </data>
+  <data name="About_UpdateStatus_Initial" xml:space="preserve">
+    <value>Check whether a newer version is available.</value>
+  </data>
+  <data name="About_UpdateStatus_Checking" xml:space="preserve">
+    <value>Checking for updates...</value>
+  </data>
+  <data name="About_UpdateStatus_UpToDate" xml:space="preserve">
+    <value>You are using the latest version.</value>
+  </data>
+  <data name="About_UpdateStatus_AvailableFormat" xml:space="preserve">
+    <value>A new version (v{0}) is available.</value>
+  </data>
+  <data name="About_UpdateStatus_Failed" xml:space="preserve">
+    <value>Failed to check for updates. Please check your network connection.</value>
+  </data>
+  <data name="EnvironmentConfigPage_UpdateSectionHeader.Text" xml:space="preserve">
+    <value>Updates</value>
+  </data>
+  <data name="EnvironmentConfigPage_UpdateSectionDescription.Text" xml:space="preserve">
+    <value>Configure application update check settings</value>
+  </data>
+  <data name="EnvironmentConfigPage_CheckForUpdatesOnStartupLabel.Text" xml:space="preserve">
+    <value>Check for updates on startup</value>
+  </data>
+  <data name="EnvironmentConfigPage_CheckForUpdatesOnStartupDescription.Text" xml:space="preserve">
+    <value>Automatically check for the latest release at startup and notify you in the title bar when a new version is available</value>
+  </data>
 </root>

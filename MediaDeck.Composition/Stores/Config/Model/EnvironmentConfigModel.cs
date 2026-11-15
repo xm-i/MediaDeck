@@ -19,4 +19,11 @@ public class EnvironmentConfigModel {
 	public ReactiveProperty<AppSystemBackdrop> SystemBackdrop {
 		get;
 	} = new(AppSystemBackdrop.Mica);
+
+	/// <summary>
+	/// 起動時に新しいバージョンを自動確認するかどうか（Unpackaged版のみ有効）
+	/// </summary>
+	public ReactiveProperty<bool> CheckForUpdatesOnStartup {
+		get;
+	} = new(true);
 }

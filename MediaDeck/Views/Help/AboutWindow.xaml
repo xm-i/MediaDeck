@@ -19,29 +19,71 @@
 		<!-- カスタムタイトルバー -->
 		<controls:WindowTitleBar x:Name="AppTitleBar" Grid.Row="0" Title="{x:Bind Title}" />
 
-		<StackPanel Grid.Row="1" Padding="24" Spacing="12" HorizontalAlignment="Center" VerticalAlignment="Center" MaxWidth="460">
-			<Image Source="/Assets/Square150x150Logo.scale-200.png" Width="128" Height="128" Margin="0,0,0,12"/>
-			<TextBlock Text="{x:Bind ViewModel.AppName}" FontSize="28" FontWeight="Bold" HorizontalAlignment="Center"/>
-			<StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="4">
-				<TextBlock x:Uid="About_VersionLabel" FontSize="14" Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"/>
-				<TextBlock Text="{x:Bind ViewModel.Version}" FontSize="14" Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"/>
-			</StackPanel>
-			<TextBlock Text="{x:Bind ViewModel.Description}" TextWrapping="Wrap" MaxWidth="400" HorizontalAlignment="Center" TextAlignment="Center" Margin="0,12"/>
-			<TextBlock Text="{x:Bind ViewModel.Copyright}" FontSize="12" Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}" HorizontalAlignment="Center"/>
-			<HyperlinkButton x:Uid="About_WebSiteLink" Command="{x:Bind ViewModel.OpenWebSiteCommand}" HorizontalAlignment="Center" FontSize="12" Margin="0,4,0,0"/>
-
-			<Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="4" Padding="16,12" Margin="0,8,0,0" HorizontalAlignment="Stretch">
-				<StackPanel Spacing="8">
-					<TextBlock x:Uid="About_DataManagementHeader" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-					<TextBlock Text="{x:Bind ViewModel.AppDataDirectoryPath, Mode=OneWay}" TextWrapping="WrapWholeWords" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-					<Button Command="{x:Bind ViewModel.OpenAppDataDirectoryCommand}" HorizontalAlignment="Left">
-						<StackPanel Orientation="Horizontal" Spacing="8">
-							<FontIcon Glyph="&#xE838;" FontSize="14"/>
-							<TextBlock x:Uid="About_OpenAppDataDirectory" FontWeight="SemiBold"/>
-						</StackPanel>
-					</Button>
+		<ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" >
+			<StackPanel Padding="24" Spacing="12" HorizontalAlignment="Center" VerticalAlignment="Center" MaxWidth="460">
+				<Image Source="/Assets/Square150x150Logo.scale-200.png" Width="128" Height="128" Margin="0,0,0,12"/>
+				<TextBlock Text="{x:Bind ViewModel.AppName}" FontSize="28" FontWeight="Bold" HorizontalAlignment="Center"/>
+				<StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="4">
+					<TextBlock x:Uid="About_VersionLabel" FontSize="14" Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"/>
+					<TextBlock Text="{x:Bind ViewModel.Version}" FontSize="14" Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"/>
 				</StackPanel>
-			</Border>
-		</StackPanel>
+				<TextBlock Text="{x:Bind ViewModel.Description}" TextWrapping="Wrap" MaxWidth="400" HorizontalAlignment="Center" TextAlignment="Center" Margin="0,12"/>
+				<TextBlock Text="{x:Bind ViewModel.Copyright}" FontSize="12" Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}" HorizontalAlignment="Center"/>
+				<HyperlinkButton x:Uid="About_WebSiteLink" Command="{x:Bind ViewModel.OpenWebSiteCommand}" HorizontalAlignment="Center" FontSize="12" Margin="0,4,0,0"/>
+
+				<Border Visibility="{x:Bind ViewModel.IsUpdateCheckSupported, Mode=OneTime}"
+					Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+					BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+					BorderThickness="1"
+					CornerRadius="4"
+					Padding="16,12"
+					Margin="0,8,0,0"
+					HorizontalAlignment="Stretch">
+					<StackPanel Spacing="8">
+						<TextBlock x:Uid="About_UpdateHeader" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+						<StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+							<ProgressRing IsActive="{x:Bind ViewModel.IsCheckingUpdate.Value, Mode=OneWay}"
+								Visibility="{x:Bind ViewModel.IsCheckingUpdate.Value, Mode=OneWay}"
+								Width="16"
+								Height="16"/>
+							<TextBlock Text="{x:Bind ViewModel.UpdateStatusMessage.Value, Mode=OneWay}"
+								TextWrapping="WrapWholeWords"
+								Style="{StaticResource CaptionTextBlockStyle}"
+								Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+								VerticalAlignment="Center"/>
+						</StackPanel>
+						<StackPanel Orientation="Horizontal" Spacing="8">
+							<Button Command="{x:Bind ViewModel.CheckForUpdatesCommand}">
+								<StackPanel Orientation="Horizontal" Spacing="8">
+									<FontIcon Glyph="&#xE72C;" FontSize="14"/>
+									<TextBlock x:Uid="About_CheckForUpdates" FontWeight="SemiBold"/>
+								</StackPanel>
+							</Button>
+							<Button Style="{StaticResource AccentButtonStyle}"
+								Visibility="{x:Bind ViewModel.HasAvailableUpdate.Value, Mode=OneWay}"
+								Click="OpenUpdateNotificationButton_Click">
+								<StackPanel Orientation="Horizontal" Spacing="8">
+									<FontIcon Glyph="&#xE896;" FontSize="14"/>
+									<TextBlock x:Uid="About_ViewUpdateDetails" FontWeight="SemiBold"/>
+								</StackPanel>
+							</Button>
+						</StackPanel>
+					</StackPanel>
+				</Border>
+
+				<Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="4" Padding="16,12" Margin="0,8,0,0" HorizontalAlignment="Stretch">
+					<StackPanel Spacing="8">
+						<TextBlock x:Uid="About_DataManagementHeader" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+						<TextBlock Text="{x:Bind ViewModel.AppDataDirectoryPath, Mode=OneWay}" TextWrapping="WrapWholeWords" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+						<Button Command="{x:Bind ViewModel.OpenAppDataDirectoryCommand}" HorizontalAlignment="Left">
+							<StackPanel Orientation="Horizontal" Spacing="8">
+								<FontIcon Glyph="&#xE838;" FontSize="14"/>
+								<TextBlock x:Uid="About_OpenAppDataDirectory" FontWeight="SemiBold"/>
+							</StackPanel>
+						</Button>
+					</StackPanel>
+				</Border>
+			</StackPanel>
+		</ScrollViewer>
 	</Grid>
 </Window>

@@ -71,6 +71,10 @@ public sealed partial class NavigationMenu {
 		}
 	}
 
+	private void UpdateNotificationButton_Click(object sender, RoutedEventArgs e) {
+		this._windowService.ActivateCentered<UpdateNotificationWindow>(this);
+	}
+
 	private void SyncNotificationButton_Click(object sender, RoutedEventArgs e) {
 		this._windowService.ActivateCentered<FileChangeSyncWindow>(this);
 	}

@@ -176,4 +176,60 @@ public class ConfigStoreTests : IDisposable {
 			}
 		}
 	}
+
+	/// <summary>
+	/// 既存のJSON設定ファイルに新しい環境設定項目（CheckForUpdatesOnStartup）が存在しない場合でもデフォルト値 true が維持され、falseへの変更が保存・復元できることを確認します。
+	/// </summary>
+	[Fact]
+	public void Load_WhenCheckForUpdatesOnStartupIsMissing_PreservesDefaultTrueAndPersistsFalse() {
+		// Arrange: 旧バージョンの設定JSON（CheckForUpdatesOnStartup を含まない）
+		var legacyJson = """
+			{
+			  "Version": 1,
+			  "EnvironmentConfig": {
+			    "Theme": 0,
+			    "SystemBackdrop": 1
+			  }
+			}
+			""";
+		File.WriteAllText(this._testConfigFilePath, legacyJson);
+
+		var services = CreateConfigStoreTestServices();
+		using var serviceProvider = services.BuildServiceProvider();
+		var pathProvider = serviceProvider.GetRequiredService<IAppPathProvider>();
+
+		// Act: 読み込み
+		using var store = new TestableConfigStore(serviceProvider, pathProvider);
+
+		// Assert: デフォルト値 true が保たれる
+		store.Config.EnvironmentConfig.CheckForUpdatesOnStartup.Value.ShouldBeTrue();
+
+		// Act: false に変更して保存し、別ストアで再読み込み
+		store.Config.EnvironmentConfig.CheckForUpdatesOnStartup.Value = false;
+		store.Save();
+
+		using var reloadedStore = new TestableConfigStore(serviceProvider, pathProvider);
+
+		// Assert: false が永続化されている
+		reloadedStore.Config.EnvironmentConfig.CheckForUpdatesOnStartup.Value.ShouldBeFalse();
+	}
+
+	/// <summary>
+	/// <see cref="ConfigStore"/> のシリアライズ/デシリアライズテスト用に最小構成のDIコンテナを構築します。
+	/// </summary>
+	/// <returns>構成済みの <see cref="ServiceCollection"/></returns>
+	private static ServiceCollection CreateConfigStoreTestServices() {
+		var services = new ServiceCollection();
+		services.AddLogging();
+		services.AddSingleton<AppNotificationDispatcher>();
+		services.AddSingleton<MediaDeck.Composition.Interfaces.IStringProvider, StubStringProvider>();
+
+		var mockPathProvider = new Mock<IAppPathProvider>();
+		mockPathProvider.Setup(x => x.ConfigFilePath).Returns(() => TestableConfigStore.TestPath);
+		services.AddSingleton(mockPathProvider.Object);
+
+		MediaDeck.Composition.DIRegistration.AddGeneratedServices(services);
+
+		return services;
+	}
 }

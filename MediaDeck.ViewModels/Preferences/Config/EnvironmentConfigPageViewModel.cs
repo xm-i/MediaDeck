@@ -66,13 +66,31 @@ public class EnvironmentConfigPageViewModel : ViewModelBase, IConfigPageViewMode
 	}
 
 	/// <summary>
+	/// アプリ内での更新確認に対応しているかどうか（Unpackaged版のみ true）
+	/// </summary>
+	public bool IsUpdateCheckSupported {
+		get;
+	}
+
+	/// <summary>
+	/// 起動時に新しいバージョンを自動確認するかどうか
+	/// </summary>
+	public BindableReactiveProperty<bool> CheckForUpdatesOnStartup {
+		get;
+	}
+
+	/// <summary>
 	/// アプリケーションデータフォルダをエクスプローラーで開くコマンド
 	/// </summary>
 	public ReactiveCommand OpenAppDataDirectoryCommand {
 		get;
-	} = new();
+	}
 
-	public EnvironmentConfigPageViewModel(EnvironmentConfigModel environmentConfig, IStringProvider stringProvider, IAppPathProvider appPathProvider) {
+	public EnvironmentConfigPageViewModel(
+		EnvironmentConfigModel environmentConfig,
+		IStringProvider stringProvider,
+		IAppPathProvider appPathProvider,
+		IAppEnvironmentService appEnvironmentService) {
 		this.PageName = stringProvider.GetString("Config_Environment_Name");
 		this.PageDescription = stringProvider.GetString("Config_Environment_Description");
 
@@ -99,6 +117,9 @@ public class EnvironmentConfigPageViewModel : ViewModelBase, IConfigPageViewMode
 
 		this.SelectedSystemBackdrop = new BindableReactiveProperty<SystemBackdropOption>(initialSystemBackdrop).AddTo(this.CompositeDisposable);
 		this.AppDataDirectoryPath = appPathProvider.BaseDirectory;
+		this.IsUpdateCheckSupported = appEnvironmentService.IsUnpackaged;
+		this.CheckForUpdatesOnStartup = new BindableReactiveProperty<bool>(environmentConfig.CheckForUpdatesOnStartup.Value)
+			.AddTo(this.CompositeDisposable);
 
 		// ViewModel の選択変更を Model に反映
 		this.SelectedTheme
@@ -109,6 +130,11 @@ public class EnvironmentConfigPageViewModel : ViewModelBase, IConfigPageViewMode
 			.Subscribe(opt => environmentConfig.SystemBackdrop.Value = opt?.Backdrop ?? AppSystemBackdrop.None)
 			.AddTo(this.CompositeDisposable);
 
+		this.CheckForUpdatesOnStartup
+			.Subscribe(value => environmentConfig.CheckForUpdatesOnStartup.Value = value)
+			.AddTo(this.CompositeDisposable);
+
+		this.OpenAppDataDirectoryCommand = new ReactiveCommand().AddTo(this.CompositeDisposable);
 		this.OpenAppDataDirectoryCommand
 			.Subscribe(_ => ShellUtility.ShellExecute(this.AppDataDirectoryPath))
 			.AddTo(this.CompositeDisposable);

@@ -46,6 +46,28 @@
 		</Grid>
 	  </Border>
 	  <InfoBar x:Uid="EnvironmentConfigPage_RestartNotice" IsOpen="True" IsClosable="False" Severity="Informational" Margin="0,16,0,0" />
+	  <StackPanel Visibility="{x:Bind ViewModel.IsUpdateCheckSupported, Mode=OneTime, Converter={StaticResource BoolToVisibilityConverter}}"
+				  Spacing="4"
+				  Margin="0,24,0,0">
+		<StackPanel Spacing="4" Margin="0,0,0,12">
+		  <TextBlock x:Uid="EnvironmentConfigPage_UpdateSectionHeader" Style="{StaticResource BodyStrongTextBlockStyle}" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+		  <TextBlock x:Uid="EnvironmentConfigPage_UpdateSectionDescription" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+		</StackPanel>
+		<Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="4" Padding="16,12">
+		  <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+			<StackPanel Grid.Column="0" VerticalAlignment="Center" Spacing="2">
+			  <TextBlock x:Uid="EnvironmentConfigPage_CheckForUpdatesOnStartupLabel" Style="{StaticResource BodyTextBlockStyle}" />
+			  <TextBlock x:Uid="EnvironmentConfigPage_CheckForUpdatesOnStartupDescription" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" />
+			</StackPanel>
+			<ToggleSwitch Grid.Column="1"
+						  VerticalAlignment="Center"
+						  MinWidth="0"
+						  OnContent=""
+						  OffContent=""
+						  IsOn="{x:Bind ViewModel.CheckForUpdatesOnStartup.Value, Mode=TwoWay}" />
+		  </Grid>
+		</Border>
+	  </StackPanel>
       </StackPanel>
     </ScrollViewer>
   </Grid>

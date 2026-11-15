@@ -8,6 +8,7 @@ using MapControl;
 using MediaDeck.Composition.Constants;
 using MediaDeck.Composition.Database;
 using MediaDeck.Composition.Interfaces;
+using MediaDeck.Composition.Interfaces.Services;
 using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Core.Models.Tools;
@@ -100,6 +101,26 @@ public partial class App {
 		});
 		// メインウィンドウが表示されたらスプラッシュ画面を閉じる
 		splashScreen.Close();
+
+		// Unpackaged版で起動時アップデート確認が有効な場合はバックグラウンドで確認を開始する
+		var appEnvironmentService = Ioc.Default.GetRequiredService<IAppEnvironmentService>();
+		if (appEnvironmentService.IsUnpackaged && this._configStore.Config.EnvironmentConfig.CheckForUpdatesOnStartup.Value) {
+			var appUpdateService = Ioc.Default.GetRequiredService<IAppUpdateService>();
+			_ = CheckForUpdatesOnStartupAsync(appUpdateService, logger);
+		}
+	}
+
+	/// <summary>
+	/// アプリケーション起動時にバックグラウンドで新バージョンの確認を行います。
+	/// </summary>
+	/// <param name="appUpdateService">アプリケーション更新サービス</param>
+	/// <param name="logger">ロガー</param>
+	private static async Task CheckForUpdatesOnStartupAsync(IAppUpdateService appUpdateService, Microsoft.Extensions.Logging.ILogger logger) {
+		try {
+			await appUpdateService.CheckForUpdatesAsync();
+		} catch (Exception ex) {
+			logger.LogWarning(ex, "起動時のアップデート確認中に予期しないエラーが発生しました。");
+		}
 	}
 
 	/// <summary>
