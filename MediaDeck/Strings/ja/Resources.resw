@@ -313,6 +313,15 @@
   <data name="AlbumRepository_ContextCreateAlbum.Text" xml:space="preserve">
     <value>アルバムを新規作成...</value>
   </data>
+  <data name="AlbumRepository_ContextDeleteAlbum.Text" xml:space="preserve">
+    <value>アルバムを削除...</value>
+  </data>
+  <data name="AlbumRepository_DeleteConfirmation_Title" xml:space="preserve">
+    <value>アルバム「{0}」を削除しますか？</value>
+  </data>
+  <data name="AlbumRepository_DeleteConfirmation_Content" xml:space="preserve">
+    <value>この操作は元に戻せません。登録されているメディアファイル自体は削除されません。</value>
+  </data>
 
   <!-- 並べ替え -->
   <data name="Sort_Header.Text" xml:space="preserve">

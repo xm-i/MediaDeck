@@ -313,6 +313,15 @@
   <data name="AlbumRepository_ContextCreateAlbum.Text" xml:space="preserve">
     <value>Create New Album...</value>
   </data>
+  <data name="AlbumRepository_ContextDeleteAlbum.Text" xml:space="preserve">
+    <value>Delete Album...</value>
+  </data>
+  <data name="AlbumRepository_DeleteConfirmation_Title" xml:space="preserve">
+    <value>Delete album "{0}"?</value>
+  </data>
+  <data name="AlbumRepository_DeleteConfirmation_Content" xml:space="preserve">
+    <value>This action cannot be undone. The registered media files themselves will not be deleted.</value>
+  </data>
 
   <!-- Sort -->
   <data name="Sort_Header.Text" xml:space="preserve">

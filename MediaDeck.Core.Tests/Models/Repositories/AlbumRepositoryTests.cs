@@ -193,4 +193,82 @@ public class AlbumRepositoryTests {
 		sut2.RootAlbum.Value.ChildAlbums.Length.ShouldBe(1);
 		sut2.RootAlbum.Value.ChildAlbums[0].AlbumName.ShouldBe("TestAlbum");
 	}
+
+	/// <summary>
+	/// DeleteAlbumAsync で単アルバムを削除するとアルバムと紐付けのみが削除され、メディア本体は残り、他の AlbumRepository にも通知されることを確認します。
+	/// </summary>
+	[Fact]
+	public async Task DeleteAlbumAsync_LeafAlbum_DeletesAlbumAndLinksAndNotifiesOthers() {
+		var dbFactory = CreateInMemoryDbFactory(nameof(DeleteAlbumAsync_LeafAlbum_DeletesAlbumAndLinksAndNotifiesOthers));
+
+		await using (var db = await dbFactory.CreateDbContextAsync()) {
+			db.MediaItems.Add(new MediaItem {
+				MediaItemId = 1,
+				FilePath = "/test.jpg",
+				DirectoryPath = "/",
+				MediaType = MediaType.Image,
+				Description = "",
+				IsUnderFolderGroup = false,
+				ThumbnailFileName = "",
+				FileSize = 100,
+			});
+			await db.SaveChangesAsync();
+		}
+
+		using var sut1 = CreateSut(dbFactory);
+		using var sut2 = CreateSut(dbFactory);
+		await sut1.AddItemsAsync("TestAlbum", [1]);
+		await sut2.Load();
+		sut2.RootAlbum.Value.ChildAlbums.Length.ShouldBe(1);
+
+		var deleted = await sut1.DeleteAlbumAsync("TestAlbum");
+
+		deleted.ShouldBeTrue();
+		sut1.RootAlbum.Value.ChildAlbums.ShouldBeEmpty();
+
+		await using (var db = await dbFactory.CreateDbContextAsync()) {
+			(await db.Albums.CountAsync()).ShouldBe(0);
+			(await db.MediaItemAlbums.CountAsync()).ShouldBe(0);
+			(await db.MediaItems.CountAsync()).ShouldBe(1);
+		}
+
+		for (var i = 0; i < 100 && sut2.RootAlbum.Value.ChildAlbums.Length > 0; i++) {
+			await Task.Delay(20);
+		}
+		sut2.RootAlbum.Value.ChildAlbums.ShouldBeEmpty();
+	}
+
+	/// <summary>
+	/// 子アルバムを持つ親ノードは DeleteAlbumAsync で削除できず、子アルバムを削除した後にのみ削除できることを確認します。
+	/// </summary>
+	[Fact]
+	public async Task DeleteAlbumAsync_ParentAlbum_ReturnsFalseAndDoesNotDelete() {
+		var dbFactory = CreateInMemoryDbFactory(nameof(DeleteAlbumAsync_ParentAlbum_ReturnsFalseAndDoesNotDelete));
+		using var sut = CreateSut(dbFactory);
+
+		await sut.GetOrCreateAsync("Parent");
+		await sut.GetOrCreateAsync("Parent/Child");
+
+		sut.RootAlbum.Value.ChildAlbums.Length.ShouldBe(1);
+		var parentNode = sut.RootAlbum.Value.ChildAlbums[0];
+		parentNode.CanDelete.ShouldBeFalse();
+		parentNode.ChildAlbums.Length.ShouldBe(1);
+		parentNode.ChildAlbums[0].CanDelete.ShouldBeTrue();
+
+		var deletedParent = await sut.DeleteAlbumAsync("Parent");
+		deletedParent.ShouldBeFalse();
+
+		await using (var db = await dbFactory.CreateDbContextAsync()) {
+			(await db.Albums.CountAsync()).ShouldBe(2);
+		}
+
+		var deletedChild = await sut.DeleteAlbumAsync("Parent/Child");
+		deletedChild.ShouldBeTrue();
+		sut.RootAlbum.Value.ChildAlbums.Length.ShouldBe(1);
+		sut.RootAlbum.Value.ChildAlbums[0].CanDelete.ShouldBeTrue();
+
+		var deletedParentAfterChildRemoved = await sut.DeleteAlbumAsync("Parent");
+		deletedParentAfterChildRemoved.ShouldBeTrue();
+		sut.RootAlbum.Value.ChildAlbums.ShouldBeEmpty();
+	}
 }

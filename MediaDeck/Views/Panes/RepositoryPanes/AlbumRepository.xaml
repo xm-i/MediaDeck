@@ -39,6 +39,18 @@
 						ItemsSource="{x:Bind ChildAlbums}"
 						DoubleTapped="TreeViewItem_DoubleTapped"
 						IsExpanded="{x:Bind IsExpanded, Mode=TwoWay}" >
+						<TreeViewItem.ContextFlyout>
+							<MenuFlyout>
+								<MenuFlyoutItem x:Uid="AlbumRepository_ContextDeleteAlbum"
+									Tag="{x:Bind}"
+									Click="DeleteAlbumMenuItem_Click"
+									IsEnabled="{x:Bind CanDelete}" >
+									<MenuFlyoutItem.Icon>
+										<FontIcon Glyph="&#xE74D;" />
+									</MenuFlyoutItem.Icon>
+								</MenuFlyoutItem>
+							</MenuFlyout>
+						</TreeViewItem.ContextFlyout>
 						<StackPanel Orientation="Horizontal" >
 							<FontIcon Glyph="&#xE8FD;" />
 							<TextBlock Margin="0,0,10,0" />

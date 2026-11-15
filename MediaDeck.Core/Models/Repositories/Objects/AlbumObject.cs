@@ -38,6 +38,15 @@ public partial class AlbumObject {
 		set;
 	} = false;
 
+	/// <summary>
+	/// このアルバムを削除可能かどうか（子アルバムを持たない単アルバムかどうか）を取得します。
+	/// </summary>
+	public bool CanDelete {
+		get {
+			return this.ChildAlbums.Length == 0;
+		}
+	}
+
 	public AlbumObject(AlbumObject? parent, string currentPath, ValueCountPair<string>[] albumPaths) {
 		this.Parent = parent;
 		this.AlbumPath = currentPath;

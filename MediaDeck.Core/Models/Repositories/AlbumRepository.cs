@@ -121,6 +121,36 @@ public class AlbumRepository : RepositoryBase {
 	}
 
 	/// <summary>
+	/// 指定 Path の単アルバムを削除します。配下にサブアルバムが存在する場合は削除しません。
+	/// </summary>
+	/// <param name="path">削除するアルバムのパス。</param>
+	/// <returns>削除できた場合は <c>true</c>、対象が存在しないか子アルバムがあるため削除できなかった場合は <c>false</c>。</returns>
+	public async Task<bool> DeleteAlbumAsync(string path) {
+		path = NormalizePath(path);
+		var prefix = $"{path}{AlbumObject.Separator}";
+		await using var db = await this._dbFactory.CreateDbContextAsync();
+
+		if (await db.Albums.AnyAsync(a => a.Path.StartsWith(prefix))) {
+			await this.Load();
+			return false;
+		}
+
+		var album = await db.Albums
+			.Include(a => a.MediaItemAlbums)
+			.FirstOrDefaultAsync(a => a.Path == path);
+		if (album == null) {
+			await this.Load();
+			return false;
+		}
+
+		db.Albums.Remove(album);
+		await db.SaveChangesAsync();
+		await this.Load();
+		AlbumNotifications.AlbumUpdated.OnNext(this);
+		return true;
+	}
+
+	/// <summary>
 	/// 指定したメディアアイテム群を、指定 Path のアルバムへ追加する。
 	/// アルバムが存在しなければ新規作成する。
 	/// </summary>

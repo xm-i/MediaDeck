@@ -79,4 +79,18 @@ public class AlbumRepositoryViewModel : RepositoryViewModelBase {
 	public Task CreateAlbumAsync(string path) {
 		return this.AlbumRepository.GetOrCreateAsync(path);
 	}
+
+	/// <summary>
+	/// 指定された単アルバムを削除します。子アルバムを持つ場合は削除しません。
+	/// </summary>
+	/// <param name="album">削除するアルバムオブジェクト。</param>
+	public async Task DeleteAlbumAsync(AlbumObject album) {
+		if (!album.CanDelete) {
+			return;
+		}
+		var deleted = await this.AlbumRepository.DeleteAlbumAsync(album.AlbumPath);
+		if (deleted && ReferenceEquals(this.SelectedAlbum.Value, album)) {
+			this.SelectedAlbum.Value = null;
+		}
+	}
 }

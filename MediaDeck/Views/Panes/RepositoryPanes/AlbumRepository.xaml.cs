@@ -1,7 +1,11 @@
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.DependencyInjection;
+using MediaDeck.Composition.Interfaces;
+using MediaDeck.Core.Models.Repositories.Objects;
+using MediaDeck.Core.Stores.Config;
 using MediaDeck.ViewModels.Panes.RepositoryPanes;
 using MediaDeck.Views.Dialogs;
+using MediaDeck.Views.Helpers;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -14,6 +18,8 @@ namespace MediaDeck.Views.Panes.RepositoryPanes;
 /// アルバムリポジトリペインのビュー。
 /// </summary>
 public sealed partial class AlbumRepository {
+	private bool _isDialogOpen;
+
 	/// <summary>
 	/// <see cref="AlbumRepository"/> クラスの新しいインスタンスを初期化します。
 	/// </summary>
@@ -30,6 +36,12 @@ public sealed partial class AlbumRepository {
 
 	private async void CreateAlbum_Click(object sender, RoutedEventArgs e) {
 		await this.CreateAlbumAsync();
+	}
+
+	private async void DeleteAlbumMenuItem_Click(object sender, RoutedEventArgs e) {
+		if (sender is FrameworkElement { Tag: AlbumObject album }) {
+			await this.ConfirmAndDeleteAlbumAsync(album);
+		}
 	}
 
 	private void AlbumArea_ContextRequested(UIElement sender, ContextRequestedEventArgs args) {
@@ -71,15 +83,49 @@ public sealed partial class AlbumRepository {
 	/// 新規アルバム作成ダイアログを表示し、入力されたパスでアルバムを作成します。
 	/// </summary>
 	private async Task CreateAlbumAsync() {
-		if (this.ViewModel is not { } vm || this.XamlRoot is null) {
+		if (this.ViewModel is not { } vm || this.XamlRoot is null || this._isDialogOpen) {
 			return;
 		}
-		var dialog = Ioc.Default.GetRequiredService<NewAlbumDialog>();
-		dialog.XamlRoot = this.XamlRoot;
-		dialog.Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style;
-		var result = await dialog.ShowAsync();
-		if (result == ContentDialogResult.Primary && !string.IsNullOrWhiteSpace(dialog.FullAlbumPath)) {
-			await vm.CreateAlbumAsync(dialog.FullAlbumPath);
+		this._isDialogOpen = true;
+		try {
+			var dialog = Ioc.Default.GetRequiredService<NewAlbumDialog>();
+			dialog.XamlRoot = this.XamlRoot;
+			dialog.Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style;
+			var result = await dialog.ShowAsync();
+			if (result == ContentDialogResult.Primary && !string.IsNullOrWhiteSpace(dialog.FullAlbumPath)) {
+				await vm.CreateAlbumAsync(dialog.FullAlbumPath);
+			}
+		} finally {
+			this._isDialogOpen = false;
+		}
+	}
+
+	/// <summary>
+	/// 削除確認ダイアログを表示し、承認された場合は指定された単アルバムを削除します。
+	/// </summary>
+	/// <param name="album">削除対象のアルバムオブジェクト。</param>
+	private async Task ConfirmAndDeleteAlbumAsync(AlbumObject album) {
+		if (this.ViewModel is not { } vm || this.XamlRoot is null || !album.CanDelete || this._isDialogOpen) {
+			return;
+		}
+		this._isDialogOpen = true;
+		try {
+			var stringProvider = Ioc.Default.GetRequiredService<IStringProvider>();
+			var dialog = new ContentDialog {
+				XamlRoot = this.XamlRoot,
+				Title = string.Format(stringProvider.GetString("AlbumRepository_DeleteConfirmation_Title"), album.AlbumPath),
+				Content = stringProvider.GetString("AlbumRepository_DeleteConfirmation_Content"),
+				PrimaryButtonText = stringProvider.GetString("DialogButton_Delete"),
+				CloseButtonText = stringProvider.GetString("DialogButton_Cancel"),
+				DefaultButton = ContentDialogButton.Close
+			};
+			using var disposable = new CompositeDisposable();
+			ThemeHelper.BindTheme(dialog, Ioc.Default.GetRequiredService<IConfigStore>(), disposable);
+			if (await dialog.ShowAsync() == ContentDialogResult.Primary) {
+				await vm.DeleteAlbumAsync(album);
+			}
+		} finally {
+			this._isDialogOpen = false;
 		}
 	}
 }
