@@ -5,9 +5,9 @@
     <Nullable>enable</Nullable>
     <AnalysisLevel>preview</AnalysisLevel>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
-    <Version>1.0.3</Version>
-    <AssemblyVersion>1.0.3.0</AssemblyVersion>
-    <FileVersion>1.0.3.0</FileVersion>
+    <Version>1.1.0</Version>
+    <AssemblyVersion>1.1.0.0</AssemblyVersion>
+    <FileVersion>1.1.0.0</FileVersion>
   </PropertyGroup>
   <ItemGroup Condition="'$(ProjectName)' != 'MediaDeck.Analyzers' AND !$(ProjectName.EndsWith('.Tests'))">
     <ProjectReference Include="$(MSBuildThisFileDirectory)lib\MediaDeck.Analyzers\MediaDeck.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
