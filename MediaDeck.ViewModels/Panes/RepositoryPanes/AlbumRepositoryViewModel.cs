@@ -4,11 +4,23 @@ using MediaDeck.Core.Models.Repositories.Objects;
 
 namespace MediaDeck.ViewModels.Panes.RepositoryPanes;
 
+/// <summary>
+/// アルバムリポジトリペインの ViewModel。
+/// </summary>
 [Inject(InjectServiceLifetime.Scoped)]
 public class AlbumRepositoryViewModel : RepositoryViewModelBase {
+	/// <summary>
+	/// <see cref="AlbumRepositoryViewModel"/> クラスの新しいインスタンスを初期化します。
+	/// </summary>
+	/// <param name="albumRepository">アルバムリポジトリ。</param>
 	public AlbumRepositoryViewModel(AlbumRepository albumRepository) : base("Album", albumRepository) {
 		this.AlbumRepository = albumRepository;
 		this.RootAlbum = albumRepository.RootAlbum.ObserveOnCurrentSynchronizationContext().ToBindableReactiveProperty(null!).AddTo(this.CompositeDisposable);
+		this.IsEmpty = albumRepository.RootAlbum
+			.Select(root => root is { ChildAlbums.Length: 0 })
+			.ObserveOnCurrentSynchronizationContext()
+			.ToBindableReactiveProperty(albumRepository.RootAlbum.Value is { ChildAlbums.Length: 0 })
+			.AddTo(this.CompositeDisposable);
 		this.SetRepositoryConditionCommand.Merge(this.IncludeSubAlbums.ToUnit())
 			.Subscribe(_ => {
 				if (this.SelectedAlbum.Value is not { } album) {
@@ -18,23 +30,53 @@ public class AlbumRepositoryViewModel : RepositoryViewModelBase {
 			}).AddTo(this.CompositeDisposable);
 	}
 
+	/// <summary>
+	/// アルバムリポジトリモデルを取得します。
+	/// </summary>
 	public AlbumRepository AlbumRepository {
 		get;
 	}
 
+	/// <summary>
+	/// ルートアルバムオブジェクトを取得します。
+	/// </summary>
 	public BindableReactiveProperty<AlbumObject> RootAlbum {
 		get;
 	}
 
+	/// <summary>
+	/// アルバムが1件も存在しないかどうかを取得します。
+	/// </summary>
+	public BindableReactiveProperty<bool> IsEmpty {
+		get;
+	}
+
+	/// <summary>
+	/// 選択中のアルバムを取得または設定します。
+	/// </summary>
 	public BindableReactiveProperty<AlbumObject?> SelectedAlbum {
 		get;
 	} = new();
 
+	/// <summary>
+	/// 選択中のアルバムを検索条件に設定するコマンドを取得します。
+	/// </summary>
 	public ReactiveCommand SetRepositoryConditionCommand {
 		get;
 	} = new();
 
+	/// <summary>
+	/// サブアルバムを検索条件に含めるかどうかを取得または設定します。
+	/// </summary>
 	public BindableReactiveProperty<bool> IncludeSubAlbums {
 		get;
 	} = new(true);
+
+	/// <summary>
+	/// 指定されたパスのアルバムを作成します。
+	/// </summary>
+	/// <param name="path">作成するアルバムのパス。</param>
+	public Task CreateAlbumAsync(string path) {
+		return this.AlbumRepository.GetOrCreateAsync(path);
+	}
 }

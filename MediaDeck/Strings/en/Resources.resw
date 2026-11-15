@@ -301,6 +301,18 @@
   <data name="AlbumRepository_IncludeSubAlbums.Content" xml:space="preserve">
     <value>Include Sub Albums</value>
   </data>
+  <data name="AlbumRepository_EmptyTitle.Text" xml:space="preserve">
+    <value>No albums yet</value>
+  </data>
+  <data name="AlbumRepository_EmptyDescription.Text" xml:space="preserve">
+    <value>Create an album to organize your media.</value>
+  </data>
+  <data name="AlbumRepository_CreateAlbum.Text" xml:space="preserve">
+    <value>Create Album</value>
+  </data>
+  <data name="AlbumRepository_ContextCreateAlbum.Text" xml:space="preserve">
+    <value>Create New Album...</value>
+  </data>
 
   <!-- Sort -->
   <data name="Sort_Header.Text" xml:space="preserve">

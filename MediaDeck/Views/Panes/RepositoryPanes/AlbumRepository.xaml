@@ -8,15 +8,29 @@
 	xmlns:objects="using:MediaDeck.Core.Models.Repositories.Objects"
 	mc:Ignorable="d" >
 
-	<Grid>
+	<Grid x:Name="RootGrid"
+		Background="Transparent"
+		ContextRequested="AlbumArea_ContextRequested" >
+		<Grid.Resources>
+			<MenuFlyout x:Key="EmptyAreaContextMenu" >
+				<MenuFlyoutItem x:Uid="AlbumRepository_ContextCreateAlbum"
+					Click="CreateAlbum_Click" >
+					<MenuFlyoutItem.Icon>
+						<FontIcon Glyph="&#xE710;" />
+					</MenuFlyoutItem.Icon>
+				</MenuFlyoutItem>
+			</MenuFlyout>
+		</Grid.Resources>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="Auto" />
 			<RowDefinition Height="*" />
 		</Grid.RowDefinitions>
 		<CheckBox Grid.Row="0"
 			x:Uid="AlbumRepository_IncludeSubAlbums"
+			Visibility="{x:Bind ViewModel.IsEmpty.Value, Mode=OneWay, Converter={StaticResource InvertBoolToVisibilityConverter}}"
 			IsChecked="{x:Bind ViewModel.IncludeSubAlbums.Value,Mode=TwoWay}" />
 		<TreeView Grid.Row="1"
+			Visibility="{x:Bind ViewModel.IsEmpty.Value, Mode=OneWay, Converter={StaticResource InvertBoolToVisibilityConverter}}"
 			ItemsSource="{x:Bind ViewModel.RootAlbum.Value.ChildAlbums, Mode=OneWay}"
 			SelectedItem="{x:Bind ViewModel.SelectedAlbum.Value,Mode=TwoWay}" >
 			<TreeView.ItemTemplate>
@@ -39,5 +53,41 @@
 				</DataTemplate>
 			</TreeView.ItemTemplate>
 		</TreeView>
+		<ScrollViewer Grid.Row="0"
+			Grid.RowSpan="2"
+			VerticalScrollBarVisibility="Auto"
+			HorizontalScrollBarVisibility="Disabled"
+			VerticalContentAlignment="Center"
+			Visibility="{x:Bind ViewModel.IsEmpty.Value, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" >
+			<StackPanel Spacing="8"
+				Padding="8"
+				HorizontalAlignment="Center"
+				VerticalAlignment="Center" >
+				<FontIcon Glyph="&#xE8FD;"
+					FontSize="28"
+					HorizontalAlignment="Center" />
+				<TextBlock x:Uid="AlbumRepository_EmptyTitle"
+					FontWeight="SemiBold"
+					TextWrapping="Wrap"
+					TextAlignment="Center"
+					HorizontalAlignment="Center" />
+				<TextBlock x:Uid="AlbumRepository_EmptyDescription"
+					Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+					TextWrapping="Wrap"
+					TextAlignment="Center"
+					HorizontalAlignment="Center" />
+				<Button Style="{StaticResource AccentButtonStyle}"
+					HorizontalAlignment="Center"
+					Margin="0,4,0,0"
+					Click="CreateAlbum_Click" >
+					<StackPanel Orientation="Horizontal"
+						Spacing="6" >
+						<FontIcon Glyph="&#xE710;"
+							FontSize="14" />
+						<TextBlock x:Uid="AlbumRepository_CreateAlbum" />
+					</StackPanel>
+				</Button>
+			</StackPanel>
+		</ScrollViewer>
 	</Grid>
 </local:AlbumRepositoryUserControl>

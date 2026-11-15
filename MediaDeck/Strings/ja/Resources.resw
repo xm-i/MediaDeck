@@ -301,6 +301,18 @@
   <data name="AlbumRepository_IncludeSubAlbums.Content" xml:space="preserve">
     <value>サブアルバムを含める</value>
   </data>
+  <data name="AlbumRepository_EmptyTitle.Text" xml:space="preserve">
+    <value>アルバムがありません</value>
+  </data>
+  <data name="AlbumRepository_EmptyDescription.Text" xml:space="preserve">
+    <value>メディアを整理するためのアルバムを作成できます。</value>
+  </data>
+  <data name="AlbumRepository_CreateAlbum.Text" xml:space="preserve">
+    <value>アルバムを作成</value>
+  </data>
+  <data name="AlbumRepository_ContextCreateAlbum.Text" xml:space="preserve">
+    <value>アルバムを新規作成...</value>
+  </data>
 
   <!-- 並べ替え -->
   <data name="Sort_Header.Text" xml:space="preserve">

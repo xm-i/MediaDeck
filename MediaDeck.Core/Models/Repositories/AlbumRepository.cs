@@ -10,12 +10,21 @@ using MediaDeck.Core.Primitives;
 
 namespace MediaDeck.Core.Models.Repositories;
 
+/// <summary>
+/// アルバムの階層構造および検索候補への反映を管理するリポジトリ。
+/// </summary>
 [Inject(InjectServiceLifetime.Scoped)]
 public class AlbumRepository : RepositoryBase {
 	private readonly IDbContextFactory<MediaDeckDbContext> _dbFactory;
 	private readonly ISearchConditionNotificationDispatcher _searchConditionNotificationDispatcher;
 	private readonly TabStateModel _tabState;
 
+	/// <summary>
+	/// <see cref="AlbumRepository"/> クラスの新しいインスタンスを初期化します。
+	/// </summary>
+	/// <param name="dbFactory">データベースコンテキストファクトリ。</param>
+	/// <param name="searchConditionNotificationDispatcher">検索条件通知ディスパッチャ。</param>
+	/// <param name="tabState">タブ状態モデル。</param>
 	public AlbumRepository(IDbContextFactory<MediaDeckDbContext> dbFactory,
 		ISearchConditionNotificationDispatcher searchConditionNotificationDispatcher,
 		TabStateModel tabState) {
@@ -25,6 +34,11 @@ public class AlbumRepository : RepositoryBase {
 		FileNotifications
 			.FileRegistered
 			.ThrottleLast(TimeSpan.FromSeconds(10))
+			.SubscribeAwait(async (_, ct) => await this.Load(), AwaitOperation.Sequential)
+			.AddTo(this.CompositeDisposable);
+		AlbumNotifications
+			.AlbumUpdated
+			.Where(sender => !ReferenceEquals(sender, this))
 			.SubscribeAwait(async (_, ct) => await this.Load(), AwaitOperation.Sequential)
 			.AddTo(this.CompositeDisposable);
 	}
@@ -89,6 +103,8 @@ public class AlbumRepository : RepositoryBase {
 	/// <summary>
 	/// 指定 Path のアルバムを取得。存在しない場合は新規作成。
 	/// </summary>
+	/// <param name="path">アルバムパス。</param>
+	/// <returns>取得または作成された <see cref="Album"/>。</returns>
 	public async Task<Album> GetOrCreateAsync(string path) {
 		path = NormalizePath(path);
 		await using var db = await this._dbFactory.CreateDbContextAsync();
@@ -99,6 +115,8 @@ public class AlbumRepository : RepositoryBase {
 		var album = new Album { Path = path };
 		db.Albums.Add(album);
 		await db.SaveChangesAsync();
+		await this.Load();
+		AlbumNotifications.AlbumUpdated.OnNext(this);
 		return album;
 	}
 
@@ -106,6 +124,8 @@ public class AlbumRepository : RepositoryBase {
 	/// 指定したメディアアイテム群を、指定 Path のアルバムへ追加する。
 	/// アルバムが存在しなければ新規作成する。
 	/// </summary>
+	/// <param name="albumPath">アルバムパス。</param>
+	/// <param name="mediaItemIds">追加するメディアアイテム ID 一覧。</param>
 	public async Task AddItemsAsync(string albumPath, IEnumerable<long> mediaItemIds) {
 		var path = NormalizePath(albumPath);
 		await using var db = await this._dbFactory.CreateDbContextAsync();
@@ -131,6 +151,7 @@ public class AlbumRepository : RepositoryBase {
 		}
 		await db.SaveChangesAsync();
 		await this.Load();
+		AlbumNotifications.AlbumUpdated.OnNext(this);
 	}
 
 	/// <summary>

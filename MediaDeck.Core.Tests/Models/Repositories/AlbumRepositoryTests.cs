@@ -167,4 +167,30 @@ public class AlbumRepositoryTests {
 
 		await Should.ThrowAsync<ArgumentException>(() => sut.GetOrCreateAsync(""));
 	}
+
+	/// <summary>
+	/// GetOrCreateAsync で新規アルバムを作成したとき RootAlbum が更新され、他の AlbumRepository インスタンスにも通知されることを確認します。
+	/// </summary>
+	[Fact]
+	public async Task GetOrCreateAsync_NewAlbum_UpdatesRootAlbumAndNotifiesOthers() {
+		var dbFactory = CreateInMemoryDbFactory(nameof(GetOrCreateAsync_NewAlbum_UpdatesRootAlbumAndNotifiesOthers));
+		using var sut1 = CreateSut(dbFactory);
+		using var sut2 = CreateSut(dbFactory);
+
+		await sut1.Load();
+		await sut2.Load();
+		sut1.RootAlbum.Value.ChildAlbums.ShouldBeEmpty();
+		sut2.RootAlbum.Value.ChildAlbums.ShouldBeEmpty();
+
+		await sut1.GetOrCreateAsync("TestAlbum");
+
+		sut1.RootAlbum.Value.ChildAlbums.Length.ShouldBe(1);
+		sut1.RootAlbum.Value.ChildAlbums[0].AlbumName.ShouldBe("TestAlbum");
+
+		for (var i = 0; i < 100 && sut2.RootAlbum.Value.ChildAlbums.Length == 0; i++) {
+			await Task.Delay(20);
+		}
+		sut2.RootAlbum.Value.ChildAlbums.Length.ShouldBe(1);
+		sut2.RootAlbum.Value.ChildAlbums[0].AlbumName.ShouldBe("TestAlbum");
+	}
 }
