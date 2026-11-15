@@ -8,6 +8,6 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	mc:Ignorable="d" >
 	<StackPanel Padding="12" Spacing="8" >
-		<TextBlock Text="未対応のメディアタイプです。" FontWeight="SemiBold" />
+		<TextBlock x:Uid="UnknownBulkThumbnailConfig_Message" FontWeight="SemiBold" />
 	</StackPanel>
 </local:UnknownBulkThumbnailConfigViewUserControl>

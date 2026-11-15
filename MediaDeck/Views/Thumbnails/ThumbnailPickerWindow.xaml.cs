@@ -1,3 +1,4 @@
+using MediaDeck.Composition.Interfaces;
 using MediaDeck.Core.Stores.Config;
 using MediaDeck.ViewModels.Thumbnails;
 using MediaDeck.Views.Helpers;
@@ -8,9 +9,17 @@ namespace MediaDeck.Views.Thumbnails;
 public sealed partial class ThumbnailPickerWindow : Microsoft.UI.Xaml.Window {
 	private readonly CompositeDisposable _disposable = new();
 
-	public ThumbnailPickerWindow(ThumbnailPickerSelectorViewModel thumbnailPickerSelectorViewModel, IConfigStore configStore) {
+	/// <summary>
+	/// <see cref="ThumbnailPickerWindow"/> クラスの新しいインスタンスを初期化します。
+	/// </summary>
+	/// <param name="thumbnailPickerSelectorViewModel">サムネイルピッカーセレクターViewModel</param>
+	/// <param name="configStore">設定ストア</param>
+	/// <param name="stringProvider">文字列プロバイダー</param>
+	public ThumbnailPickerWindow(ThumbnailPickerSelectorViewModel thumbnailPickerSelectorViewModel, IConfigStore configStore, IStringProvider stringProvider) {
+		this.ViewModel = thumbnailPickerSelectorViewModel.AddTo(this._disposable);
 		this.InitializeComponent();
-		this.ViewModel = thumbnailPickerSelectorViewModel;
+
+		this.Title = stringProvider.GetString("ThumbnailPicker_WindowTitle");
 
 		// テーマのバインド
 		ThemeHelper.BindTheme(this, configStore, this._disposable);
@@ -20,6 +29,9 @@ public sealed partial class ThumbnailPickerWindow : Microsoft.UI.Xaml.Window {
 		this.Closed += (s, e) => this._disposable.Dispose();
 	}
 
+	/// <summary>
+	/// サムネイルピッカーセレクターViewModel
+	/// </summary>
 	public ThumbnailPickerSelectorViewModel ViewModel {
 		get;
 	}

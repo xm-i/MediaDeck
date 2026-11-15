@@ -5,51 +5,79 @@ using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Composition.Tables;
 using MediaDeck.MediaItemTypes.Base.Models;
+using Microsoft.Extensions.Logging;
 
 namespace MediaDeck.MediaItemTypes.FolderGroup.Models;
 
+/// <summary>
+/// フォルダグループメディアアイテムの操作クラス
+/// </summary>
 [Inject(InjectServiceLifetime.Transient)]
 public partial class FolderGroupMediaItemOperator : BaseMediaItemOperator {
 	private readonly IFilePathService _filePathService;
 	private readonly ConfigModel _config;
+	private readonly ILogger<FolderGroupMediaItemOperator> _logger;
 
+	/// <summary>
+	/// コンストラクタ
+	/// </summary>
+	/// <param name="dbFactory">DbContextファクトリ</param>
+	/// <param name="updateFileHashBackgroundService">ハッシュ更新サービス</param>
+	/// <param name="databaseWriteCoordinator">データベース書き込みコーディネーター</param>
+	/// <param name="filePathService">ファイルパスサービス</param>
+	/// <param name="config">設定モデル</param>
+	/// <param name="logger">ロガー</param>
 	public FolderGroupMediaItemOperator(
 		IDbContextFactory<MediaDeckDbContext> dbFactory,
 		IFileHashUpdatorService updateFileHashBackgroundService,
+		IDatabaseWriteCoordinator databaseWriteCoordinator,
 		IFilePathService filePathService,
-		ConfigModel config)
-		: base(dbFactory, updateFileHashBackgroundService, MediaType.FolderGroup) {
+		ConfigModel config,
+		ILogger<FolderGroupMediaItemOperator> logger)
+		: base(dbFactory, updateFileHashBackgroundService, databaseWriteCoordinator, MediaType.FolderGroup) {
 		this._filePathService = filePathService;
 		this._config = config;
+		this._logger = logger;
 	}
 
+	/// <summary>
+	/// メディアアイテムをDBに登録します。
+	/// </summary>
+	/// <param name="filePath">対象ファイルパス</param>
+	/// <returns>登録されたメディアアイテム</returns>
 	public override async Task<MediaItem?> RegisterMediaItemAsync(string filePath) {
-		await using var db = await this._dbFactory.CreateDbContextAsync();
-		using var transaction = await db.Database.BeginTransactionAsync();
+		MediaItem? firstItem;
+		await using (var dbCheck = await this._dbFactory.CreateDbContextAsync()) {
+			var isExists = await dbCheck.MediaItems.AnyAsync(x => x.FilePath == filePath);
+			if (isExists) {
+				return null;
+			}
 
-		var isExists = await db.MediaItems.AnyAsync(x => x.FilePath == filePath);
-		if (isExists) {
-			return null;
+			firstItem = await dbCheck.MediaItems
+				.Where(x => x.DirectoryPath == filePath || x.DirectoryPath.StartsWith(filePath + Path.DirectorySeparatorChar))
+				.Where(x => x.ThumbnailFileName != null)
+				.OrderBy(x => x.FilePath)
+				.FirstOrDefaultAsync();
 		}
-		var thumbRelativePath = this._filePathService.GetThumbnailRelativeFilePath();
-		var thumbPath = this._filePathService.GetThumbnailAbsoluteFilePath(thumbRelativePath);
-
-		var firstItem = await db.MediaItems
-			.Where(x => x.DirectoryPath == filePath || x.DirectoryPath.StartsWith(filePath + Path.DirectorySeparatorChar))
-			.Where(x => x.ThumbnailFileName != null)
-			.OrderBy(x => x.FilePath)
-			.FirstOrDefaultAsync();
 
 		var currentSize = this._config.ThumbnailConfig.ThumbnailSize.Value;
+		string? thumbRelativePath = null;
 		if (firstItem != null && firstItem.ThumbnailFileName != null) {
-			new FileInfo(thumbPath).Directory?.Create();
-			File.Copy(this._filePathService.GetThumbnailAbsoluteFilePath(firstItem.ThumbnailFileName, firstItem.ThumbnailSize), thumbPath, true);
+			var candidateRelativePath = this._filePathService.GetThumbnailRelativeFilePath();
+			var thumbPath = this._filePathService.GetThumbnailAbsoluteFilePath(candidateRelativePath);
+			try {
+				new FileInfo(thumbPath).Directory?.Create();
+				File.Copy(this._filePathService.GetThumbnailAbsoluteFilePath(firstItem.ThumbnailFileName, firstItem.ThumbnailSize), thumbPath, true);
+				thumbRelativePath = candidateRelativePath;
+			} catch (Exception ex) {
+				this._logger.LogError(ex, "Failed to copy thumbnail for folder group {FilePath}", filePath);
+				thumbRelativePath = null;
+			}
 		}
 
 		var directoryInfo = new DirectoryInfo(filePath);
-
 		var directoryPath = directoryInfo.Parent?.FullName ?? filePath;
-		var isUnderFolderGroup = await this.GetIsUnderFolderGroup(db, directoryPath);
+
 		var mediaItem = new MediaItem {
 			MediaType = MediaType.FolderGroup,
 			DirectoryPath = directoryPath,
@@ -64,18 +92,29 @@ public partial class FolderGroupMediaItemOperator : BaseMediaItemOperator {
 			LastAccessTime = directoryInfo.Exists ? directoryInfo.LastAccessTime : DateTime.MinValue,
 			RegisteredTime = DateTime.Now,
 			IsExists = directoryInfo.Exists,
-			IsUnderFolderGroup = isUnderFolderGroup,
+			IsUnderFolderGroup = false,
 			ThumbnailSize = currentSize
 		};
 
-		await db.MediaItems.AddAsync(mediaItem);
-		await db.SaveChangesAsync();
+		return await this._databaseWriteCoordinator.ExecuteAsync(async ct => {
+			await using var db = await this._dbFactory.CreateDbContextAsync(ct);
+			using var transaction = await db.Database.BeginTransactionAsync(ct);
 
-		await db.MediaItems.Where(x => x.DirectoryPath == filePath || x.DirectoryPath.StartsWith(filePath + Path.DirectorySeparatorChar))
-			.ExecuteUpdateAsync(x => x.SetProperty(p => p.IsUnderFolderGroup, true));
+			if (await db.MediaItems.AnyAsync(x => x.FilePath == filePath, ct)) {
+				return null;
+			}
 
-		await transaction.CommitAsync();
+			mediaItem.IsUnderFolderGroup = await this.GetIsUnderFolderGroup(db, directoryPath);
 
-		return mediaItem;
+			await db.MediaItems.AddAsync(mediaItem, ct);
+			await db.SaveChangesAsync(ct);
+
+			await db.MediaItems.Where(x => x.DirectoryPath == filePath || x.DirectoryPath.StartsWith(filePath + Path.DirectorySeparatorChar))
+				.ExecuteUpdateAsync(x => x.SetProperty(p => p.IsUnderFolderGroup, true), ct);
+
+			await transaction.CommitAsync(ct);
+
+			return mediaItem;
+		});
 	}
 }

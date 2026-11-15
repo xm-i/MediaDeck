@@ -3,14 +3,15 @@ using MediaDeck.Common.Extensions;
 using MediaDeck.Composition.Objects;
 using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Core.Stores.State;
-
-using Microsoft.Extensions.DependencyInjection;
+using MediaDeck.ViewModels.Controls;
+using MediaDeck.ViewModels.Tabs;
 
 namespace MediaDeck.ViewModels;
 
 [Inject(InjectServiceLifetime.Scoped)]
 public class MainWindowViewModel : ViewModelBase {
 	private readonly IServiceProvider _rootServiceProvider;
+	private readonly ITabScopeFactory _tabScopeFactory;
 	private readonly WindowStateModel _windowState;
 	private readonly RootStateModel _rootState;
 
@@ -25,9 +26,13 @@ public class MainWindowViewModel : ViewModelBase {
 		IServiceProvider serviceProvider,
 		IStateStore stateStore,
 		WindowStateProvider windowStateProvider,
-		NavigationMenuViewModel navigationMenuViewModel) {
+		ITabScopeFactory tabScopeFactory,
+		NavigationMenuViewModel navigationMenuViewModel,
+		GlobalInfoBarViewModel globalInfoBarViewModel) {
 		this._rootServiceProvider = serviceProvider;
+		this._tabScopeFactory = tabScopeFactory;
 		this.NavigationMenuViewModel = navigationMenuViewModel;
+		this.GlobalInfoBarViewModel = globalInfoBarViewModel.AddTo(this.CompositeDisposable);
 		this._rootState = stateStore.RootState;
 
 		// 自身のウィンドウの状態を取得（WindowManagerによってセット済み）
@@ -37,13 +42,13 @@ public class MainWindowViewModel : ViewModelBase {
 				tabId => {
 					var tabState = this._rootState.Tabs.FirstOrDefault(t => t.TabId == tabId)
 						?? throw new InvalidOperationException($"TabStateModel not found for TabId: {tabId}");
-					return tabState.ServiceProvider.GetRequiredService<TabViewModel>();
+					return this._tabScopeFactory.GetOrCreateTabViewModel(tabState);
 				},
 			(TabViewModel tabViewModel, Guid tabId, ref bool setValue) => {
 				setValue = true;
 				return tabViewModel.TabState.TabId;
 			},
-			SynchronizationContextCollectionEventDispatcher.Current);
+			SynchronizationContextCollectionEventDispatcher.Current).AddTo(this.CompositeDisposable);
 
 		this.SelectedTab = this._windowState.SelectedTabId.ToTwoWayBindableReactiveProperty(
 			x => x.HasValue ? this.Tabs.FirstOrDefault(t => t.TabState.TabId == x.Value) : null,
@@ -78,6 +83,13 @@ public class MainWindowViewModel : ViewModelBase {
 	}
 
 	/// <summary>
+	/// グローバル情報バー ViewModel
+	/// </summary>
+	public GlobalInfoBarViewModel GlobalInfoBarViewModel {
+		get;
+	}
+
+	/// <summary>
 	/// ウィンドウ活性化コマンド
 	/// </summary>
 	public ReactiveCommand WindowActivatedCommand {
@@ -102,29 +114,8 @@ public class MainWindowViewModel : ViewModelBase {
 	/// 新しいタブを追加する
 	/// </summary>
 	public void AddTab() {
-		var scope = this._rootServiceProvider.CreateScope();
-		var tabState = scope.ServiceProvider.GetRequiredService<TabStateModel>();
-		for (var num = 1; true; num++) {
-			var tabName = $"Tab {num}";
-			if (this._rootState.Tabs.All(t => t.DisplayName.Value != tabName)) {
-				tabState.DisplayName.Value = tabName;
-				break;
-			}
-		}
+		var tabState = this._tabScopeFactory.CreateTabState();
 
-		// 通知コンテキストの初期化（所属するWindowを動的に検索する）
-		var notifContext = scope.ServiceProvider.GetRequiredService<NotificationContextProvider>();
-		var stateStore = scope.ServiceProvider.GetRequiredService<IStateStore>();
-		notifContext.TargetWindowIdResolver = () => {
-			return stateStore.RootState.Windows.FirstOrDefault(w => w.TabIds.Contains(tabState.TabId))?.WindowId;
-		};
-
-		// AppStateのデフォルトタブ状態を新規タブに適用
-		var defaultTab = stateStore.RootState.AppState.DefaultTabState;
-		tabState.ApplyDefaultState(defaultTab);
-
-		// ルートの状態リストに追加
-		this._rootState.Tabs.Add(tabState);
 		// 自身のウィンドウのTabIdリストに追加
 		this._windowState.TabIds.Add(tabState.TabId);
 
@@ -158,7 +149,6 @@ public class MainWindowViewModel : ViewModelBase {
 	/// 指定タブを閉じる
 	/// </summary>
 	public void CloseTab(TabViewModel tab) {
-		tab.Dispose();
 		this._windowState.TabIds.Remove(tab.TabState.TabId);
 		this._rootState.Tabs.Remove(tab.TabState);
 
@@ -172,11 +162,31 @@ public class MainWindowViewModel : ViewModelBase {
 		}
 	}
 
+	/// <summary>
+	/// このウィンドウのすべてのタブを指定したターゲットウィンドウへ移動（マージ）します。
+	/// 移動されたタブは <see cref="RootStateModel.Tabs"/> に維持されたまま、ターゲットウィンドウのタブリストに追加されます。
+	/// </summary>
+	/// <param name="targetWindowId">移動先のウィンドウID</param>
+	public void MoveAllTabsToWindow(Guid targetWindowId) {
+		var targetWindow = this._rootState.Windows.FirstOrDefault(w => w.WindowId == targetWindowId);
+		if (targetWindow == null) {
+			return;
+		}
+
+		var tabIdsToMove = this._windowState.TabIds.ToList();
+		this._windowState.TabIds.Clear();
+
+		foreach (var tabId in tabIdsToMove) {
+			if (!targetWindow.TabIds.Contains(tabId)) {
+				targetWindow.TabIds.Add(tabId);
+			}
+		}
+	}
+
 	protected override void Dispose(bool disposing) {
 		if (disposing) {
 			foreach (var tab in this.Tabs) {
 				this._rootState.Tabs.Remove(tab.TabState);
-				tab.Dispose();
 			}
 			this.Tabs.Dispose();
 		}

@@ -11,6 +11,7 @@ using MediaDeck.Core.Models.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
+using R3;
 using Shouldly;
 
 namespace MediaDeck.Core.Tests.Models.Files;
@@ -92,5 +93,67 @@ public class MediaContentLibraryTests : IDisposable {
 	[Fact]
 	public void Dispose_DoesNotThrow() {
 		Should.NotThrow(() => this._sut.Dispose());
+	}
+
+	private static async Task WaitForConditionAsync(Func<bool> condition, int timeoutMs = 5000) {
+		var sw = System.Diagnostics.Stopwatch.StartNew();
+		while (!condition()) {
+			if (sw.ElapsedMilliseconds > timeoutMs) {
+				throw new TimeoutException("Condition was not met within timeout.");
+			}
+			await Task.Delay(10);
+		}
+	}
+
+	/// <summary>
+	/// 新しい検索が実行された際、前回の検索セッションで読み込まれたファイルモデルが破棄されることを検証します。
+	/// </summary>
+	[Fact]
+	public async Task SearchAsync_DisposesPreviousSessionFiles_WhenNewSearchTriggered() {
+		var mockFile1 = new Mock<MediaDeck.Composition.Interfaces.MediaItemTypes.Models.IMediaItemModel>();
+		var mockFile2 = new Mock<MediaDeck.Composition.Interfaces.MediaItemTypes.Models.IMediaItemModel>();
+
+		var filesLoaderMock = new Mock<FilesLoader>(
+			MockBehavior.Loose,
+			null!, null!, null!, null!);
+
+		var callCount = 0;
+		filesLoaderMock.Setup(x => x.GetFilesStreamAsync(
+				It.IsAny<IEnumerable<MediaDeck.Composition.Interfaces.Files.ISearchCondition>>(),
+				It.IsAny<int?>(),
+				It.IsAny<int?>(),
+				It.IsAny<CancellationToken>()))
+			.Returns((IEnumerable<MediaDeck.Composition.Interfaces.Files.ISearchCondition> _, int? _, int? _, CancellationToken _) => {
+				callCount++;
+				return callCount == 1
+					? new[] { mockFile1.Object }.ToAsyncEnumerable()
+					: new[] { mockFile2.Object }.ToAsyncEnumerable();
+			});
+
+		var searchRequested = new Subject<Unit>();
+		var dispatcherMock = new Mock<MediaDeck.Composition.Interfaces.Notifications.ISearchConditionNotificationDispatcher>();
+		dispatcherMock.Setup(d => d.SearchRequested).Returns(searchRequested);
+
+		var uiDispatcher = new Mock<IUiDispatcher>();
+		uiDispatcher.Setup(x => x.Run(It.IsAny<Action>())).Callback<Action>(a => a());
+		uiDispatcher.Setup(x => x.RunAsync(It.IsAny<Action>())).Returns<Action>(a => { a(); return Task.CompletedTask; });
+		uiDispatcher.Setup(x => x.RunAsync(It.IsAny<Func<Task>>())).Returns<Func<Task>>(async a => await a());
+
+		using var sut = new MediaContentLibrary(filesLoaderMock.Object, new SearchConfigModel(), this._searchConditionManager, dispatcherMock.Object, uiDispatcher.Object);
+
+		// 1回目の検索
+		searchRequested.OnNext(Unit.Default);
+		await WaitForConditionAsync(() => sut.Files.Count == 1);
+
+		sut.Files[0].ShouldBe(mockFile1.Object);
+		mockFile1.Verify(x => x.Dispose(), Times.Never);
+
+		// 2回目の検索
+		searchRequested.OnNext(Unit.Default);
+		await WaitForConditionAsync(() => sut.Files.Count == 1 && sut.Files[0] == mockFile2.Object);
+
+		// 1回目のファイルモデルがセッション更新により破棄されていることを検証
+		mockFile1.Verify(x => x.Dispose(), Times.Once);
+		mockFile2.Verify(x => x.Dispose(), Times.Never);
 	}
 }

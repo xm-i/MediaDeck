@@ -7,6 +7,15 @@ public sealed partial class ImageDetailViewerPreviewControlView : ImageDetailVie
 	public ImageDetailViewerPreviewControlView() {
 		this.InitializeComponent();
 	}
+
+	/// <inheritdoc/>
+	protected override void OnViewModelChanged(IMediaItemViewModel? oldViewModel, IMediaItemViewModel? newViewModel) {
+		base.OnViewModelChanged(oldViewModel, newViewModel);
+		if (newViewModel == null) {
+			this.PreviewImage.Source = null;
+		}
+		this.Bindings.Update();
+	}
 }
 
 public class ImageDetailViewerPreviewControlViewUserControl : UserControlBase<IMediaItemViewModel> {

@@ -72,8 +72,8 @@ public class ResolutionFilterCreatorViewModel : ViewModelBase, IFilterCreatorVie
 			new DisplayObject<SearchTypeComparison>(this._stringProvider.GetString("FilterCreator_Comparison_LessThanOrEqual"), SearchTypeComparison.LessThanOrEqual),
 			new DisplayObject<SearchTypeComparison>(this._stringProvider.GetString("FilterCreator_Comparison_LessThan"), SearchTypeComparison.LessThan)
 		];
-		this.ResolutionWidthText = new BindableReactiveProperty<string?>().EnableValidation(() => this.ResolutionWidthText);
-		this.ResolutionHeightText = new BindableReactiveProperty<string?>().EnableValidation(() => this.ResolutionHeightText);
+		this.ResolutionWidthText = new BindableReactiveProperty<string?>().EnableValidation(() => this.ResolutionWidthText).AddTo(this.CompositeDisposable);
+		this.ResolutionHeightText = new BindableReactiveProperty<string?>().EnableValidation(() => this.ResolutionHeightText).AddTo(this.CompositeDisposable);
 		this.SearchType.Value = this.SearchTypeList.First(x => x.Value == SearchTypeComparison.GreaterThanOrEqual);
 
 		this.AddFilterCommand =
@@ -82,7 +82,8 @@ public class ResolutionFilterCreatorViewModel : ViewModelBase, IFilterCreatorVie
 					this.ResolutionWidthText.ErrorsChangedAsObservable().Select(x => this.ResolutionWidthText.HasErrors),
 					this.ResolutionHeightText.ErrorsChangedAsObservable().Select(_ => this.ResolutionHeightText.HasErrors),
 					(x, x2, x3, x4) => !x && !x2 && !x3 && !x4)
-				.ToReactiveCommand();
+				.ToReactiveCommand()
+				.AddTo(this.CompositeDisposable);
 
 		this.AddFilterCommand
 			.Subscribe(vm => {

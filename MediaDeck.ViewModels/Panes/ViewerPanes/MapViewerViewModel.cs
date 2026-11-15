@@ -1,22 +1,43 @@
 using MediaDeck.Composition.Interfaces.MediaItemTypes.ViewModels;
 using MediaDeck.Composition.Interfaces.Primitives;
+using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Core.Models.Files;
 using MediaDeck.Core.Models.Maps;
 
 namespace MediaDeck.ViewModels.Panes.ViewerPanes;
 
+/// <summary>
+/// 地図上にメディアアイテムを配置・表示するマップビューの ViewModel。
+/// </summary>
 [Inject(InjectServiceLifetime.Transient)]
 public class MapViewerViewModel : ViewerPaneViewModelBase {
-	private readonly MediaContentLibraryViewModel _mediaContentLibraryViewModel;
 	private readonly ILocationFactory _locationFactory;
 
-	public MapViewerViewModel(MediaContentLibraryViewModel mediaContentLibraryViewModel, FilesManager filesManager, ILocationFactory locationFactory)
-		: base(ViewerType.Map, "Map", "\uE800", filesManager) {
-		this._mediaContentLibraryViewModel = mediaContentLibraryViewModel;
+	/// <summary>
+	/// <see cref="MapViewerViewModel"/> クラスの新しいインスタンスを初期化します。
+	/// </summary>
+	/// <param name="filesManager">ファイル管理モデル。</param>
+	/// <param name="mediaContentLibraryViewModel">メディアライブラリ ViewModel。</param>
+	/// <param name="searchConditionManagerViewModel">検索条件マネージャ ViewModel。</param>
+	/// <param name="tabState">タブ状態モデル。</param>
+	/// <param name="locationFactory">位置情報ファクトリ。</param>
+	/// <param name="executionConfig">外部実行設定モデル。</param>
+	public MapViewerViewModel(
+		FilesManager filesManager,
+		MediaContentLibraryViewModel mediaContentLibraryViewModel,
+		SearchConditionManagerViewModel searchConditionManagerViewModel,
+		TabStateModel tabState,
+		ILocationFactory locationFactory,
+		ExecutionConfigModel executionConfig)
+		: base(ViewerType.Map, "Map", "\uE800", filesManager, mediaContentLibraryViewModel, searchConditionManagerViewModel, tabState, executionConfig) {
 		this._locationFactory = locationFactory;
 
-		this.Center = new BindableReactiveProperty<ILocation>(this._locationFactory.Create(35, 135));
+		this.Center = new BindableReactiveProperty<ILocation>(this._locationFactory.Create(35, 135)).AddTo(this.CompositeDisposable);
+		this.MapPins = new BindableReactiveProperty<IEnumerable<MapPinViewModel>?>().AddTo(this.CompositeDisposable);
+		this.BoundsNorthWest = new BindableReactiveProperty<ILocation?>().AddTo(this.CompositeDisposable);
+		this.BoundsSouthEast = new BindableReactiveProperty<ILocation?>().AddTo(this.CompositeDisposable);
+		this.ZoomLevel = new BindableReactiveProperty<double>(11).AddTo(this.CompositeDisposable);
 
 		// 選択ファイルの変化を監視してピンの PinState を更新
 		mediaContentLibraryViewModel.SelectedFiles
@@ -24,18 +45,12 @@ public class MapViewerViewModel : ViewerPaneViewModelBase {
 			.AddTo(this.CompositeDisposable);
 	}
 
-	public MediaContentLibraryViewModel MediaContentLibraryViewModel {
-		get {
-			return this._mediaContentLibraryViewModel;
-		}
-	}
-
 	/// <summary>
 	/// 地図上のピンリスト
 	/// </summary>
 	public BindableReactiveProperty<IEnumerable<MapPinViewModel>?> MapPins {
 		get;
-	} = new();
+	}
 
 	/// <summary>
 	/// 地図の中心座標
@@ -45,22 +60,25 @@ public class MapViewerViewModel : ViewerPaneViewModelBase {
 	}
 
 	/// <summary>
-	/// 地図の表示範囲（緯度経度）
+	/// 地図の表示範囲（北西の緯度経度）
 	/// </summary>
 	public BindableReactiveProperty<ILocation?> BoundsNorthWest {
 		get;
-	} = new();
+	}
 
+	/// <summary>
+	/// 地図の表示範囲（南東の緯度経度）
+	/// </summary>
 	public BindableReactiveProperty<ILocation?> BoundsSouthEast {
 		get;
-	} = new();
+	}
 
 	/// <summary>
 	/// 地図のズームレベル
 	/// </summary>
 	public BindableReactiveProperty<double> ZoomLevel {
 		get;
-	} = new(11);
+	}
 
 	/// <summary>
 	/// ピンが選択されたときに呼び出す。対応するメディアを SelectedFiles に設定し、カメラ位置を更新する。
@@ -70,7 +88,7 @@ public class MapViewerViewModel : ViewerPaneViewModelBase {
 			return;
 		}
 		// ピンに含まれるメディアをすべて選択状態にする
-		this._mediaContentLibraryViewModel.SelectedFiles.Value = pinVm.Items.ToArray();
+		this.MediaContentLibraryViewModel.SelectedFiles.Value = pinVm.Items.ToArray();
 	}
 
 	/// <summary>
@@ -102,7 +120,7 @@ public class MapViewerViewModel : ViewerPaneViewModelBase {
 
 		var list = new List<MapPinViewModel>();
 
-		foreach (var item in this._mediaContentLibraryViewModel.Files) {
+		foreach (var item in this.MediaContentLibraryViewModel.Files) {
 			if (item.Location is not { } location) {
 				continue;
 			}
@@ -137,7 +155,7 @@ public class MapViewerViewModel : ViewerPaneViewModelBase {
 		}
 
 		this.MapPins.Value = list.ToArray();
-		this.UpdatePinStates(this._mediaContentLibraryViewModel.SelectedFiles.Value);
+		this.UpdatePinStates(this.MediaContentLibraryViewModel.SelectedFiles.Value);
 	}
 
 	/// <summary>
@@ -146,7 +164,7 @@ public class MapViewerViewModel : ViewerPaneViewModelBase {
 	/// <param name="mapWidth">地図コントロールの幅</param>
 	/// <param name="mapHeight">地図コントロールの高さ</param>
 	public void FitToItems(double mapWidth, double mapHeight) {
-		var locations = this._mediaContentLibraryViewModel.Files
+		var locations = this.MediaContentLibraryViewModel.Files
 			.Select(x => x.Location)
 			.Where(x => x is { })
 			.ToList();
@@ -193,5 +211,17 @@ public class MapViewerViewModel : ViewerPaneViewModelBase {
 			: Math.Log(mapHeight * 2 * Math.PI / (latDiffMerc * tileSize / padding), 2);
 
 		this.ZoomLevel.Value = Math.Clamp(Math.Min(zoomLon, zoomLat), 2, 21);
+	}
+
+	/// <inheritdoc />
+	protected override void Dispose(bool disposing) {
+		if (disposing) {
+			if (this.MapPins.Value is { } pins) {
+				foreach (var pin in pins) {
+					pin.Dispose();
+				}
+			}
+		}
+		base.Dispose(disposing);
 	}
 }

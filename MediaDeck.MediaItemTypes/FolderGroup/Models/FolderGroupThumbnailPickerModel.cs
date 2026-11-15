@@ -38,6 +38,7 @@ public class FolderGroupThumbnailPickerModel(
 			.AsNoTracking();
 
 		query = query
+			.AsSplitQuery()
 			.Include(mf => mf.MediaItemTags)
 			.ThenInclude(mft => mft.Tag)
 			.ThenInclude(t => t.TagCategory)
@@ -61,6 +62,11 @@ public class FolderGroupThumbnailPickerModel(
 		this.Items.AddRange(items);
 	}
 
+	/// <summary>
+	/// モデルからサムネイルのバイナリデータを取得します。
+	/// </summary>
+	/// <param name="model">メディアアイテムモデル</param>
+	/// <returns>サムネイルバイナリデータ。存在しない場合は null。</returns>
 	public byte[]? GetThumbnailBinary(IMediaItemModel model) {
 		if (model.ThumbnailFilePath == null) {
 			return null;

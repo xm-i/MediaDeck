@@ -8,8 +8,13 @@ namespace MediaDeck.Views.Tags;
 public sealed partial class NewTagDialog {
 	private readonly CompositeDisposable _disposable = new();
 
+	/// <summary>
+	/// <see cref="NewTagDialog"/> クラスの新しいインスタンスを初期化します。
+	/// </summary>
+	/// <param name="viewModel">新規タグ作成ダイアログViewModel</param>
+	/// <param name="configStore">設定ストア</param>
 	public NewTagDialog(NewTagDialogViewModel viewModel, IConfigStore configStore) {
-		this.ViewModel = viewModel;
+		this.ViewModel = viewModel.AddTo(this._disposable);
 		this.InitializeComponent();
 
 		ThemeHelper.BindTheme(this, configStore, this._disposable);
@@ -24,6 +29,9 @@ public sealed partial class NewTagDialog {
 		};
 	}
 
+	/// <summary>
+	/// 新規タグ作成ダイアログViewModel
+	/// </summary>
 	public NewTagDialogViewModel ViewModel {
 		get;
 	}

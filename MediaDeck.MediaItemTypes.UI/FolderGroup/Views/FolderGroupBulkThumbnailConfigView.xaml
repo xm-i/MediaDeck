@@ -8,10 +8,10 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	mc:Ignorable="d" >
 	<StackPanel Padding="12" Spacing="12" >
-		<TextBlock Text="フォルダグループ (FolderGroup)" FontWeight="SemiBold" />
-		<TextBlock Text="フォルダ内アイテムの何番目を代表サムネイルとして用いるかを指定します。"
+		<TextBlock x:Uid="FolderGroupBulkThumbnailConfig_Title" FontWeight="SemiBold" />
+		<TextBlock x:Uid="FolderGroupBulkThumbnailConfig_Description"
 			TextWrapping="Wrap" />
-		<NumberBox Header="アイテム番号 (1 始まり)"
+		<NumberBox x:Uid="FolderGroupBulkThumbnailConfig_ItemIndex"
 			Minimum="1" SpinButtonPlacementMode="Inline"
 			Value="{x:Bind ViewModel.ItemIndex.Value, Mode=TwoWay}" />
 	</StackPanel>

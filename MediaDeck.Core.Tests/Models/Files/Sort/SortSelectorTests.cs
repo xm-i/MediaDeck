@@ -6,6 +6,7 @@ using MediaDeck.Composition.Stores.State.Model.Objects;
 using MediaDeck.Core.Models.Files.Sort;
 using MediaDeck.Core.Models.NotificationDispatcher;
 using Microsoft.Extensions.DependencyInjection;
+using R3;
 
 namespace MediaDeck.Core.Tests.Models.Files.Sort;
 
@@ -49,19 +50,27 @@ public class SortSelectorTests {
 	}
 
 	/// <summary>
-	/// ソート条件オブジェクトが空の場合、<see cref="InvalidOperationException"/> が送出されることを確認します。
+	/// ソート項目が空の条件を選択した場合、デフォルトソートが適用されることを確認します。
 	/// </summary>
 	[Fact]
-	public void SetSortConditions_ThrowsInvalidOperationException_WhenSortItemObjectsIsEmpty() {
+	public void SetSortConditions_AppliesDefaultSort_WhenSortItemObjectsIsEmpty() {
 		// Arrange
-		var sortObject = this._searchDefinitions.AddSortCondition();
-		this._tabState.SearchState.CurrentSortCondition.Value = sortObject.Id;
+		var emptySortObject = this._searchDefinitions.AddSortCondition();
+		this._tabState.SearchState.CurrentSortCondition.Value = emptySortObject.Id;
 
 		var selector = new SortSelector(this._tabState, this._searchDefinitions, new SearchConditionNotificationDispatcher());
-		var files = new[] { new TestFileModel { Id = 1 } };
+		var files = new[]
+		{
+			new TestFileModel { FilePath = "B" },
+			new TestFileModel { FilePath = "A" }
+		};
 
-		// Act & Assert
-		Assert.Throws<InvalidOperationException>(() => selector.SetSortConditions(files.AsQueryable()));
+		// Act
+		var result = selector.SetSortConditions(files.AsQueryable()).Cast<TestFileModel>().ToList();
+
+		// Assert: デフォルトソート（FilePath昇順）が適用されること
+		Assert.Equal("A", result[0].FilePath);
+		Assert.Equal("B", result[1].FilePath);
 	}
 
 	/// <summary>
@@ -166,5 +175,83 @@ public class SortSelectorTests {
 
 		Assert.Equal(3, result[2].Rate);
 		Assert.Equal("A", result[2].FilePath);
+	}
+
+	/// <summary>
+	/// SortSelector が Dispose された際、ソート項目の変更監視が解除されることを確認します。
+	/// </summary>
+	[Fact]
+	public void Dispose_UnsubscribesFromSortItemObjects() {
+		// Arrange
+		var sortObject = this._searchDefinitions.AddSortCondition();
+		this._tabState.SearchState.CurrentSortCondition.Value = sortObject.Id;
+
+		var dispatcher = new SearchConditionNotificationDispatcher();
+		var selector = new SortSelector(this._tabState, this._searchDefinitions, dispatcher);
+
+		var notified = false;
+		dispatcher.SortChanged.Subscribe(_ => notified = true);
+
+		// Act: Dispose 呼び出し
+		selector.Dispose();
+
+		// ソート項目を追加しても通知が発火しないこと
+		sortObject.AddSortItemObject();
+
+		// Assert
+		Assert.False(notified);
+	}
+
+	/// <summary>
+	/// ソート条件にRandomが含まれている場合、IsRandomSortがtrueを返すことを確認します。
+	/// </summary>
+	[Fact]
+	public void IsRandomSort_ReturnsTrue_WhenSortItemKeyIsRandom() {
+		// Arrange
+		var sortObject = this._searchDefinitions.AddSortCondition();
+		var item = sortObject.AddSortItemObject();
+		item.SortItemKey = SortItemKey.Random;
+
+		this._tabState.SearchState.CurrentSortCondition.Value = sortObject.Id;
+		var selector = new SortSelector(this._tabState, this._searchDefinitions, new SearchConditionNotificationDispatcher());
+
+		// Act & Assert
+		Assert.True(selector.IsRandomSort);
+	}
+
+	/// <summary>
+	/// ソート条件にRandomが含まれていない場合、IsRandomSortがfalseを返すことを確認します。
+	/// </summary>
+	[Fact]
+	public void IsRandomSort_ReturnsFalse_WhenSortItemKeyIsNotRandom() {
+		// Arrange
+		var sortObject = this._searchDefinitions.AddSortCondition();
+		var item = sortObject.AddSortItemObject();
+		item.SortItemKey = SortItemKey.FilePath;
+
+		this._tabState.SearchState.CurrentSortCondition.Value = sortObject.Id;
+		var selector = new SortSelector(this._tabState, this._searchDefinitions, new SearchConditionNotificationDispatcher());
+
+		// Act & Assert
+		Assert.False(selector.IsRandomSort);
+
+	}
+	/// <summary>
+	/// RandomSeed が初期化され、RegenerateRandomSeed により更新されることを確認します。
+	/// </summary>
+	[Fact]
+	public void RandomSeed_InitializedAndRegenerated() {
+		// Arrange
+		var selector = new SortSelector(this._tabState, this._searchDefinitions, new SearchConditionNotificationDispatcher());
+		var initialSeed = selector.RandomSeed;
+
+		// Assert: 0 以外の正のシード値が設定されていること
+		Assert.True(initialSeed > 0);
+
+		// Act
+		selector.RegenerateRandomSeed();
+
+		// Assert: 再生成でシード値が有効な値であること
+		Assert.True(selector.RandomSeed > 0);
 	}
 }

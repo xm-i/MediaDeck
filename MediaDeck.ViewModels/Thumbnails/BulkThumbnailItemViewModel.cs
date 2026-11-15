@@ -1,4 +1,5 @@
 using MediaDeck.Common.Base;
+using MediaDeck.Composition.Interfaces;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.ViewModels;
 
 namespace MediaDeck.ViewModels.Thumbnails;
@@ -21,8 +22,19 @@ public enum BulkRegenerationStatus {
 /// 一括サムネイル再生成ウィンドウの 1 アイテム ViewModel。
 /// </summary>
 public class BulkThumbnailItemViewModel : ViewModelBase {
-	public BulkThumbnailItemViewModel(IMediaItemViewModel target) {
+	private readonly IStringProvider _stringProvider;
+
+	/// <summary>
+	/// <see cref="BulkThumbnailItemViewModel"/> クラスの新しいインスタンスを初期化します。
+	/// </summary>
+	/// <param name="target">対象メディアアイテムViewModel</param>
+	/// <param name="stringProvider">文字列プロバイダー</param>
+	public BulkThumbnailItemViewModel(IMediaItemViewModel target, IStringProvider stringProvider) {
 		this.Target = target;
+		this._stringProvider = stringProvider;
+		this.Status = new BindableReactiveProperty<BulkRegenerationStatus>(BulkRegenerationStatus.Pending).AddTo(this.CompositeDisposable);
+		this.StatusText = new BindableReactiveProperty<string>(this.GetStatusDisplayText(BulkRegenerationStatus.Pending)).AddTo(this.CompositeDisposable);
+		this.ErrorMessage = new BindableReactiveProperty<string?>().AddTo(this.CompositeDisposable);
 		this.Status
 			.Select(this.GetStatusDisplayText)
 			.Subscribe(x => this.StatusText.Value = x)
@@ -41,23 +53,23 @@ public class BulkThumbnailItemViewModel : ViewModelBase {
 
 	public BindableReactiveProperty<BulkRegenerationStatus> Status {
 		get;
-	} = new(BulkRegenerationStatus.Pending);
+	}
 
 	public BindableReactiveProperty<string> StatusText {
 		get;
-	} = new("未処理");
+	}
 
 	public BindableReactiveProperty<string?> ErrorMessage {
 		get;
-	} = new();
+	}
 
 	private string GetStatusDisplayText(BulkRegenerationStatus status) {
 		return status switch {
-			BulkRegenerationStatus.Pending => "未処理",
-			BulkRegenerationStatus.Processing => "処理中",
-			BulkRegenerationStatus.Completed => "完了",
-			BulkRegenerationStatus.Failed => "失敗",
-			_ => "未処理"
+			BulkRegenerationStatus.Pending => this._stringProvider.GetString("BulkThumbnail_Status_Pending"),
+			BulkRegenerationStatus.Processing => this._stringProvider.GetString("BulkThumbnail_Status_Processing"),
+			BulkRegenerationStatus.Completed => this._stringProvider.GetString("BulkThumbnail_Status_Completed"),
+			BulkRegenerationStatus.Failed => this._stringProvider.GetString("BulkThumbnail_Status_Failed"),
+			_ => this._stringProvider.GetString("BulkThumbnail_Status_Pending")
 		};
 	}
 }

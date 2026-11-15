@@ -20,7 +20,7 @@ public class ImageBulkThumbnailConfigViewModel : BulkThumbnailConfigViewModelBas
 		this._imageOperator = imageOperator;
 	}
 
-	protected override Task<byte[]?> GenerateThumbnailAsync(IMediaItemViewModel target) {
-		return Task.FromResult<byte[]?>(this._imageOperator.CreateThumbnail(target.FileModel, (uint)this._config.ThumbnailConfig.ThumbnailSize.Value, (uint)this._config.ThumbnailConfig.ThumbnailSize.Value));
+	protected override async Task<byte[]?> GenerateThumbnailAsync(IMediaItemViewModel target) {
+		return await Task.Run(() => this._imageOperator.CreateThumbnail(target.FileModel, (uint)this._config.ThumbnailConfig.ThumbnailSize.Value, (uint)this._config.ThumbnailConfig.ThumbnailSize.Value));
 	}
 }

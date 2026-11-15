@@ -8,9 +8,9 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	mc:Ignorable="d" >
 	<StackPanel Padding="12" Spacing="12" >
-		<TextBlock Text="PDF" FontWeight="SemiBold" />
-		<TextBlock Text="サムネイルとして抽出するページ番号を指定してください。" TextWrapping="Wrap" />
-		<NumberBox Header="ページ番号 (1 始まり)"
+		<TextBlock x:Uid="PdfBulkThumbnailConfig_Title" FontWeight="SemiBold" />
+		<TextBlock x:Uid="PdfBulkThumbnailConfig_Description" TextWrapping="Wrap" />
+		<NumberBox x:Uid="PdfBulkThumbnailConfig_PageNumber"
 			Minimum="1" SpinButtonPlacementMode="Inline"
 			Value="{x:Bind ViewModel.PageNumber.Value, Mode=TwoWay}" />
 	</StackPanel>

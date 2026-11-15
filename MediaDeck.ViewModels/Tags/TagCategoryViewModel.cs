@@ -1,35 +1,69 @@
 using MediaDeck.Common.Base;
+using MediaDeck.Common.Extensions;
 using MediaDeck.Composition.Interfaces.Tags;
+using MediaDeck.Core.Models.Tags;
 
 namespace MediaDeck.ViewModels.Tags;
 
+/// <summary>
+/// タグカテゴリーの ViewModel クラス。
+/// </summary>
 public class TagCategoryViewModel : ViewModelBase {
 	private readonly ITagsManager _tagsManager;
 
-	public TagCategoryViewModel(ITagCategoryModel tagCategory, ITagsManager tagsManager, ITagModelFactory tagModelFactory) {
+	/// <summary>
+	/// <see cref="TagCategoryViewModel"/> クラスの新しいインスタンスを初期化します。
+	/// </summary>
+	/// <param name="tagCategory">タグカテゴリーモデル</param>
+	/// <param name="tagsManager">タグマネージャー</param>
+	/// <param name="tagModelFactory">タグモデルファクトリー</param>
+	/// <param name="onTagMoved">配下タグが他カテゴリへ移動した際のコールバック</param>
+	public TagCategoryViewModel(
+		ITagCategoryModel tagCategory,
+		ITagsManager tagsManager,
+		ITagModelFactory tagModelFactory,
+		Action<ITagModel>? onTagMoved = null) {
 		this._tagsManager = tagsManager;
 		this.Model = tagCategory;
-		this.TagCategoryId = tagCategory.TagCategoryId;
-		this.TagCategoryName.Value = tagCategory.TagCategoryName;
-		this.Detail.Value = tagCategory.Detail;
-		this.Tags = tagCategory.Tags.CreateView(x => new TagViewModel(this, x, tagsManager, tagModelFactory));
-		this.FilteredTags = this.Tags.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
+
+		this.SelectedTag = new BindableReactiveProperty<TagViewModel?>().AddTo(this.CompositeDisposable);
+		this.TagCategoryName = new BindableReactiveProperty<string>(tagCategory.TagCategoryName).AddTo(this.CompositeDisposable);
+		this.Detail = new BindableReactiveProperty<string>(tagCategory.Detail).AddTo(this.CompositeDisposable);
+		this.FilterText = new BindableReactiveProperty<string>(string.Empty).AddTo(this.CompositeDisposable);
+
+		this.Tags = tagCategory.Tags.CreateViewWithDisposal(x => new TagViewModel(this, x, tagsManager, tagModelFactory, onTagMoved)).AddTo(this.CompositeDisposable);
+		this.FilteredTags = this.Tags.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current).AddTo(this.CompositeDisposable);
 
 		this.FilterText.ThrottleLast(TimeSpan.FromMilliseconds(300))
 			.ObserveOnCurrentSynchronizationContext()
 			.Subscribe(_ => {
 				this.RefreshTagCandidateFilter();
 			}).AddTo(this.CompositeDisposable);
+
+		tagCategory.Changed?.Subscribe(_ => {
+			this.SyncFromModel();
+		}).AddTo(this.CompositeDisposable);
 	}
 
+	/// <summary>
+	/// タグカテゴリーモデルを取得します。
+	/// </summary>
 	public ITagCategoryModel Model {
 		get;
 	}
 
+	/// <summary>
+	/// タグカテゴリーIDを取得します。
+	/// </summary>
 	public int? TagCategoryId {
-		get;
+		get {
+			return this.Model.TagCategoryId;
+		}
 	}
 
+	/// <summary>
+	/// カテゴリー配下のタグビューを取得します。
+	/// </summary>
 	public ISynchronizedView<ITagModel, TagViewModel> Tags {
 		get;
 	}
@@ -43,6 +77,18 @@ public class TagCategoryViewModel : ViewModelBase {
 		}
 	}
 
+	/// <summary>
+	/// このカテゴリが編集可能かどうか（システム定義の未分類カテゴリ以外は編集可能）
+	/// </summary>
+	public bool IsEditable {
+		get {
+			return this.Model != this._tagsManager.NoCategory;
+		}
+	}
+
+	/// <summary>
+	/// フィルタリング済みタグリストを取得します。
+	/// </summary>
 	public INotifyCollectionChangedSynchronizedViewList<TagViewModel> FilteredTags {
 		get;
 	}
@@ -52,25 +98,35 @@ public class TagCategoryViewModel : ViewModelBase {
 	/// </summary>
 	public BindableReactiveProperty<TagViewModel?> SelectedTag {
 		get;
-	} = new();
+	}
 
+	/// <summary>
+	/// タグカテゴリー名を取得します。
+	/// </summary>
 	public BindableReactiveProperty<string> TagCategoryName {
 		get;
-	} = new();
+	}
 
+	/// <summary>
+	/// タグカテゴリーの説明を取得します。
+	/// </summary>
 	public BindableReactiveProperty<string> Detail {
 		get;
-	} = new();
+	}
 
+	/// <summary>
+	/// タグ検索フィルター文字列を取得します。
+	/// </summary>
 	public BindableReactiveProperty<string> FilterText {
 		get;
-	} = new();
+	}
 
-	public void SyncToModel() {
-		this.Model.TagCategoryName = this.TagCategoryName.Value;
-		this.Model.Detail = this.Detail.Value;
-		foreach (var tag in this.Tags) {
-			tag.SyncToModel();
+	private void SyncFromModel() {
+		if (this.TagCategoryName.Value != this.Model.TagCategoryName) {
+			this.TagCategoryName.Value = this.Model.TagCategoryName;
+		}
+		if (this.Detail.Value != this.Model.Detail) {
+			this.Detail.Value = this.Model.Detail;
 		}
 	}
 
@@ -78,23 +134,12 @@ public class TagCategoryViewModel : ViewModelBase {
 		this.Tags.AttachFilter((tag, tagVm) => {
 			var text = this.FilterText.Value ?? "";
 			if (text.Length == 0) {
-				return true;
-			}
-			if (tag.TagName.Contains(text) ||
-				(tag.Ruby?.Contains(text) ?? false) ||
-				(tag.Romaji?.Contains(text, StringComparison.CurrentCultureIgnoreCase) ?? false)) {
 				tagVm.RepresentativeText.Value = null;
 				return true;
 			}
-			var result =
-				tag
-					.TagAliases
-					.FirstOrDefault(x =>
-						x.Alias.Contains(text, StringComparison.CurrentCultureIgnoreCase) ||
-						(x.Ruby?.Contains(text) ?? false) ||
-						(x.Romaji?.Contains(text, StringComparison.CurrentCultureIgnoreCase) ?? false));
-			tagVm.RepresentativeText.Value = result?.Alias;
-			return result != null;
+			var result = tag.MatchesFilter(text, out var repText);
+			tagVm.RepresentativeText.Value = repText;
+			return result;
 		});
 	}
 }

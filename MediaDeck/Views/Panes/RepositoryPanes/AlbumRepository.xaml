@@ -15,16 +15,16 @@
 		</Grid.RowDefinitions>
 		<CheckBox Grid.Row="0"
 			x:Uid="AlbumRepository_IncludeSubAlbums"
-			IsChecked="{x:Bind ViewModel.AlbumRepositoryViewModel.IncludeSubAlbums.Value,Mode=TwoWay}" />
+			IsChecked="{x:Bind ViewModel.IncludeSubAlbums.Value,Mode=TwoWay}" />
 		<TreeView Grid.Row="1"
-			ItemsSource="{x:Bind ViewModel.AlbumRepositoryViewModel.RootAlbum.Value.ChildAlbums, Mode=OneWay}"
-			SelectedItem="{x:Bind ViewModel.AlbumRepositoryViewModel.SelectedAlbum.Value,Mode=TwoWay}" >
+			ItemsSource="{x:Bind ViewModel.RootAlbum.Value.ChildAlbums, Mode=OneWay}"
+			SelectedItem="{x:Bind ViewModel.SelectedAlbum.Value,Mode=TwoWay}" >
 			<TreeView.ItemTemplate>
 				<DataTemplate x:DataType="objects:AlbumObject" >
 					<TreeViewItem AutomationProperties.Name="{x:Bind AlbumName}"
 						ItemsSource="{x:Bind ChildAlbums}"
 						DoubleTapped="TreeViewItem_DoubleTapped"
-						IsExpanded="{x:Bind IsExpanded}" >
+						IsExpanded="{x:Bind IsExpanded, Mode=TwoWay}" >
 						<StackPanel Orientation="Horizontal" >
 							<FontIcon Glyph="&#xE8FD;" />
 							<TextBlock Margin="0,0,10,0" />

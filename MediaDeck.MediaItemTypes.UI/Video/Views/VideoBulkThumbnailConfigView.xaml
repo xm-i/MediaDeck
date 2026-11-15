@@ -9,18 +9,18 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	mc:Ignorable="d" >
 	<StackPanel Padding="12" Spacing="12" >
-		<TextBlock Text="動画 (Video)" FontWeight="SemiBold" />
-		<TextBlock Text="サムネイル抽出位置の指定方法を選択してください。" TextWrapping="Wrap" />
-		<ComboBox Header="抽出方法"
+		<TextBlock x:Uid="VideoBulkThumbnailConfig_Title" FontWeight="SemiBold" />
+		<TextBlock x:Uid="VideoBulkThumbnailConfig_Description" TextWrapping="Wrap" />
+		<ComboBox x:Uid="VideoBulkThumbnailConfig_Mode"
 			SelectedIndex="{x:Bind ModeIndex, Mode=TwoWay}" >
-			<ComboBoxItem Content="開始からの秒数指定" />
-			<ComboBoxItem Content="全体長の % 指定" />
+			<ComboBoxItem x:Uid="VideoBulkThumbnailConfig_ModeSeconds" />
+			<ComboBoxItem x:Uid="VideoBulkThumbnailConfig_ModePercentage" />
 		</ComboBox>
-		<NumberBox Header="位置 (秒)"
+		<NumberBox x:Uid="VideoBulkThumbnailConfig_Seconds"
 			Minimum="0" SpinButtonPlacementMode="Inline"
 			Visibility="{x:Bind SecondsVisibility, Mode=OneWay}"
 			Value="{x:Bind ViewModel.Seconds.Value, Mode=TwoWay}" />
-		<NumberBox Header="位置 (%)"
+		<NumberBox x:Uid="VideoBulkThumbnailConfig_Percentage"
 			Minimum="0" Maximum="100" SpinButtonPlacementMode="Inline"
 			Visibility="{x:Bind PercentageVisibility, Mode=OneWay}"
 			Value="{x:Bind ViewModel.Percentage.Value, Mode=TwoWay}" />

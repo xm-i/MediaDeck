@@ -14,12 +14,18 @@ namespace MediaDeck.Views.Dialogs;
 [Inject(InjectServiceLifetime.Transient)]
 public sealed partial class PropertyComparisonDialog : ContentDialog {
 
+	/// <summary>ダイアログの ViewModel を取得します。</summary>
 	public PropertyComparisonDialogViewModel ViewModel {
 		get;
 	}
 
 	private readonly CompositeDisposable _disposable = new();
 
+	/// <summary>
+	/// <see cref="PropertyComparisonDialog"/> クラスの新しいインスタンスを初期化します。
+	/// </summary>
+	/// <param name="viewModel">ダイアログ ViewModel。</param>
+	/// <param name="configStore">設定ストア。</param>
 	public PropertyComparisonDialog(PropertyComparisonDialogViewModel viewModel, IConfigStore configStore) {
 		this.ViewModel = viewModel;
 		this.InitializeComponent();
@@ -33,42 +39,33 @@ public sealed partial class PropertyComparisonDialog : ContentDialog {
 		};
 	}
 
+	/// <summary>
+	/// 対象プロパティの記述情報を受け取ってダイアログを初期化します。
+	/// </summary>
+	/// <param name="descriptor">プロパティ記述情報。</param>
 	public void Initialize(MediaItemPropertyDescriptor descriptor) {
 		this.ViewModel.Initialize(descriptor);
 	}
 
 	/// <summary>確定後の比較演算子。</summary>
 	public SearchTypeComparison SelectedOperator {
-		get;
-		private set;
+		get {
+			return this.ViewModel.ConfirmedOperator;
+		}
 	}
 
 	/// <summary>確定後の入力値。</summary>
 	public string SelectedValue {
-		get;
-		private set;
-	} = string.Empty;
+		get {
+			return this.ViewModel.ConfirmedValue;
+		}
+	}
 
 	private void OnPrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args) {
-		if (this.ViewModel.SelectedOperator.Value == null) {
+		if (!this.ViewModel.TryConfirm(out var errorMessage)) {
 			args.Cancel = true;
-			this.ShowError("演算子を選択してください。");
-			return;
+			this.ShowError(errorMessage ?? string.Empty);
 		}
-		var raw = this.ViewModel.GetRawValueString();
-		if (string.IsNullOrWhiteSpace(raw)) {
-			args.Cancel = true;
-			this.ShowError("値を入力してください。");
-			return;
-		}
-		// 入力値が型として解釈可能か Build で検証する
-		if (this.ViewModel.Descriptor.Build(this.ViewModel.SelectedOperator.Value.Value, raw) is null) {
-			args.Cancel = true;
-			this.ShowError($"値を {this.ViewModel.Descriptor.ValueType.Name} として解釈できません。");
-			return;
-		}
-		this.SelectedOperator = this.ViewModel.SelectedOperator.Value.Value;
-		this.SelectedValue = raw;
 	}
 
 	private void ShowError(string message) {

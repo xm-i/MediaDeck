@@ -32,14 +32,18 @@ public class ArchiveBulkThumbnailConfigViewModel : BulkThumbnailConfigViewModelB
 		get;
 	} = new(1);
 
-	protected override Task<byte[]?> GenerateThumbnailAsync(IMediaItemViewModel target) {
-		using var archive = ZipFile.OpenRead(target.FilePath);
-		var images = archive.Entries.Where(x => this._mediaItemTypeService.IsTargetPath(x.Name, MediaType.Image)).ToList();
-		if (images.Count == 0) {
-			return Task.FromResult<byte[]?>(null);
-		}
-		var index = Math.Clamp(this.EntryIndex.Value - 1, 0, images.Count - 1);
-		var entry = images[index];
-		return Task.FromResult<byte[]?>(this._archiveOperator.CreateThumbnail(archive, (uint)this._config.ThumbnailConfig.ThumbnailSize.Value, (uint)this._config.ThumbnailConfig.ThumbnailSize.Value, entry.FullName));
+	protected override async Task<byte[]?> GenerateThumbnailAsync(IMediaItemViewModel target) {
+		var entryIndex = this.EntryIndex.Value;
+		var thumbSize = (uint)this._config.ThumbnailConfig.ThumbnailSize.Value;
+		return await Task.Run(() => {
+			using var archive = ZipFile.OpenRead(target.FilePath);
+			var images = archive.Entries.Where(x => this._mediaItemTypeService.IsTargetPath(x.Name, MediaType.Image)).ToList();
+			if (images.Count == 0) {
+				return null;
+			}
+			var index = Math.Clamp(entryIndex - 1, 0, images.Count - 1);
+			var entry = images[index];
+			return this._archiveOperator.CreateThumbnail(archive, thumbSize, thumbSize, entry.FullName);
+		});
 	}
 }

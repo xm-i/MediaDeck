@@ -1,3 +1,4 @@
+using MediaDeck.Composition.Interfaces;
 using MediaDeck.Core.Stores.Config;
 using MediaDeck.ViewModels.Tags;
 using MediaDeck.Views.Helpers;
@@ -8,9 +9,17 @@ namespace MediaDeck.Views.Tags;
 public sealed partial class TagManagerWindow : Microsoft.UI.Xaml.Window {
 	private readonly CompositeDisposable _disposable = new();
 
-	public TagManagerWindow(TagManagerViewModel viewModel, IConfigStore configStore) {
-		this.ViewModel = viewModel;
+	/// <summary>
+	/// <see cref="TagManagerWindow"/> クラスの新しいインスタンスを初期化します。
+	/// </summary>
+	/// <param name="viewModel">タグ管理ViewModel</param>
+	/// <param name="configStore">設定ストア</param>
+	/// <param name="stringProvider">文字列プロバイダー</param>
+	public TagManagerWindow(TagManagerViewModel viewModel, IConfigStore configStore, IStringProvider stringProvider) {
+		this.ViewModel = viewModel.AddTo(this._disposable);
 		this.InitializeComponent();
+
+		this.Title = stringProvider.GetString("TagManager_WindowTitle");
 
 		// テーマのバインド
 		ThemeHelper.BindTheme(this, configStore, this._disposable);
@@ -23,6 +32,9 @@ public sealed partial class TagManagerWindow : Microsoft.UI.Xaml.Window {
 		this.Closed += (s, e) => this._disposable.Dispose();
 	}
 
+	/// <summary>
+	/// タグ管理ViewModel
+	/// </summary>
 	public TagManagerViewModel ViewModel {
 		get;
 	}

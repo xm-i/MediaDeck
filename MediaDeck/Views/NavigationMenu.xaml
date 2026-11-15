@@ -31,6 +31,11 @@
 		</Grid.ColumnDefinitions>
 
 		<MenuBar Grid.Column="0" Style="{StaticResource TransparentMenuBarStyle}">
+			<MenuBarItem x:Uid="NavMenu_File" >
+				<MenuFlyoutItem x:Uid="NavMenu_Exit"
+					Click="MenuFlyoutItem_Click"
+					Tag="Exit" />
+			</MenuBarItem>
 			<MenuBarItem x:Uid="NavMenu_Tools" >
 				<MenuFlyoutItem x:Uid="NavMenu_TagManager"
 					Click="MenuFlyoutItem_Click"
@@ -54,6 +59,10 @@
 				<MenuFlyoutItem x:Uid="NavMenu_License"
 					Click="MenuFlyoutItem_Click"
 					Tag="License" />
+				<MenuFlyoutSeparator />
+				<MenuFlyoutItem x:Uid="NavMenu_Feedback"
+					Click="MenuFlyoutItem_Click"
+					Tag="Feedback" />
 			</MenuBarItem>
 		</MenuBar>
 

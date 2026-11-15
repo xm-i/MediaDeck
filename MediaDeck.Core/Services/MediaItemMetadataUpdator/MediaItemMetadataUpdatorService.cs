@@ -1,5 +1,7 @@
+using MediaDeck.Common.Base;
 using MediaDeck.Composition.Database;
 using MediaDeck.Composition.Interfaces.MediaItemTypes;
+using Microsoft.Extensions.Logging;
 
 namespace MediaDeck.Core.Services.MediaItemMetadataUpdator;
 
@@ -7,27 +9,41 @@ namespace MediaDeck.Core.Services.MediaItemMetadataUpdator;
 /// メディアアイテムのメタデータを更新するサービス。
 /// </summary>
 [Inject(InjectServiceLifetime.Singleton)]
-public class MediaItemMetadataUpdatorService {
+public class MediaItemMetadataUpdatorService : ServiceBase {
 	private readonly IDbContextFactory<MediaDeckDbContext> _dbFactory;
 	private readonly IMediaItemTypeService _mediaItemTypeService;
+	private readonly ILogger<MediaItemMetadataUpdatorService>? _logger;
 
 	/// <summary>
 	/// 更新対象の総数。
 	/// </summary>
 	public ReactiveProperty<long> TargetCount {
 		get;
-	} = new();
+	}
 
 	/// <summary>
 	/// 更新完了数。
 	/// </summary>
 	public ReactiveProperty<long> CompletedCount {
 		get;
-	} = new();
+	}
 
-	public MediaItemMetadataUpdatorService(IDbContextFactory<MediaDeckDbContext> dbFactory, IMediaItemTypeService mediaItemTypeService) {
+	/// <summary>
+	/// コンストラクタ。
+	/// </summary>
+	/// <param name="dbFactory">DbContextファクトリ</param>
+	/// <param name="mediaItemTypeService">メディアアイテム種別サービス</param>
+	/// <param name="logger">ロガー（省略可）</param>
+	public MediaItemMetadataUpdatorService(
+		IDbContextFactory<MediaDeckDbContext> dbFactory,
+		IMediaItemTypeService mediaItemTypeService,
+		ILogger<MediaItemMetadataUpdatorService>? logger = null) {
 		this._dbFactory = dbFactory;
 		this._mediaItemTypeService = mediaItemTypeService;
+		this._logger = logger;
+
+		this.TargetCount = new ReactiveProperty<long>().AddTo(this.CompositeDisposable);
+		this.CompletedCount = new ReactiveProperty<long>().AddTo(this.CompositeDisposable);
 	}
 
 	/// <summary>
@@ -66,16 +82,23 @@ public class MediaItemMetadataUpdatorService {
 				return;
 			}
 
-			await using var db = await this._dbFactory.CreateDbContextAsync(ct);
-			var file = await this._mediaItemTypeService.IncludeTables(db.MediaItems).FirstOrDefaultAsync(x => x.MediaItemId == id, ct);
+			try {
+				await using var db = await this._dbFactory.CreateDbContextAsync(ct);
+				var file = await this._mediaItemTypeService.IncludeTables(db.MediaItems).FirstOrDefaultAsync(x => x.MediaItemId == id, ct);
 
-			if (file != null) {
-				if (operators.TryGetValue(file.MediaType, out var op)) {
-					await op.UpdateMetadata(file);
+				if (file != null) {
+					if (operators.TryGetValue(file.MediaType, out var op)) {
+						await op.UpdateMetadata(file);
+					}
+					await db.SaveChangesAsync(ct);
 				}
-				await db.SaveChangesAsync(ct);
+			} catch (OperationCanceledException) {
+				return;
+			} catch (Exception ex) {
+				this._logger?.LogError(ex, "Failed to update metadata for MediaItemId {MediaItemId}", id);
+			} finally {
+				this.CompletedCount.Value++;
 			}
-			this.CompletedCount.Value++;
 		}
 	}
 }

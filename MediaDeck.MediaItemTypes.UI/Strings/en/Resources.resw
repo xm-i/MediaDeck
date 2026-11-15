@@ -96,4 +96,79 @@
   <data name="ExecConfig_ExecutionTypeLabel.Text" xml:space="preserve">
     <value>Execution Type</value>
   </data>
+
+  <!-- Bulk Thumbnail Regeneration Configurations -->
+  <data name="ArchiveBulkThumbnailConfig_Title.Text" xml:space="preserve">
+    <value>Archive</value>
+  </data>
+  <data name="ArchiveBulkThumbnailConfig_Description.Text" xml:space="preserve">
+    <value>Specifies which image entry in the archive to use as the representative thumbnail.</value>
+  </data>
+  <data name="ArchiveBulkThumbnailConfig_EntryIndex.Header" xml:space="preserve">
+    <value>Entry number (1-based)</value>
+  </data>
+
+  <data name="FolderGroupBulkThumbnailConfig_Title.Text" xml:space="preserve">
+    <value>Folder Group</value>
+  </data>
+  <data name="FolderGroupBulkThumbnailConfig_Description.Text" xml:space="preserve">
+    <value>Specifies which item in the folder to use as the representative thumbnail.</value>
+  </data>
+  <data name="FolderGroupBulkThumbnailConfig_ItemIndex.Header" xml:space="preserve">
+    <value>Item number (1-based)</value>
+  </data>
+
+  <data name="ImageBulkThumbnailConfig_Title.Text" xml:space="preserve">
+    <value>Image</value>
+  </data>
+  <data name="ImageBulkThumbnailConfig_Description.Text" xml:space="preserve">
+    <value>No additional configuration for this media type. Thumbnails will be regenerated from the first image of each file.</value>
+  </data>
+
+  <data name="PdfBulkThumbnailConfig_Title.Text" xml:space="preserve">
+    <value>PDF</value>
+  </data>
+  <data name="PdfBulkThumbnailConfig_Description.Text" xml:space="preserve">
+    <value>Specify the page number to extract as a thumbnail.</value>
+  </data>
+  <data name="PdfBulkThumbnailConfig_PageNumber.Header" xml:space="preserve">
+    <value>Page number (1-based)</value>
+  </data>
+
+  <data name="UnknownBulkThumbnailConfig_Message.Text" xml:space="preserve">
+    <value>Unsupported media type.</value>
+  </data>
+
+  <data name="VideoBulkThumbnailConfig_Title.Text" xml:space="preserve">
+    <value>Video</value>
+  </data>
+  <data name="VideoBulkThumbnailConfig_Description.Text" xml:space="preserve">
+    <value>Select the method to specify thumbnail extraction position.</value>
+  </data>
+  <data name="VideoBulkThumbnailConfig_Mode.Header" xml:space="preserve">
+    <value>Extraction Method</value>
+  </data>
+  <data name="VideoBulkThumbnailConfig_ModeSeconds.Content" xml:space="preserve">
+    <value>Specify seconds from start</value>
+  </data>
+  <data name="VideoBulkThumbnailConfig_ModePercentage.Content" xml:space="preserve">
+    <value>Specify % of total length</value>
+  </data>
+  <data name="VideoBulkThumbnailConfig_Seconds.Header" xml:space="preserve">
+    <value>Position (seconds)</value>
+  </data>
+  <data name="VideoBulkThumbnailConfig_Percentage.Header" xml:space="preserve">
+    <value>Position (%)</value>
+  </data>
+
+  <!-- Thumbnail Picker Common Buttons -->
+  <data name="ThumbnailPicker_Recreate.Text" xml:space="preserve">
+    <value>Recreate</value>
+  </data>
+  <data name="ThumbnailPicker_Browse.Text" xml:space="preserve">
+    <value>Browse...</value>
+  </data>
+  <data name="ThumbnailPicker_Save.Text" xml:space="preserve">
+    <value>Save</value>
+  </data>
 </root>

@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Text;
@@ -59,6 +58,7 @@ public partial class App {
 #endif
 		this.InitializeComponent();
 		AppDomain.CurrentDomain.ProcessExit += (_, _) => {
+			this._stateStore.Save();
 			this._configStore.Save();
 			this.Vacuum();
 		};
@@ -72,7 +72,8 @@ public partial class App {
 		this._dispatcherQueue = DispatcherQueue.GetForCurrentThread();
 
 		// スプラッシュ画面を表示
-		var splashScreen = new Views.SplashScreenWindow(this._configStore);
+		var stringProvider = Ioc.Default.GetRequiredService<IStringProvider>();
+		var splashScreen = new Views.SplashScreenWindow(this._configStore, stringProvider);
 		splashScreen.Activate();
 
 		await this.InitializeAsync(splashScreen.ViewModel);
@@ -82,14 +83,9 @@ public partial class App {
 
 		// 登録フォルダ数が0件の場合はフォルダ管理画面を自動で開く
 		if (this._configStore.Config.FolderManagerConfig.Folders.Count == 0) {
-			var folderManagerWindow = Ioc.Default.GetRequiredService<FolderManagerWindow>();
-			var windowService = Ioc.Default.GetRequiredService<WindowService>();
+			var windowService = Ioc.Default.GetRequiredService<IWindowService>();
 			var mainWindow = windowManager.Windows.FirstOrDefault()?.Window;
-			if (mainWindow != null) {
-				windowService.ActivateCenteredOnMainWindow(folderManagerWindow, mainWindow);
-			} else {
-				folderManagerWindow.Activate();
-			}
+			windowService.ActivateCentered<FolderManagerWindow>(mainWindow);
 		}
 
 		var logger = LoggerFactory.CreateLogger<App>();
@@ -112,7 +108,7 @@ public partial class App {
 	/// </summary>
 	public void HandleRedirectedActivation(AppActivationArguments args) {
 		this._dispatcherQueue?.TryEnqueue(() => {
-			this._stateStore.RootState.Windows.Add(new WindowStateModel());
+			this._stateStore.RootState.Windows.Add(Ioc.Default.GetRequiredService<WindowStateModel>());
 		});
 	}
 
@@ -229,9 +225,6 @@ public partial class App {
 			var backgroundTasksModel = Ioc.Default.GetRequiredService<BackgroundTasksModel>();
 			backgroundTasksModel.Start();
 
-			var _ = this._stateStore.RootState.AppState.DefaultTabState.SearchState.CurrentSortCondition.Subscribe(x => Debug.WriteLine($"CurrentSortCondition {x}"));
-			_ = this._stateStore.RootState.AppState.DefaultTabState.SearchState.SortDirection.Subscribe(x => Debug.WriteLine($"SortDirection {x}"));
-
 			splashViewModel?.UpdateStatus(stringProvider.GetString("Splash_StartingMediaEngine"));
 			await Task.Delay(100);
 			this._dispatcherQueue?.TryEnqueue(() => {
@@ -239,7 +232,7 @@ public partial class App {
 #if DEBUG
 					LogOutput = ":debug",
 					LogLevel = FlyleafLib.LogLevel.Debug,
-					FFmpegLogLevel = Flyleaf.FFmpeg.LogLevel.Warn,
+					FFmpegLogLevel = Flyleaf.FFmpeg.LogLevel.Warning,
 #endif
 					UIRefresh = false,
 					FFmpegPath = this._configStore.Config.PathConfig.FFMpegFolderPath.Value,

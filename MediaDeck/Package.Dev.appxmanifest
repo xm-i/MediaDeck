@@ -11,7 +11,7 @@
   <Identity
     Name="xmi.MediaDeck.Dev"
     Publisher="CN=E31B20E5-2E2D-4987-A053-01449B6DA81A"
-    Version="1.0.3.0" />
+    Version="1.1.0.0" />
 
   <!-- ストア版と衝突しないように別のPhoneProductId（GUID）を設定 -->
   <mp:PhoneIdentity PhoneProductId="8c6efbd6-db52-47ef-b816-75fa590b5a32" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>

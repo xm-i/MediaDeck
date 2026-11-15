@@ -2,11 +2,10 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
-
 using FFMpegCore;
 using FFMpegCore.Exceptions;
-
 using MediaDeck.Composition.Database;
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.Models;
@@ -14,11 +13,13 @@ using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Composition.Tables;
 using MediaDeck.Composition.Tables.Metadata;
 using MediaDeck.MediaItemTypes.Base.Models;
-
 using Microsoft.Extensions.Logging;
 
 namespace MediaDeck.MediaItemTypes.Video.Models;
 
+/// <summary>
+/// 動画メディアアイテムの操作クラス
+/// </summary>
 [Inject(InjectServiceLifetime.Transient)]
 public partial class VideoMediaItemOperator : BaseMediaItemOperator {
 	private readonly ConfigModel _config;
@@ -30,46 +31,62 @@ public partial class VideoMediaItemOperator : BaseMediaItemOperator {
 		"TAG:com.apple.quicktime.location.ISO6709"
 	];
 
+	/// <summary>
+	/// コンストラクタ
+	/// </summary>
+	/// <param name="filePathService">ファイルパスサービス</param>
+	/// <param name="logger">ロガー</param>
+	/// <param name="config">設定モデル</param>
+	/// <param name="dbFactory">DbContextファクトリ</param>
+	/// <param name="updateFileHashBackgroundService">ハッシュ更新サービス</param>
+	/// <param name="databaseWriteCoordinator">データベース書き込みコーディネーター</param>
 	public VideoMediaItemOperator(
 		IFilePathService filePathService,
 		ILogger<VideoMediaItemOperator> logger,
 		ConfigModel config,
 		IDbContextFactory<MediaDeckDbContext> dbFactory,
-		IFileHashUpdatorService updateFileHashBackgroundService)
-		: base(dbFactory, updateFileHashBackgroundService, MediaType.Video) {
+		IFileHashUpdatorService updateFileHashBackgroundService,
+		IDatabaseWriteCoordinator databaseWriteCoordinator)
+		: base(dbFactory, updateFileHashBackgroundService, databaseWriteCoordinator, MediaType.Video) {
 		this._config = config;
 		this._filePathService = filePathService;
 		this._logger = logger;
 	}
 
+	/// <summary>
+	/// メディアアイテムをDBに登録します。
+	/// </summary>
+	/// <param name="filePath">対象ファイルパス</param>
+	/// <returns>登録されたメディアアイテム</returns>
 	public override async Task<MediaItem?> RegisterMediaItemAsync(string filePath) {
-		await using var db = await this._dbFactory.CreateDbContextAsync();
-		using var transaction = await db.Database.BeginTransactionAsync();
-		var isExists = await db.MediaItems.AnyAsync(x => x.FilePath == filePath);
-		if (isExists) {
-			return null;
+		await using (var dbCheck = await this._dbFactory.CreateDbContextAsync()) {
+			var isExists = await dbCheck.MediaItems.AnyAsync(x => x.FilePath == filePath);
+			if (isExists) {
+				return null;
+			}
 		}
+
 		var metadata = await FFProbe.AnalyseAsync(filePath);
 
-		var thumbRelativePath = this._filePathService.GetThumbnailRelativeFilePath();
-		var thumbPath = this._filePathService.GetThumbnailAbsoluteFilePath(thumbRelativePath);
+		string? thumbRelativePath = null;
 		try {
 			if (metadata.PrimaryVideoStream is not { } videoStream) {
 				throw new Exception("PrimaryVideoStream is null");
 			}
-			var image = this.CreateThumbnail(filePath, videoStream.Width, videoStream.Height, this._config.ThumbnailConfig.ThumbnailSize.Value, this._config.ThumbnailConfig.ThumbnailSize.Value, metadata.Duration / 5);
+			var candidateRelativePath = this._filePathService.GetThumbnailRelativeFilePath();
+			var thumbPath = this._filePathService.GetThumbnailAbsoluteFilePath(candidateRelativePath);
+			var image = await this.CreateThumbnailAsync(filePath, videoStream.Width.GetValueOrDefault(), videoStream.Height.GetValueOrDefault(), this._config.ThumbnailConfig.ThumbnailSize.Value, this._config.ThumbnailConfig.ThumbnailSize.Value, metadata.Duration / 5);
 			new FileInfo(thumbPath).Directory?.Create();
-			File.WriteAllBytes(thumbPath, image);
+			await File.WriteAllBytesAsync(thumbPath, image);
+			thumbRelativePath = candidateRelativePath;
 		} catch (Exception ex) {
 			this._logger.LogError(ex, "Failed to create video thumbnail for file {FilePath}", filePath);
-			thumbPath = null;
 			thumbRelativePath = null;
 		}
 
 		var fileInfo = new FileInfo(filePath);
 		var location = GetLocation(metadata);
 		var directoryPath = Path.GetDirectoryName(filePath)!;
-		var isUnderFolderGroup = await this.GetIsUnderFolderGroup(db, directoryPath);
 
 		var mf = new MediaItem {
 			MediaType = MediaType.Video,
@@ -85,12 +102,12 @@ public partial class VideoMediaItemOperator : BaseMediaItemOperator {
 			LastAccessTime = fileInfo.Exists ? fileInfo.LastAccessTime : DateTime.MinValue,
 			RegisteredTime = DateTime.Now,
 			IsExists = fileInfo.Exists,
+			IsUnderFolderGroup = false,
 			Latitude = location?.Latitude,
 			Longitude = location?.Longitude,
 			Altitude = location?.Altitude,
 			Width = metadata.PrimaryVideoStream?.Width ?? 0,
 			Height = metadata.PrimaryVideoStream?.Height ?? 0,
-			IsUnderFolderGroup = isUnderFolderGroup,
 			ThumbnailSize = this._config.ThumbnailConfig.ThumbnailSize.Value,
 			VideoFile = new() {
 				Duration = Math.Max(metadata.Duration.TotalSeconds, metadata.PrimaryVideoStream?.Duration.TotalSeconds ?? 0),
@@ -101,13 +118,36 @@ public partial class VideoMediaItemOperator : BaseMediaItemOperator {
 			}
 		};
 
-		await db.MediaItems.AddAsync(mf);
-		await db.SaveChangesAsync();
-		await transaction.CommitAsync();
+		var registeredItem = await this._databaseWriteCoordinator.ExecuteAsync(async ct => {
+			await using var db = await this._dbFactory.CreateDbContextAsync(ct);
+			using var transaction = await db.Database.BeginTransactionAsync(ct);
 
-		this._updateFileHashBackgroundService.EnqueueHashUpdate(mf.MediaItemId);
+			if (await db.MediaItems.AnyAsync(x => x.FilePath == filePath, ct)) {
+				return null;
+			}
 
-		return mf;
+			mf.IsUnderFolderGroup = await this.GetIsUnderFolderGroup(db, directoryPath);
+
+			if (location?.Latitude != null && location?.Longitude != null) {
+				var lat = location.Value.Latitude;
+				var lon = location.Value.Longitude;
+				if (!await db.Positions.AnyAsync(x => x.Latitude == lat && x.Longitude == lon, ct)) {
+					await db.Positions.AddAsync(new Position { Latitude = lat, Longitude = lon }, ct);
+				}
+			}
+
+			await db.MediaItems.AddAsync(mf, ct);
+			await db.SaveChangesAsync(ct);
+			await transaction.CommitAsync(ct);
+
+			return mf;
+		});
+
+		if (registeredItem != null) {
+			this._updateFileHashBackgroundService.EnqueueHashUpdate(registeredItem.MediaItemId);
+		}
+
+		return registeredItem;
 	}
 
 	public override async Task UpdateMetadata(MediaItem mediaItem) {
@@ -177,7 +217,7 @@ public partial class VideoMediaItemOperator : BaseMediaItemOperator {
 		if (mediaAnalysis.PrimaryVideoStream is { } video) {
 			AddEntryIfNotNull(entries, "VideoCodec", video.CodecName);
 			AddEntryIfNotNull(entries, "Resolution", $"{video.Width}x{video.Height}");
-			AddEntryIfNotNull(entries, "FrameRate", $"{video.FrameRate} fps");
+			AddEntryIfNotNull(entries, "FrameRate", $"{video.AverageFrameRate} fps");
 		}
 
 		if (mediaAnalysis.PrimaryAudioStream is { } audio) {
@@ -238,7 +278,7 @@ public partial class VideoMediaItemOperator : BaseMediaItemOperator {
 		if (metadata.PrimaryVideoStream is not { } videoStream) {
 			throw new Exception("PrimaryVideoStream is null");
 		}
-		return this.CreateThumbnail(fileModel.FilePath, videoStream.Width, videoStream.Height, width, height, time);
+		return this.CreateThumbnail(fileModel.FilePath, videoStream.Width.GetValueOrDefault(), videoStream.Height.GetValueOrDefault(), width, height, time);
 	}
 
 	/// <summary>
@@ -260,11 +300,59 @@ public partial class VideoMediaItemOperator : BaseMediaItemOperator {
 
 		var uuid = Guid.NewGuid();
 		var temporaryThumbPath = Path.Combine(this._config.PathConfig.TemporaryFolderPath.Value, $"{uuid}.png");
-		FFMpeg.Snapshot(filePath, temporaryThumbPath, new Size(width, height), time);
+		FFMpeg.Snapshot(filePath, temporaryThumbPath, new Size(width, height), time).ProcessSynchronously();
 
 		var binary = File.ReadAllBytes(temporaryThumbPath);
 		File.Delete(temporaryThumbPath);
 		return binary;
+	}
+
+	/// <summary>
+	/// サムネイルを非同期に作成します。
+	/// </summary>
+	/// <param name="fileModel">動画ファイル</param>
+	/// <param name="width">サムネイル幅</param>
+	/// <param name="height">サムネイル高さ</param>
+	/// <param name="time">時間指定</param>
+	/// <param name="cancellationToken">キャンセレーショントークン</param>
+	/// <returns>作成されたサムネイルバイナリ</returns>
+	public async Task<byte[]> CreateThumbnailAsync(IMediaItemModel fileModel, int width, int height, TimeSpan time, CancellationToken cancellationToken = default) {
+		var metadata = await FFProbe.AnalyseAsync(fileModel.FilePath, cancellationToken: cancellationToken).ConfigureAwait(false);
+		if (metadata.PrimaryVideoStream is not { } videoStream) {
+			throw new InvalidOperationException("PrimaryVideoStream is null");
+		}
+		return await this.CreateThumbnailAsync(fileModel.FilePath, videoStream.Width.GetValueOrDefault(), videoStream.Height.GetValueOrDefault(), width, height, time, cancellationToken).ConfigureAwait(false);
+	}
+
+	/// <summary>
+	/// サムネイルを非同期に作成します。
+	/// </summary>
+	/// <param name="filePath">動画ファイルパス</param>
+	/// <param name="originalWidth">元動画幅</param>
+	/// <param name="originalHeight">元動画高さ</param>
+	/// <param name="width">サムネイル幅</param>
+	/// <param name="height">サムネイル高さ</param>
+	/// <param name="time">時間指定</param>
+	/// <param name="cancellationToken">キャンセレーショントークン</param>
+	/// <returns>作成されたサムネイルバイナリ</returns>
+	public async Task<byte[]> CreateThumbnailAsync(string filePath, int originalWidth, int originalHeight, int width, int height, TimeSpan time, CancellationToken cancellationToken = default) {
+		if (originalWidth / width > originalHeight / height) {
+			height = -1;
+		} else {
+			width = -1;
+		}
+
+		var uuid = Guid.NewGuid();
+		var temporaryThumbPath = Path.Combine(this._config.PathConfig.TemporaryFolderPath.Value, $"{uuid}.png");
+		try {
+			await FFMpeg.Snapshot(filePath, temporaryThumbPath, new Size(width, height), time).ProcessAsynchronously().ConfigureAwait(false);
+			var binary = await File.ReadAllBytesAsync(temporaryThumbPath, cancellationToken).ConfigureAwait(false);
+			return binary;
+		} finally {
+			if (File.Exists(temporaryThumbPath)) {
+				File.Delete(temporaryThumbPath);
+			}
+		}
 	}
 
 	/// <summary>

@@ -105,4 +105,45 @@ public class FileChangeItemTests {
 		// Assert
 		Assert.Equal("不明", result);
 	}
+
+	/// <summary>
+	/// <see cref="IStringProvider"/> が注入された場合、リソースキー経由でローカライズされたテキストが返されるかをテストします。
+	/// </summary>
+	[Theory]
+	[InlineData(FileChangeType.Deleted, "FileChangeType_Deleted")]
+	[InlineData(FileChangeType.Renamed, "FileChangeType_Renamed")]
+	[InlineData(FileChangeType.Moved, "FileChangeType_Moved")]
+	[InlineData(FileChangeType.Added, "FileChangeType_Added")]
+	[InlineData((FileChangeType)999, "FileChangeType_Unknown")]
+	public void ChangeTypeText_WithStringProvider_ReturnsLocalizedKey(FileChangeType changeType, string expectedKey) {
+		// Arrange
+		var stringProvider = new StubStringProvider();
+		var item = new FileChangeItem(stringProvider) {
+			ChangeType = changeType
+		};
+
+		// Act
+		var result = item.ChangeTypeText;
+
+		// Assert
+		Assert.Equal(expectedKey, result);
+	}
+
+	/// <summary>
+	/// <see cref="FileChangeItem.GetChangeTypeText"/> が正しくリソースキーを解決するかをテストします。
+	/// </summary>
+	[Fact]
+	public void GetChangeTypeText_WithValidType_ReturnsExpectedKey() {
+		// Arrange
+		var stringProvider = new StubStringProvider();
+		var item = new FileChangeItem {
+			ChangeType = FileChangeType.Added
+		};
+
+		// Act
+		var result = item.GetChangeTypeText(stringProvider);
+
+		// Assert
+		Assert.Equal("FileChangeType_Added", result);
+	}
 }

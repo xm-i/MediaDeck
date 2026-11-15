@@ -9,39 +9,50 @@ namespace MediaDeck.Views.Panes.FilterPanes;
 
 public sealed partial class FilterSelector {
 	private bool _isSyncingSelection;
-	private IDisposable? _selectedConditionsSubscription;
+	private readonly CompositeDisposable _vmSubscriptions = new();
 
 	public FilterSelector() {
 		this.InitializeComponent();
 		this.Loaded += this.FilterSelector_Loaded;
+		this.Unloaded += (_, _) => {
+			this._vmSubscriptions.Clear();
+		};
 	}
 
 	private void FilterSelector_Loaded(object sender, RoutedEventArgs e) {
-		if (this.ViewModel == null) {
+		this.SubscribeViewModel(this.ViewModel);
+	}
+
+	/// <summary>
+	/// ViewModel の選択状態同期および購読を開始します。
+	/// </summary>
+	/// <param name="vm">購読対象の ViewModel。</param>
+	private void SubscribeViewModel(FilterSelectorViewModel? vm) {
+		this._vmSubscriptions.Clear();
+		if (vm == null) {
 			return;
 		}
-		this.ViewModel.UIReadyCommand.Execute(Unit.Default);
-		this.Bindings.Update();
-		this.SyncListSelectionFromViewModel(this.ViewModel.SelectedConditions.Value);
-		this._selectedConditionsSubscription?.Dispose();
-		this._selectedConditionsSubscription = this.ViewModel.SelectedConditions
-			.Subscribe(this.SyncListSelectionFromViewModel);
+		vm.UIReadyCommand.Execute(Unit.Default);
+		this.SyncListSelectionFromViewModel(vm.SelectedConditions.Value);
+		vm.SelectedConditions
+			.Subscribe(this.SyncListSelectionFromViewModel)
+			.AddTo(this._vmSubscriptions);
 	}
 
 	private void SyncListSelectionFromViewModel(FilteringConditionViewModel[]? selected) {
 		var selectedArray = selected ?? [];
 		this._isSyncingSelection = true;
 		try {
-			this.FilteringCondisionListBox.SelectedItems.Clear();
+			this.FilteringConditionListBox.SelectedItems.Clear();
 			foreach (var item in selectedArray) {
-				this.FilteringCondisionListBox.SelectedItems.Add(item);
+				this.FilteringConditionListBox.SelectedItems.Add(item);
 			}
 		} finally {
 			this._isSyncingSelection = false;
 		}
 	}
 
-	private void FilteringCondisionListBox_SelectionChanged(object sender, SelectionChangedEventArgs e) {
+	private void FilteringConditionListBox_SelectionChanged(object sender, SelectionChangedEventArgs e) {
 		if (this._isSyncingSelection) {
 			return;
 		}
@@ -56,23 +67,19 @@ public sealed partial class FilterSelector {
 	}
 
 	private void OpenFilterSettingsWindowButton_Click(object sender, RoutedEventArgs e) {
-		var window = Ioc.Default.GetRequiredService<FilterManagerWindow>();
-		var windowManager = Ioc.Default.GetRequiredService<WindowManager>();
-		var parent = windowManager.GetWindowFromElement(this);
-		if (parent == null) {
-			// TODO: notify
-			return;
-		}
-		Ioc.Default.GetRequiredService<WindowService>().ActivateCenteredOnMainWindow(window, parent);
+		Ioc.Default.GetRequiredService<IWindowService>().ActivateCentered<FilterManagerWindow>(this);
 	}
 
+	/// <inheritdoc />
 	protected override void OnViewModelChanged(FilterSelectorViewModel? oldViewModel, FilterSelectorViewModel? newViewModel) {
 		base.OnViewModelChanged(oldViewModel, newViewModel);
-		this._selectedConditionsSubscription?.Dispose();
-		this._selectedConditionsSubscription = null;
+		this._vmSubscriptions.Clear();
+		if (this.IsLoaded && newViewModel != null) {
+			this.SubscribeViewModel(newViewModel);
+		}
 	}
 
-	private void FilteringCondisionListBox_ItemClick(object sender, ItemClickEventArgs e) {
+	private void FilteringConditionListBox_ItemClick(object sender, ItemClickEventArgs e) {
 		if (this._isSyncingSelection) {
 			return;
 		}

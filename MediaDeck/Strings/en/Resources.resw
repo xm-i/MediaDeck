@@ -105,8 +105,17 @@
   <data name="DialogButton_Cancel" xml:space="preserve">
     <value>Cancel</value>
   </data>
+  <data name="DialogButton_Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
 
   <!-- Navigation menu -->
+  <data name="NavMenu_File.Title" xml:space="preserve">
+    <value>File</value>
+  </data>
+  <data name="NavMenu_Exit.Text" xml:space="preserve">
+    <value>Exit</value>
+  </data>
   <data name="NavMenu_View.Title" xml:space="preserve">
     <value>View</value>
   </data>
@@ -138,6 +147,9 @@
   </data>
   <data name="NavMenu_License.Text" xml:space="preserve">
     <value>License Information</value>
+  </data>
+  <data name="NavMenu_Feedback.Text" xml:space="preserve">
+    <value>Send Feedback</value>
   </data>
   <data name="AboutWindow_Title" xml:space="preserve">
     <value>About MediaDeck</value>
@@ -291,6 +303,9 @@
   <data name="Sort_UsageCount" xml:space="preserve">
     <value>Usage Count</value>
   </data>
+  <data name="Sort_Random" xml:space="preserve">
+    <value>Random</value>
+  </data>
   <data name="Sort_FileSize" xml:space="preserve">
     <value>File Size</value>
   </data>
@@ -306,6 +321,12 @@
   <!-- Details Pane -->
   <data name="Details_Header.Text" xml:space="preserve">
     <value>Details</value>
+  </data>
+  <data name="Details_NoSelection.Text" xml:space="preserve">
+    <value>No items selected</value>
+  </data>
+  <data name="Details_NoSelectionHint.Text" xml:space="preserve">
+    <value>Select an item to view its details.</value>
   </data>
   <data name="Details_Rating.Text" xml:space="preserve">
     <value>Rating</value>
@@ -546,6 +567,25 @@
   <data name="TabRenameDialog_Name.PlaceholderText" xml:space="preserve">
     <value>Enter a name</value>
   </data>
+  <!-- Close Window Confirmation Dialog -->
+  <data name="CloseWindowDialog.Title" xml:space="preserve">
+    <value>Close Window</value>
+  </data>
+  <data name="CloseWindowDialog.PrimaryButtonText" xml:space="preserve">
+    <value>Move to Another Window</value>
+  </data>
+  <data name="CloseWindowDialog.SecondaryButtonText" xml:space="preserve">
+    <value>Close without Moving</value>
+  </data>
+  <data name="CloseWindowDialog.CloseButtonText" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="CloseWindowDialog_MessageFormat" xml:space="preserve">
+    <value>There are {0} tabs open in this window. Do you want to move these tabs to another window? If not, these tabs will be closed.</value>
+  </data>
+  <data name="CloseWindowDialog_TargetWindowHeader.Text" xml:space="preserve">
+    <value>Destination Window:</value>
+  </data>
   <!-- Property Comparison Dialog -->
   <data name="PropertyComparisonDialog.Title" xml:space="preserve">
     <value>Property Comparison Condition</value>
@@ -591,6 +631,9 @@
     <value>Ready...</value>
   </data>
   <!-- Duplicate File Finder -->
+  <data name="DuplicateDetector_WindowTitle" xml:space="preserve">
+    <value>Duplicate File Detector</value>
+  </data>
   <data name="Duplicate_StartDetection.Content" xml:space="preserve">
     <value>Start Detection</value>
   </data>
@@ -610,14 +653,26 @@
     <value>Total Duplicate Files: </value>
   </data>
   <!-- Tag Manager -->
+  <data name="TagManager_WindowTitle" xml:space="preserve">
+    <value>Tag Manager</value>
+  </data>
   <data name="TagManager_Category.Text" xml:space="preserve">
     <value>Tag Category</value>
   </data>
-  <data name="TagManager_CategoryName.Text" xml:space="preserve">
-    <value>Category Name</value>
+  <data name="TagManager_AddTagCategory.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Add new tag category</value>
   </data>
-  <data name="TagManager_CategoryNameInput.PlaceholderText" xml:space="preserve">
-    <value>Enter category name</value>
+  <data name="TagManager_EditTagCategory.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Edit selected tag category</value>
+  </data>
+  <data name="TagManager_DeleteTagCategory.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Delete selected tag category</value>
+  </data>
+  <data name="TagManager_EditCategoryMenu.Text" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="TagManager_DeleteCategoryMenu.Text" xml:space="preserve">
+    <value>Delete</value>
   </data>
   <data name="TagManager_Detail.Text" xml:space="preserve">
     <value>Detail</value>
@@ -625,14 +680,11 @@
   <data name="TagManager_DetailInput.PlaceholderText" xml:space="preserve">
     <value>Enter detail</value>
   </data>
-  <data name="TagManager_DeleteCategory.Text" xml:space="preserve">
-    <value>Delete Category</value>
-  </data>
-  <data name="TagManager_DeleteCategory.ToolTipService.ToolTip" xml:space="preserve">
-    <value>Delete this tag category</value>
-  </data>
   <data name="TagManager_Tags.Text" xml:space="preserve">
     <value>Tags</value>
+  </data>
+  <data name="TagManager_AddTag.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Add a new tag</value>
   </data>
   <data name="TagManager_SearchTags.PlaceholderText" xml:space="preserve">
     <value>Search tags...</value>
@@ -671,6 +723,9 @@
     <value>Delete this tag</value>
   </data>
   <!-- Folder Manager -->
+  <data name="FolderManager_WindowTitle" xml:space="preserve">
+    <value>Folder Manager</value>
+  </data>
   <data name="FolderManager_RegisteredFolders.Text" xml:space="preserve">
     <value>Registered Folders</value>
   </data>
@@ -819,6 +874,9 @@
   <data name="TabViewModel_RenameTab" xml:space="preserve">
     <value>Rename Tab</value>
   </data>
+  <data name="TabView_CloseButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Close tab</value>
+  </data>
   <data name="AppName" xml:space="preserve">
     <value>MediaDeck</value>
   </data>
@@ -947,6 +1005,9 @@
   <data name="SortItemKey_UsageCount" xml:space="preserve">
     <value>Usage Count</value>
   </data>
+  <data name="SortItemKey_Random" xml:space="preserve">
+    <value>Random</value>
+  </data>
   <data name="SortItemKey_Duration" xml:space="preserve">
     <value>Duration</value>
   </data>
@@ -1037,6 +1098,39 @@
   </data>
   <data name="FilterCreator_Comparison_LessThan" xml:space="preserve">
     <value>less than</value>
+  </data>
+  <data name="FilterCreator_Comparison_Contains" xml:space="preserve">
+    <value>contains</value>
+  </data>
+  <data name="FilterCreator_AddFilter.Content" xml:space="preserve">
+    <value>Add Filter</value>
+  </data>
+  <data name="FilterCreator_FilePath_Prefix.Text" xml:space="preserve">
+    <value>File path contains </value>
+  </data>
+  <data name="FilterCreator_FilePath_Suffix.Text" xml:space="preserve">
+    <value> </value>
+  </data>
+  <data name="FilterCreator_FolderGroup_Prefix.Text" xml:space="preserve">
+    <value>Folder group </value>
+  </data>
+  <data name="FilterCreator_FolderGroup_Suffix.Text" xml:space="preserve">
+    <value> files</value>
+  </data>
+  <data name="FilterCreator_Rate_Prefix.Text" xml:space="preserve">
+    <value>Rating is </value>
+  </data>
+  <data name="FilterCreator_Resolution_Width.Text" xml:space="preserve">
+    <value>Width</value>
+  </data>
+  <data name="FilterCreator_Resolution_Height.Text" xml:space="preserve">
+    <value>Height</value>
+  </data>
+  <data name="FilterCreator_Tag_Prefix.Text" xml:space="preserve">
+    <value>Tag contains </value>
+  </data>
+  <data name="FilterCreator_Tag_Suffix.Text" xml:space="preserve">
+    <value> </value>
   </data>
 
   <!-- FilterItemObject DisplayName Formats -->
@@ -1178,8 +1272,39 @@
   <data name="NewTagDialog_DescriptionInput.PlaceholderText" xml:space="preserve">
     <value>Enter description</value>
   </data>
-  <data name="BulkThumbnailRegenerationWindow.Title" xml:space="preserve">
+  <data name="TagCategoryEditDialog.CloseButtonText" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="TagCategoryEditDialog_CreateTitle" xml:space="preserve">
+    <value>Add New Category</value>
+  </data>
+  <data name="TagCategoryEditDialog_EditTitle" xml:space="preserve">
+    <value>Edit Category</value>
+  </data>
+  <data name="TagCategoryEditDialog_CreateButton" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="TagCategoryEditDialog_SaveButton" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="TagCategoryEditDialog_NameLabel.Text" xml:space="preserve">
+    <value>Category Name</value>
+  </data>
+  <data name="TagCategoryEditDialog_NameInput.PlaceholderText" xml:space="preserve">
+    <value>Enter category name</value>
+  </data>
+  <data name="TagCategoryEditDialog_DetailLabel.Text" xml:space="preserve">
+    <value>Description (Optional)</value>
+  </data>
+  <data name="TagCategoryEditDialog_DetailInput.PlaceholderText" xml:space="preserve">
+    <value>Enter description</value>
+  </data>
+  <!-- Bulk Thumbnail Regeneration / Thumbnail Picker -->
+  <data name="BulkThumbnailRegeneration_WindowTitle" xml:space="preserve">
     <value>Bulk Thumbnail Regeneration</value>
+  </data>
+  <data name="ThumbnailPicker_WindowTitle" xml:space="preserve">
+    <value>Thumbnail Picker</value>
   </data>
   <data name="BulkThumbnailRegeneration_TargetFiles.Text" xml:space="preserve">
     <value>Target Files</value>
@@ -1283,4 +1408,178 @@
   <data name="Viewer_ContextCreateNewAlbum" xml:space="preserve">
     <value>Create New Album</value>
   </data>
-</root>
+
+  <!-- FolderManager Dialogs -->
+  <data name="FolderManager_DeleteConfirmation_Title" xml:space="preserve">
+    <value>Are you sure you want to remove this folder? This action cannot be undone.</value>
+  </data>
+
+  <!-- TagManager Dialogs -->
+  <data name="TagManager_DeleteCategoryConfirmation_Title" xml:space="preserve">
+    <value>Are you sure you want to delete category "{0}"?</value>
+  </data>
+  <data name="TagManager_DeleteCategoryConfirmation_Content" xml:space="preserve">
+    <value>Tags in this category will be moved to 'Unset'. This action cannot be undone.</value>
+  </data>
+  <data name="TagManager_DeleteTagConfirmation_Title" xml:space="preserve">
+    <value>Are you sure you want to delete this tag?</value>
+  </data>
+  <data name="TagManager_DeleteTagConfirmation_Content" xml:space="preserve">
+    <value>This action cannot be undone. Tagging from associated files will also be removed.</value>
+  </data>
+
+  <!-- PropertyComparison Dialog -->
+  <data name="PropertyComparisonDialog_Error_SelectOperator" xml:space="preserve">
+    <value>Please select an operator.</value>
+  </data>
+  <data name="PropertyComparisonDialog_Error_EnterValue" xml:space="preserve">
+    <value>Please enter a value.</value>
+  </data>
+  <data name="PropertyComparisonDialog_Error_CannotParseValue" xml:space="preserve">
+    <value>Cannot interpret the value as {0}.</value>
+  </data>
+
+  <!-- BulkThumbnail Status -->
+  <data name="BulkThumbnail_Status_Pending" xml:space="preserve">
+    <value>Pending</value>
+  </data>
+  <data name="BulkThumbnail_Status_Processing" xml:space="preserve">
+    <value>Processing</value>
+  </data>
+  <data name="BulkThumbnail_Status_Completed" xml:space="preserve">
+    <value>Completed</value>
+  </data>
+  <data name="BulkThumbnail_Status_Failed" xml:space="preserve">
+    <value>Failed</value>
+  </data>
+
+  <!-- Splash Screen -->
+  <data name="Splash_Starting" xml:space="preserve">
+    <value>Starting...</value>
+  </data>
+
+  <!-- FileChangeMonitor -->
+  <data name="FileChangeMonitor_BufferOverflow_Message" xml:space="preserve">
+    <value>File change monitoring could not keep up. Please manually reload folders to reflect the latest changes.</value>
+  </data>
+  <data name="FileChangeMonitor_BufferOverflow_Title" xml:space="preserve">
+    <value>Monitoring Error</value>
+  </data>
+
+  <!-- ConfigStore Notifications -->
+  <data name="ConfigStore_LoadError_Corrupted" xml:space="preserve">
+    <value>The configuration file is corrupted. Using default settings.</value>
+  </data>
+  <data name="ConfigStore_LoadError_Title" xml:space="preserve">
+    <value>Configuration Load Error</value>
+  </data>
+  <data name="ConfigStore_SaveError_Message" xml:space="preserve">
+    <value>Cannot save application settings.</value>
+  </data>
+  <data name="ConfigStore_SaveError_Title" xml:space="preserve">
+    <value>Save Error</value>
+  </data>
+
+  <!-- StateStore Notifications -->
+  <data name="StateStore_LoadError_Corrupted" xml:space="preserve">
+    <value>The state file is corrupted. Using default state.</value>
+  </data>
+  <data name="StateStore_LoadError_CannotRead" xml:space="preserve">
+    <value>Cannot read the state file. Using default state.</value>
+  </data>
+  <data name="StateStore_LoadError_Unexpected" xml:space="preserve">
+    <value>An unexpected error occurred while loading state. Using default state.</value>
+  </data>
+  <data name="StateStore_LoadError_Title" xml:space="preserve">
+    <value>State Load Error</value>
+  </data>
+  <data name="StateStore_SaveError_CannotSave" xml:space="preserve">
+    <value>Cannot save state.</value>
+  </data>
+  <data name="StateStore_SaveError_Serialize" xml:space="preserve">
+    <value>Failed to serialize state.</value>
+  </data>
+  <data name="StateStore_SaveError_Unexpected" xml:space="preserve">
+    <value>An unexpected error occurred while saving state.</value>
+  </data>
+  <data name="StateStore_SaveError_Title" xml:space="preserve">
+    <value>Save Error</value>
+  </data>
+
+  <!-- Feedback window -->
+  <data name="FeedbackWindow_Title" xml:space="preserve">
+    <value>Send Feedback</value>
+  </data>
+  <data name="Feedback_HeaderDescription.Text" xml:space="preserve">
+    <value>Please share any bug reports, feature requests, or comments. Your feedback helps us improve MediaDeck.</value>
+  </data>
+  <data name="Feedback_ErrorInfoBar.Title" xml:space="preserve">
+    <value>Submission Error</value>
+  </data>
+  <data name="Feedback_CategoryComboBox.Header" xml:space="preserve">
+    <value>Category</value>
+  </data>
+  <data name="Feedback_Category_BugReport" xml:space="preserve">
+    <value>Bug Report</value>
+  </data>
+  <data name="Feedback_Category_FeatureRequest" xml:space="preserve">
+    <value>Feature Request</value>
+  </data>
+  <data name="Feedback_Category_Other" xml:space="preserve">
+    <value>Question / Other</value>
+  </data>
+  <data name="Feedback_TitleTextBox.Header" xml:space="preserve">
+    <value>Subject *</value>
+  </data>
+  <data name="Feedback_TitleTextBox.PlaceholderText" xml:space="preserve">
+    <value>Enter a brief summary</value>
+  </data>
+  <data name="Feedback_DescriptionTextBox.Header" xml:space="preserve">
+    <value>Details *</value>
+  </data>
+  <data name="Feedback_DescriptionTextBox.PlaceholderText" xml:space="preserve">
+    <value>Describe the issue, steps to reproduce, or details of your request</value>
+  </data>
+  <data name="Feedback_ContactTextBox.Header" xml:space="preserve">
+    <value>Contact (Optional)</value>
+  </data>
+  <data name="Feedback_ContactTextBox.PlaceholderText" xml:space="preserve">
+    <value>Email address, X (Twitter), or GitHub username, etc.</value>
+  </data>
+  <data name="Feedback_ScreenshotLabel.Text" xml:space="preserve">
+    <value>Screenshot (Optional)</value>
+  </data>
+  <data name="Feedback_PickScreenshotButton.Text" xml:space="preserve">
+    <value>Select Image</value>
+  </data>
+  <data name="Feedback_ClearScreenshotButton.Text" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="Feedback_IncludeEnvironmentCheckBox.Content" xml:space="preserve">
+    <value>Include environment info (app version, OS, etc.)</value>
+  </data>
+  <data name="Feedback_IncludeLogsCheckBox.Content" xml:space="preserve">
+    <value>Include recent logs (up to 100 lines)</value>
+  </data>
+  <data name="Feedback_RefreshLogsButton.Text" xml:space="preserve">
+    <value>Refresh</value>
+  </data>
+  <data name="Feedback_SubmittingText.Text" xml:space="preserve">
+    <value>Sending...</value>
+  </data>
+  <data name="Feedback_CancelButton.Content" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="Feedback_SubmitButton.Text" xml:space="preserve">
+    <value>Submit</value>
+  </data>
+  <data name="Feedback_SubmitSuccess_Title" xml:space="preserve">
+    <value>Feedback Sent</value>
+  </data>
+  <data name="Feedback_SubmitSuccess_Message" xml:space="preserve">
+    <value>Your feedback has been sent. Thank you for your contribution.</value>
+  </data>
+  <data name="Feedback_SubmitError_Message" xml:space="preserve">
+    <value>Failed to send feedback. Please check your network connection and try again later.</value>
+  </data>
+</root>

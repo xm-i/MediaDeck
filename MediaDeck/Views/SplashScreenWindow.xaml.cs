@@ -1,3 +1,4 @@
+using MediaDeck.Composition.Interfaces;
 using MediaDeck.Core.Stores.Config;
 using MediaDeck.ViewModels;
 using MediaDeck.Views.Helpers;
@@ -15,13 +16,16 @@ public sealed partial class SplashScreenWindow : Window {
 	/// </summary>
 	public SplashScreenViewModel ViewModel {
 		get;
-	} = new();
+	}
 
-	public SplashScreenWindow(IConfigStore configStore) {
+	private readonly CompositeDisposable _disposable = new();
+
+	public SplashScreenWindow(IConfigStore configStore, IStringProvider? stringProvider = null) {
+		this.ViewModel = new SplashScreenViewModel(stringProvider).AddTo(this._disposable);
 		this.InitializeComponent();
 
 		// テーマを適用
-		ThemeHelper.BindTheme(this, configStore, this.ViewModel.CompositeDisposable);
+		ThemeHelper.BindTheme(this, configStore, this._disposable);
 
 		// ウィンドウタイトルを設定
 		this.Title = "MediaDeck";
@@ -45,7 +49,7 @@ public sealed partial class SplashScreenWindow : Window {
 		// 画面中央に配置
 		this.CenterWindow();
 
-		this.Closed += (s, e) => this.ViewModel.Dispose();
+		this.Closed += (s, e) => this._disposable.Dispose();
 	}
 
 	/// <summary>

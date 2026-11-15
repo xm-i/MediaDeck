@@ -1,32 +1,80 @@
 using System.Collections.ObjectModel;
+using MediaDeck.Composition.Interfaces;
+using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Core.Models.Files;
 
 namespace MediaDeck.ViewModels.Panes.ViewerPanes;
 
+/// <summary>
+/// メディアアイテムをリスト形式（詳細表形式）で表示するビューの ViewModel。
+/// </summary>
 [Inject(InjectServiceLifetime.Transient)]
 public class ListViewerViewModel : ViewerPaneViewModelBase {
 	/// <summary>
 	/// 列ID定数。 View 側の DataTemplate キーと対応させる。
 	/// </summary>
 	public static class ColumnIds {
-		public const string Thumbnail = "Thumbnail";
-		public const string FileName = "FileName";
-		public const string Resolution = "Resolution";
-		public const string FileSize = "FileSize";
-		public const string CreationTime = "CreationTime";
-		public const string Rate = "Rate";
+		/// <summary>サムネイル列 ID。</summary>
+		public const string Thumbnail = MediaDeck.Composition.Constants.ListViewerColumnIds.Thumbnail;
+
+		/// <summary>ファイル名列 ID。</summary>
+		public const string FileName = MediaDeck.Composition.Constants.ListViewerColumnIds.FileName;
+
+		/// <summary>解像度列 ID。</summary>
+		public const string Resolution = MediaDeck.Composition.Constants.ListViewerColumnIds.Resolution;
+
+		/// <summary>ファイルサイズ列 ID。</summary>
+		public const string FileSize = MediaDeck.Composition.Constants.ListViewerColumnIds.FileSize;
+
+		/// <summary>作成日時列 ID。</summary>
+		public const string CreationTime = MediaDeck.Composition.Constants.ListViewerColumnIds.CreationTime;
+
+		/// <summary>評価列 ID。</summary>
+		public const string Rate = MediaDeck.Composition.Constants.ListViewerColumnIds.Rate;
 	}
 
-	public ListViewerViewModel(FilesManager filesManager, TabStateModel tabState) : base(ViewerType.List, "List", "\uE8FD", filesManager) {
+	/// <summary>
+	/// <see cref="ListViewerViewModel"/> クラスの新しいインスタンスを初期化します。
+	/// </summary>
+	/// <param name="filesManager">ファイル管理モデル</param>
+	/// <param name="mediaContentLibraryViewModel">メディアコンテンツライブラリViewModel</param>
+	/// <param name="searchConditionManagerViewModel">検索条件管理ViewModel</param>
+	/// <param name="tabState">タブ状態モデル</param>
+	/// <param name="stringProvider">文字列プロバイダー</param>
+	/// <param name="executionConfig">外部実行設定モデル</param>
+	public ListViewerViewModel(
+		FilesManager filesManager,
+		MediaContentLibraryViewModel mediaContentLibraryViewModel,
+		SearchConditionManagerViewModel searchConditionManagerViewModel,
+		TabStateModel tabState,
+		IStringProvider stringProvider,
+		ExecutionConfigModel executionConfig)
+		: base(ViewerType.List, "List", "\uE8FD", filesManager, mediaContentLibraryViewModel, searchConditionManagerViewModel, tabState, executionConfig) {
 		var viewerState = tabState.ViewerState;
 
-		this.ThumbnailColumn = new ListViewerColumn(ColumnIds.Thumbnail, "", 60, minWidth: 20, canHide: false);
-		this.FileNameColumn = new ListViewerColumn(ColumnIds.FileName, "ファイル名", viewerState.ListFileNameColumnWidth.Value, minWidth: 120, isVisible: viewerState.ListFileNameColumnVisible.Value);
-		this.ResolutionColumn = new ListViewerColumn(ColumnIds.Resolution, "解像度", viewerState.ListResolutionColumnWidth.Value, minWidth: 60, isVisible: viewerState.ListResolutionColumnVisible.Value);
-		this.FileSizeColumn = new ListViewerColumn(ColumnIds.FileSize, "サイズ", viewerState.ListFileSizeColumnWidth.Value, minWidth: 60, isVisible: viewerState.ListFileSizeColumnVisible.Value);
-		this.CreationTimeColumn = new ListViewerColumn(ColumnIds.CreationTime, "作成日時", viewerState.ListCreationTimeColumnWidth.Value, minWidth: 80, isVisible: viewerState.ListCreationTimeColumnVisible.Value);
-		this.RateColumn = new ListViewerColumn(ColumnIds.Rate, "評価", viewerState.ListRateColumnWidth.Value, minWidth: 40, isVisible: viewerState.ListRateColumnVisible.Value);
+		ListViewerColumn CreateBoundColumn(string columnId, string header, double defaultWidth, double minWidth, bool defaultVisible = true) {
+			var colState = viewerState.GetOrCreateColumnState(columnId, defaultWidth, defaultVisible);
+			var column = new ListViewerColumn(columnId, header, colState.Width.Value, minWidth: minWidth, isVisible: colState.IsVisible.Value);
+
+			column.Width
+				.Skip(1)
+				.Subscribe(x => colState.Width.Value = x)
+				.AddTo(this.CompositeDisposable);
+			column.IsVisible
+				.Skip(1)
+				.Subscribe(x => colState.IsVisible.Value = x)
+				.AddTo(this.CompositeDisposable);
+
+			return column;
+		}
+
+		this.ThumbnailColumn = new ListViewerColumn(ColumnIds.Thumbnail, "", 60, minWidth: 20, canHide: false).AddTo(this.CompositeDisposable);
+		this.FileNameColumn = CreateBoundColumn(ColumnIds.FileName, stringProvider.GetString("Viewer_ColumnFileName.Text"), 400, minWidth: 120).AddTo(this.CompositeDisposable);
+		this.ResolutionColumn = CreateBoundColumn(ColumnIds.Resolution, stringProvider.GetString("Viewer_ColumnResolution.Text"), 100, minWidth: 60).AddTo(this.CompositeDisposable);
+		this.FileSizeColumn = CreateBoundColumn(ColumnIds.FileSize, stringProvider.GetString("Viewer_ColumnSize.Text"), 100, minWidth: 60).AddTo(this.CompositeDisposable);
+		this.CreationTimeColumn = CreateBoundColumn(ColumnIds.CreationTime, stringProvider.GetString("Viewer_ColumnCreationTime.Text"), 150, minWidth: 80).AddTo(this.CompositeDisposable);
+		this.RateColumn = CreateBoundColumn(ColumnIds.Rate, stringProvider.GetString("Viewer_ColumnRate.Text"), 60, minWidth: 40).AddTo(this.CompositeDisposable);
 
 		this.AllColumns = [
 			this.ThumbnailColumn,
@@ -36,63 +84,34 @@ public class ListViewerViewModel : ViewerPaneViewModelBase {
 			this.CreationTimeColumn,
 			this.RateColumn,
 		];
-
-		this.FileNameColumn.Width
-			.Subscribe(x => viewerState.ListFileNameColumnWidth.Value = x)
-			.AddTo(this.CompositeDisposable);
-		this.FileNameColumn.IsVisible
-			.Subscribe(x => viewerState.ListFileNameColumnVisible.Value = x)
-			.AddTo(this.CompositeDisposable);
-
-		this.ResolutionColumn.Width
-			.Subscribe(x => viewerState.ListResolutionColumnWidth.Value = x)
-			.AddTo(this.CompositeDisposable);
-		this.ResolutionColumn.IsVisible
-			.Subscribe(x => viewerState.ListResolutionColumnVisible.Value = x)
-			.AddTo(this.CompositeDisposable);
-
-		this.FileSizeColumn.Width
-			.Subscribe(x => viewerState.ListFileSizeColumnWidth.Value = x)
-			.AddTo(this.CompositeDisposable);
-		this.FileSizeColumn.IsVisible
-			.Subscribe(x => viewerState.ListFileSizeColumnVisible.Value = x)
-			.AddTo(this.CompositeDisposable);
-
-		this.CreationTimeColumn.Width
-			.Subscribe(x => viewerState.ListCreationTimeColumnWidth.Value = x)
-			.AddTo(this.CompositeDisposable);
-		this.CreationTimeColumn.IsVisible
-			.Subscribe(x => viewerState.ListCreationTimeColumnVisible.Value = x)
-			.AddTo(this.CompositeDisposable);
-
-		this.RateColumn.Width
-			.Subscribe(x => viewerState.ListRateColumnWidth.Value = x)
-			.AddTo(this.CompositeDisposable);
-		this.RateColumn.IsVisible
-			.Subscribe(x => viewerState.ListRateColumnVisible.Value = x)
-			.AddTo(this.CompositeDisposable);
 	}
 
+	/// <summary>サムネイル列を取得します。</summary>
 	public ListViewerColumn ThumbnailColumn {
 		get;
 	}
 
+	/// <summary>ファイル名列を取得します。</summary>
 	public ListViewerColumn FileNameColumn {
 		get;
 	}
 
+	/// <summary>解像度列を取得します。</summary>
 	public ListViewerColumn ResolutionColumn {
 		get;
 	}
 
+	/// <summary>ファイルサイズ列を取得します。</summary>
 	public ListViewerColumn FileSizeColumn {
 		get;
 	}
 
+	/// <summary>作成日時列を取得します。</summary>
 	public ListViewerColumn CreationTimeColumn {
 		get;
 	}
 
+	/// <summary>評価列を取得します。</summary>
 	public ListViewerColumn RateColumn {
 		get;
 	}

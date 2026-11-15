@@ -11,10 +11,10 @@ public sealed class ListViewerColumn : ViewModelBase {
 		this.Header = header;
 		this.MinWidth = minWidth;
 		this.CanHide = canHide;
-		this.Width = new BindableReactiveProperty<double>(width);
-		this.IsVisible = new BindableReactiveProperty<bool>(isVisible);
-		this.EffectiveWidth = new BindableReactiveProperty<double>(isVisible ? width : 0);
-		this.EffectiveMinWidth = new BindableReactiveProperty<double>(isVisible ? minWidth : 0);
+		this.Width = new BindableReactiveProperty<double>(width).AddTo(this.CompositeDisposable);
+		this.IsVisible = new BindableReactiveProperty<bool>(isVisible).AddTo(this.CompositeDisposable);
+		this.EffectiveWidth = new BindableReactiveProperty<double>(isVisible ? width : 0).AddTo(this.CompositeDisposable);
+		this.EffectiveMinWidth = new BindableReactiveProperty<double>(isVisible ? minWidth : 0).AddTo(this.CompositeDisposable);
 
 		this.Width
 			.Subscribe(x => {

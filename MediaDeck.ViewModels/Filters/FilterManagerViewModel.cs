@@ -1,4 +1,5 @@
 using MediaDeck.Common.Base;
+using MediaDeck.Common.Extensions;
 using MediaDeck.Composition.Interfaces;
 using MediaDeck.Core.Models.Files.Filter;
 using MediaDeck.ViewModels.Filters.FilterItemCreators;
@@ -86,17 +87,20 @@ public class FilterManagerViewModel : ViewModelBase {
 			this.Save();
 		}).AddTo(this.CompositeDisposable);
 
-		this.FilteringConditions = filterManager.FilteringConditions.CreateView(x => new FilteringConditionEditorViewModel(x)).ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
+		this.FilteringConditions = filterManager.FilteringConditions
+			.CreateViewWithDisposal(x => new FilteringConditionEditorViewModel(x))
+			.ToNotifyCollectionChangedWithDisposal(SynchronizationContextCollectionEventDispatcher.Current)
+			.AddTo(this.CompositeDisposable);
 
 		this.FilterCreatorViewModels = [
-			new ExistsFilterCreatorViewModel(this.CurrentCondition, stringProvider),
-			new FilePathFilterCreatorViewModel(this.CurrentCondition, stringProvider),
-			new LocationFilterCreatorViewModel(this.CurrentCondition, stringProvider),
-			new MediaTypeFilterCreatorViewModel(this.CurrentCondition, stringProvider),
-			new RateFilterCreatorViewModel(this.CurrentCondition, stringProvider),
-			new ResolutionFilterCreatorViewModel(this.CurrentCondition, stringProvider),
-			new TagFilterCreatorViewModel(this.CurrentCondition, stringProvider),
-			new FolderGroupFilterCreatorViewModel(this.CurrentCondition, stringProvider)
+			new ExistsFilterCreatorViewModel(this.CurrentCondition, stringProvider).AddTo(this.CompositeDisposable),
+			new FilePathFilterCreatorViewModel(this.CurrentCondition, stringProvider).AddTo(this.CompositeDisposable),
+			new LocationFilterCreatorViewModel(this.CurrentCondition, stringProvider).AddTo(this.CompositeDisposable),
+			new MediaTypeFilterCreatorViewModel(this.CurrentCondition, stringProvider).AddTo(this.CompositeDisposable),
+			new RateFilterCreatorViewModel(this.CurrentCondition, stringProvider).AddTo(this.CompositeDisposable),
+			new ResolutionFilterCreatorViewModel(this.CurrentCondition, stringProvider).AddTo(this.CompositeDisposable),
+			new TagFilterCreatorViewModel(this.CurrentCondition, stringProvider).AddTo(this.CompositeDisposable),
+			new FolderGroupFilterCreatorViewModel(this.CurrentCondition, stringProvider).AddTo(this.CompositeDisposable)
 		];
 		this.SelectedFilterCreatorViewModel.Value = this.FilterCreatorViewModels.First();
 	}

@@ -55,15 +55,15 @@
 			Padding="8">
 			<Button controls:DockPanel.Dock="Right"
 				Command="{x:Bind ViewModel.RecreateThumbnailCommand}">
-				<TextBlock Text="Recreate" />
+				<TextBlock x:Uid="ThumbnailPicker_Recreate" />
 			</Button>
 			<Button controls:DockPanel.Dock="Right"
 				Command="{x:Bind ViewModel.PickThumbnailFromFileCommand}">
-				<TextBlock Text="Browse..." />
+				<TextBlock x:Uid="ThumbnailPicker_Browse" />
 			</Button>
 			<Button controls:DockPanel.Dock="Right"
 				Command="{x:Bind ViewModel.SaveCommand}">
-				<TextBlock Text="Save" />
+				<TextBlock x:Uid="ThumbnailPicker_Save" />
 			</Button>
 			<Grid />
 		</controls:DockPanel>

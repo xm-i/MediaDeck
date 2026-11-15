@@ -36,14 +36,15 @@ public class FilteringConditionEditorViewModel : ViewModelBase {
 
 	public FilteringConditionEditorViewModel(FilteringConditionEditor model) {
 		this.Model = model;
-		this.DisplayName = this.Model.DisplayName.ToBindableReactiveProperty(null!);
+		this.DisplayName = this.Model.DisplayName.ToBindableReactiveProperty(null!).AddTo(this.CompositeDisposable);
 		this.DisplayName.Subscribe(x => {
 			this.Model.DisplayName.Value = x;
 		}).AddTo(this.CompositeDisposable);
 
-		this.FilterItems = this.Model.FilterItemObjects.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
+		this.FilterItems = this.Model.FilterItemObjects.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current).AddTo(this.CompositeDisposable);
 
 		// 削除
+		this.RemoveFilterCommand.AddTo(this.CompositeDisposable);
 		this.RemoveFilterCommand.Subscribe(this.Model.RemoveFilter).AddTo(this.CompositeDisposable);
 	}
 

@@ -96,4 +96,79 @@
   <data name="ExecConfig_ExecutionTypeLabel.Text" xml:space="preserve">
     <value>実行タイプ</value>
   </data>
+
+  <!-- 一括サムネイル再生成設定 -->
+  <data name="ArchiveBulkThumbnailConfig_Title.Text" xml:space="preserve">
+    <value>アーカイブ (Archive)</value>
+  </data>
+  <data name="ArchiveBulkThumbnailConfig_Description.Text" xml:space="preserve">
+    <value>アーカイブ内画像エントリの何番目を代表サムネイルとするかを指定します。</value>
+  </data>
+  <data name="ArchiveBulkThumbnailConfig_EntryIndex.Header" xml:space="preserve">
+    <value>エントリ番号 (1 始まり)</value>
+  </data>
+
+  <data name="FolderGroupBulkThumbnailConfig_Title.Text" xml:space="preserve">
+    <value>フォルダグループ (FolderGroup)</value>
+  </data>
+  <data name="FolderGroupBulkThumbnailConfig_Description.Text" xml:space="preserve">
+    <value>フォルダ内アイテムの何番目を代表サムネイルとして用いるかを指定します。</value>
+  </data>
+  <data name="FolderGroupBulkThumbnailConfig_ItemIndex.Header" xml:space="preserve">
+    <value>アイテム番号 (1 始まり)</value>
+  </data>
+
+  <data name="ImageBulkThumbnailConfig_Title.Text" xml:space="preserve">
+    <value>画像 (Image)</value>
+  </data>
+  <data name="ImageBulkThumbnailConfig_Description.Text" xml:space="preserve">
+    <value>このメディアタイプには追加の設定はありません。各ファイルの先頭画像からサムネイルを再生成します。</value>
+  </data>
+
+  <data name="PdfBulkThumbnailConfig_Title.Text" xml:space="preserve">
+    <value>PDF</value>
+  </data>
+  <data name="PdfBulkThumbnailConfig_Description.Text" xml:space="preserve">
+    <value>サムネイルとして抽出するページ番号を指定してください。</value>
+  </data>
+  <data name="PdfBulkThumbnailConfig_PageNumber.Header" xml:space="preserve">
+    <value>ページ番号 (1 始まり)</value>
+  </data>
+
+  <data name="UnknownBulkThumbnailConfig_Message.Text" xml:space="preserve">
+    <value>未対応のメディアタイプです。</value>
+  </data>
+
+  <data name="VideoBulkThumbnailConfig_Title.Text" xml:space="preserve">
+    <value>動画 (Video)</value>
+  </data>
+  <data name="VideoBulkThumbnailConfig_Description.Text" xml:space="preserve">
+    <value>サムネイル抽出位置の指定方法を選択してください。</value>
+  </data>
+  <data name="VideoBulkThumbnailConfig_Mode.Header" xml:space="preserve">
+    <value>抽出方法</value>
+  </data>
+  <data name="VideoBulkThumbnailConfig_ModeSeconds.Content" xml:space="preserve">
+    <value>開始からの秒数指定</value>
+  </data>
+  <data name="VideoBulkThumbnailConfig_ModePercentage.Content" xml:space="preserve">
+    <value>全体長の % 指定</value>
+  </data>
+  <data name="VideoBulkThumbnailConfig_Seconds.Header" xml:space="preserve">
+    <value>位置 (秒)</value>
+  </data>
+  <data name="VideoBulkThumbnailConfig_Percentage.Header" xml:space="preserve">
+    <value>位置 (%)</value>
+  </data>
+
+  <!-- サムネイルピッカー共通ボタン -->
+  <data name="ThumbnailPicker_Recreate.Text" xml:space="preserve">
+    <value>再生成</value>
+  </data>
+  <data name="ThumbnailPicker_Browse.Text" xml:space="preserve">
+    <value>参照...</value>
+  </data>
+  <data name="ThumbnailPicker_Save.Text" xml:space="preserve">
+    <value>保存</value>
+  </data>
 </root>

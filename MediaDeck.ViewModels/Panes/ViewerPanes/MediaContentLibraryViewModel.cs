@@ -1,4 +1,6 @@
 using MediaDeck.Common.Base;
+using MediaDeck.Common.Collections;
+using MediaDeck.Common.Extensions;
 using MediaDeck.Composition.Interfaces.MediaItemTypes;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.ViewModels;
 using MediaDeck.Composition.Interfaces.Notifications;
@@ -17,7 +19,10 @@ public class MediaContentLibraryViewModel : ViewModelBase {
 		this._albumRepository = albumRepository;
 		this._backgroundTasksModel = backgroundTasksModel;
 		this.SearchConditionManagerViewModel = searchConditionManagerViewModel;
-		this.Files = mediaContentLibrary.Files.CreateView(MediaItemTypeService.CreateMediaItemViewModel).ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
+		this.Files = mediaContentLibrary.Files
+			.CreateViewWithDisposal(MediaItemTypeService.CreateMediaItemViewModel)
+			.ToNotifyCollectionChangedWithDisposal(SynchronizationContextCollectionEventDispatcher.Current)
+			.AddTo(this.CompositeDisposable);
 		this.SearchElapsedMilliseconds = mediaContentLibrary.SearchElapsedMilliseconds.ObserveOnCurrentSynchronizationContext().ToBindableReactiveProperty().AddTo(this.CompositeDisposable);
 		this.CanLoadMore = mediaContentLibrary.CanLoadMore.ObserveOnCurrentSynchronizationContext().ToBindableReactiveProperty().AddTo(this.CompositeDisposable);
 		this.TotalCount = mediaContentLibrary.TotalCount.ObserveOnCurrentSynchronizationContext().ToBindableReactiveProperty().AddTo(this.CompositeDisposable);
@@ -28,6 +33,15 @@ public class MediaContentLibraryViewModel : ViewModelBase {
 				await mediaContentLibrary.LoadMoreAsync(ct).ConfigureAwait(false);
 			}, AwaitOperation.Drop)
 			.AddTo(this.CompositeDisposable);
+		this.SelectedFile = new BindableReactiveProperty<IMediaItemViewModel?>(null).AddTo(this.CompositeDisposable);
+		this.SelectedFiles = new BindableReactiveProperty<IMediaItemViewModel[]>([]).AddTo(this.CompositeDisposable);
+
+		this.Files.CollectionChanged += (s, e) => {
+			if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Reset) {
+				this.SelectedFile.Value = null;
+				this.SelectedFiles.Value = [];
+			}
+		};
 	}
 
 	public ReactiveCommand LoadMoreCommand {
@@ -46,7 +60,7 @@ public class MediaContentLibraryViewModel : ViewModelBase {
 		get;
 	}
 
-	public NotifyCollectionChangedSynchronizedViewList<IMediaItemViewModel> Files {
+	public DisposingNotifyCollectionChangedSynchronizedViewList<IMediaItemViewModel> Files {
 		get;
 	}
 
@@ -62,13 +76,13 @@ public class MediaContentLibraryViewModel : ViewModelBase {
 		}
 	}
 
-	public BindableReactiveProperty<IMediaItemViewModel> SelectedFile {
+	public BindableReactiveProperty<IMediaItemViewModel?> SelectedFile {
 		get;
-	} = new();
+	}
 
 	public BindableReactiveProperty<IMediaItemViewModel[]> SelectedFiles {
 		get;
-	} = new([]);
+	}
 
 	public BindableReactiveProperty<long?> SearchElapsedMilliseconds {
 		get;

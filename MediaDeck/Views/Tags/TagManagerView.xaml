@@ -27,8 +27,6 @@
 				<RowDefinition Height="*" />
 				<RowDefinition Height="8" />
 				<RowDefinition Height="Auto" />
-				<RowDefinition Height="8" />
-				<RowDefinition Height="Auto" />
 			</Grid.RowDefinitions>
 
 			<TextBlock Grid.Row="0"
@@ -42,20 +40,64 @@
 				CornerRadius="4" >
 				<ListBox ItemsSource="{x:Bind ViewModel.TagCategories, Mode=OneWay}"
 					SelectedItem="{x:Bind ViewModel.SelectedTagCategory.Value, Mode=TwoWay}" >
+					<ListBox.ItemContainerStyle>
+						<Style TargetType="ListBoxItem" >
+							<Setter Property="HorizontalContentAlignment"
+								Value="Stretch" />
+						</Style>
+					</ListBox.ItemContainerStyle>
 					<ItemsControl.ItemTemplate>
 						<DataTemplate x:DataType="tags:TagCategoryViewModel" >
-							<TextBlock Text="{x:Bind TagCategoryName.Value}"
-								TextTrimming="CharacterEllipsis" />
+							<Grid Background="Transparent"
+								Tag="{x:Bind}"
+								DoubleTapped="TagCategoryItem_DoubleTapped"
+								RightTapped="TagCategoryItem_RightTapped" >
+								<StackPanel Spacing="2" >
+									<TextBlock Text="{x:Bind TagCategoryName.Value, Mode=OneWay}"
+										TextTrimming="CharacterEllipsis" />
+									<TextBlock
+										Text="{x:Bind Detail.Value, Mode=OneWay}"
+										Visibility="{x:Bind Detail.Value, Mode=OneWay, Converter={StaticResource StringNotEmptyToVisibilityConverter}}"
+										FontSize="10"
+										Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+										TextTrimming="CharacterEllipsis" />
+								</StackPanel>
+								<FlyoutBase.AttachedFlyout>
+									<MenuFlyout>
+										<MenuFlyoutItem x:Uid="TagManager_EditCategoryMenu"
+											Tag="{x:Bind}"
+											Click="EditTagCategoryMenuItem_Click"
+											IsEnabled="{x:Bind IsEditable}" >
+											<MenuFlyoutItem.Icon>
+												<FontIcon Glyph="&#xE70F;" />
+											</MenuFlyoutItem.Icon>
+										</MenuFlyoutItem>
+										<MenuFlyoutItem x:Uid="TagManager_DeleteCategoryMenu"
+											Tag="{x:Bind}"
+											Click="DeleteTagCategoryMenuItem_Click"
+											IsEnabled="{x:Bind IsDeletable}" >
+											<MenuFlyoutItem.Icon>
+												<FontIcon Glyph="&#xE74D;" />
+											</MenuFlyoutItem.Icon>
+										</MenuFlyoutItem>
+									</MenuFlyout>
+								</FlyoutBase.AttachedFlyout>
+							</Grid>
 						</DataTemplate>
 					</ItemsControl.ItemTemplate>
 				</ListBox>
 			</Border>
 
-			<StackPanel Grid.Row="4"
-				Orientation="Horizontal"
-				Spacing="8" >
-				<Button Command="{x:Bind ViewModel.AddTagCategoryCommand}"
-					ToolTipService.ToolTip="新しいタグカテゴリを追加" >
+			<Grid Grid.Row="4" >
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="Auto" />
+					<ColumnDefinition Width="*" />
+					<ColumnDefinition Width="Auto" />
+				</Grid.ColumnDefinitions>
+
+				<Button Grid.Column="0"
+					Command="{x:Bind ViewModel.AddTagCategoryCommand}"
+					x:Uid="TagManager_AddTagCategory" >
 					<StackPanel Orientation="Horizontal"
 						Spacing="6" >
 						<FontIcon Glyph="&#xF8AA;"
@@ -63,41 +105,36 @@
 						<TextBlock x:Uid="Common_Add" />
 					</StackPanel>
 				</Button>
-			</StackPanel>
 
-			<!-- カテゴリ編集エリア -->
-			<StackPanel Grid.Row="6"
-				Spacing="6"
-				Visibility="{x:Bind ViewModel.SelectedTagCategory.Value, Mode=OneWay, Converter={StaticResource NullToCollapseConverter}}" >
-				<TextBlock x:Uid="TagManager_CategoryName"
-					FontWeight="SemiBold" />
-				<TextBox
-					Text="{x:Bind ViewModel.SelectedTagCategory.Value.TagCategoryName.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-					x:Uid="TagManager_CategoryNameInput" />
-				<TextBlock x:Uid="TagManager_Detail"
-					FontWeight="SemiBold" />
-				<TextBox
-					Text="{x:Bind ViewModel.SelectedTagCategory.Value.Detail.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-					x:Uid="TagManager_DetailInput" />
-				<Button Click="DeleteTagCategoryButton_Click"
-					Margin="0,8,0,0"
-					HorizontalAlignment="Right"
-					IsEnabled="{x:Bind ViewModel.SelectedTagCategory.Value.IsDeletable, Mode=OneWay}" >
-					<StackPanel Orientation="Horizontal" Spacing="6">
-						<FontIcon Glyph="&#xE74D;" FontSize="12" Foreground="{ThemeResource SystemFillColorCriticalBrush}" />
-						<TextBlock x:Uid="TagManager_DeleteCategory" Foreground="{ThemeResource SystemFillColorCriticalBrush}" />
-					</StackPanel>
-				</Button>
-			</StackPanel>
+				<StackPanel Grid.Column="2"
+					Orientation="Horizontal"
+					Spacing="6" >
+					<Button Command="{x:Bind ViewModel.EditTagCategoryCommand}"
+						CommandParameter="{x:Bind ViewModel.SelectedTagCategory.Value, Mode=OneWay}"
+						IsEnabled="{x:Bind ViewModel.CanEditSelectedCategory.Value, Mode=OneWay}"
+						x:Uid="TagManager_EditTagCategory"
+						Padding="8" >
+						<FontIcon Glyph="&#xE70F;"
+							FontSize="14" />
+					</Button>
+					<Button Click="DeleteTagCategoryButton_Click"
+						IsEnabled="{x:Bind ViewModel.CanEditSelectedCategory.Value, Mode=OneWay}"
+						x:Uid="TagManager_DeleteTagCategory"
+						Padding="8" >
+						<FontIcon Glyph="&#xE74D;"
+							FontSize="14"
+							Foreground="{ThemeResource SystemFillColorCriticalBrush}" />
+					</Button>
+				</StackPanel>
+			</Grid>
 		</Grid>
 
-
-		<!-- 区切り2 -->
+		<!-- 区切り1 -->
 		<toolkit:GridSplitter Grid.Column="1"
 			Width="4"
 			HorizontalAlignment="Center"
 			ResizeBehavior="BasedOnAlignment" />
-		
+
 		<!-- タグ一覧 -->
 		<Grid Grid.Column="2" >
 			<Grid.RowDefinitions>
@@ -106,6 +143,8 @@
 				<RowDefinition Height="Auto" />
 				<RowDefinition Height="8" />
 				<RowDefinition Height="*" />
+				<RowDefinition Height="8" />
+				<RowDefinition Height="Auto" />
 			</Grid.RowDefinitions>
 
 			<TextBlock Grid.Row="0"
@@ -123,6 +162,12 @@
 				CornerRadius="4" >
 				<ListBox ItemsSource="{x:Bind ViewModel.SelectedTagCategory.Value.FilteredTags, Mode=OneWay}"
 					SelectedItem="{x:Bind ViewModel.SelectedTagCategory.Value.SelectedTag.Value, Mode=TwoWay}" >
+					<ListBox.ItemContainerStyle>
+						<Style TargetType="ListBoxItem" >
+							<Setter Property="HorizontalContentAlignment"
+								Value="Stretch" />
+						</Style>
+					</ListBox.ItemContainerStyle>
 					<ItemsControl.ItemTemplate>
 						<DataTemplate x:DataType="tags:TagViewModel" >
 							<StackPanel Spacing="2" >
@@ -142,6 +187,20 @@
 					</ItemsControl.ItemTemplate>
 				</ListBox>
 			</Border>
+
+			<StackPanel Grid.Row="6"
+				Orientation="Horizontal"
+				Spacing="8" >
+				<Button Command="{x:Bind ViewModel.AddTagCommand}"
+					x:Uid="TagManager_AddTag" >
+					<StackPanel Orientation="Horizontal"
+						Spacing="6" >
+						<FontIcon Glyph="&#xF8AA;"
+							FontSize="12" />
+						<TextBlock x:Uid="Common_Add" />
+					</StackPanel>
+				</Button>
+			</StackPanel>
 		</Grid>
 
 		<!-- 区切り2 -->
@@ -151,139 +210,10 @@
 			ResizeBehavior="BasedOnAlignment" />
 
 		<!-- タグ編集エリア -->
-		<Border Grid.Column="4"
+		<local:TagDetailView Grid.Column="4"
+			ViewModel="{x:Bind ViewModel.SelectedTagCategory.Value.SelectedTag.Value, Mode=OneWay}"
+			Categories="{x:Bind ViewModel.TagCategories, Mode=OneWay}"
 			Visibility="{x:Bind ViewModel.SelectedTagCategory.Value.SelectedTag.Value, Mode=OneWay, Converter={StaticResource NullToCollapseConverter}}"
-			Padding="16"
-			Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-			BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
-			BorderThickness="1"
-			CornerRadius="8" >
-			<Grid>
-				<Grid.RowDefinitions>
-					<RowDefinition Height="Auto" />
-					<RowDefinition Height="16" />
-					<RowDefinition Height="Auto" />
-					<RowDefinition Height="16" />
-					<RowDefinition Height="*" />
-					<RowDefinition Height="8" />
-					<RowDefinition Height="Auto" />
-				</Grid.RowDefinitions>
-
-				<!-- タグ名入力 -->
-				<StackPanel Grid.Row="0"
-					Spacing="6" >
-					<TextBlock x:Uid="TagManager_TagName"
-						FontWeight="SemiBold" />
-					<TextBox
-						Text="{x:Bind ViewModel.SelectedTagCategory.Value.SelectedTag.Value.TagName.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-						x:Uid="TagManager_TagNameInput" />
-					
-					<TextBlock x:Uid="TagManager_Ruby"
-						FontWeight="SemiBold"
-						Margin="0,8,0,0" />
-					<TextBox
-						Text="{x:Bind ViewModel.SelectedTagCategory.Value.SelectedTag.Value.Ruby.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-						x:Uid="TagManager_RubyInput" />
-				</StackPanel>
-
-				<!-- カテゴリ選択 -->
-				<StackPanel Grid.Row="2"
-					Spacing="6" >
-					<TextBlock x:Uid="TagManager_ParentCategory"
-						FontWeight="SemiBold" />
-					<ComboBox HorizontalAlignment="Stretch"
-						ItemsSource="{x:Bind ViewModel.TagCategories, Mode=OneWay}"
-						SelectedItem="{x:Bind ViewModel.SelectedTagCategory.Value.SelectedTag.Value.TagCategory.Value, Mode=TwoWay}" >
-						<ComboBox.ItemTemplate>
-							<DataTemplate x:DataType="tags:TagCategoryViewModel" >
-								<TextBlock Text="{x:Bind TagCategoryName.Value}" />
-							</DataTemplate>
-						</ComboBox.ItemTemplate>
-					</ComboBox>
-				</StackPanel>
-
-				<!-- エイリアス一覧 -->
-				<Grid Grid.Row="4" >
-					<Grid.RowDefinitions>
-						<RowDefinition Height="Auto" />
-						<RowDefinition Height="8" />
-						<RowDefinition Height="*" />
-					</Grid.RowDefinitions>
-
-					<TextBlock Grid.Row="0"
-						x:Uid="TagManager_Aliases"
-						FontWeight="SemiBold" />
-
-					<Border Grid.Row="2"
-						BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
-						BorderThickness="1"
-						CornerRadius="4" >
-						<ScrollViewer>
-							<ItemsControl
-								ItemsSource="{x:Bind ViewModel.SelectedTagCategory.Value.SelectedTag.Value.TagAliases, Mode=OneWay}" >
-								<ItemsControl.ItemTemplate>
-									<DataTemplate x:DataType="tags:TagAliasViewModel" >
-										<Grid Padding="8"
-											BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
-											BorderThickness="0,0,0,1" >
-											<Grid.ColumnDefinitions>
-												<ColumnDefinition Width="*" />
-												<ColumnDefinition Width="8" />
-												<ColumnDefinition Width="*" />
-												<ColumnDefinition Width="8" />
-												<ColumnDefinition Width="Auto" />
-											</Grid.ColumnDefinitions>
-											<TextBox Grid.Column="0"
-												Text="{x:Bind Alias.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-												x:Uid="TagManager_AliasInput" />
-											<TextBox Grid.Column="2"
-												Text="{x:Bind Ruby.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-												x:Uid="TagManager_RubyInputShort" />
-											<Button Grid.Column="4"
-												Command="{Binding DataContext.SelectedTagCategory.Value.SelectedTag.Value.RemoveTagAliasCommand, ElementName=Root}"
-												CommandParameter="{x:Bind Mode=OneWay}"
-												x:Uid="Common_Delete_ToolTip"
-												Padding="6" >
-												<FontIcon Glyph="&#xF78A;"
-													FontSize="12" />
-											</Button>
-										</Grid>
-									</DataTemplate>
-								</ItemsControl.ItemTemplate>
-							</ItemsControl>
-						</ScrollViewer>
-					</Border>
-				</Grid>
-
-				<!-- ボタンエリア -->
-				<Grid Grid.Row="6">
-					<Grid.ColumnDefinitions>
-						<ColumnDefinition Width="Auto" />
-						<ColumnDefinition Width="*" />
-						<ColumnDefinition Width="Auto" />
-					</Grid.ColumnDefinitions>
-					
-					<!-- エイリアス追加ボタン -->
-					<Button Grid.Column="0"
-						Command="{x:Bind ViewModel.SelectedTagCategory.Value.SelectedTag.Value.AddTagAliasCommand, Mode=OneWay}" >
-						<StackPanel Orientation="Horizontal"
-							Spacing="6" >
-							<FontIcon Glyph="&#xF8AA;"
-								FontSize="12" />
-							<TextBlock x:Uid="TagManager_AddAlias" />
-						</StackPanel>
-					</Button>
-
-					<!-- タグ削除ボタン -->
-					<Button Grid.Column="2" 
-						Click="DeleteTagButton_Click" >
-						<StackPanel Orientation="Horizontal" Spacing="6">
-							<FontIcon Glyph="&#xE74D;" FontSize="12" Foreground="{ThemeResource SystemFillColorCriticalBrush}" />
-							<TextBlock x:Uid="TagManager_DeleteTag" Foreground="{ThemeResource SystemFillColorCriticalBrush}" />
-						</StackPanel>
-					</Button>
-				</Grid>
-			</Grid>
-		</Border>
+			DeleteTagRequested="TagDetailView_DeleteTagRequested" />
 	</Grid>
 </local:TagManagerViewUserControl>

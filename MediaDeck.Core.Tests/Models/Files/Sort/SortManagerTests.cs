@@ -33,6 +33,7 @@ public class SortManagerTests {
 		services.AddSingleton<ViewerStateModel>();
 		services.AddSingleton<AppStateModel>();
 		services.AddSingleton<DefaultTabStateModel>();
+		services.AddTransient<ListViewerColumnStateModel>();
 		services.AddSingleton<TabStateModel>();
 		services.AddSingleton<SearchDefinitionsConfigModel>();
 		services.AddSingleton<LanguageConfigModel>();

@@ -56,16 +56,16 @@ public class VideoBulkThumbnailConfigViewModel : BulkThumbnailConfigViewModelBas
 		get;
 	} = new(20);
 
-	protected override Task<byte[]?> GenerateThumbnailAsync(IMediaItemViewModel target) {
-		var time = this.ResolveTime(target.FilePath);
-		return Task.FromResult<byte[]?>(this._videoOperator.CreateThumbnail(target.FileModel, this._config.ThumbnailConfig.ThumbnailSize.Value, this._config.ThumbnailConfig.ThumbnailSize.Value, time));
+	protected override async Task<byte[]?> GenerateThumbnailAsync(IMediaItemViewModel target) {
+		var time = await this.ResolveTimeAsync(target.FilePath).ConfigureAwait(false);
+		return await this._videoOperator.CreateThumbnailAsync(target.FileModel, this._config.ThumbnailConfig.ThumbnailSize.Value, this._config.ThumbnailConfig.ThumbnailSize.Value, time).ConfigureAwait(false);
 	}
 
-	private TimeSpan ResolveTime(string filePath) {
+	private async Task<TimeSpan> ResolveTimeAsync(string filePath) {
 		if (this.Mode.Value == VideoBulkThumbnailMode.Seconds) {
 			return TimeSpan.FromSeconds(Math.Max(0, this.Seconds.Value));
 		}
-		var metadata = FFProbe.Analyse(filePath);
+		var metadata = await FFProbe.AnalyseAsync(filePath).ConfigureAwait(false);
 		var pct = Math.Clamp(this.Percentage.Value, 0, 100) / 100.0;
 		return TimeSpan.FromSeconds(metadata.Duration.TotalSeconds * pct);
 	}

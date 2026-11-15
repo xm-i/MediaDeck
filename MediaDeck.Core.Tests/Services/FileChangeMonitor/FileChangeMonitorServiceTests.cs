@@ -1,12 +1,13 @@
 using MediaDeck.Composition.Database;
+using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.Services;
 using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Composition.Stores.Config.Model.Objects;
 using MediaDeck.Composition.Stores.State.Model.Objects;
+using MediaDeck.Composition.Tables;
 using MediaDeck.Core.Models.Files;
 using MediaDeck.Core.Models.NotificationDispatcher;
 using MediaDeck.Core.Services.FileChangeMonitor;
-using MediaDeck.Core.Stores.State;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,19 +22,19 @@ namespace MediaDeck.Core.Tests.Services.FileChangeMonitor;
 public class FileChangeMonitorServiceTests {
 	private readonly FileChangeMonitorService _sut;
 	private readonly FileChangeTracker _tracker;
+	private readonly DbContextOptions<MediaDeckDbContext> _options;
 
 	public FileChangeMonitorServiceTests() {
-		var options = new DbContextOptionsBuilder<MediaDeckDbContext>()
+		this._options = new DbContextOptionsBuilder<MediaDeckDbContext>()
 			.UseInMemoryDatabase($"FCM_{Guid.NewGuid()}")
 			.Options;
 		var dbFactoryMock = new Mock<IDbContextFactory<MediaDeckDbContext>>();
 		dbFactoryMock.Setup(x => x.CreateDbContextAsync(It.IsAny<CancellationToken>()))
-			.ReturnsAsync(() => new MediaDeckDbContext(options));
+			.ReturnsAsync(() => new MediaDeckDbContext(this._options));
 
 		var trackerLogger = new Mock<ILogger<FileChangeTracker>>();
 		this._tracker = new FileChangeTracker(dbFactoryMock.Object, trackerLogger.Object);
 
-		var stateStore = new Mock<IStateStore>();
 		var logger = new Mock<ILogger<FileChangeMonitorService>>();
 		var appNotifDispatcher = new AppNotificationDispatcher();
 		var dbWriteCoord = new Mock<IDatabaseWriteCoordinator>();
@@ -63,7 +64,8 @@ public class FileChangeMonitorServiceTests {
 		mediaItemTypeService.Setup(x => x.CreateMediaItemOperators()).Returns([]);
 		var fileRegistrar = new FileRegistrar(config, new Mock<ILogger<FileRegistrar>>().Object, mediaItemTypeService.Object);
 
-		this._sut = new FileChangeMonitorService(stateStore.Object, dbFactoryMock.Object, this._tracker, logger.Object, appNotifDispatcher, fileRegistrar, dbWriteCoord.Object);
+		var stringProvider = provider.GetRequiredService<MediaDeck.Composition.Interfaces.IStringProvider>();
+		this._sut = new FileChangeMonitorService(dbFactoryMock.Object, this._tracker, logger.Object, appNotifDispatcher, fileRegistrar, dbWriteCoord.Object, stringProvider);
 	}
 
 	[Fact]
@@ -89,6 +91,43 @@ public class FileChangeMonitorServiceTests {
 		await this._sut.ApplyChangesAsync([item], false);
 
 		this._tracker.UnprocessedChanges.ShouldNotContain(item);
+	}
+
+	[Fact]
+	public async Task ApplyChangesAsync_MovedItem_UpdatesFilePathAndDirectoryPath() {
+		var oldDir = Path.GetFullPath("OldFolder");
+		var newDir = Path.GetFullPath("NewFolder");
+		var oldPath = Path.Combine(oldDir, "image.png");
+		var newPath = Path.Combine(newDir, "image.png");
+
+		await using (var db = new MediaDeckDbContext(this._options)) {
+			db.MediaItems.Add(new MediaItem {
+				MediaItemId = 100,
+				MediaType = MediaType.Image,
+				FilePath = oldPath,
+				DirectoryPath = oldDir,
+				Description = string.Empty,
+				IsUnderFolderGroup = false,
+			});
+			await db.SaveChangesAsync();
+		}
+
+		var item = new FileChangeItem {
+			ChangeType = FileChangeType.Moved,
+			MediaItemId = 100,
+			OldPath = oldPath,
+			NewPath = newPath,
+		};
+		this._tracker.UnprocessedChanges.Add(item);
+
+		await this._sut.ApplyChangesAsync([item], false);
+
+		await using (var db = new MediaDeckDbContext(this._options)) {
+			var updated = await db.MediaItems.FindAsync(100L);
+			updated.ShouldNotBeNull();
+			updated.FilePath.ShouldBe(newPath);
+			updated.DirectoryPath.ShouldBe(newDir);
+		}
 	}
 
 	[Fact]

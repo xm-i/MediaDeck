@@ -1,7 +1,11 @@
 using GenJsonConfig.Attributes;
+using MediaDeck.Composition.Constants;
 
 namespace MediaDeck.Composition.Stores.State.Model;
 
+/// <summary>
+/// ビューワーの状態モデル
+/// </summary>
 [Inject(InjectServiceLifetime.Transient)]
 [GenerateJsonConfigDto]
 public class ViewerStateModel {
@@ -33,74 +37,53 @@ public class ViewerStateModel {
 		get;
 	} = new(true);
 
+	/// <summary>
+	/// ListViewer: 列設定リスト
+	/// </summary>
+	public ObservableList<ListViewerColumnStateModel> ListColumns {
+		get;
+	} = CreateDefaultColumns();
 
 	/// <summary>
-	/// ListViewer: 列幅 (ファイル名)
+	/// 指定した列IDの列状態を取得します。存在しない場合は作成して追加します。
 	/// </summary>
-	public ReactiveProperty<double> ListFileNameColumnWidth {
-		get;
-	} = new(400);
+	/// <param name="columnId">列ID</param>
+	/// <param name="defaultWidth">デフォルト幅</param>
+	/// <param name="defaultVisible">デフォルト表示状態</param>
+	/// <returns>列状態モデル</returns>
+	public ListViewerColumnStateModel GetOrCreateColumnState(string columnId, double defaultWidth = 100, bool defaultVisible = true) {
+		var column = this.ListColumns.FirstOrDefault(x => x.ColumnId == columnId);
+		if (column is null) {
+			column = new ListViewerColumnStateModel(columnId, defaultWidth, defaultVisible);
+			this.ListColumns.Add(column);
+		}
+		return column;
+	}
 
 	/// <summary>
-	/// ListViewer: 列幅 (解像度)
+	/// 別の <see cref="ViewerStateModel"/> から設定値をコピーします。
 	/// </summary>
-	public ReactiveProperty<double> ListResolutionColumnWidth {
-		get;
-	} = new(100);
+	/// <param name="source">コピー元のモデル</param>
+	public void CopyFrom(ViewerStateModel source) {
+		this.ItemSize.Value = source.ItemSize.Value;
+		this.ActiveViewer.Value = source.ActiveViewer.Value;
+		this.ShowOverlay.Value = source.ShowOverlay.Value;
+		this.ShowInfo.Value = source.ShowInfo.Value;
 
-	/// <summary>
-	/// ListViewer: 列幅 (サイズ)
-	/// </summary>
-	public ReactiveProperty<double> ListFileSizeColumnWidth {
-		get;
-	} = new(100);
+		foreach (var sourceCol in source.ListColumns) {
+			var targetCol = this.GetOrCreateColumnState(sourceCol.ColumnId, sourceCol.Width.Value, sourceCol.IsVisible.Value);
+			targetCol.Width.Value = sourceCol.Width.Value;
+			targetCol.IsVisible.Value = sourceCol.IsVisible.Value;
+		}
+	}
 
-	/// <summary>
-	/// ListViewer: 列幅 (作成日時)
-	/// </summary>
-	public ReactiveProperty<double> ListCreationTimeColumnWidth {
-		get;
-	} = new(150);
-
-	/// <summary>
-	/// ListViewer: 列幅 (評価)
-	/// </summary>
-	public ReactiveProperty<double> ListRateColumnWidth {
-		get;
-	} = new(60);
-
-	/// <summary>
-	/// ListViewer: 表示状態 (ファイル名)
-	/// </summary>
-	public ReactiveProperty<bool> ListFileNameColumnVisible {
-		get;
-	} = new(true);
-
-	/// <summary>
-	/// ListViewer: 表示状態 (解像度)
-	/// </summary>
-	public ReactiveProperty<bool> ListResolutionColumnVisible {
-		get;
-	} = new(true);
-
-	/// <summary>
-	/// ListViewer: 表示状態 (サイズ)
-	/// </summary>
-	public ReactiveProperty<bool> ListFileSizeColumnVisible {
-		get;
-	} = new(true);
-
-	/// <summary>
-	/// ListViewer: 表示状態 (作成日時)
-	/// </summary>
-	public ReactiveProperty<bool> ListCreationTimeColumnVisible {
-		get;
-	} = new(true);
-
-	/// <summary>
-	/// ListViewer: 表示状態 (評価)
-	/// </summary>
-	public ReactiveProperty<bool> ListRateColumnVisible {
-		get;
-	} = new(true);
+	private static ObservableList<ListViewerColumnStateModel> CreateDefaultColumns() {
+		return [
+		new(ListViewerColumnIds.FileName, 400, true),
+		new(ListViewerColumnIds.Resolution, 100, true),
+		new(ListViewerColumnIds.FileSize, 100, true),
+		new(ListViewerColumnIds.CreationTime, 150, true),
+		new(ListViewerColumnIds.Rate, 60, true),
+	];
+	}
 }

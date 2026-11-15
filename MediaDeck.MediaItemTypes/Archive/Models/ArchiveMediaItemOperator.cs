@@ -14,6 +14,9 @@ using Microsoft.Extensions.Logging;
 
 namespace MediaDeck.MediaItemTypes.Archive.Models;
 
+/// <summary>
+/// アーカイブメディアアイテムの操作クラス
+/// </summary>
 [Inject(InjectServiceLifetime.Transient)]
 public partial class ArchiveMediaItemOperator : BaseMediaItemOperator {
 	private IMediaItemTypeService _mediaItemTypeService {
@@ -26,48 +29,64 @@ public partial class ArchiveMediaItemOperator : BaseMediaItemOperator {
 	private readonly IServiceProvider _serviceProvider;
 	private readonly ConfigModel _config;
 
+	/// <summary>
+	/// コンストラクタ
+	/// </summary>
+	/// <param name="filePathService">ファイルパスサービス</param>
+	/// <param name="logger">ロガー</param>
+	/// <param name="dbFactory">DbContextファクトリ</param>
+	/// <param name="updateFileHashBackgroundService">ハッシュ更新サービス</param>
+	/// <param name="databaseWriteCoordinator">データベース書き込みコーディネーター</param>
+	/// <param name="serviceProvider">サービスプロバイダー</param>
+	/// <param name="config">設定モデル</param>
 	public ArchiveMediaItemOperator(
 		IFilePathService filePathService,
 		ILogger<ArchiveMediaItemOperator> logger,
 		IDbContextFactory<MediaDeckDbContext> dbFactory,
 		IFileHashUpdatorService updateFileHashBackgroundService,
+		IDatabaseWriteCoordinator databaseWriteCoordinator,
 		IServiceProvider serviceProvider,
 		ConfigModel config)
-		: base(dbFactory, updateFileHashBackgroundService, MediaType.Archive) {
+		: base(dbFactory, updateFileHashBackgroundService, databaseWriteCoordinator, MediaType.Archive) {
 		this._filePathService = filePathService;
 		this._logger = logger;
 		this._serviceProvider = serviceProvider;
 		this._config = config;
 	}
 
+	/// <summary>
+	/// メディアアイテムをDBに登録します。
+	/// </summary>
+	/// <param name="filePath">対象ファイルパス</param>
+	/// <returns>登録されたメディアアイテム</returns>
 	public override async Task<MediaItem?> RegisterMediaItemAsync(string filePath) {
-		await using var db = await this._dbFactory.CreateDbContextAsync();
-		using var transaction = await db.Database.BeginTransactionAsync();
-		var isExists = await db.MediaItems.AnyAsync(x => x.FilePath == filePath);
-		if (isExists) {
-			return null;
+		await using (var dbCheck = await this._dbFactory.CreateDbContextAsync()) {
+			var isExists = await dbCheck.MediaItems.AnyAsync(x => x.FilePath == filePath);
+			if (isExists) {
+				return null;
+			}
 		}
-		var thumbRelativePath = this._filePathService.GetThumbnailRelativeFilePath();
-		var thumbPath = this._filePathService.GetThumbnailAbsoluteFilePath(thumbRelativePath);
 
 		using var archiveFile = ZipFile.Open(filePath, ZipArchiveMode.Read);
-
 		var first = archiveFile.Entries.FirstOrDefault(x => this._mediaItemTypeService.IsTargetPath(x.Name, MediaType.Image));
-		try {
-			if (first != null) {
+
+		string? thumbRelativePath = null;
+		if (first != null) {
+			var candidateRelativePath = this._filePathService.GetThumbnailRelativeFilePath();
+			var thumbPath = this._filePathService.GetThumbnailAbsoluteFilePath(candidateRelativePath);
+			try {
 				var image = this.CreateThumbnail(archiveFile, (uint)this._config.ThumbnailConfig.ThumbnailSize.Value, (uint)this._config.ThumbnailConfig.ThumbnailSize.Value, first.FullName);
 				new FileInfo(thumbPath).Directory?.Create();
-				File.WriteAllBytes(thumbPath, image);
+				await File.WriteAllBytesAsync(thumbPath, image);
+				thumbRelativePath = candidateRelativePath;
+			} catch (Exception ex) {
+				this._logger.LogError(ex, "Failed to create archive thumbnail for file {FilePath}", filePath);
+				thumbRelativePath = null;
 			}
-		} catch (Exception ex) {
-			this._logger.LogError(ex, "Failed to create archive thumbnail for file {FilePath}", filePath);
-			thumbPath = null;
-			thumbRelativePath = null;
 		}
 
 		var fileInfo = new FileInfo(filePath);
 		var directoryPath = Path.GetDirectoryName(filePath)!;
-		var isUnderFolderGroup = await this.GetIsUnderFolderGroup(db, directoryPath);
 		var mf = new MediaItem {
 			MediaType = MediaType.Archive,
 			DirectoryPath = directoryPath,
@@ -82,7 +101,7 @@ public partial class ArchiveMediaItemOperator : BaseMediaItemOperator {
 			LastAccessTime = fileInfo.Exists ? fileInfo.LastAccessTime : DateTime.MinValue,
 			RegisteredTime = DateTime.Now,
 			IsExists = fileInfo.Exists,
-			IsUnderFolderGroup = isUnderFolderGroup,
+			IsUnderFolderGroup = false,
 			ThumbnailSize = this._config.ThumbnailConfig.ThumbnailSize.Value,
 			Metadata = new() { Entries = [new() { Key = "PageCount", Value = archiveFile.Entries.Count(x => this._mediaItemTypeService.IsTargetPath(x.Name, MediaType.Image)).ToString() }] }
 		};
@@ -91,7 +110,7 @@ public partial class ArchiveMediaItemOperator : BaseMediaItemOperator {
 			try {
 				using var stream = first!.Open();
 				using var ms = new MemoryStream();
-				stream.CopyTo(ms);
+				await stream.CopyToAsync(ms);
 				ms.Seek(0, SeekOrigin.Begin);
 				using var meta = ImageMetadataFactory.Create(ms);
 				mf.Width = meta.Width;
@@ -103,13 +122,28 @@ public partial class ArchiveMediaItemOperator : BaseMediaItemOperator {
 			}
 		}
 
-		await db.MediaItems.AddAsync(mf);
-		await db.SaveChangesAsync();
-		await transaction.CommitAsync();
+		var registeredItem = await this._databaseWriteCoordinator.ExecuteAsync(async ct => {
+			await using var db = await this._dbFactory.CreateDbContextAsync(ct);
+			using var transaction = await db.Database.BeginTransactionAsync(ct);
 
-		this._updateFileHashBackgroundService.EnqueueHashUpdate(mf.MediaItemId);
+			if (await db.MediaItems.AnyAsync(x => x.FilePath == filePath, ct)) {
+				return null;
+			}
 
-		return mf;
+			mf.IsUnderFolderGroup = await this.GetIsUnderFolderGroup(db, directoryPath);
+
+			await db.MediaItems.AddAsync(mf, ct);
+			await db.SaveChangesAsync(ct);
+			await transaction.CommitAsync(ct);
+
+			return mf;
+		});
+
+		if (registeredItem != null) {
+			this._updateFileHashBackgroundService.EnqueueHashUpdate(registeredItem.MediaItemId);
+		}
+
+		return registeredItem;
 	}
 
 	public override async Task UpdateMetadata(MediaItem mediaItem) {

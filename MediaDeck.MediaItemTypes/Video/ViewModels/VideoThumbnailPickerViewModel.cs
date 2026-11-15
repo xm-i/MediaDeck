@@ -35,17 +35,16 @@ public class VideoThumbnailPickerViewModel : BaseThumbnailPickerViewModel<BaseTh
 		get;
 	} = new();
 
-	public override Task RecreateThumbnailAsync() {
+	public override async Task RecreateThumbnailAsync() {
 		if (this.targetFileViewModel is null) {
-			return Task.CompletedTask;
+			return;
 		}
 		try {
-			this.CandidateThumbnail.Value = this._VideoMediaItemOperator.CreateThumbnail(this.targetFileViewModel.FileModel, this._config.ThumbnailConfig.ThumbnailSize.Value, this._config.ThumbnailConfig.ThumbnailSize.Value, this.Time.Value);
+			this.CandidateThumbnail.Value = await this._VideoMediaItemOperator.CreateThumbnailAsync(this.targetFileViewModel.FileModel, this._config.ThumbnailConfig.ThumbnailSize.Value, this._config.ThumbnailConfig.ThumbnailSize.Value, this.Time.Value);
 		} catch (Exception ex) {
 			this._logger.LogError(ex, "Failed to recreate video thumbnail for file {FilePath}", this.targetFileViewModel.FilePath);
 			this.CandidateThumbnail.Value = null;
 		}
-		return Task.CompletedTask;
 	}
 
 	public override async Task LoadAsync(IMediaItemViewModel fileViewModel) {

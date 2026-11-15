@@ -9,6 +9,9 @@ using Microsoft.Extensions.Logging;
 
 namespace MediaDeck.MediaItemTypes.Pdf.Models;
 
+/// <summary>
+/// PDFメディアアイテムの操作クラス
+/// </summary>
 [Inject(InjectServiceLifetime.Transient)]
 public partial class PdfMediaItemOperator : BaseMediaItemOperator {
 	private readonly IFilePathService _filePathService;
@@ -16,44 +19,60 @@ public partial class PdfMediaItemOperator : BaseMediaItemOperator {
 	private readonly IPdfDocumentOperator _pdfDocumentOperator;
 	private readonly ConfigModel _config;
 
+	/// <summary>
+	/// コンストラクタ
+	/// </summary>
+	/// <param name="filePathService">ファイルパスサービス</param>
+	/// <param name="logger">ロガー</param>
+	/// <param name="dbFactory">DbContextファクトリ</param>
+	/// <param name="updateFileHashBackgroundService">ハッシュ更新サービス</param>
+	/// <param name="databaseWriteCoordinator">データベース書き込みコーディネーター</param>
+	/// <param name="pdfDocumentOperator">PDFドキュメント操作</param>
+	/// <param name="config">設定モデル</param>
 	public PdfMediaItemOperator(
 		IFilePathService filePathService,
 		ILogger<PdfMediaItemOperator> logger,
 		IDbContextFactory<MediaDeckDbContext> dbFactory,
 		IFileHashUpdatorService updateFileHashBackgroundService,
+		IDatabaseWriteCoordinator databaseWriteCoordinator,
 		IPdfDocumentOperator pdfDocumentOperator,
 		ConfigModel config)
-		: base(dbFactory, updateFileHashBackgroundService, MediaType.Pdf) {
+		: base(dbFactory, updateFileHashBackgroundService, databaseWriteCoordinator, MediaType.Pdf) {
 		this._filePathService = filePathService;
 		this._logger = logger;
 		this._pdfDocumentOperator = pdfDocumentOperator;
 		this._config = config;
 	}
 
+	/// <summary>
+	/// メディアアイテムをDBに登録します。
+	/// </summary>
+	/// <param name="filePath">対象ファイルパス</param>
+	/// <returns>登録されたメディアアイテム</returns>
 	public override async Task<MediaItem?> RegisterMediaItemAsync(string filePath) {
-		await using var db = await this._dbFactory.CreateDbContextAsync();
-		using var transaction = await db.Database.BeginTransactionAsync();
-		var isExists = await db.MediaItems.AnyAsync(x => x.FilePath == filePath);
-		if (isExists) {
-			return null;
+		await using (var dbCheck = await this._dbFactory.CreateDbContextAsync()) {
+			var isExists = await dbCheck.MediaItems.AnyAsync(x => x.FilePath == filePath);
+			if (isExists) {
+				return null;
+			}
 		}
 
-		var thumbRelativePath = this._filePathService.GetThumbnailRelativeFilePath();
-		var thumbPath = this._filePathService.GetThumbnailAbsoluteFilePath(thumbRelativePath);
+		string? thumbRelativePath = null;
 		try {
+			var candidateRelativePath = this._filePathService.GetThumbnailRelativeFilePath();
+			var thumbPath = this._filePathService.GetThumbnailAbsoluteFilePath(candidateRelativePath);
 			var image = await this._pdfDocumentOperator.CreateThumbnailAsync(filePath, this._config.ThumbnailConfig.ThumbnailSize.Value, this._config.ThumbnailConfig.ThumbnailSize.Value, 1);
 			new FileInfo(thumbPath).Directory?.Create();
-			File.WriteAllBytes(thumbPath, image);
+			await File.WriteAllBytesAsync(thumbPath, image);
+			thumbRelativePath = candidateRelativePath;
 		} catch (Exception ex) {
 			this._logger.LogError(ex, "Failed to create pdf thumbnail for file {FilePath}", filePath);
-			thumbPath = null;
 			thumbRelativePath = null;
 		}
 
 		var pdfDocument = await this._pdfDocumentOperator.GetPdfPropertiesAsync(filePath);
 		var fileInfo = new FileInfo(filePath);
 		var directoryPath = Path.GetDirectoryName(filePath)!;
-		var isUnderFolderGroup = await this.GetIsUnderFolderGroup(db, directoryPath);
 
 		var mf = new MediaItem {
 			MediaType = MediaType.Pdf,
@@ -69,20 +88,35 @@ public partial class PdfMediaItemOperator : BaseMediaItemOperator {
 			LastAccessTime = fileInfo.Exists ? fileInfo.LastAccessTime : DateTime.MinValue,
 			RegisteredTime = DateTime.Now,
 			IsExists = fileInfo.Exists,
+			IsUnderFolderGroup = false,
 			Width = (int)pdfDocument.Width,
 			Height = (int)pdfDocument.Height,
-			IsUnderFolderGroup = isUnderFolderGroup,
 			ThumbnailSize = this._config.ThumbnailConfig.ThumbnailSize.Value,
 			Metadata = new() { Entries = [new() { Key = "PageCount", Value = pdfDocument.PageCount.ToString() }] }
 		};
 
-		await db.MediaItems.AddAsync(mf);
-		await db.SaveChangesAsync();
-		await transaction.CommitAsync();
+		var registeredItem = await this._databaseWriteCoordinator.ExecuteAsync(async ct => {
+			await using var db = await this._dbFactory.CreateDbContextAsync(ct);
+			using var transaction = await db.Database.BeginTransactionAsync(ct);
 
-		this._updateFileHashBackgroundService.EnqueueHashUpdate(mf.MediaItemId);
+			if (await db.MediaItems.AnyAsync(x => x.FilePath == filePath, ct)) {
+				return null;
+			}
 
-		return mf;
+			mf.IsUnderFolderGroup = await this.GetIsUnderFolderGroup(db, directoryPath);
+
+			await db.MediaItems.AddAsync(mf, ct);
+			await db.SaveChangesAsync(ct);
+			await transaction.CommitAsync(ct);
+
+			return mf;
+		});
+
+		if (registeredItem != null) {
+			this._updateFileHashBackgroundService.EnqueueHashUpdate(registeredItem.MediaItemId);
+		}
+
+		return registeredItem;
 	}
 
 	public override async Task UpdateMetadata(MediaItem mediaItem) {

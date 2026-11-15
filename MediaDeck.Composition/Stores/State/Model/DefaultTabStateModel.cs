@@ -3,16 +3,22 @@ using GenJsonConfig.Attributes;
 namespace MediaDeck.Composition.Stores.State.Model;
 
 /// <summary>
-/// 新規タブのデフォルト状態
+/// 新規タブのデフォルト状態テンプレート（Singleton）
 /// </summary>
 [Inject(InjectServiceLifetime.Singleton)]
 [GenerateJsonConfigDto]
 public class DefaultTabStateModel(SearchStateModel searchState, ViewerStateModel viewerState) {
+	/// <summary>
+	/// 検索状態テンプレート
+	/// </summary>
 	public SearchStateModel SearchState {
 		get;
 		set;
 	} = searchState;
 
+	/// <summary>
+	/// ビューワー状態テンプレート
+	/// </summary>
 	public ViewerStateModel ViewerState {
 		get;
 		set;

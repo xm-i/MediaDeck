@@ -56,7 +56,7 @@ public class FilePathFilterCreatorViewModel : ViewModelBase, IFilterCreatorViewM
 			new DisplayObject<SearchTypeInclude>(this._stringProvider.GetString("FilterCreator_Exclude"), SearchTypeInclude.Exclude)
 		];
 		this.SearchType.Value = this.SearchTypeList.First();
-		this.AddFilterCommand = this.FilePath.Select(x => !string.IsNullOrEmpty(x)).ToReactiveCommand();
+		this.AddFilterCommand = this.FilePath.Select(x => !string.IsNullOrEmpty(x)).ToReactiveCommand().AddTo(this.CompositeDisposable);
 		this.AddFilterCommand.Subscribe(vm => {
 			var filter = new FilePathFilterItemObject {
 				Text = this.FilePath.Value,

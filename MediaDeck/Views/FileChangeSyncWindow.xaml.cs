@@ -22,7 +22,7 @@ public sealed partial class FileChangeSyncWindow : Window {
 	/// <param name="configStore">設定ストア</param>
 	/// <param name="stringProvider">文字列リソースプロバイダー</param>
 	public FileChangeSyncWindow(FileChangeSyncViewModel viewModel, IConfigStore configStore, IStringProvider stringProvider) {
-		this.ViewModel = viewModel;
+		this.ViewModel = viewModel.AddTo(this._disposable);
 		this.Title = stringProvider.GetString("FileChangeSync_Title");
 		this.InitializeComponent();
 
@@ -34,6 +34,9 @@ public sealed partial class FileChangeSyncWindow : Window {
 		this.Closed += (s, e) => this._disposable.Dispose();
 	}
 
+	/// <summary>
+	/// ファイル変更同期 ViewModel
+	/// </summary>
 	public FileChangeSyncViewModel ViewModel {
 		get;
 	}

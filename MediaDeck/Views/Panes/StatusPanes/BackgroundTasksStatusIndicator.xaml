@@ -6,7 +6,7 @@
 	xmlns:local="using:MediaDeck.Views.Panes.StatusPanes"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-	xmlns:toolsViewModels="using:MediaDeck.ViewModels.Tools"
+	xmlns:statuspanesVm="using:MediaDeck.ViewModels.Panes.StatusPanes"
 	mc:Ignorable="d">
 
 	<Button
@@ -47,7 +47,7 @@
 						IsItemClickEnabled="False"
 						MaxHeight="340">
 						<ListView.ItemTemplate>
-							<DataTemplate x:DataType="toolsViewModels:BackgroundTaskStatusItemViewModel">
+							<DataTemplate x:DataType="statuspanesVm:BackgroundTaskStatusItemViewModel">
 								<Grid Padding="0,8"
 									ColumnSpacing="12"
 									RowSpacing="6">

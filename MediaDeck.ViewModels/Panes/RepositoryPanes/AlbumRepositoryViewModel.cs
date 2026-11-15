@@ -8,7 +8,7 @@ namespace MediaDeck.ViewModels.Panes.RepositoryPanes;
 public class AlbumRepositoryViewModel : RepositoryViewModelBase {
 	public AlbumRepositoryViewModel(AlbumRepository albumRepository) : base("Album", albumRepository) {
 		this.AlbumRepository = albumRepository;
-		this.RootAlbum = albumRepository.RootAlbum.ObserveOnCurrentSynchronizationContext().ToBindableReactiveProperty(null!);
+		this.RootAlbum = albumRepository.RootAlbum.ObserveOnCurrentSynchronizationContext().ToBindableReactiveProperty(null!).AddTo(this.CompositeDisposable);
 		this.SetRepositoryConditionCommand.Merge(this.IncludeSubAlbums.ToUnit())
 			.Subscribe(_ => {
 				if (this.SelectedAlbum.Value is not { } album) {

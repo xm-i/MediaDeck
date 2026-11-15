@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -46,24 +47,31 @@ namespace MediaDeck.Analyzers {
 				return;
 			}
 
+			if (IsIgnoredInvocation(node, context.SemanticModel)) {
+				return;
+			}
+
+			if (HasCompositeDisposableArgument(node, context.SemanticModel)) {
+				return;
+			}
+
 			// If it's part of a Chained .AddTo(...) call, it's handled.
 			if (HasChainedAddTo(node)) {
 				return;
 			}
 
 			// Check if it is "handled" by language constructs or patterns.
-			// We allow assignment to a variable/field and passing as an argument to any method 
-			// because we cannot easily determine if they are correctly disposed later.
-			// The analyzer will focus on "floating" expressions that are never captured.
+			// Assignments to .Disposable (e.g. SerialDisposable.Disposable) or static members are permitted.
+			// Other assignments (AssignmentExpressionSyntax) without AddTo are flagged to detect leaks.
 			var ancestor = node.FirstAncestorOrSelf<SyntaxNode>(n =>
 				n is ReturnStatementSyntax ||
 				n is YieldStatementSyntax ||
 				n is ArrowExpressionClauseSyntax ||
 				n is EqualsValueClauseSyntax ||
-				n is AssignmentExpressionSyntax ||
 				n is ArgumentSyntax ||
 				(n is LocalDeclarationStatementSyntax l && l.UsingKeyword.IsKind(SyntaxKind.UsingKeyword)) ||
-				n is UsingStatementSyntax);
+				n is UsingStatementSyntax ||
+				IsHandledAssignment(n, context.SemanticModel));
 
 			if (ancestor != null) {
 				return;
@@ -102,6 +110,140 @@ namespace MediaDeck.Analyzers {
 		private static bool IsAddToInvocation(SyntaxNode node) {
 			if (node is InvocationExpressionSyntax inv && inv.Expression is MemberAccessExpressionSyntax ma) {
 				return ma.Name.Identifier.Text == "AddTo";
+			}
+			return false;
+		}
+
+		/// <summary>
+		/// 代入式が破棄管理されている（SerialDisposable.Disposable や ProtectedCursor への代入、静的メンバへの代入、Dispose メソッド内で破棄されるメンバへの代入など）かどうかを判定します。
+		/// </summary>
+		/// <param name="n">判定対象の構文ノード</param>
+		/// <param name="semanticModel">セマンティックモデル</param>
+		/// <returns>破棄管理された代入式の場合 true</returns>
+		private static bool IsHandledAssignment(SyntaxNode n, SemanticModel semanticModel) {
+			if (n is AssignmentExpressionSyntax assignment) {
+				// SerialDisposable.Disposable = ... のような Disposable プロパティへの代入は破棄管理されているため許可する
+				if (assignment.Left is MemberAccessExpressionSyntax ma && ma.Name.Identifier.Text == "Disposable") {
+					return true;
+				}
+
+				var leftSymbol = semanticModel.GetSymbolInfo(assignment.Left).Symbol;
+
+				// WinUI の UIElement.ProtectedCursor 等はフレームワーク側でライフサイクル管理されるため許可する
+				if (leftSymbol is IPropertySymbol { Name: "ProtectedCursor" } prop &&
+					prop.ContainingType?.ToDisplayString() == "Microsoft.UI.Xaml.UIElement") {
+					return true;
+				}
+
+				// 静的メンバ（例: Log.Logger）への代入は CompositeDisposable に追加できないため許可する
+				if (leftSymbol?.IsStatic == true) {
+					return true;
+				}
+
+				// 同じ型内の Dispose メソッドで明示的に破棄されるフィールドまたはプロパティへの代入は許可する
+				if (leftSymbol is IFieldSymbol or IPropertySymbol &&
+					IsDisposedInTypeDispose(leftSymbol, assignment, semanticModel)) {
+					return true;
+				}
+
+				return false;
+			}
+			return false;
+		}
+
+		/// <summary>
+		/// 指定されたメンバーシンボルが、同じ型宣言内の Dispose メソッドで .Dispose() 呼び出しにより破棄されているかを判定します。
+		/// </summary>
+		/// <param name="memberSymbol">判定対象のメンバーシンボル</param>
+		/// <param name="node">代入式ノード</param>
+		/// <param name="semanticModel">セマンティックモデル</param>
+		/// <returns>Dispose メソッド内で破棄されている場合 true</returns>
+		private static bool IsDisposedInTypeDispose(ISymbol memberSymbol, SyntaxNode node, SemanticModel semanticModel) {
+			var typeDecl = node.FirstAncestorOrSelf<TypeDeclarationSyntax>();
+			if (typeDecl == null) {
+				return false;
+			}
+
+			foreach (var method in typeDecl.DescendantNodes().OfType<MethodDeclarationSyntax>()) {
+				if (method.Identifier.Text != "Dispose") {
+					continue;
+				}
+
+				foreach (var invocation in method.DescendantNodes().OfType<InvocationExpressionSyntax>()) {
+					ExpressionSyntax? targetExpr = null;
+					string? invokedName = null;
+
+					if (invocation.Expression is MemberAccessExpressionSyntax memberAccess) {
+						invokedName = memberAccess.Name.Identifier.Text;
+						targetExpr = memberAccess.Expression;
+					} else if (invocation.Expression is MemberBindingExpressionSyntax memberBinding &&
+						invocation.Parent is ConditionalAccessExpressionSyntax conditionalAccess) {
+						invokedName = memberBinding.Name.Identifier.Text;
+						targetExpr = conditionalAccess.Expression;
+					}
+
+					if (invokedName != "Dispose" || targetExpr == null) {
+						continue;
+					}
+
+					var targetSymbol = semanticModel.GetSymbolInfo(targetExpr).Symbol;
+					if (SymbolEqualityComparer.Default.Equals(targetSymbol, memberSymbol)) {
+						return true;
+					}
+				}
+			}
+
+			return false;
+		}
+
+		/// <summary>
+		/// メソッド呼び出しの引数に null 以外の CompositeDisposable が渡されているかを判定します。
+		/// </summary>
+		/// <param name="node">判定対象の式</param>
+		/// <param name="semanticModel">セマンティックモデル</param>
+		/// <returns>CompositeDisposable を引数として渡している場合 true</returns>
+		private static bool HasCompositeDisposableArgument(ExpressionSyntax node, SemanticModel semanticModel) {
+			if (node is not InvocationExpressionSyntax inv) {
+				return false;
+			}
+
+			foreach (var arg in inv.ArgumentList.Arguments) {
+				if (arg.Expression.IsKind(SyntaxKind.NullLiteralExpression) ||
+					arg.Expression.IsKind(SyntaxKind.DefaultLiteralExpression)) {
+					continue;
+				}
+
+				var argType = semanticModel.GetTypeInfo(arg.Expression).Type;
+				if (argType?.Name == "CompositeDisposable") {
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		/// <summary>
+		/// メソッド呼び出しが解析対象から除外すべき呼び出し（DI コンテナからのサービス取得や既存要素取得の LINQ など）かどうかを判定します。
+		/// </summary>
+		/// <param name="node">判定対象の式</param>
+		/// <param name="semanticModel">セマンティックモデル</param>
+		/// <returns>除外すべき呼び出しの場合 true</returns>
+		private static bool IsIgnoredInvocation(ExpressionSyntax node, SemanticModel semanticModel) {
+			if (node is InvocationExpressionSyntax inv && inv.Expression is MemberAccessExpressionSyntax ma) {
+				var name = ma.Name.Identifier.Text;
+				// DI コンテナからのサービス取得はコンテナがライフサイクルを管理するため除外する
+				if (name is "GetRequiredService" or "GetService" or "CreateScope") {
+					return true;
+				}
+
+				// 既存コレクションから要素参照を取得する LINQ メソッドは新規生成ではないため除外する
+				if (name is "First" or "FirstOrDefault" or "Last" or "LastOrDefault" or "Single" or "SingleOrDefault" or "ElementAt" or "ElementAtOrDefault") {
+					var symbol = semanticModel.GetSymbolInfo(inv).Symbol as IMethodSymbol;
+					var containingType = symbol?.ContainingType?.ToDisplayString();
+					if (containingType is "System.Linq.Enumerable" or "System.Linq.Queryable") {
+						return true;
+					}
+				}
 			}
 			return false;
 		}

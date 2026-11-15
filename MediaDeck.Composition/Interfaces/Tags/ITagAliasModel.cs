@@ -1,13 +1,9 @@
-using GenJsonConfig.Attributes;
-using MediaDeck.Composition.Tables;
-
 namespace MediaDeck.Composition.Interfaces.Tags;
 
 /// <summary>
 /// タグ別名のモデルクラスのインターフェース
 /// </summary>
-[GenerateJsonConfigDto]
-public interface ITagAliasModel {
+public interface ITagAliasModel : IDisposable {
 	/// <summary>
 	/// タグ別名ID
 	/// </summary>
@@ -47,6 +43,4 @@ public interface ITagAliasModel {
 		get;
 		set;
 	}
-
-	public void Initialize(TagAlias tagAlias);
 }
