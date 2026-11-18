@@ -25,4 +25,14 @@ public class FileNotificationsTests {
 		received.ShouldNotBeNull();
 		received!.FilePath.ShouldBe("test.jpg");
 	}
+
+	[Fact]
+	public void FilesChanged_EmitsSignal() {
+		var received = false;
+		using var subscription = FileNotifications.FilesChanged.Subscribe(_ => received = true);
+
+		FileNotifications.FilesChanged.OnNext(Unit.Default);
+
+		received.ShouldBeTrue();
+	}
 }

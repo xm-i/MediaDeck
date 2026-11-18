@@ -1544,6 +1544,12 @@
   <data name="FileChangeMonitor_BufferOverflow_Title" xml:space="preserve">
     <value>Monitoring Error</value>
   </data>
+  <data name="FileChangeMonitor_ApplyError_Message" xml:space="preserve">
+    <value>Failed to apply some file changes to the database. If there are conflicting changes (such as deletions), please apply them together or verify the file state.</value>
+  </data>
+  <data name="FileChangeMonitor_ApplyError_Title" xml:space="preserve">
+    <value>Sync Apply Error</value>
+  </data>
 
   <!-- ConfigStore Notifications -->
   <data name="ConfigStore_LoadError_Corrupted" xml:space="preserve">
