@@ -29,7 +29,7 @@ namespace MediaDeck.Core.Tests.Services.FileChangeMonitor;
 /// <summary>
 /// <see cref="FileChangeMonitorService"/> の単体テストクラスです。
 /// </summary>
-public class FileChangeMonitorServiceTests : IDisposable {
+public sealed class FileChangeMonitorServiceTests : IDisposable {
 	private readonly SqliteConnection _connection;
 	private readonly DbContextOptions<MediaDeckDbContext> _options;
 	private readonly Mock<IDbContextFactory<MediaDeckDbContext>> _dbFactoryMock;

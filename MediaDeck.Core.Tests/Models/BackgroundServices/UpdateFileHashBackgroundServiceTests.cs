@@ -13,7 +13,7 @@ using Shouldly;
 
 namespace MediaDeck.Core.Tests.Models.BackgroundServices;
 
-public class UpdateFileHashBackgroundServiceTests : IDisposable {
+public sealed class UpdateFileHashBackgroundServiceTests : IDisposable {
 	private readonly string _tempDir;
 	private readonly Microsoft.Data.Sqlite.SqliteConnection _connection;
 	private readonly DbContextOptions<MediaDeckDbContext> _options;

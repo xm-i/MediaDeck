@@ -116,7 +116,7 @@ public class FileStatusUpdatorService : ServiceBase {
 		}
 
 		// 3. 更新フェーズ (ExecuteUpdate を使用してフェッチなしで直接更新)
-		if (updates.Any()) {
+		if (updates.Count > 0) {
 			foreach (var updateChunk in updates.Chunk(100)) {
 				if (ct.IsCancellationRequested) {
 					return;

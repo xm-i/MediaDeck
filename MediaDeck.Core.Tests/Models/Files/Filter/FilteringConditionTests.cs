@@ -6,7 +6,7 @@ using Shouldly;
 
 namespace MediaDeck.Core.Tests.Models.Files.Filter;
 
-public class FilteringConditionTests : IDisposable {
+public sealed class FilteringConditionTests : IDisposable {
 	private readonly FilterObject _filterObject = new() { DisplayName = { Value = "TestFilter" } };
 	private readonly FilteringCondition _sut;
 

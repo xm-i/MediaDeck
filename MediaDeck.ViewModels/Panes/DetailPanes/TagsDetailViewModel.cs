@@ -183,7 +183,8 @@ public class TagsDetailViewModel : ViewModelBase {
 
 			var tag = await model.FindTagByNameAsync(this.Text.Value);
 			if (tag is null) {
-				this.NewTagRequested.OnNext(new NewTagRequestedContext(this.Text.Value, model.TagCategories.FirstOrDefault()));
+				var defaultCategory = model.TagCategories.Count > 0 ? model.TagCategories[0] : null;
+				this.NewTagRequested.OnNext(new NewTagRequestedContext(this.Text.Value, defaultCategory));
 				return;
 			}
 

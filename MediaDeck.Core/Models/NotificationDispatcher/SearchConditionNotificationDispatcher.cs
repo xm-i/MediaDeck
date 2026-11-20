@@ -9,7 +9,7 @@ namespace MediaDeck.Core.Models.NotificationDispatcher;
 /// 外部クラスは <see cref="SearchRequested"/> を監視するだけで全条件変更を受信できる。
 /// </summary>
 [Inject(InjectServiceLifetime.Scoped, typeof(ISearchConditionNotificationDispatcher))]
-public class SearchConditionNotificationDispatcher : ISearchConditionNotificationDispatcher {
+public sealed class SearchConditionNotificationDispatcher : ISearchConditionNotificationDispatcher {
 	/// <summary>コンストラクタ</summary>
 	public SearchConditionNotificationDispatcher() {
 		var searchConditionChanged = Observable.Merge(
@@ -73,6 +73,7 @@ public class SearchConditionNotificationDispatcher : ISearchConditionNotificatio
 		this.AddRequest.Dispose();
 		this.RemoveRequest.Dispose();
 		this.UpdateRequest.Dispose();
+		this.SearchConditionChanged.Dispose();
 		this.SortChanged.Dispose();
 		this.FilterChanged.Dispose();
 		this.ReloadRequested.Dispose();

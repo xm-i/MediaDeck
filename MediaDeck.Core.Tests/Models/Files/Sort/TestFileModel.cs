@@ -10,7 +10,7 @@ namespace MediaDeck.Core.Tests.Models.Files.Sort;
 /// <summary>
 /// <see cref="IMediaItemModel"/> のテスト用スタブ実装
 /// </summary>
-public class TestFileModel : MediaItem, IMediaItemModel {
+public sealed class TestFileModel : MediaItem, IMediaItemModel {
 	[global::System.Diagnostics.CodeAnalysis.SetsRequiredMembers]
 	public TestFileModel() {
 		this.DirectoryPath = string.Empty;

@@ -17,7 +17,7 @@ using Shouldly;
 namespace MediaDeck.Core.Tests.Models.Files;
 
 
-public class MediaContentLibraryTests : IDisposable {
+public sealed class MediaContentLibraryTests : IDisposable {
 	private readonly MediaContentLibrary _sut;
 	private readonly SearchConditionManager _searchConditionManager;
 	private readonly FolderRepository _folderRepository;

@@ -10,7 +10,7 @@ namespace MediaDeck.Core.Tests.Models.Files;
 /// <summary>
 /// <see cref="PropertiesDetailModel"/> の単体テスト。
 /// </summary>
-public class PropertiesDetailModelTests : IDisposable {
+public sealed class PropertiesDetailModelTests : IDisposable {
 	private readonly PropertiesDetailModel _sut;
 
 	public PropertiesDetailModelTests() {

@@ -9,7 +9,7 @@ using Shouldly;
 
 namespace MediaDeck.Core.Tests.Stores.Config;
 
-public class ConfigStoreTests : IDisposable {
+public sealed class ConfigStoreTests : IDisposable {
 	private readonly string _tempDirectory;
 	private readonly string _testConfigFilePath;
 

@@ -52,7 +52,7 @@ public static class RuntimeArgumentsParser {
 			}
 		}
 
-		if (currentArg.StartsWith("/", StringComparison.Ordinal)) {
+		if (currentArg.StartsWith('/')) {
 			var body = currentArg[1..];
 			var separatorIndex = body.IndexOf(':');
 			if (separatorIndex >= 0) {

@@ -24,11 +24,39 @@ public readonly struct ValueCountPair<T> : IEquatable<ValueCountPair<T>>, IDispo
 		get;
 	}
 
+	/// <inheritdoc/>
 	public bool Equals(ValueCountPair<T> other) {
-		if (EqualityComparer<T>.Default.Equals(this.Value, other.Value) && this.Count == other.Count) {
-			return true;
-		}
-		return false;
+		return EqualityComparer<T>.Default.Equals(this.Value, other.Value) && this.Count == other.Count;
+	}
+
+	/// <inheritdoc/>
+	public override bool Equals(object? obj) {
+		return obj is ValueCountPair<T> other && this.Equals(other);
+	}
+
+	/// <inheritdoc/>
+	public override int GetHashCode() {
+		return HashCode.Combine(this.Value, this.Count);
+	}
+
+	/// <summary>
+	/// 2つの <see cref="ValueCountPair{T}"/> が等しいかどうかを判定します。
+	/// </summary>
+	/// <param name="left">比較元の値。</param>
+	/// <param name="right">比較先の値。</param>
+	/// <returns>等しい場合は <c>true</c>、それ以外は <c>false</c>。</returns>
+	public static bool operator ==(ValueCountPair<T> left, ValueCountPair<T> right) {
+		return left.Equals(right);
+	}
+
+	/// <summary>
+	/// 2つの <see cref="ValueCountPair{T}"/> が等しくないかどうかを判定します。
+	/// </summary>
+	/// <param name="left">比較元の値。</param>
+	/// <param name="right">比較先の値。</param>
+	/// <returns>等しくない場合は <c>true</c>、それ以外は <c>false</c>。</returns>
+	public static bool operator !=(ValueCountPair<T> left, ValueCountPair<T> right) {
+		return !left.Equals(right);
 	}
 
 	/// <summary>

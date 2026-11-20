@@ -16,7 +16,7 @@ namespace MediaDeck.Core.Tests.Services.FileStatusUpdator;
 /// 責務: データベース上のメディアアイテム情報を物理ファイルの状態（存在有無、ファイルサイズ、更新日時など）と同期させ、
 /// 変更が検知された場合はハッシュ値（PreHash/FullHash）の再計算をキューに登録すること。
 /// </summary>
-public class FileStatusUpdatorServiceTests : IDisposable {
+public sealed class FileStatusUpdatorServiceTests : IDisposable {
 	private SqliteConnection? _connection;
 
 	private IDbContextFactory<MediaDeckDbContext> CreateInMemoryDbFactory() {

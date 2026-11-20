@@ -64,7 +64,8 @@ public class SortItemFactoryTests {
 		var obj = new SortItemObject { SortItemKey = (SortItemKey)9999, Direction = ListSortDirection.Ascending };
 
 		// Act & Assert
-		Should.Throw<ArgumentException>(() => SortItemFactory.Create(obj));
+		var ex = Should.Throw<ArgumentException>(() => SortItemFactory.Create(obj));
+		ex.ParamName.ShouldBe("sortItemObject");
 	}
 	/// <summary>
 	///     SortItemKey.Random の場合、指定したシード値を持つ RandomSortItem が生成されることを確認します。

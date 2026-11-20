@@ -115,7 +115,7 @@ public class MediaItemTypeServiceTest {
 	public void CreateMediaItemOperators_ReturnsOperatorsForAllRegisteredMediaItemTypes() {
 		var result = this._service.CreateMediaItemOperators();
 
-		result.Count().ShouldBe(3);
+		result.Length.ShouldBe(3);
 		result.ShouldAllBe(x => x is TestFileOperator);
 		result.Cast<TestFileOperator>().Select(x => x.CreatedBy).ToArray().ShouldBe(["unknown", "image", "video"]);
 	}

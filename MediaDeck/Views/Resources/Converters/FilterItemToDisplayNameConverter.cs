@@ -24,6 +24,7 @@ public class FilterItemToDisplayNameConverter : IValueConverter {
 		}
 	}
 
+	/// <inheritdoc/>
 	public object? Convert(object value, Type targetType, object parameter, string language) {
 		if (value is not IFilterItemObject filterItem) {
 			return null;
@@ -73,7 +74,7 @@ public class FilterItemToDisplayNameConverter : IValueConverter {
 					SearchTypeComparison.Equal => "FilterItem_Rate_Equal",
 					SearchTypeComparison.LessThanOrEqual => "FilterItem_Rate_LessThanOrEqual",
 					SearchTypeComparison.LessThan => "FilterItem_Rate_LessThan",
-					_ => throw new ArgumentOutOfRangeException()
+					_ => throw new ArgumentOutOfRangeException(nameof(value), rf.SearchType, "Unsupported comparison search type.")
 				};
 				return stringProvider.GetString(rateKey, rf.Rate);
 
@@ -84,7 +85,7 @@ public class FilterItemToDisplayNameConverter : IValueConverter {
 					SearchTypeComparison.Equal => "Equal",
 					SearchTypeComparison.LessThanOrEqual => "LessThanOrEqual",
 					SearchTypeComparison.LessThan => "LessThan",
-					_ => throw new ArgumentOutOfRangeException()
+					_ => throw new ArgumentOutOfRangeException(nameof(value), resolutionFilter.SearchType, "Unsupported comparison search type.")
 				};
 
 				if (resolutionFilter.Width is { } w) {

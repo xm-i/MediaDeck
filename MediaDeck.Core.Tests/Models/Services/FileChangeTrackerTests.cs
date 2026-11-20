@@ -28,7 +28,7 @@ namespace MediaDeck.Core.Tests.Models.Services;
 /// <summary>
 /// <see cref="FileChangeTracker"/> の単体テストクラスです。
 /// </summary>
-public class FileChangeTrackerTests : IDisposable {
+public sealed class FileChangeTrackerTests : IDisposable {
 	private readonly ITestOutputHelper _output;
 	private readonly string _tempRoot;
 	private readonly List<SqliteConnection> _connections = [];
@@ -1153,7 +1153,7 @@ public class FileChangeTrackerTests : IDisposable {
 			.Returns(async (CancellationToken _) => {
 				enteredDbFactory.TrySetResult();
 				await releaseDbFactory.Task;
-				return await dbFactory.CreateDbContextAsync();
+				return await dbFactory.CreateDbContextAsync(CancellationToken.None);
 			});
 
 		var tracker = new FileChangeTracker(slowFactoryMock.Object, NullLogger<FileChangeTracker>.Instance, this.CreateTestConfig((this._tempRoot, false)));

@@ -7,7 +7,7 @@ namespace MediaDeck.Core.Services.FileChangeMonitor;
 /// <summary>
 /// FileSystemWatcherの生成・破棄・イベント登録を一元管理するクラスです。
 /// </summary>
-public class FileSystemWatcherManager : IDisposable {
+public sealed class FileSystemWatcherManager : IDisposable {
 	private readonly ConcurrentDictionary<string, FileSystemWatcher> _watchers = new();
 	private readonly ILogger _logger;
 	private readonly Action<string> _onFileDeleted;

@@ -10,7 +10,7 @@ namespace MediaDeck.Core.Tests.Models.Files;
 /// <summary>
 /// <see cref="TagsDetailModel"/> の単体テスト。
 /// </summary>
-public class TagsDetailModelTests : IDisposable {
+public sealed class TagsDetailModelTests : IDisposable {
 	private readonly Mock<ITagsManager> _tagsManagerMock;
 	private readonly TagsDetailModel _sut;
 

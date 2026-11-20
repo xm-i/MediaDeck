@@ -27,7 +27,7 @@ public static class SortItemFactory {
 			SortItemKey.UsageCount => new SortItem(sortItemObject.SortItemKey, mf => (object?)mf.UsageCount, sortItemObject.Direction),
 			SortItemKey.Duration => new SortItem(sortItemObject.SortItemKey, mf => (object?)(mf.VideoFile != null ? mf.VideoFile.Duration : null), sortItemObject.Direction),
 			SortItemKey.Random => new RandomSortItem(seed, sortItemObject.SortItemKey, sortItemObject.Direction),
-			_ => throw new ArgumentException(),
+			_ => throw new ArgumentException($"Unsupported sort item key: {sortItemObject.SortItemKey}", nameof(sortItemObject)),
 		};
 	}
 }

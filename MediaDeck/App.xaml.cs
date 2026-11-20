@@ -85,7 +85,7 @@ public partial class App {
 		// 登録フォルダ数が0件の場合はフォルダ管理画面を自動で開く
 		if (this._configStore.Config.FolderManagerConfig.Folders.Count == 0) {
 			var windowService = Ioc.Default.GetRequiredService<IWindowService>();
-			var mainWindow = windowManager.Windows.FirstOrDefault()?.Window;
+			var mainWindow = windowManager.Windows.Count > 0 ? windowManager.Windows[0].Window : null;
 			windowService.ActivateCentered<FolderManagerWindow>(mainWindow);
 		}
 

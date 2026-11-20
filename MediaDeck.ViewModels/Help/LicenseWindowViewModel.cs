@@ -8,7 +8,7 @@ namespace MediaDeck.ViewModels.Help;
 /// </summary>
 [Inject(InjectServiceLifetime.Transient)]
 public class LicenseWindowViewModel : ViewModelBase {
-	private static readonly Lazy<IReadOnlyList<LicenseInfo>> _cachedLicenses = new(LoadLicenses);
+	private static readonly Lazy<List<LicenseInfo>> _cachedLicenses = new(LoadLicenses);
 
 	/// <summary>
 	/// コンストラクタ
@@ -19,7 +19,7 @@ public class LicenseWindowViewModel : ViewModelBase {
 		this.SelectedLicense = new BindableReactiveProperty<LicenseInfo?>().AddTo(this.CompositeDisposable);
 
 		// 初期選択
-		this.SelectedLicense.Value = this.Licenses.FirstOrDefault();
+		this.SelectedLicense.Value = this.Licenses.Count > 0 ? this.Licenses[0] : null;
 	}
 
 	/// <summary>
@@ -40,7 +40,7 @@ public class LicenseWindowViewModel : ViewModelBase {
 	/// 埋め込みリソースからライセンス情報を読み込みます。
 	/// </summary>
 	/// <returns>読み込まれたライセンス情報のリスト</returns>
-	private static IReadOnlyList<LicenseInfo> LoadLicenses() {
+	private static List<LicenseInfo> LoadLicenses() {
 		var assembly = typeof(LicenseWindowViewModel).Assembly;
 		var resourceName = assembly.GetManifestResourceNames()
 			.FirstOrDefault(n => n.EndsWith("licenses.json", StringComparison.OrdinalIgnoreCase))

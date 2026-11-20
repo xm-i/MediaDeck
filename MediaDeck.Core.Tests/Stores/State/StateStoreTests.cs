@@ -12,7 +12,7 @@ using Shouldly;
 
 namespace MediaDeck.Core.Tests.Stores.State;
 
-public class StateStoreTests : IDisposable {
+public sealed class StateStoreTests : IDisposable {
 	private readonly Mock<IServiceProvider> _serviceProviderMock;
 	private readonly Mock<IServiceScopeFactory> _serviceScopeFactoryMock;
 	private readonly Mock<IServiceScope> _serviceScopeMock;

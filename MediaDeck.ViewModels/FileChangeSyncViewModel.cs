@@ -111,7 +111,7 @@ public partial class FileChangeSyncViewModel : ViewModelBase {
 
 		this._view = this._service.Tracker.UnprocessedChanges.CreateView(x => x).AddTo(this.CompositeDisposable);
 		this.Changes = this._view.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current).AddTo(this.CompositeDisposable);
-		this.FilteredCount.Value = this.Changes.Count();
+		this.FilteredCount.Value = ((ICollection<FileChangeItem>)this.Changes).Count;
 		this.FileChangeItems.Value = this._view.ToArray();
 
 		// フィルター変更の監視。選択されたフィルターに応じて表示リストを絞り込みます。
@@ -134,7 +134,7 @@ public partial class FileChangeSyncViewModel : ViewModelBase {
 				h => this.Changes.CollectionChanged += h,
 				h => this.Changes.CollectionChanged -= h)
 			.Subscribe(_ => {
-				this.FilteredCount.Value = this.Changes.Count();
+				this.FilteredCount.Value = ((ICollection<FileChangeItem>)this.Changes).Count;
 				this.FileChangeItems.Value = this._view.ToArray();
 			})
 			.AddTo(this.CompositeDisposable);

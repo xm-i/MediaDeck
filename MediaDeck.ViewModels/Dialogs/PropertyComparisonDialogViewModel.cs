@@ -83,14 +83,14 @@ public class PropertyComparisonDialogViewModel : ViewModelBase {
 			.Select(op => new DisplayObject<SearchTypeComparison>(this.GetOperatorLabel(op), op))
 			.ToList();
 
-		this.SelectedOperator.Value = this.OperatorItems.FirstOrDefault();
+		this.SelectedOperator.Value = this.OperatorItems.Count > 0 ? this.OperatorItems[0] : null;
 
 		if (descriptor.ValueType.IsEnum) {
 			this.EnumItems = Enum.GetValues(descriptor.ValueType)
 				.Cast<object>()
 				.Select(v => new DisplayObject<object>(v.ToString() ?? string.Empty, v))
 				.ToList();
-			this.EnumValue.Value = this.EnumItems.FirstOrDefault()?.Value;
+			this.EnumValue.Value = this.EnumItems.Count > 0 ? this.EnumItems[0].Value : null;
 		} else {
 			this.EnumItems = Array.Empty<DisplayObject<object>>();
 		}

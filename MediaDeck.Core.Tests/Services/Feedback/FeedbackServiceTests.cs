@@ -10,7 +10,7 @@ namespace MediaDeck.Core.Tests.Services.Feedback;
 /// <summary>
 /// <see cref="FeedbackService"/> の単体テストクラス
 /// </summary>
-public class FeedbackServiceTests : IDisposable {
+public sealed class FeedbackServiceTests : IDisposable {
 	private readonly StubAppPathProvider _appPathProvider;
 
 	/// <summary>

@@ -20,7 +20,7 @@ namespace MediaDeck.Services;
 /// ウィンドウ単位のコンテキスト実装。
 /// ウィンドウ固有のDIスコープのライフサイクルを管理する。
 /// </summary>
-public class WindowContext(IServiceScope scope, Guid windowId) : IWindowContext {
+public sealed class WindowContext(IServiceScope scope, Guid windowId) : IWindowContext {
 	private readonly IServiceScope _scope = scope;
 
 	public IServiceProvider Services {
@@ -41,6 +41,7 @@ public class WindowContext(IServiceScope scope, Guid windowId) : IWindowContext 
 		this.Window = window;
 	}
 
+	/// <inheritdoc/>
 	public void Dispose() {
 		this._scope.Dispose();
 	}

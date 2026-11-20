@@ -11,7 +11,7 @@ namespace MediaDeck.Core.Tests.Models.Files;
 /// <summary>
 /// <see cref="DetailSelectorModel"/> の単体テスト。
 /// </summary>
-public class DetailSelectorModelTests : IDisposable {
+public sealed class DetailSelectorModelTests : IDisposable {
 	private readonly PropertiesDetailModel _propertiesModel;
 	private readonly TagsDetailModel _tagsModel;
 	private readonly DetailSelectorModel _sut;

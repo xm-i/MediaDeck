@@ -140,7 +140,7 @@ public class MainWindowViewModel : ViewModelBase {
 		}
 
 		// 最後のタブを移動した際、他にウィンドウがあればこのウィンドウを閉じる
-		if (!this.Tabs.Any() && this._rootState.Windows.Count > 1) {
+		if (((ICollection<TabViewModel>)this.Tabs).Count == 0 && this._rootState.Windows.Count > 1) {
 			this._rootState.Windows.Remove(this._windowState);
 		}
 	}
@@ -157,7 +157,7 @@ public class MainWindowViewModel : ViewModelBase {
 		}
 
 		// 最後のタブを閉じたらウィンドウを閉じる。他にウィンドウがあればこのウィンドウを閉じる
-		if (!this.Tabs.Any() && this._rootState.Windows.Count > 1) {
+		if (((ICollection<TabViewModel>)this.Tabs).Count == 0 && this._rootState.Windows.Count > 1) {
 			this._rootState.Windows.Remove(this._windowState);
 		}
 	}

@@ -16,7 +16,7 @@ namespace MediaDeck.Core.Tests.Models.FileDetailManagers;
 /// <summary>
 /// FilesManagerクラスのテスト
 /// </summary>
-public class FilesManagerTests : IDisposable {
+public sealed class FilesManagerTests : IDisposable {
 	private readonly SqliteConnection _connection;
 	private readonly Mock<IDbContextFactory<MediaDeckDbContext>> _dbFactoryMock;
 	private readonly AppNotificationDispatcher _notificationDispatcher;

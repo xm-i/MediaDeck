@@ -8,7 +8,7 @@ namespace MediaDeck.Core.Tests.Models.NotificationDispatcher;
 /// <summary>
 ///     <see cref="SearchConditionNotificationDispatcher"/> のテストクラスです。
 /// </summary>
-public class SearchConditionNotificationDispatcherTests : IDisposable {
+public sealed class SearchConditionNotificationDispatcherTests : IDisposable {
 	private readonly SearchConditionNotificationDispatcher _dispatcher = new();
 
 	public void Dispose() {
@@ -135,5 +135,7 @@ public class SearchConditionNotificationDispatcherTests : IDisposable {
 		// Assert — Disposed後にOnNextすると例外が発生する
 		Should.Throw<ObjectDisposedException>(() =>
 			dispatcher.AddRequest.OnNext(new Moq.Mock<ISearchCondition>().Object));
+		Should.Throw<ObjectDisposedException>(() =>
+			dispatcher.SearchConditionChanged.OnNext(Unit.Default));
 	}
 }

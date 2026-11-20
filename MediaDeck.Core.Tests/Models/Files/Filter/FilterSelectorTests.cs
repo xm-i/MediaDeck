@@ -10,7 +10,7 @@ using Shouldly;
 
 namespace MediaDeck.Core.Tests.Models.Files.Filter;
 
-public class FilterSelectorTests : IDisposable {
+public sealed class FilterSelectorTests : IDisposable {
 	private readonly Mock<ISearchConditionNotificationDispatcher> _dispatcherMock;
 	private readonly SearchDefinitionsConfigModel _searchDefinitions;
 	private readonly FilterSelector _sut;
