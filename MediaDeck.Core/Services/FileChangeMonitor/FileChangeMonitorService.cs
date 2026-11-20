@@ -535,16 +535,18 @@ public class FileChangeMonitorService : ModelBase {
 	}
 
 	/// <summary>
-	/// 新規追加されたアイテムをファイル登録キューへ投入します。フォルダグループ登録前に配下ファイルを優先します。
+	/// 新規追加されたアイテムをファイル登録キューへ一括投入します。フォルダグループ登録前に配下ファイルを優先します。
 	/// </summary>
 	/// <param name="targetItems">反映対象のアイテム一覧</param>
 	private void EnqueueAddedItems(FileChangeItem[] targetItems) {
 		// フォルダ(FolderGroup)登録時に配下ファイルのサムネイルを利用できるよう、通常ファイルを先にキューへ投入する
-		var addedItems = targetItems
+		var addedPaths = targetItems
 			.Where(static x => x.ChangeType == FileChangeType.Added)
-			.OrderBy(static x => Directory.Exists(x.NewPath) ? 1 : 0);
-		foreach (var item in addedItems) {
-			this._fileRegistrar.Enqueue(item.NewPath);
+			.OrderBy(static x => Directory.Exists(x.NewPath) ? 1 : 0)
+			.Select(static x => x.NewPath)
+			.ToList();
+		if (addedPaths.Count > 0) {
+			this._fileRegistrar.EnqueueRange(addedPaths);
 		}
 	}
 

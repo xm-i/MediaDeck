@@ -1,3 +1,4 @@
+using MediaDeck.Common.Utilities;
 using MediaDeck.Composition.Database;
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces;
@@ -32,6 +33,7 @@ public class FileChangeMonitorServiceTests : IDisposable {
 	private readonly SqliteConnection _connection;
 	private readonly DbContextOptions<MediaDeckDbContext> _options;
 	private readonly Mock<IDbContextFactory<MediaDeckDbContext>> _dbFactoryMock;
+	private readonly ServiceProvider _serviceProvider;
 	private readonly ConfigModel _config;
 	private readonly IStringProvider _stringProvider;
 	private readonly AppNotificationDispatcher _appNotifDispatcher;
@@ -76,8 +78,8 @@ public class FileChangeMonitorServiceTests : IDisposable {
 		services.AddSingleton<ConfigModel>();
 		services.AddTransient<SortObject>(sp => new SortObject(sp));
 		services.AddTransient<SortItemObject>();
-		var provider = services.BuildServiceProvider();
-		this._config = provider.GetRequiredService<ConfigModel>();
+		this._serviceProvider = services.BuildServiceProvider();
+		this._config = this._serviceProvider.GetRequiredService<ConfigModel>();
 
 		var trackerLogger = new Mock<ILogger<FileChangeTracker>>();
 		this._tracker = new FileChangeTracker(this._dbFactoryMock.Object, trackerLogger.Object, this._config);
@@ -102,13 +104,15 @@ public class FileChangeMonitorServiceTests : IDisposable {
 			.Returns(unknownFactoryMock.Object);
 
 		this._fileRegistrar = new FileRegistrar(this._config, new Mock<ILogger<FileRegistrar>>().Object, mediaItemTypeService.Object);
-		this._stringProvider = provider.GetRequiredService<IStringProvider>();
+		this._stringProvider = this._serviceProvider.GetRequiredService<IStringProvider>();
 		this._sut = new FileChangeMonitorService(this._dbFactoryMock.Object, this._tracker, logger.Object, this._appNotifDispatcher, this._fileRegistrar, dbWriteCoord.Object, this._stringProvider);
 	}
 
 	/// <inheritdoc />
 	public void Dispose() {
 		this._sut.Dispose();
+		this._fileRegistrar.Dispose();
+		this._serviceProvider.Dispose();
 		this._connection.Dispose();
 		if (Directory.Exists(this._tempRoot)) {
 			try {
@@ -669,6 +673,173 @@ public class FileChangeMonitorServiceTests : IDisposable {
 
 		await using (var db = new MediaDeckDbContext(this._options)) {
 			(await db.MediaItems.FindAsync(1L))!.FilePath.ShouldBe(pathB);
+		}
+	}
+
+	/// <summary>
+	/// 複数の新規ファイルと複数フォルダグループを一括適用した場合に、
+	/// 取りこぼしなく全ファイルがフォルダグループより先へキュー投入されることを検証します。
+	/// </summary>
+	[Fact]
+	public async Task ApplyChangesAsync_MultipleAddedFilesAndFolderGroups_EnqueuesAllViaBatchInExpectedOrder() {
+		var dir1 = Path.Combine(this._tempRoot, "BatchAlbum1");
+		var dir2 = Path.Combine(this._tempRoot, "BatchAlbum2");
+		Directory.CreateDirectory(dir1);
+		Directory.CreateDirectory(dir2);
+
+		var files = Enumerable.Range(1, 6)
+			.Select(i => {
+				var p = Path.Combine(i <= 3 ? dir1 : dir2, $"img_{i:D2}.jpg");
+				File.WriteAllText(p, $"content-{i}");
+				return p;
+			})
+			.ToList();
+
+		var items = new List<FileChangeItem> {
+			new() { ChangeType = FileChangeType.Added, NewPath = dir1 },
+			new() { ChangeType = FileChangeType.Added, NewPath = dir2 },
+		};
+		items.AddRange(files.Select(p => new FileChangeItem { ChangeType = FileChangeType.Added, NewPath = p }));
+		this._tracker.UnprocessedChanges.AddRange(items);
+
+		await this._sut.ApplyChangesAsync(items, false);
+		await this.WaitForRegisteredCountAsync(files.Count + 2);
+
+		lock (this._registeredPaths) {
+			this._registeredPaths.Count.ShouldBe(files.Count + 2);
+			var firstDirIndex = Math.Min(this._registeredPaths.IndexOf(dir1), this._registeredPaths.IndexOf(dir2));
+			firstDirIndex.ShouldBe(files.Count);
+			foreach (var f in files) {
+				this._registeredPaths.IndexOf(f).ShouldBeLessThan(firstDirIndex);
+			}
+		}
+	}
+
+	/// <summary>
+	/// A -&gt; B の反映処理中に実体が B -&gt; A へ戻って Reconcile で相殺消去された場合でも、
+	/// 反映完了後に自動再評価が走り、最新 DB (B) と実体 (A) の差分（B -&gt; A）が再検出されることを検証します。
+	/// </summary>
+	[Fact]
+	public async Task ApplyChangesAsync_RoundTripBackToADuringApply_ReschedulesAndDetectsBToA() {
+		var pathA = Path.Combine(this._tempRoot, "RoundApplyA.jpg");
+		var pathB = Path.Combine(this._tempRoot, "RoundApplyB.jpg");
+		File.WriteAllText(pathB, "roundtrip-apply-content");
+		var contentHash = FileHashUtility.ComputeFileHash(pathB);
+		var contentSize = new FileInfo(pathB).Length;
+
+		await using (var db = new MediaDeckDbContext(this._options)) {
+			db.MediaItems.Add(new MediaItem {
+				MediaItemId = 1,
+				MediaType = MediaType.Image,
+				FilePath = pathA,
+				DirectoryPath = this._tempRoot,
+				PreHash = contentHash,
+				FileSize = contentSize,
+				Description = string.Empty,
+				IsUnderFolderGroup = false,
+			});
+			await db.SaveChangesAsync();
+		}
+
+		var pausedBeforeDbCommit = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+		var resumeDbCommit = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+		var delayedCoord = new Mock<IDatabaseWriteCoordinator>();
+		delayedCoord.Setup(x => x.ExecuteAsync(It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()))
+			.Returns<Func<CancellationToken, Task>, CancellationToken>(async (op, ct) => {
+				pausedBeforeDbCommit.TrySetResult();
+				await resumeDbCommit.Task;
+				await op(ct);
+			});
+
+		this._tracker.StabilityDelay = TimeSpan.FromMilliseconds(50);
+		using var service = new FileChangeMonitorService(
+			this._dbFactoryMock.Object,
+			this._tracker,
+			new Mock<ILogger<FileChangeMonitorService>>().Object,
+			this._appNotifDispatcher,
+			this._fileRegistrar,
+			delayedCoord.Object,
+			this._stringProvider);
+
+		this._tracker.OnRenamed(pathA, pathB);
+		await this._tracker.ProcessPendingChangesAsync();
+		var itemAtoB = this._tracker.UnprocessedChanges.Single();
+
+		// A -> B の反映を開始し、DB更新の前に一時停止させる
+		var applyTask = service.ApplyChangesAsync([itemAtoB], false);
+		await pausedBeforeDbCommit.Task.WaitAsync(TimeSpan.FromSeconds(5));
+
+		// 反映完了前に実体が B -> A へ戻り、Reconcile で UnprocessedChanges が空へ相殺される
+		File.Move(pathB, pathA);
+		this._tracker.OnRenamed(pathB, pathA);
+		await this._tracker.ProcessPendingChangesAsync();
+		this._tracker.UnprocessedChanges.ShouldBeEmpty();
+
+		// 遅延していた A -> B の DB 更新が完了すると、自動で再評価がスケジュールされ B -> A が再検出される
+		resumeDbCommit.SetResult();
+		await applyTask;
+
+		var deadline = DateTime.UtcNow.AddSeconds(5);
+		while (this._tracker.UnprocessedChanges.Count == 0 && DateTime.UtcNow < deadline) {
+			await Task.Delay(25);
+		}
+
+		this._tracker.UnprocessedChanges.Count.ShouldBe(1);
+		var redetected = this._tracker.UnprocessedChanges[0];
+		redetected.MediaItemId.ShouldBe(1L);
+		redetected.ChangeType.ShouldBe(FileChangeType.Moved);
+		redetected.OldPath.ShouldBe(pathB);
+		redetected.NewPath.ShouldBe(pathA);
+	}
+
+	/// <summary>
+	/// 上書き移動の連鎖（B 削除 -&gt; A -&gt; B -&gt; C）を検知してそのまま DB へ一括反映しても、
+	/// UNIQUE 制約エラーなく正しく更新・削除されることを検証します。
+	/// </summary>
+	[Fact]
+	public async Task ApplyChangesAsync_OverwriteMoveChain_AppliesCleanlyWithoutUniqueConstraintError() {
+		var pathA = Path.Combine(this._tempRoot, "ApplyChainOverA.jpg");
+		var pathB = Path.Combine(this._tempRoot, "ApplyChainOverB.jpg");
+		var pathC = Path.Combine(this._tempRoot, "ApplyChainOverC.jpg");
+		File.WriteAllText(pathC, "chain-a-bytes");
+
+		await using (var db = new MediaDeckDbContext(this._options)) {
+			db.MediaItems.AddRange(
+				new MediaItem {
+					MediaItemId = 1,
+					MediaType = MediaType.Image,
+					FilePath = pathA,
+					DirectoryPath = this._tempRoot,
+					PreHash = FileHashUtility.ComputeFileHash(pathC),
+					FileSize = new FileInfo(pathC).Length,
+					Description = string.Empty,
+					IsUnderFolderGroup = false,
+				},
+				new MediaItem {
+					MediaItemId = 2,
+					MediaType = MediaType.Image,
+					FilePath = pathB,
+					DirectoryPath = this._tempRoot,
+					PreHash = "chain-b-hash",
+					FileSize = 123,
+					Description = string.Empty,
+					IsUnderFolderGroup = false,
+				});
+			await db.SaveChangesAsync();
+		}
+
+		this._tracker.OnDeleted(pathB);
+		this._tracker.OnRenamed(pathA, pathB);
+		this._tracker.OnRenamed(pathB, pathC);
+		await this._tracker.ProcessPendingChangesAsync();
+
+		this._tracker.UnprocessedChanges.Count.ShouldBe(2);
+		await this._sut.ApplyChangesAsync(this._tracker.UnprocessedChanges.ToArray(), false);
+
+		this._tracker.UnprocessedChanges.ShouldBeEmpty();
+		await using (var db = new MediaDeckDbContext(this._options)) {
+			(await db.MediaItems.FindAsync(1L))!.FilePath.ShouldBe(pathC);
+			(await db.MediaItems.FindAsync(2L)).ShouldBeNull();
 		}
 	}
 

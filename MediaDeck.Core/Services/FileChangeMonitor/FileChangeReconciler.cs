@@ -79,17 +79,18 @@ internal sealed class FileChangeReconciler {
 	/// <param name="cancellationToken">キャンセルトークン</param>
 	/// <returns>算出された変更差分およびリトライ情報</returns>
 	public async Task<ReconcileResult> ReconcileAsync(ReconcileInput input, CancellationToken cancellationToken) {
+		var configSnapshot = this.CaptureConfigSnapshot();
 		var context = this.BuildSearchContext(input);
 
 		await using var db = await this._dbFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
 		var dbItemsById = await this.FetchAffectedDbItemsAsync(db, context.CandidateOldPaths, cancellationToken).ConfigureAwait(false);
-		var resolvedPathById = BuildResolvedTargetPaths(dbItemsById, context, input.RenameHistory);
+		var resolvedPathById = ResolveTargetPaths(dbItemsById, context, input.RenameHistory);
 
 		var diskFiles = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 		var diskFolderGroups = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-		this.CollectDiskEntries(context.CandidateNewPaths, context.UntouchedNewPaths, diskFiles, diskFolderGroups);
+		this.CollectDiskEntries(context.CandidateNewPaths, context.UntouchedNewPaths, configSnapshot, diskFiles, diskFolderGroups);
 
-		var classification = this.ClassifyDbItems(dbItemsById, resolvedPathById, context, diskFiles, diskFolderGroups);
+		var classification = this.ClassifyDbItems(dbItemsById, resolvedPathById, context, configSnapshot, diskFiles, diskFolderGroups);
 
 		var remainingDiskFiles = await this.ExcludeRegisteredAndOverwrittenFilesAsync(
 			db,
@@ -97,6 +98,7 @@ internal sealed class FileChangeReconciler {
 			diskFolderGroups,
 			classification.EvaluatedDbPaths,
 			classification.MissingDbItems,
+			configSnapshot,
 			cancellationToken).ConfigureAwait(false);
 
 		var addedEvaluation = this.EvaluateAddedAndCrossBatchMoves(
@@ -131,6 +133,7 @@ internal sealed class FileChangeReconciler {
 		var candidateOldPaths = new HashSet<string>(input.DirtyPaths, StringComparer.OrdinalIgnoreCase);
 		var candidateNewPaths = new HashSet<string>(input.DirtyPaths, StringComparer.OrdinalIgnoreCase);
 		var existingByOldPath = new Dictionary<string, FileChangeItem>(StringComparer.OrdinalIgnoreCase);
+		var existingDeletedIds = new HashSet<long>();
 
 		foreach (var existing in input.ScopedExistingItems) {
 			if (!string.IsNullOrEmpty(existing.OldPath)) {
@@ -139,6 +142,9 @@ internal sealed class FileChangeReconciler {
 				if (existing.ChangeType is FileChangeType.Renamed or FileChangeType.Moved) {
 					existingByOldPath[normOld] = existing;
 				}
+			}
+			if (existing.ChangeType == FileChangeType.Deleted && existing.MediaItemId.HasValue) {
+				existingDeletedIds.Add(existing.MediaItemId.Value);
 			}
 			if (!string.IsNullOrEmpty(existing.NewPath)) {
 				var normNew = FileChangePathUtility.NormalizePath(existing.NewPath);
@@ -166,30 +172,83 @@ internal sealed class FileChangeReconciler {
 			candidateOldPaths,
 			candidateNewPaths,
 			existingByOldPath,
+			existingDeletedIds,
 			untouchedMediaItemIds,
 			untouchedNewPaths);
 	}
 
 	/// <summary>
-	/// 影響範囲の DB レコードに対してリネーム履歴をリプレイし、期待パスを算出します。
+	/// 影響範囲の DB レコードに対してリネーム履歴を時系列にリプレイし、上書き消失を考慮した期待パスを算出します。
 	/// </summary>
 	/// <param name="dbItemsById">DBレコード辞書</param>
 	/// <param name="context">検索コンテキスト</param>
 	/// <param name="renameHistory">時系列のリネーム履歴</param>
 	/// <returns>メディアアイテムIDごとの解決済みパス辞書</returns>
-	private static Dictionary<long, string> BuildResolvedTargetPaths(
+	private static Dictionary<long, string> ResolveTargetPaths(
 		Dictionary<long, MediaItem> dbItemsById,
 		ReconcileSearchContext context,
 		List<RenameOperation> renameHistory) {
-		var resolvedPathById = new Dictionary<long, string>();
+		var states = new Dictionary<long, ReplayTrackState>();
 		foreach (var dbItem in dbItemsById.Values) {
 			if (context.UntouchedMediaItemIds.Contains(dbItem.MediaItemId)) {
 				continue;
 			}
-			var resolvedPath = ReplayRenames(dbItem.FilePath, context.ExistingByOldPath, renameHistory);
-			resolvedPathById[dbItem.MediaItemId] = resolvedPath;
-			context.CandidateNewPaths.Add(FileChangePathUtility.NormalizePath(dbItem.FilePath));
-			context.CandidateNewPaths.Add(resolvedPath);
+
+			var dbNormPath = FileChangePathUtility.NormalizePath(dbItem.FilePath);
+			if (context.ExistingDeletedIds.Contains(dbItem.MediaItemId)) {
+				// 既に前バッチで消失済みとして扱われているレコードには後続リネームを適用しない
+				states[dbItem.MediaItemId] = new ReplayTrackState(dbNormPath, dbNormPath, isOverwrittenOrDeleted: true);
+				continue;
+			}
+
+			var initialPath = dbNormPath;
+			if (context.ExistingByOldPath.TryGetValue(dbNormPath, out var seeded) && !string.IsNullOrEmpty(seeded.NewPath)) {
+				initialPath = FileChangePathUtility.NormalizePath(seeded.NewPath);
+			}
+			states[dbItem.MediaItemId] = new ReplayTrackState(dbNormPath, initialPath, isOverwrittenOrDeleted: false);
+		}
+
+		// 全対象レコードをステップ単位で進め、別 DB レコードの上書き移動先となったレコードは以降のリネーム対象から外す
+		foreach (var op in renameHistory) {
+			var movedIds = new HashSet<long>();
+			var movedTargetPaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+			foreach (var (id, state) in states) {
+				if (state.IsOverwrittenOrDeleted) {
+					continue;
+				}
+				if (string.Equals(state.CurrentPath, op.OldPath, StringComparison.OrdinalIgnoreCase)) {
+					state.CurrentPath = op.NewPath;
+					movedIds.Add(id);
+					movedTargetPaths.Add(op.NewPath);
+				} else if (FileChangePathUtility.IsSubPathOf(state.CurrentPath, op.OldPath)) {
+					var replaced = FileChangePathUtility.ReplacePathPrefix(state.CurrentPath, op.OldPath, op.NewPath);
+					state.CurrentPath = replaced;
+					movedIds.Add(id);
+					movedTargetPaths.Add(replaced);
+				}
+			}
+
+			if (movedIds.Count == 0 || string.Equals(op.OldPath, op.NewPath, StringComparison.OrdinalIgnoreCase)) {
+				continue;
+			}
+
+			foreach (var (id, state) in states) {
+				if (state.IsOverwrittenOrDeleted || movedIds.Contains(id)) {
+					continue;
+				}
+				if (movedTargetPaths.Contains(state.CurrentPath)) {
+					state.IsOverwrittenOrDeleted = true;
+					state.CurrentPath = state.OriginalDbPath;
+				}
+			}
+		}
+
+		var resolvedPathById = new Dictionary<long, string>(states.Count);
+		foreach (var (id, state) in states) {
+			resolvedPathById[id] = state.CurrentPath;
+			context.CandidateNewPaths.Add(state.OriginalDbPath);
+			context.CandidateNewPaths.Add(state.CurrentPath);
 		}
 		return resolvedPathById;
 	}
@@ -341,11 +400,13 @@ internal sealed class FileChangeReconciler {
 	/// </summary>
 	/// <param name="candidateNewPaths">走査対象の候補パス集合</param>
 	/// <param name="untouchedNewPaths">除外すべき未変更対象パス集合</param>
+	/// <param name="configSnapshot">対象拡張子およびグループ化ルート設定のスナップショット</param>
 	/// <param name="diskFiles">収集した実在ファイル集合</param>
 	/// <param name="diskFolderGroups">収集したフォルダグループ候補ディレクトリ集合</param>
 	private void CollectDiskEntries(
 		HashSet<string> candidateNewPaths,
 		HashSet<string> untouchedNewPaths,
+		ConfigSnapshot configSnapshot,
 		HashSet<string> diskFiles,
 		HashSet<string> diskFolderGroups) {
 		var enumFileOptions = new EnumerationOptions {
@@ -371,11 +432,11 @@ internal sealed class FileChangeReconciler {
 					diskFiles.Add(FileChangePathUtility.NormalizePath(file));
 				}
 
-				if (this.IsGroupingRoot(path)) {
+				if (IsGroupingRoot(path, configSnapshot)) {
 					foreach (var subDir in Directory.EnumerateDirectories(path, "*", enumDirOptions)) {
 						diskFolderGroups.Add(FileChangePathUtility.NormalizePath(subDir));
 					}
-				} else if (this.IsGroupingRootChildDirectory(path)) {
+				} else if (IsGroupingRootChildDirectory(path, configSnapshot)) {
 					diskFolderGroups.Add(FileChangePathUtility.NormalizePath(path));
 				}
 			} catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) {
@@ -395,6 +456,7 @@ internal sealed class FileChangeReconciler {
 	/// <param name="dbItemsById">DBレコード辞書</param>
 	/// <param name="resolvedPathById">解決済みパス辞書</param>
 	/// <param name="context">検索コンテキスト</param>
+	/// <param name="configSnapshot">対象拡張子およびグループ化ルート設定のスナップショット</param>
 	/// <param name="diskFiles">実在ファイル集合（消費されたものは除去）</param>
 	/// <param name="diskFolderGroups">実在フォルダグループ候補集合（消費されたものは除去）</param>
 	/// <returns>DBレコード分類結果</returns>
@@ -402,6 +464,7 @@ internal sealed class FileChangeReconciler {
 		Dictionary<long, MediaItem> dbItemsById,
 		Dictionary<long, string> resolvedPathById,
 		ReconcileSearchContext context,
+		ConfigSnapshot configSnapshot,
 		HashSet<string> diskFiles,
 		HashSet<string> diskFolderGroups) {
 		var evaluatedDbPaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -432,6 +495,7 @@ internal sealed class FileChangeReconciler {
 		this.ClassifyPathChangedItems(
 			pathChangedItems,
 			context.ExistingByOldPath,
+			configSnapshot,
 			diskFiles,
 			diskFolderGroups,
 			claimedTargetPaths,
@@ -440,8 +504,9 @@ internal sealed class FileChangeReconciler {
 			retryPaths,
 			retryRenames);
 
-		this.ClassifyPathUnchangedItems(
+		ClassifyPathUnchangedItems(
 			pathUnchangedItems,
+			configSnapshot,
 			claimedTargetPaths,
 			diskFiles,
 			diskFolderGroups,
@@ -451,11 +516,12 @@ internal sealed class FileChangeReconciler {
 	}
 
 	/// <summary>
-	/// リネーム履歴によりパスが変化した DB レコードを評価します。
+	/// リネーム履歴によりパスが変化した DB レコードを評価します。同一の移動先パスへ複数候補が競合した場合は勝者 1 件のみを採用します。
 	/// </summary>
 	private void ClassifyPathChangedItems(
 		List<(MediaItem DbItem, string DbNormPath, string ResolvedPath)> pathChangedItems,
 		Dictionary<string, FileChangeItem> existingByOldPath,
+		ConfigSnapshot configSnapshot,
 		HashSet<string> diskFiles,
 		HashSet<string> diskFolderGroups,
 		HashSet<string> claimedTargetPaths,
@@ -463,70 +529,146 @@ internal sealed class FileChangeReconciler {
 		List<MediaItem> missingDbItems,
 		List<string> retryPaths,
 		List<RenameOperation> retryRenames) {
-		foreach (var (dbItem, dbNormPath, resolvedPath) in pathChangedItems) {
-			var isDirectory = dbItem.MediaType == MediaType.FolderGroup;
-			long targetFileSize = 0;
-			var existsAtTarget = false;
-			var ioBlocked = false;
-
-			if (isDirectory) {
-				existsAtTarget = Directory.Exists(resolvedPath);
-			} else if (this.IsTargetFile(resolvedPath)) {
-				try {
-					var fi = new FileInfo(resolvedPath);
-					if (fi.Exists) {
-						targetFileSize = fi.Length;
-						existsAtTarget = true;
-						this._resetRetryCount(resolvedPath);
-					}
-				} catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) {
-					if (this._tryConsumeRetrySlot(resolvedPath)) {
-						ioBlocked = true;
-					} else {
-						this._logger.LogWarning(ex, "Exceeded retry limit while reading renamed file info; falling back to DB size: {Path}", resolvedPath);
-						targetFileSize = dbItem.FileSize;
-						existsAtTarget = File.Exists(resolvedPath);
+		foreach (var group in pathChangedItems.GroupBy(static x => x.ResolvedPath, StringComparer.OrdinalIgnoreCase)) {
+			var candidates = group.ToList();
+			(MediaItem DbItem, string DbNormPath, string ResolvedPath) winner;
+			if (candidates.Count == 1) {
+				winner = candidates[0];
+			} else {
+				winner = SelectWinningPathChangedItem(candidates, group.Key, existingByOldPath);
+				foreach (var candidate in candidates) {
+					if (candidate.DbItem.MediaItemId != winner.DbItem.MediaItemId) {
+						missingDbItems.Add(candidate.DbItem);
 					}
 				}
 			}
 
-			if (ioBlocked) {
-				retryPaths.Add(dbNormPath);
-				retryPaths.Add(resolvedPath);
-				retryRenames.Add(new RenameOperation(dbNormPath, resolvedPath));
-				continue;
-			}
+			this.EvaluatePathChangedWinner(
+				winner,
+				existingByOldPath,
+				configSnapshot,
+				diskFiles,
+				diskFolderGroups,
+				claimedTargetPaths,
+				reconciledItems,
+				missingDbItems,
+				retryPaths,
+				retryRenames);
+		}
+	}
 
-			if (!existsAtTarget) {
-				missingDbItems.Add(dbItem);
-				continue;
+	/// <summary>
+	/// 同一の遷移先パスへ競合した複数候補の中から、ハッシュ・ファイルサイズ・既存状態に基づいて勝者 1 件を選定します。
+	/// </summary>
+	/// <param name="candidates">競合している DB レコード候補一覧</param>
+	/// <param name="targetPath">競合している遷移先パス</param>
+	/// <param name="existingByOldPath">既存の移動・リネーム未処理アイテム辞書</param>
+	/// <returns>採用する勝者候補</returns>
+	private static (MediaItem DbItem, string DbNormPath, string ResolvedPath) SelectWinningPathChangedItem(
+		List<(MediaItem DbItem, string DbNormPath, string ResolvedPath)> candidates,
+		string targetPath,
+		Dictionary<string, FileChangeItem> existingByOldPath) {
+		string? targetHash = null;
+		long? targetSize = null;
+		if (File.Exists(targetPath)) {
+			try {
+				var fi = new FileInfo(targetPath);
+				if (fi.Exists) {
+					targetSize = fi.Length;
+					targetHash = FileHashUtility.ComputeFileHash(targetPath);
+				}
+			} catch {
+				// 読み取り失敗時はサイズ・ハッシュ以外の基準で優先順位を決定する
 			}
+		}
 
-			var wasMoved = existingByOldPath.TryGetValue(dbNormPath, out var prev) && prev.ChangeType == FileChangeType.Moved;
-			reconciledItems.Add(new FileChangeItem {
-				MediaItemId = dbItem.MediaItemId,
-				ChangeType = wasMoved ? FileChangeType.Moved : FileChangeType.Renamed,
-				OldPath = dbItem.FilePath,
-				NewPath = resolvedPath,
-				FileSize = targetFileSize,
-				OldHash = dbItem.PreHash ?? string.Empty,
-				IsPending = false
-			});
+		return candidates
+			.OrderByDescending(c => !string.IsNullOrEmpty(targetHash)
+				&& !string.IsNullOrEmpty(c.DbItem.PreHash)
+				&& string.Equals(c.DbItem.PreHash, targetHash, StringComparison.OrdinalIgnoreCase))
+			.ThenByDescending(c => targetSize.HasValue && c.DbItem.FileSize == targetSize.Value)
+			.ThenByDescending(c => existingByOldPath.ContainsKey(c.DbNormPath))
+			.ThenBy(c => c.DbItem.MediaItemId)
+			.First();
+	}
 
-			claimedTargetPaths.Add(resolvedPath);
-			if (isDirectory) {
-				diskFolderGroups.Remove(resolvedPath);
-			} else {
-				diskFiles.Remove(resolvedPath);
+	/// <summary>
+	/// 選定されたパス変更候補の実体存在を確認し、<see cref="FileChangeType.Renamed"/> / <see cref="FileChangeType.Moved"/> または消失へ分類します。
+	/// </summary>
+	private void EvaluatePathChangedWinner(
+		(MediaItem DbItem, string DbNormPath, string ResolvedPath) entry,
+		Dictionary<string, FileChangeItem> existingByOldPath,
+		ConfigSnapshot configSnapshot,
+		HashSet<string> diskFiles,
+		HashSet<string> diskFolderGroups,
+		HashSet<string> claimedTargetPaths,
+		List<FileChangeItem> reconciledItems,
+		List<MediaItem> missingDbItems,
+		List<string> retryPaths,
+		List<RenameOperation> retryRenames) {
+		var (dbItem, dbNormPath, resolvedPath) = entry;
+		var isDirectory = dbItem.MediaType == MediaType.FolderGroup;
+		long targetFileSize = 0;
+		var existsAtTarget = false;
+		var ioBlocked = false;
+
+		if (isDirectory) {
+			existsAtTarget = Directory.Exists(resolvedPath);
+		} else if (IsTargetFile(resolvedPath, configSnapshot)) {
+			try {
+				var fi = new FileInfo(resolvedPath);
+				if (fi.Exists) {
+					targetFileSize = fi.Length;
+					existsAtTarget = true;
+					this._resetRetryCount(resolvedPath);
+				}
+			} catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) {
+				if (this._tryConsumeRetrySlot(resolvedPath)) {
+					ioBlocked = true;
+				} else {
+					this._logger.LogWarning(ex, "Exceeded retry limit while reading renamed file info; falling back to DB size: {Path}", resolvedPath);
+					targetFileSize = dbItem.FileSize;
+					existsAtTarget = File.Exists(resolvedPath);
+				}
 			}
+		}
+
+		if (ioBlocked) {
+			retryPaths.Add(dbNormPath);
+			retryPaths.Add(resolvedPath);
+			retryRenames.Add(new RenameOperation(dbNormPath, resolvedPath));
+			return;
+		}
+
+		if (!existsAtTarget || !claimedTargetPaths.Add(resolvedPath)) {
+			missingDbItems.Add(dbItem);
+			return;
+		}
+
+		var wasMoved = existingByOldPath.TryGetValue(dbNormPath, out var prev) && prev.ChangeType == FileChangeType.Moved;
+		reconciledItems.Add(new FileChangeItem {
+			MediaItemId = dbItem.MediaItemId,
+			ChangeType = wasMoved ? FileChangeType.Moved : FileChangeType.Renamed,
+			OldPath = dbItem.FilePath,
+			NewPath = resolvedPath,
+			FileSize = targetFileSize,
+			OldHash = dbItem.PreHash ?? string.Empty,
+			IsPending = false
+		});
+
+		if (isDirectory) {
+			diskFolderGroups.Remove(resolvedPath);
+		} else {
+			diskFiles.Remove(resolvedPath);
 		}
 	}
 
 	/// <summary>
 	/// 元のパスから変化していない DB レコードの残存有無を判定します。
 	/// </summary>
-	private void ClassifyPathUnchangedItems(
+	private static void ClassifyPathUnchangedItems(
 		List<(MediaItem DbItem, string DbNormPath)> pathUnchangedItems,
+		ConfigSnapshot configSnapshot,
 		HashSet<string> claimedTargetPaths,
 		HashSet<string> diskFiles,
 		HashSet<string> diskFolderGroups,
@@ -535,7 +677,7 @@ internal sealed class FileChangeReconciler {
 			var isDirectory = dbItem.MediaType == MediaType.FolderGroup;
 			var existsAtOriginal = !claimedTargetPaths.Contains(dbNormPath) && (isDirectory
 				? Directory.Exists(dbItem.FilePath)
-				: (File.Exists(dbItem.FilePath) && this.IsTargetFile(dbItem.FilePath)));
+				: (File.Exists(dbItem.FilePath) && IsTargetFile(dbItem.FilePath, configSnapshot)));
 
 			if (!existsAtOriginal) {
 				missingDbItems.Add(dbItem);
@@ -559,6 +701,7 @@ internal sealed class FileChangeReconciler {
 	/// <param name="diskFolderGroups">未消費のフォルダグループ候補集合</param>
 	/// <param name="evaluatedDbPaths">既に評価済みの DB パス集合</param>
 	/// <param name="missingDbItems">消失した DB レコード一覧（同一パス上書き分を除去）</param>
+	/// <param name="configSnapshot">対象拡張子およびグループ化ルート設定のスナップショット</param>
 	/// <param name="cancellationToken">キャンセルトークン</param>
 	/// <returns>新規または移動先候補となる実在ファイルパス一覧</returns>
 	private async Task<List<string>> ExcludeRegisteredAndOverwrittenFilesAsync(
@@ -567,8 +710,9 @@ internal sealed class FileChangeReconciler {
 		HashSet<string> diskFolderGroups,
 		HashSet<string> evaluatedDbPaths,
 		List<MediaItem> missingDbItems,
+		ConfigSnapshot configSnapshot,
 		CancellationToken cancellationToken) {
-		var targetDiskFiles = diskFiles.Where(this.IsTargetFile).ToList();
+		var targetDiskFiles = diskFiles.Where(p => IsTargetFile(p, configSnapshot)).ToList();
 		var uncheckedDiskPaths = targetDiskFiles
 			.Concat(diskFolderGroups)
 			.Where(p => !evaluatedDbPaths.Contains(p))
@@ -723,14 +867,16 @@ internal sealed class FileChangeReconciler {
 			}
 
 			this._logger.LogWarning(ex, "Exceeded retry limit while reading file hash; adding without hash: {Path}", filePath);
-			fileSize = 0;
 			try {
 				var fi = new FileInfo(filePath);
-				if (fi.Exists) {
-					fileSize = fi.Length;
+				if (!fi.Exists) {
+					fileSize = -1;
+					return false;
 				}
+				fileSize = fi.Length;
 			} catch {
-				// サイズ取得失敗時は0のまま扱う
+				// サイズ取得失敗時は実在確認できた場合のみ0として扱う
+				fileSize = File.Exists(filePath) ? 0 : -1;
 			}
 			return false;
 		} catch (Exception ex) {
@@ -804,31 +950,75 @@ internal sealed class FileChangeReconciler {
 	}
 
 	/// <summary>
+	/// 対象拡張子およびグループ化ルート設定の現在値をスナップショットとして取得します。
+	/// UI スレッドからの設定変更と競合した場合は再取得を試みます。
+	/// </summary>
+	/// <returns>取得した設定スナップショット</returns>
+	private ConfigSnapshot CaptureConfigSnapshot() {
+		const int maxRetryCount = 5;
+		for (var attempt = 0; ; attempt++) {
+			try {
+				var targetExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+				foreach (var ext in this._config.ScanConfig.TargetExtensions) {
+					var mediaType = ext.MediaType.Value;
+					var extValue = ext.Extension.Value;
+					if (mediaType is not (MediaType.Unknown or MediaType.FolderGroup)
+						&& !string.IsNullOrWhiteSpace(extValue)) {
+						targetExtensions.Add(extValue);
+					}
+				}
+
+				var groupingRoots = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+				foreach (var folder in this._config.FolderManagerConfig.Folders) {
+					if (folder.IsGroupingRoot) {
+						var norm = FileChangePathUtility.NormalizePath(folder.FolderPath);
+						if (!string.IsNullOrEmpty(norm)) {
+							groupingRoots.Add(norm);
+						}
+					}
+				}
+
+				return new ConfigSnapshot(targetExtensions, groupingRoots);
+			} catch (Exception ex) when (attempt < maxRetryCount - 1
+				&& ex is InvalidOperationException or ArgumentOutOfRangeException or NullReferenceException) {
+				Thread.Yield();
+			}
+		}
+	}
+
+	/// <summary>
 	/// 指定されたファイルパスが設定された対象拡張子に一致するかを判定します。
 	/// </summary>
-	private bool IsTargetFile(string filePath) {
+	/// <param name="filePath">判定対象のファイルパス</param>
+	/// <param name="configSnapshot">設定スナップショット</param>
+	/// <returns>対象拡張子に一致する場合は true</returns>
+	private static bool IsTargetFile(string filePath, ConfigSnapshot configSnapshot) {
 		var extension = Path.GetExtension(filePath);
 		if (string.IsNullOrWhiteSpace(extension)) {
 			return false;
 		}
 
-		return this._config.ScanConfig.TargetExtensions
-			.Any(x => string.Equals(x.Extension.Value, extension, StringComparison.OrdinalIgnoreCase));
+		return configSnapshot.TargetExtensions.Contains(extension);
 	}
 
 	/// <summary>
 	/// 指定されたディレクトリがフォルダグループ化のルート監視フォルダであるかを判定します。
 	/// </summary>
-	private bool IsGroupingRoot(string dirPath) {
+	/// <param name="dirPath">判定対象のディレクトリパス</param>
+	/// <param name="configSnapshot">設定スナップショット</param>
+	/// <returns>グループ化ルートである場合は true</returns>
+	private static bool IsGroupingRoot(string dirPath, ConfigSnapshot configSnapshot) {
 		var normDir = FileChangePathUtility.NormalizePath(dirPath);
-		return this._config.FolderManagerConfig.Folders
-			.Any(f => f.IsGroupingRoot && string.Equals(FileChangePathUtility.NormalizePath(f.FolderPath), normDir, StringComparison.OrdinalIgnoreCase));
+		return !string.IsNullOrEmpty(normDir) && configSnapshot.GroupingRoots.Contains(normDir);
 	}
 
 	/// <summary>
 	/// 指定されたディレクトリがグループ化ルート監視フォルダの直下ディレクトリであるかを判定します。
 	/// </summary>
-	private bool IsGroupingRootChildDirectory(string dirPath) {
+	/// <param name="dirPath">判定対象のディレクトリパス</param>
+	/// <param name="configSnapshot">設定スナップショット</param>
+	/// <returns>グループ化ルートの直下ディレクトリである場合は true</returns>
+	private static bool IsGroupingRootChildDirectory(string dirPath, ConfigSnapshot configSnapshot) {
 		var normDir = FileChangePathUtility.NormalizePath(dirPath);
 		var parentDir = Path.GetDirectoryName(normDir);
 		if (string.IsNullOrEmpty(parentDir)) {
@@ -836,31 +1026,7 @@ internal sealed class FileChangeReconciler {
 		}
 
 		var normParent = FileChangePathUtility.NormalizePath(parentDir);
-		return this._config.FolderManagerConfig.Folders
-			.Any(f => f.IsGroupingRoot && string.Equals(FileChangePathUtility.NormalizePath(f.FolderPath), normParent, StringComparison.OrdinalIgnoreCase));
-	}
-
-	/// <summary>
-	/// DB上のパスに対し、既存の未処理リネームおよび今回のリネーム履歴を時系列にリプレイして移動先パスを算出します。
-	/// </summary>
-	private static string ReplayRenames(
-		string originalDbPath,
-		Dictionary<string, FileChangeItem> existingByOldPath,
-		List<RenameOperation> renameHistory) {
-		var currentPath = FileChangePathUtility.NormalizePath(originalDbPath);
-		if (existingByOldPath.TryGetValue(currentPath, out var seeded) && !string.IsNullOrEmpty(seeded.NewPath)) {
-			currentPath = FileChangePathUtility.NormalizePath(seeded.NewPath);
-		}
-
-		foreach (var op in renameHistory) {
-			if (string.Equals(currentPath, op.OldPath, StringComparison.OrdinalIgnoreCase)) {
-				currentPath = op.NewPath;
-			} else if (FileChangePathUtility.IsSubPathOf(currentPath, op.OldPath)) {
-				currentPath = FileChangePathUtility.ReplacePathPrefix(currentPath, op.OldPath, op.NewPath);
-			}
-		}
-
-		return currentPath;
+		return !string.IsNullOrEmpty(normParent) && configSnapshot.GroupingRoots.Contains(normParent);
 	}
 
 	/// <summary>
@@ -935,14 +1101,65 @@ internal sealed class FileChangeReconciler {
 	/// <param name="CandidateOldPaths">DB検索候補となる旧パス集合</param>
 	/// <param name="CandidateNewPaths">ディスク走査候補となる新パス集合</param>
 	/// <param name="ExistingByOldPath">既存の移動・リネーム未処理アイテム辞書</param>
+	/// <param name="ExistingDeletedIds">既に前バッチで削除扱いとなっているメディアアイテムID集合</param>
 	/// <param name="UntouchedMediaItemIds">今回の評価対象外として維持するメディアアイテムID集合</param>
 	/// <param name="UntouchedNewPaths">今回の評価対象外として除外する新パス集合</param>
 	private sealed record ReconcileSearchContext(
 		HashSet<string> CandidateOldPaths,
 		HashSet<string> CandidateNewPaths,
 		Dictionary<string, FileChangeItem> ExistingByOldPath,
+		HashSet<long> ExistingDeletedIds,
 		HashSet<long> UntouchedMediaItemIds,
 		HashSet<string> UntouchedNewPaths);
+
+	/// <summary>
+	/// 1回の差分計算で使用する対象拡張子およびグループ化ルート設定のスナップショットです。
+	/// </summary>
+	/// <param name="TargetExtensions">監視対象となる拡張子集合</param>
+	/// <param name="GroupingRoots">正規化済みのグループ化ルートディレクトリ集合</param>
+	private sealed record ConfigSnapshot(
+		HashSet<string> TargetExtensions,
+		HashSet<string> GroupingRoots);
+
+	/// <summary>
+	/// リネーム履歴の時系列リプレイ中に各 DB レコードの現在パスと上書き消失状態を追跡するクラスです。
+	/// </summary>
+	private sealed class ReplayTrackState {
+		/// <summary>
+		/// <see cref="ReplayTrackState"/> クラスの新しいインスタンスを初期化します。
+		/// </summary>
+		/// <param name="originalDbPath">DB 上の元の正規化パス</param>
+		/// <param name="currentPath">リプレイ開始時点の現在パス</param>
+		/// <param name="isOverwrittenOrDeleted">既に上書き消失または削除済みであるかどうか</param>
+		public ReplayTrackState(string originalDbPath, string currentPath, bool isOverwrittenOrDeleted) {
+			this.OriginalDbPath = originalDbPath;
+			this.CurrentPath = currentPath;
+			this.IsOverwrittenOrDeleted = isOverwrittenOrDeleted;
+		}
+
+		/// <summary>
+		/// DB 上の元の正規化パス
+		/// </summary>
+		public string OriginalDbPath {
+			get;
+		}
+
+		/// <summary>
+		/// リプレイ途中の現在パス
+		/// </summary>
+		public string CurrentPath {
+			get;
+			set;
+		}
+
+		/// <summary>
+		/// 既に上書き消失または削除済みとして以降のリネーム適用を打ち切ったかどうか
+		/// </summary>
+		public bool IsOverwrittenOrDeleted {
+			get;
+			set;
+		}
+	}
 
 	/// <summary>
 	/// 影響範囲の DB レコードに対する分類結果を保持します。

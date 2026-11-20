@@ -32,6 +32,7 @@ public class FileChangeTrackerTests : IDisposable {
 	private readonly ITestOutputHelper _output;
 	private readonly string _tempRoot;
 	private readonly List<SqliteConnection> _connections = [];
+	private readonly List<ServiceProvider> _serviceProviders = [];
 
 	/// <summary>
 	/// <see cref="FileChangeTrackerTests"/> の新しいインスタンスを初期化します。
@@ -45,6 +46,9 @@ public class FileChangeTrackerTests : IDisposable {
 
 	/// <inheritdoc />
 	public void Dispose() {
+		foreach (var provider in this._serviceProviders) {
+			provider.Dispose();
+		}
 		foreach (var conn in this._connections) {
 			conn.Dispose();
 		}
@@ -77,7 +81,7 @@ public class FileChangeTrackerTests : IDisposable {
 		return factoryMock.Object;
 	}
 
-	private static ConfigModel CreateTestConfig(params (string FolderPath, bool IsGroupingRoot)[] folders) {
+	private ConfigModel CreateTestConfig(params (string FolderPath, bool IsGroupingRoot)[] folders) {
 		var services = new ServiceCollection();
 		services.AddSingleton<PathConfigModel>();
 		services.AddSingleton<ExecutionConfigModel>();
@@ -94,6 +98,7 @@ public class FileChangeTrackerTests : IDisposable {
 		services.AddTransient<SortObject>(sp => new SortObject(sp));
 		services.AddTransient<SortItemObject>();
 		var provider = services.BuildServiceProvider();
+		this._serviceProviders.Add(provider);
 		var config = provider.GetRequiredService<ConfigModel>();
 
 		foreach (var (folderPath, isGroupingRoot) in folders) {
@@ -146,7 +151,7 @@ public class FileChangeTrackerTests : IDisposable {
 			await db.SaveChangesAsync();
 		}
 
-		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, CreateTestConfig());
+		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, this.CreateTestConfig());
 
 		for (int i = 0; i < testSize; i++) {
 			tracker.OnDeleted($"/test/path/file{i}.txt");
@@ -176,7 +181,7 @@ public class FileChangeTrackerTests : IDisposable {
 			await db.SaveChangesAsync();
 		}
 
-		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, CreateTestConfig());
+		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, this.CreateTestConfig());
 		tracker.StabilityDelay = TimeSpan.FromMilliseconds(10);
 
 		var tasks = new List<Task>();
@@ -220,7 +225,7 @@ public class FileChangeTrackerTests : IDisposable {
 			await db.SaveChangesAsync();
 		}
 
-		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, CreateTestConfig((this._tempRoot, false)));
+		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, this.CreateTestConfig((this._tempRoot, false)));
 		tracker.OnRenamed(oldDir, newDir);
 		await tracker.ProcessPendingChangesAsync();
 
@@ -245,7 +250,7 @@ public class FileChangeTrackerTests : IDisposable {
 			await db.SaveChangesAsync();
 		}
 
-		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, CreateTestConfig((this._tempRoot, true)));
+		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, this.CreateTestConfig((this._tempRoot, true)));
 		tracker.OnRenamed(oldDir, newDir);
 		await tracker.ProcessPendingChangesAsync();
 
@@ -268,7 +273,7 @@ public class FileChangeTrackerTests : IDisposable {
 			await db.SaveChangesAsync();
 		}
 
-		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, CreateTestConfig((this._tempRoot, false)));
+		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, this.CreateTestConfig((this._tempRoot, false)));
 		tracker.OnRenamed(oldDir, newDir);
 		await tracker.ProcessPendingChangesAsync();
 
@@ -293,7 +298,7 @@ public class FileChangeTrackerTests : IDisposable {
 			await db.SaveChangesAsync();
 		}
 
-		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, CreateTestConfig((this._tempRoot, true)));
+		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, this.CreateTestConfig((this._tempRoot, true)));
 		tracker.OnDeleted(deletedDir);
 		await tracker.ProcessPendingChangesAsync();
 
@@ -310,7 +315,7 @@ public class FileChangeTrackerTests : IDisposable {
 		var file2 = this.CreateRealFile(Path.Combine("ImportedFolder", "Sub", "b.mp4"), "bbb");
 		this.CreateRealFile(Path.Combine("ImportedFolder", "readme.txt"), "ignored");
 
-		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, CreateTestConfig((this._tempRoot, false)));
+		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, this.CreateTestConfig((this._tempRoot, false)));
 		tracker.OnCreated(newDir);
 		await tracker.ProcessPendingChangesAsync();
 
@@ -326,7 +331,7 @@ public class FileChangeTrackerTests : IDisposable {
 		var file1 = this.CreateRealFile(Path.Combine("NewAlbum", "01.jpg"), "aaa");
 		var file2 = this.CreateRealFile(Path.Combine("NewAlbum", "Nested", "02.jpg"), "bbb");
 
-		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, CreateTestConfig((this._tempRoot, true)));
+		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, this.CreateTestConfig((this._tempRoot, true)));
 		tracker.OnCreated(newAlbumDir);
 		await tracker.ProcessPendingChangesAsync();
 
@@ -350,7 +355,7 @@ public class FileChangeTrackerTests : IDisposable {
 		}
 
 		// バッチをまたいだ多段リネーム (バッチ1: DirA -> DirB, バッチ2: DirB -> DirC)
-		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, CreateTestConfig((this._tempRoot, false)));
+		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, this.CreateTestConfig((this._tempRoot, false)));
 		tracker.OnRenamed(dirA, dirB);
 		// DirB が一時的に存在して DirC へ移動する流れを再現するため、まず同一バッチでテスト
 		tracker.OnRenamed(dirB, dirC);
@@ -378,7 +383,7 @@ public class FileChangeTrackerTests : IDisposable {
 			await db.SaveChangesAsync();
 		}
 
-		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, CreateTestConfig((this._tempRoot, false)));
+		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, this.CreateTestConfig((this._tempRoot, false)));
 
 		// バッチ1: DirA -> DirB
 		tracker.OnRenamed(dirA, dirB);
@@ -406,7 +411,7 @@ public class FileChangeTrackerTests : IDisposable {
 		var createdPath = Path.Combine(this._tempRoot, "NewFile.jpg");
 		var renamedPath = this.CreateRealFile("RenamedFile.jpg", "new-image-bytes");
 
-		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, CreateTestConfig((this._tempRoot, false)));
+		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, this.CreateTestConfig((this._tempRoot, false)));
 		tracker.OnCreated(createdPath);
 		tracker.OnRenamed(createdPath, renamedPath);
 		await tracker.ProcessPendingChangesAsync();
@@ -426,7 +431,7 @@ public class FileChangeTrackerTests : IDisposable {
 		var createdPath = this.CreateRealFile("Step1.jpg", "new-image-bytes");
 		var renamedPath = Path.Combine(this._tempRoot, "Step2.jpg");
 
-		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, CreateTestConfig((this._tempRoot, false)));
+		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, this.CreateTestConfig((this._tempRoot, false)));
 
 		// バッチ1: 新規作成が確定して Added として表示される
 		tracker.OnCreated(createdPath);
@@ -454,7 +459,7 @@ public class FileChangeTrackerTests : IDisposable {
 		var tempFile1 = Path.Combine(this._tempRoot, "transient1.jpg");
 		var tempFile2 = this.CreateRealFile("transient2.jpg", "temp");
 
-		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, CreateTestConfig((this._tempRoot, false)));
+		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, this.CreateTestConfig((this._tempRoot, false)));
 
 		// 同一バッチ内で作成→即削除
 		tracker.OnCreated(tempFile1);
@@ -492,7 +497,7 @@ public class FileChangeTrackerTests : IDisposable {
 			await db.SaveChangesAsync();
 		}
 
-		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, CreateTestConfig((this._tempRoot, false)));
+		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, this.CreateTestConfig((this._tempRoot, false)));
 
 		// 1. 対象外拡張子の作成は無視される
 		tracker.OnCreated(untrackedTxt);
@@ -526,7 +531,7 @@ public class FileChangeTrackerTests : IDisposable {
 			await db.SaveChangesAsync();
 		}
 
-		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, CreateTestConfig((this._tempRoot, false)));
+		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, this.CreateTestConfig((this._tempRoot, false)));
 		tracker.OnDeleted(oldPath);
 		tracker.OnCreated(newPath);
 		await tracker.ProcessPendingChangesAsync();
@@ -558,7 +563,7 @@ public class FileChangeTrackerTests : IDisposable {
 			await db.SaveChangesAsync();
 		}
 
-		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, CreateTestConfig((this._tempRoot, false)));
+		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, this.CreateTestConfig((this._tempRoot, false)));
 
 		// パターンA: 先に Deleted が確定し、後続バッチで Added が来た場合
 		tracker.OnDeleted(oldPath1);
@@ -606,7 +611,7 @@ public class FileChangeTrackerTests : IDisposable {
 		using var tracker = new FileChangeTracker(
 			dbFactory,
 			NullLogger<FileChangeTracker>.Instance,
-			CreateTestConfig((inboxRoot, false), (libraryRoot, false)));
+			this.CreateTestConfig((inboxRoot, false), (libraryRoot, false)));
 
 		tracker.OnDeleted(oldSub);
 		tracker.OnCreated(newSub);
@@ -634,7 +639,7 @@ public class FileChangeTrackerTests : IDisposable {
 			await db.SaveChangesAsync();
 		}
 
-		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, CreateTestConfig((this._tempRoot, false)));
+		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, this.CreateTestConfig((this._tempRoot, false)));
 
 		// パターン1: tmp作成 → 元ファイル削除 → tmpを元ファイル名へリネーム
 		tracker.OnCreated(tmp1);
@@ -663,7 +668,7 @@ public class FileChangeTrackerTests : IDisposable {
 			await db.SaveChangesAsync();
 		}
 
-		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, CreateTestConfig((this._tempRoot, false)));
+		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, this.CreateTestConfig((this._tempRoot, false)));
 
 		// 同一バッチ内で往復リネーム
 		tracker.OnRenamed(fileA, fileB);
@@ -695,7 +700,7 @@ public class FileChangeTrackerTests : IDisposable {
 			await db.SaveChangesAsync();
 		}
 
-		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, CreateTestConfig((this._tempRoot, false)));
+		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, this.CreateTestConfig((this._tempRoot, false)));
 		tracker.OnRenamed(fileA, fileB);
 		tracker.OnDeleted(fileB);
 		await tracker.ProcessPendingChangesAsync();
@@ -723,7 +728,7 @@ public class FileChangeTrackerTests : IDisposable {
 			await db.SaveChangesAsync();
 		}
 
-		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, CreateTestConfig((this._tempRoot, false)));
+		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, this.CreateTestConfig((this._tempRoot, false)));
 		tracker.OnRenamed(fileA, fileTmp);
 		tracker.OnRenamed(fileB, fileA);
 		tracker.OnRenamed(fileTmp, fileB);
@@ -734,6 +739,9 @@ public class FileChangeTrackerTests : IDisposable {
 		tracker.UnprocessedChanges.ShouldContain(x => x.MediaItemId == 2 && x.ChangeType == FileChangeType.Renamed && x.OldPath == fileB && x.NewPath == fileA);
 	}
 
+	/// <summary>
+	/// 大文字・小文字のみを変更するリネームが <see cref="FileChangeType.Renamed"/> として検知されることを検証します。
+	/// </summary>
 	[Fact]
 	public async Task CaseOnlyRename_DetectsAsRenamed() {
 		var dbFactory = this.CreateSqliteDbFactory();
@@ -745,7 +753,10 @@ public class FileChangeTrackerTests : IDisposable {
 			await db.SaveChangesAsync();
 		}
 
-		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, CreateTestConfig((this._tempRoot, false)));
+		// 大文字・小文字を区別するファイルシステム（Linux等）でも移動先が実在するよう実際にリネームする
+		File.Move(oldPath, newPath);
+
+		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, this.CreateTestConfig((this._tempRoot, false)));
 		tracker.OnRenamed(oldPath, newPath);
 		await tracker.ProcessPendingChangesAsync();
 
@@ -761,7 +772,7 @@ public class FileChangeTrackerTests : IDisposable {
 		var ignoredAdded = this.CreateRealFile("ignored_added.jpg", "aaa");
 		var nextAdded = this.CreateRealFile("next_added.jpg", "bbb");
 
-		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, CreateTestConfig((this._tempRoot, false)));
+		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, this.CreateTestConfig((this._tempRoot, false)));
 
 		tracker.OnCreated(ignoredAdded);
 		await tracker.ProcessPendingChangesAsync();
@@ -783,7 +794,7 @@ public class FileChangeTrackerTests : IDisposable {
 		var createdPath = Path.Combine(this._tempRoot, "auto1.jpg");
 		var renamedPath = this.CreateRealFile("auto2.jpg", "auto-payload");
 
-		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, CreateTestConfig((this._tempRoot, false)));
+		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, this.CreateTestConfig((this._tempRoot, false)));
 		tracker.StabilityDelay = TimeSpan.FromMilliseconds(60);
 
 		tracker.OnCreated(createdPath);
@@ -807,7 +818,7 @@ public class FileChangeTrackerTests : IDisposable {
 		var dbFactory = this.CreateSqliteDbFactory();
 		var lockedPath = this.CreateRealFile("locked.jpg", "locked-content");
 
-		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, CreateTestConfig((this._tempRoot, false)));
+		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, this.CreateTestConfig((this._tempRoot, false)));
 		tracker.StabilityDelay = TimeSpan.FromMilliseconds(50);
 
 		using (var lockStream = new FileStream(lockedPath, FileMode.Open, FileAccess.ReadWrite, FileShare.None)) {
@@ -840,7 +851,7 @@ public class FileChangeTrackerTests : IDisposable {
 			await db.SaveChangesAsync();
 		}
 
-		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, CreateTestConfig((this._tempRoot, false)));
+		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, this.CreateTestConfig((this._tempRoot, false)));
 		tracker.OnCreated(targetDir);
 		await tracker.ProcessPendingChangesAsync();
 
@@ -860,7 +871,7 @@ public class FileChangeTrackerTests : IDisposable {
 			await db.SaveChangesAsync();
 		}
 
-		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, CreateTestConfig((this._tempRoot, false)));
+		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, this.CreateTestConfig((this._tempRoot, false)));
 		tracker.OnRenamed(origPath, oldMovedPath);
 		tracker.OnCreated(origPath);
 		await tracker.ProcessPendingChangesAsync();
@@ -884,7 +895,7 @@ public class FileChangeTrackerTests : IDisposable {
 			await db.SaveChangesAsync();
 		}
 
-		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, CreateTestConfig((this._tempRoot, false)));
+		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, this.CreateTestConfig((this._tempRoot, false)));
 		tracker.OnDeleted(dstPath);
 		tracker.OnRenamed(srcPath, dstPath);
 		await tracker.ProcessPendingChangesAsync();
@@ -905,7 +916,7 @@ public class FileChangeTrackerTests : IDisposable {
 			await db.SaveChangesAsync();
 		}
 
-		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, CreateTestConfig((this._tempRoot, false)));
+		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, this.CreateTestConfig((this._tempRoot, false)));
 		tracker.OnCreated(groupDir);
 		await tracker.ProcessPendingChangesAsync();
 
@@ -926,7 +937,7 @@ public class FileChangeTrackerTests : IDisposable {
 			await db.SaveChangesAsync();
 		}
 
-		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, CreateTestConfig((this._tempRoot, false)));
+		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, this.CreateTestConfig((this._tempRoot, false)));
 		tracker.OnRenamed(pathA, pathB);
 		await tracker.ProcessPendingChangesAsync();
 
@@ -958,7 +969,7 @@ public class FileChangeTrackerTests : IDisposable {
 			await db.SaveChangesAsync();
 		}
 
-		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, CreateTestConfig((this._tempRoot, false)));
+		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, this.CreateTestConfig((this._tempRoot, false)));
 		tracker.OnRenamed(pathA, pathB);
 		await tracker.ProcessPendingChangesAsync();
 		var appliedItemAtoB = tracker.UnprocessedChanges.Single();
@@ -1014,7 +1025,7 @@ public class FileChangeTrackerTests : IDisposable {
 		dbFactoryMock.Setup(f => f.CreateDbContextAsync(It.IsAny<CancellationToken>()))
 			.ReturnsAsync(() => new MediaDeckDbContext(interceptedOptions));
 
-		using var tracker = new FileChangeTracker(dbFactoryMock.Object, NullLogger<FileChangeTracker>.Instance, CreateTestConfig((this._tempRoot, false)));
+		using var tracker = new FileChangeTracker(dbFactoryMock.Object, NullLogger<FileChangeTracker>.Instance, this.CreateTestConfig((this._tempRoot, false)));
 		var appliedItemAtoB = new FileChangeItem {
 			MediaItemId = 1,
 			ChangeType = FileChangeType.Renamed,
@@ -1084,7 +1095,7 @@ public class FileChangeTrackerTests : IDisposable {
 		dbFactoryMock.Setup(f => f.CreateDbContextAsync(It.IsAny<CancellationToken>()))
 			.ReturnsAsync(() => new MediaDeckDbContext(interceptedOptions));
 
-		using var tracker = new FileChangeTracker(dbFactoryMock.Object, NullLogger<FileChangeTracker>.Instance, CreateTestConfig((this._tempRoot, false)));
+		using var tracker = new FileChangeTracker(dbFactoryMock.Object, NullLogger<FileChangeTracker>.Instance, this.CreateTestConfig((this._tempRoot, false)));
 		var deletedItem = new FileChangeItem {
 			MediaItemId = 1,
 			ChangeType = FileChangeType.Deleted,
@@ -1121,7 +1132,7 @@ public class FileChangeTrackerTests : IDisposable {
 			await db.SaveChangesAsync();
 		}
 
-		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, CreateTestConfig((this._tempRoot, false)));
+		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, this.CreateTestConfig((this._tempRoot, false)));
 		for (int i = 0; i < 200; i++) {
 			tracker.OnDeleted(Path.Combine(this._tempRoot, $"untracked_{i}.tmp"));
 		}
@@ -1145,7 +1156,7 @@ public class FileChangeTrackerTests : IDisposable {
 				return await dbFactory.CreateDbContextAsync();
 			});
 
-		var tracker = new FileChangeTracker(slowFactoryMock.Object, NullLogger<FileChangeTracker>.Instance, CreateTestConfig((this._tempRoot, false)));
+		var tracker = new FileChangeTracker(slowFactoryMock.Object, NullLogger<FileChangeTracker>.Instance, this.CreateTestConfig((this._tempRoot, false)));
 		tracker.OnDeleted(Path.Combine(this._tempRoot, "gone.jpg"));
 
 		var reconcileTask = tracker.ProcessPendingChangesAsync();
@@ -1156,6 +1167,272 @@ public class FileChangeTrackerTests : IDisposable {
 		releaseDbFactory.SetResult();
 
 		await Should.NotThrowAsync(async () => await reconcileTask);
+	}
+
+	/// <summary>
+	/// 単一バッチ内で上書き移動の連鎖（A -&gt; B 後に B -&gt; C）が発生した場合に、
+	/// 消滅した B が C への重複 Renamed に化けず Deleted として維持されることを検証します。
+	/// </summary>
+	[Theory]
+	[InlineData(true)]
+	[InlineData(false)]
+	public async Task OverwriteMoveChain_SameBatch_DetectsWinnerRenamedAndOverwrittenDeleted(bool withExplicitDeleteEvent) {
+		var dbFactory = this.CreateSqliteDbFactory();
+		var pathA = Path.Combine(this._tempRoot, "ChainOverA.jpg");
+		var pathB = Path.Combine(this._tempRoot, "ChainOverB.jpg");
+		var pathC = this.CreateRealFile("ChainOverC.jpg", "origin-a-content");
+
+		await using (var db = await dbFactory.CreateDbContextAsync()) {
+			db.MediaItems.AddRange(
+				CreateMediaItemEntity(1, pathA, preHash: FileHashUtility.ComputeFileHash(pathC), fileSize: new FileInfo(pathC).Length),
+				CreateMediaItemEntity(2, pathB, preHash: "origin-b-hash", fileSize: 999));
+			await db.SaveChangesAsync();
+		}
+
+		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, this.CreateTestConfig((this._tempRoot, false)));
+		if (withExplicitDeleteEvent) {
+			tracker.OnDeleted(pathB);
+		}
+		tracker.OnRenamed(pathA, pathB);
+		tracker.OnRenamed(pathB, pathC);
+		await tracker.ProcessPendingChangesAsync();
+
+		tracker.UnprocessedChanges.Count.ShouldBe(2);
+		tracker.UnprocessedChanges.ShouldContain(x =>
+			x.MediaItemId == 1
+			&& x.ChangeType == FileChangeType.Renamed
+			&& x.OldPath == pathA
+			&& x.NewPath == pathC);
+		tracker.UnprocessedChanges.ShouldContain(x =>
+			x.MediaItemId == 2
+			&& x.ChangeType == FileChangeType.Deleted
+			&& x.OldPath == pathB);
+	}
+
+	/// <summary>
+	/// クロスバッチで上書き移動（Renamed A -&gt; B / Deleted B）が確定した後、さらに B -&gt; C へリネームされても、
+	/// 既に Deleted の B が C への重複 Renamed へ復活しないことを検証します。
+	/// </summary>
+	[Fact]
+	public async Task OverwriteMoveChain_AcrossBatches_DoesNotResurrectDeletedItemAsDuplicateRenamed() {
+		var dbFactory = this.CreateSqliteDbFactory();
+		var pathA = Path.Combine(this._tempRoot, "CrossOverA.jpg");
+		var pathB = this.CreateRealFile("CrossOverB.jpg", "origin-a-content");
+		var pathC = Path.Combine(this._tempRoot, "CrossOverC.jpg");
+
+		await using (var db = await dbFactory.CreateDbContextAsync()) {
+			db.MediaItems.AddRange(
+				CreateMediaItemEntity(1, pathA, preHash: FileHashUtility.ComputeFileHash(pathB), fileSize: new FileInfo(pathB).Length),
+				CreateMediaItemEntity(2, pathB, preHash: "origin-b-hash", fileSize: 999));
+			await db.SaveChangesAsync();
+		}
+
+		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, this.CreateTestConfig((this._tempRoot, false)));
+
+		// Batch 1: B を削除して A -> B
+		tracker.OnDeleted(pathB);
+		tracker.OnRenamed(pathA, pathB);
+		await tracker.ProcessPendingChangesAsync();
+
+		tracker.UnprocessedChanges.Count.ShouldBe(2);
+		tracker.UnprocessedChanges.ShouldContain(x => x.MediaItemId == 1 && x.ChangeType == FileChangeType.Renamed && x.NewPath == pathB);
+		tracker.UnprocessedChanges.ShouldContain(x => x.MediaItemId == 2 && x.ChangeType == FileChangeType.Deleted && x.OldPath == pathB);
+
+		// Batch 2: B -> C
+		File.Move(pathB, pathC);
+		tracker.OnRenamed(pathB, pathC);
+		await tracker.ProcessPendingChangesAsync();
+
+		tracker.UnprocessedChanges.Count.ShouldBe(2);
+		tracker.UnprocessedChanges.ShouldContain(x =>
+			x.MediaItemId == 1
+			&& x.ChangeType == FileChangeType.Renamed
+			&& x.OldPath == pathA
+			&& x.NewPath == pathC);
+		tracker.UnprocessedChanges.ShouldContain(x =>
+			x.MediaItemId == 2
+			&& x.ChangeType == FileChangeType.Deleted
+			&& x.OldPath == pathB);
+	}
+
+	/// <summary>
+	/// Atomic Save（一時ファイルから既存ファイルへの置換）の直後に同一バッチでリネームされた場合でも、
+	/// 登録済みアイテムが誤って消失扱いにならず Renamed として維持されることを検証します。
+	/// </summary>
+	[Fact]
+	public async Task AtomicSaveFollowedByRename_SameBatch_PreservesMediaItemAsRenamed() {
+		var dbFactory = this.CreateSqliteDbFactory();
+		var pathTmp = Path.Combine(this._tempRoot, "photo.jpg.tmp");
+		var pathA = Path.Combine(this._tempRoot, "photo.jpg");
+		var pathB = this.CreateRealFile("photo_renamed.jpg", "updated-image-bytes");
+
+		await using (var db = await dbFactory.CreateDbContextAsync()) {
+			db.MediaItems.Add(CreateMediaItemEntity(1, pathA, preHash: "old-hash", fileSize: 100));
+			await db.SaveChangesAsync();
+		}
+
+		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, this.CreateTestConfig((this._tempRoot, false)));
+		tracker.OnCreated(pathTmp);
+		tracker.OnRenamed(pathTmp, pathA);
+		tracker.OnRenamed(pathA, pathB);
+		await tracker.ProcessPendingChangesAsync();
+
+		tracker.UnprocessedChanges.Count.ShouldBe(1);
+		var item = tracker.UnprocessedChanges[0];
+		item.MediaItemId.ShouldBe(1L);
+		item.ChangeType.ShouldBe(FileChangeType.Renamed);
+		item.OldPath.ShouldBe(pathA);
+		item.NewPath.ShouldBe(pathB);
+	}
+
+	/// <summary>
+	/// <see cref="MediaType.Unknown"/> として登録された拡張子設定は監視対象ファイルとして扱われないことを検証します。
+	/// </summary>
+	[Fact]
+	public async Task ExtensionFiltering_IgnoresUnknownMediaTypeExtension() {
+		var dbFactory = this.CreateSqliteDbFactory();
+		var config = this.CreateTestConfig((this._tempRoot, false));
+		var unknownExt = new ExtensionObjectModel();
+		unknownExt.Extension.Value = ".customunknown";
+		unknownExt.MediaType.Value = MediaType.Unknown;
+		config.ScanConfig.TargetExtensions.Add(unknownExt);
+
+		var unknownFile = this.CreateRealFile("ignored.customunknown", "ignored-content");
+		var targetFile = this.CreateRealFile("valid.jpg", "valid-content");
+
+		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, config);
+		tracker.OnCreated(unknownFile);
+		tracker.OnCreated(targetFile);
+		await tracker.ProcessPendingChangesAsync();
+
+		tracker.UnprocessedChanges.Count.ShouldBe(1);
+		tracker.UnprocessedChanges[0].ChangeType.ShouldBe(FileChangeType.Added);
+		tracker.UnprocessedChanges[0].NewPath.ShouldBe(targetFile);
+	}
+
+	/// <summary>
+	/// 差分計算の実行中に別スレッドから設定コレクションが変更されても例外が発生しないことを検証します。
+	/// </summary>
+	[Fact]
+	public async Task Reconcile_ConcurrentConfigModification_DoesNotThrow() {
+		var dbFactory = this.CreateSqliteDbFactory();
+		var config = this.CreateTestConfig((this._tempRoot, false));
+		var targetFile = this.CreateRealFile("concurrent_cfg.jpg", "content");
+
+		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, config);
+		using var cts = new CancellationTokenSource();
+
+		var modifierTask = Task.Run(() => {
+			var toggle = 0;
+			while (!cts.Token.IsCancellationRequested) {
+				var ext = new ExtensionObjectModel();
+				ext.Extension.Value = $".ext{toggle++ % 5}";
+				ext.MediaType.Value = MediaType.Image;
+				config.ScanConfig.TargetExtensions.Add(ext);
+				config.ScanConfig.TargetExtensions.Remove(ext);
+
+				var folder = new FolderModel { FolderPath = Path.Combine(this._tempRoot, $"dyn_{toggle % 3}"), IsGroupingRoot = true };
+				config.FolderManagerConfig.Folders.Add(folder);
+				config.FolderManagerConfig.Folders.Remove(folder);
+			}
+		});
+
+		try {
+			for (var i = 0; i < 30; i++) {
+				tracker.OnCreated(targetFile);
+				await Should.NotThrowAsync(() => tracker.ProcessPendingChangesAsync());
+			}
+		} finally {
+			cts.Cancel();
+			await modifierTask;
+		}
+
+		tracker.UnprocessedChanges.ShouldContain(x => x.ChangeType == FileChangeType.Added && x.NewPath == targetFile);
+	}
+
+	/// <summary>
+	/// ファイルロックによるリトライ上限到達時に、実在ファイルはハッシュなし Added へフォールバックし、
+	/// 既に削除されたファイルからは幽霊 Added が生成されないことを検証します。
+	/// </summary>
+	[Fact]
+	public async Task LockedFile_RetryLimitFallback_HandlesExistingAndDeletedFilesAccurately() {
+		var dbFactory = this.CreateSqliteDbFactory();
+		var persistentLockedPath = this.CreateRealFile("still_locked.jpg", "locked-12345");
+		var vanishedPath = this.CreateRealFile("vanished_after_lock.jpg", "temp-content");
+
+		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, this.CreateTestConfig((this._tempRoot, false)));
+		tracker.StabilityDelay = TimeSpan.FromSeconds(30);
+
+		using var persistentLock = new FileStream(persistentLockedPath, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+		using (var vanishedLock = new FileStream(vanishedPath, FileMode.Open, FileAccess.ReadWrite, FileShare.None)) {
+			tracker.OnCreated(persistentLockedPath);
+			tracker.OnCreated(vanishedPath);
+
+			// リトライ上限（5回）をすべて消費する
+			for (var i = 0; i < 5; i++) {
+				await tracker.ProcessPendingChangesAsync();
+				tracker.UnprocessedChanges.ShouldBeEmpty();
+			}
+		}
+
+		// 6回目実行前に vanishedPath を削除する
+		File.Delete(vanishedPath);
+		await tracker.ProcessPendingChangesAsync();
+
+		tracker.UnprocessedChanges.Count.ShouldBe(1);
+		var added = tracker.UnprocessedChanges[0];
+		added.ChangeType.ShouldBe(FileChangeType.Added);
+		added.NewPath.ShouldBe(persistentLockedPath);
+		added.NewHash.ShouldBeEmpty();
+	}
+
+	/// <summary>
+	/// 反映中にラウンドトリップ（B -&gt; A）または削除後の再作成でリスト上から相殺消去された後、
+	/// DB 更新完了の <see cref="FileChangeTracker.NotifyChangesApplied"/> が呼ばれた際に再評価がスケジュールされることを検証します。
+	/// </summary>
+	[Fact]
+	public async Task NotifyChangesApplied_WhenCancelledOutByRoundTripOrRecreateBeforeNotify_ReschedulesAndRedetectsDiff() {
+		var dbFactory = this.CreateSqliteDbFactory();
+		var pathA = this.CreateRealFile("RoundA.jpg", "roundtrip-content");
+		var pathB = Path.Combine(this._tempRoot, "RoundB.jpg");
+		var recreatedPath = this.CreateRealFile("Recreated.jpg", "recreated-content");
+		var hashA = FileHashUtility.ComputeFileHash(pathA);
+
+		await using (var db = await dbFactory.CreateDbContextAsync()) {
+			db.MediaItems.AddRange(
+				CreateMediaItemEntity(1, pathB, preHash: hashA, fileSize: new FileInfo(pathA).Length),
+				CreateMediaItemEntity(2, recreatedPath, preHash: "old-hash"));
+			await db.SaveChangesAsync();
+		}
+
+		using var tracker = new FileChangeTracker(dbFactory, NullLogger<FileChangeTracker>.Instance, this.CreateTestConfig((this._tempRoot, false)));
+		tracker.StabilityDelay = TimeSpan.FromSeconds(30);
+
+		// ケース1: UnprocessedChanges から A -> B が既に相殺消去された後、DB が B へ更新された通知が来る
+		var appliedRename = new FileChangeItem { MediaItemId = 1, ChangeType = FileChangeType.Renamed, OldPath = pathA, NewPath = pathB };
+		tracker.NotifyChangesApplied([appliedRename], new Dictionary<long, string> { [1] = pathB }, []);
+		await tracker.ProcessPendingChangesAsync();
+
+		tracker.UnprocessedChanges.ShouldContain(x =>
+			x.MediaItemId == 1
+			&& x.ChangeType == FileChangeType.Moved
+			&& x.OldPath == pathB
+			&& x.NewPath == pathA);
+
+		// ケース2: UnprocessedChanges から Deleted(2) が既に相殺消去された後、DB から id=2 が削除された通知が来る
+		await using (var db = await dbFactory.CreateDbContextAsync()) {
+			var entity = await db.MediaItems.FindAsync(2L);
+			db.MediaItems.Remove(entity!);
+			await db.SaveChangesAsync();
+		}
+		var appliedDelete = new FileChangeItem { MediaItemId = 2, ChangeType = FileChangeType.Deleted, OldPath = recreatedPath };
+		tracker.NotifyChangesApplied([appliedDelete], new Dictionary<long, string>(), [2L]);
+		await tracker.ProcessPendingChangesAsync();
+
+		tracker.UnprocessedChanges.ShouldContain(x =>
+			x.MediaItemId == null
+			&& x.ChangeType == FileChangeType.Added
+			&& x.NewPath == recreatedPath);
 	}
 
 	private sealed class PauseOnSecondSelectInterceptor(TaskCompletionSource paused, TaskCompletionSource resume) : DbCommandInterceptor {

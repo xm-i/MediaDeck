@@ -283,10 +283,14 @@ public class FileChangeTracker : ServiceBase {
 		var needsReschedule = false;
 		var toRemove = new List<FileChangeItem>();
 		var toAdd = new List<FileChangeItem>();
+		var handledMutatedIds = new HashSet<long>();
 
 		foreach (var existing in this.UnprocessedChanges) {
 			if (itemList.Any(i => IsSameChangeItem(i, existing))) {
 				toRemove.Add(existing);
+				if (existing.MediaItemId.HasValue) {
+					handledMutatedIds.Add(existing.MediaItemId.Value);
+				}
 				continue;
 			}
 			if (!existing.MediaItemId.HasValue) {
@@ -295,6 +299,7 @@ public class FileChangeTracker : ServiceBase {
 
 			var id = existing.MediaItemId.Value;
 			if (deletedIdSet.Contains(id)) {
+				handledMutatedIds.Add(id);
 				// DBレコードが既に削除された後に別操作へ変わっていた場合は、最新パスで再評価する
 				toRemove.Add(existing);
 				if (!string.IsNullOrEmpty(existing.NewPath)) {
@@ -307,6 +312,8 @@ public class FileChangeTracker : ServiceBase {
 			if (!updatedPathsById.TryGetValue(id, out var newDbPath)) {
 				continue;
 			}
+
+			handledMutatedIds.Add(id);
 
 			// 反映中に B -> C 等へ再変更されていた場合は、基準パス(OldPath)を最新のDBパス(B)へ合わせる
 			var normNewDbPath = FileChangePathUtility.NormalizePath(newDbPath);
@@ -332,7 +339,52 @@ public class FileChangeTracker : ServiceBase {
 			this.UnprocessedChanges.AddRange(toAdd);
 		}
 
+		if (this.QueueUnmatchedAppliedMutationsLocked(itemList, deletedIdSet, updatedPathsById, handledMutatedIds)) {
+			needsReschedule = true;
+		}
+
 		return needsReschedule;
+	}
+
+	/// <summary>
+	/// DB が更新・削除されたにもかかわらず <see cref="UnprocessedChanges"/> 上に該当IDが存在しなかった変更
+	/// （適用中に別イベントで相殺消去されていたケース等）のパスを再評価対象へ積みます。
+	/// </summary>
+	/// <param name="itemList">反映した変更アイテム一覧</param>
+	/// <param name="deletedIdSet">削除されたメディアアイテムID集合</param>
+	/// <param name="updatedPathsById">DB上でパス更新されたアイテムの対応表</param>
+	/// <param name="handledMutatedIds">既にリスト上で対応処理済みのメディアアイテムID集合</param>
+	/// <returns>再評価対象パスを 1 件以上積んだ場合は true</returns>
+	private bool QueueUnmatchedAppliedMutationsLocked(
+		List<FileChangeItem> itemList,
+		ISet<long> deletedIdSet,
+		IReadOnlyDictionary<long, string> updatedPathsById,
+		HashSet<long> handledMutatedIds) {
+		var queued = false;
+		foreach (var item in itemList) {
+			if (!item.MediaItemId.HasValue) {
+				continue;
+			}
+			var id = item.MediaItemId.Value;
+			var isMutated = updatedPathsById.ContainsKey(id) || deletedIdSet.Contains(id);
+			if (!isMutated || !handledMutatedIds.Add(id)) {
+				continue;
+			}
+
+			if (!string.IsNullOrEmpty(item.OldPath)) {
+				this._dirtyPaths.Add(FileChangePathUtility.NormalizePath(item.OldPath));
+				queued = true;
+			}
+			if (!string.IsNullOrEmpty(item.NewPath)) {
+				this._dirtyPaths.Add(FileChangePathUtility.NormalizePath(item.NewPath));
+				queued = true;
+			}
+			if (updatedPathsById.TryGetValue(id, out var updatedPath) && !string.IsNullOrEmpty(updatedPath)) {
+				this._dirtyPaths.Add(FileChangePathUtility.NormalizePath(updatedPath));
+				queued = true;
+			}
+		}
+		return queued;
 	}
 
 	/// <summary>
