@@ -32,4 +32,9 @@
     <PackageReference Update="Serilog.Sinks.File" Version="7.0.0" />
     <PackageReference Update="XAML.MapControl.WinUI" Version="17.2.0" />
   </ItemGroup>
+
+  <!-- 外部サブモジュール（AutoDiAttributes / GenJsonConfig）を SonarQube の MSBuild 解析対象から除外する -->
+  <PropertyGroup Condition="$([System.String]::Copy('$(MSBuildProjectDirectory)').Replace('\', '/').StartsWith($([System.String]::Copy('$(MSBuildThisFileDirectory)lib/AutoDiAttributes').Replace('\', '/')), System.StringComparison.OrdinalIgnoreCase)) Or $([System.String]::Copy('$(MSBuildProjectDirectory)').Replace('\', '/').StartsWith($([System.String]::Copy('$(MSBuildThisFileDirectory)lib/GenJsonConfig').Replace('\', '/')), System.StringComparison.OrdinalIgnoreCase))">
+    <SonarQubeExclude>true</SonarQubeExclude>
+  </PropertyGroup>
 </Project>

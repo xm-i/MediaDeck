@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+  MediaDeck 向け SonarScanner for .NET 設定ファイル
+  実行時は /s:"<リポジトリルート>\SonarQube.Analysis.xml" を指定して読み込みます。
+  ※ sonar.projectKey / sonar.projectName / sonar.projectVersion / sonar.token は
+    このファイル内では指定せず、コマンドライン引数（/k:, /n:, /v:, /d:sonar.token=）で渡してください。
+-->
+<SonarQubeAnalysisProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.sonarsource.com/msbuild/integration/2015/1">
+  <!-- SonarQube サーバー URL（Jenkins の withSonarQubeEnv 使用時は環境変数で上書き可能） -->
+  <Property Name="sonar.host.url">https://sonarqube.home.internal</Property>
+  <Property Name="sonar.sourceEncoding">UTF-8</Property>
+  <Property Name="sonar.scm.provider">git</Property>
+
+  <!-- 外部サブモジュール（AutoDiAttributes / GenJsonConfig）および自動生成コードを解析対象から除外 -->
+  <Property Name="sonar.exclusions">lib/AutoDiAttributes/**,lib/GenJsonConfig/**,**/Migrations/**,**/*.g.cs,**/*.g.i.cs</Property>
+
+  <!-- サブモジュール・テストプロジェクト・アナライザー本体・自動生成コードをカバレッジ計測対象から除外 -->
+  <Property Name="sonar.coverage.exclusions">lib/AutoDiAttributes/**,lib/GenJsonConfig/**,MediaDeck.Core.Tests/**,lib/MediaDeck.Analyzers/**,**/Migrations/**,**/*.g.cs,**/*.g.i.cs</Property>
+
+  <!-- 単体テスト実行結果 (TRX) およびコードカバレッジ (OpenCover) レポートパス -->
+  <Property Name="sonar.cs.vstest.reportsPaths">TestResults/test-results.trx</Property>
+  <Property Name="sonar.cs.opencover.reportsPaths">TestResults/*/coverage.opencover.xml</Property>
+</SonarQubeAnalysisProperties>

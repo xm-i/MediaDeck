@@ -262,3 +262,6 @@ __pycache__/
 # MediaDeck AI Assistant artifacts
 *.txt
 *.log
+
+# SonarScanner for .NET working directory
+.sonarqube/
