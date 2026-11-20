@@ -186,4 +186,61 @@ public class FilesManagerTests : IDisposable {
 		// Act & Assert
 		await Should.ThrowAsync<ArgumentNullException>(() => this._filesManager.RemoveFilesAsync(models));
 	}
+
+	/// <summary>
+	/// 正常系：FolderGroup削除時に他に親FolderGroupが存在しない場合、配下アイテムのIsUnderFolderGroupがfalseに更新されることを検証する
+	/// </summary>
+	[Fact]
+	public async Task RemoveFilesAsync_WhenFolderGroupRemovedAndNoParentRemains_ShouldClearIsUnderFolderGroup() {
+		// Arrange
+		var groupPath = Path.Combine("root", "groupA");
+		var nestedDirPath = Path.Combine(groupPath, "nested");
+		await using (var context = await this._dbFactoryMock.Object.CreateDbContextAsync()) {
+			context.MediaItems.Add(new MediaItem { MediaType = MediaType.FolderGroup, MediaItemId = 1, FilePath = groupPath, DirectoryPath = "root", Description = "", IsUnderFolderGroup = false });
+			context.MediaItems.Add(new MediaItem { MediaType = MediaType.Image, MediaItemId = 2, FilePath = Path.Combine(groupPath, "img1.jpg"), DirectoryPath = groupPath, Description = "", IsUnderFolderGroup = true });
+			context.MediaItems.Add(new MediaItem { MediaType = MediaType.Image, MediaItemId = 3, FilePath = Path.Combine(nestedDirPath, "img2.jpg"), DirectoryPath = nestedDirPath, Description = "", IsUnderFolderGroup = true });
+			await context.SaveChangesAsync();
+		}
+
+		var groupMock = new Mock<IMediaItemModel>();
+		groupMock.Setup(m => m.Id).Returns(1);
+
+		// Act
+		await this._filesManager.RemoveFilesAsync([groupMock.Object]);
+
+		// Assert
+		await using (var context = await this._dbFactoryMock.Object.CreateDbContextAsync()) {
+			var remaining = await context.MediaItems.OrderBy(x => x.MediaItemId).ToListAsync();
+			remaining.Count.ShouldBe(2);
+			remaining.ShouldAllBe(x => !x.IsUnderFolderGroup);
+		}
+	}
+
+	/// <summary>
+	/// 正常系：入れ子のFolderGroup削除時に上位の親FolderGroupが残存している場合、配下アイテムのIsUnderFolderGroupがtrueのまま維持されることを検証する
+	/// </summary>
+	[Fact]
+	public async Task RemoveFilesAsync_WhenNestedFolderGroupRemovedAndParentRemains_ShouldKeepIsUnderFolderGroupTrue() {
+		// Arrange
+		var parentGroupPath = Path.Combine("root", "parent");
+		var childGroupPath = Path.Combine(parentGroupPath, "child");
+		await using (var context = await this._dbFactoryMock.Object.CreateDbContextAsync()) {
+			context.MediaItems.Add(new MediaItem { MediaType = MediaType.FolderGroup, MediaItemId = 1, FilePath = parentGroupPath, DirectoryPath = "root", Description = "", IsUnderFolderGroup = false });
+			context.MediaItems.Add(new MediaItem { MediaType = MediaType.FolderGroup, MediaItemId = 2, FilePath = childGroupPath, DirectoryPath = parentGroupPath, Description = "", IsUnderFolderGroup = true });
+			context.MediaItems.Add(new MediaItem { MediaType = MediaType.Image, MediaItemId = 3, FilePath = Path.Combine(childGroupPath, "img1.jpg"), DirectoryPath = childGroupPath, Description = "", IsUnderFolderGroup = true });
+			await context.SaveChangesAsync();
+		}
+
+		var childGroupMock = new Mock<IMediaItemModel>();
+		childGroupMock.Setup(m => m.Id).Returns(2);
+
+		// Act
+		await this._filesManager.RemoveFilesAsync([childGroupMock.Object]);
+
+		// Assert
+		await using (var context = await this._dbFactoryMock.Object.CreateDbContextAsync()) {
+			var img = await context.MediaItems.SingleAsync(x => x.MediaItemId == 3);
+			img.IsUnderFolderGroup.ShouldBeTrue();
+		}
+	}
 }

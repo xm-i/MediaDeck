@@ -1,5 +1,6 @@
 using MediaDeck.Common.Base;
 using MediaDeck.Common.Extensions;
+using MediaDeck.Composition.Objects;
 using MediaDeck.Core.Models.Files;
 using MediaDeck.Core.Primitives;
 using ObservableCollections;
@@ -266,5 +267,57 @@ public class R3ExAndDisposableBaseTests {
 
 		view.Dispose();
 		createdItems.All(x => x.IsDisposed).ShouldBeTrue();
+	}
+
+	/// <summary>
+	/// <see cref="DisposableLock"/> で読み取り・書き込みロックの取得と解放後に再取得できることを検証します。
+	/// </summary>
+	[Fact]
+	public void DisposableLock_ReadAndWriteLock_ShouldAcquireReleaseAndReacquire() {
+		using var disposableLock = new DisposableLock(LockRecursionPolicy.NoRecursion);
+
+		Should.NotThrow(() => {
+			using (disposableLock.DisposableEnterReadLock()) {
+			}
+
+			using (disposableLock.DisposableEnterWriteLock()) {
+			}
+
+			using (disposableLock.DisposableEnterReadLock()) {
+			}
+		});
+	}
+
+	/// <summary>
+	/// <see cref="DisposableLock"/> でロックハンドルの二重 Dispose が安全であり、後続のロック取得を妨げないことを検証します。
+	/// </summary>
+	[Fact]
+	public void DisposableLock_DoubleDisposeOfLockHandle_ShouldBeSafe() {
+		using var disposableLock = new DisposableLock(LockRecursionPolicy.NoRecursion);
+
+		using (var writeLock = disposableLock.DisposableEnterWriteLock()) {
+			writeLock.Dispose();
+			Should.NotThrow(() => writeLock.Dispose());
+		}
+
+		Should.NotThrow(() => {
+			using var readLock = disposableLock.DisposableEnterReadLock();
+		});
+	}
+
+	/// <summary>
+	/// <see cref="DisposableLock.Dispose"/> の二重呼び出しおよび Dispose 後のロック取得が例外を投げないことを検証します。
+	/// </summary>
+	[Fact]
+	public void DisposableLock_AfterDispose_ShouldNotThrowOnAcquireOrDoubleDispose() {
+		using var disposableLock = new DisposableLock(LockRecursionPolicy.NoRecursion);
+
+		disposableLock.Dispose();
+		Should.NotThrow(() => disposableLock.Dispose());
+
+		Should.NotThrow(() => {
+			using var readLock = disposableLock.DisposableEnterReadLock();
+			using var writeLock = disposableLock.DisposableEnterWriteLock();
+		});
 	}
 }

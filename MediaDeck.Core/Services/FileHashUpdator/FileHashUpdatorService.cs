@@ -74,7 +74,7 @@ public class FileHashUpdatorService : ServiceBase, IFileHashUpdatorService {
 		this._databaseWriteCoordinator = databaseWriteCoordinator;
 		this._logger = logger;
 		this.HashUpdateQueue
-			.ObserveAdd()
+			.ObserveAdd(CancellationToken.None)
 			.ThrottleFirst(TimeSpan.FromSeconds(0.1))
 			.ObserveOnThreadPool()
 			.SubscribeAwait(async (x, ct) => {
@@ -86,7 +86,7 @@ public class FileHashUpdatorService : ServiceBase, IFileHashUpdatorService {
 			.AddTo(this.CompositeDisposable);
 
 		this.FullHashUpdateQueue
-			.ObserveAdd()
+			.ObserveAdd(CancellationToken.None)
 			.ThrottleFirst(TimeSpan.FromSeconds(0.1))
 			.ObserveOnThreadPool()
 			.SubscribeAwait(async (x, ct) => {

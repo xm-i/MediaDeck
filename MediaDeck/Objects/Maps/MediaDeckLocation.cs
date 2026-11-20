@@ -113,12 +113,13 @@ public class MediaDeckLocation : global::MapControl.Location, ILocation {
 		return $"{this.Latitude} {this.Longitude} {this.Altitude}";
 	}
 
+	/// <inheritdoc/>
 	public override bool Equals(object? obj) {
 		if (obj is not IGpsLocation loc) {
 			return false;
 		}
 		return base.Equals(obj) &&
-			this.Altitude == loc.Altitude;
+			Nullable.Equals(this.Altitude, loc.Altitude);
 	}
 
 	public override int GetHashCode() {

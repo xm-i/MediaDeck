@@ -131,7 +131,7 @@ public partial class VideoMediaItemOperator : BaseMediaItemOperator {
 			if (location?.Latitude != null && location?.Longitude != null) {
 				var lat = location.Value.Latitude;
 				var lon = location.Value.Longitude;
-				if (!await db.Positions.AnyAsync(x => x.Latitude == lat && x.Longitude == lon, ct)) {
+				if (await db.Positions.FindAsync([lat, lon], ct) is null) {
 					await db.Positions.AddAsync(new Position { Latitude = lat, Longitude = lon }, ct);
 				}
 			}
@@ -345,7 +345,7 @@ public partial class VideoMediaItemOperator : BaseMediaItemOperator {
 		var uuid = Guid.NewGuid();
 		var temporaryThumbPath = Path.Combine(this._config.PathConfig.TemporaryFolderPath.Value, $"{uuid}.png");
 		try {
-			await FFMpeg.Snapshot(filePath, temporaryThumbPath, new Size(width, height), time).ProcessAsynchronously().ConfigureAwait(false);
+			await FFMpeg.Snapshot(filePath, temporaryThumbPath, new Size(width, height), time).ProcessAsynchronously(cancellationToken: cancellationToken).ConfigureAwait(false);
 			var binary = await File.ReadAllBytesAsync(temporaryThumbPath, cancellationToken).ConfigureAwait(false);
 			return binary;
 		} finally {

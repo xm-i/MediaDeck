@@ -12,6 +12,7 @@ using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
+using Serilog;
 using Windows.System;
 using Windows.UI.Core;
 
@@ -29,6 +30,7 @@ public abstract class ViewerPaneBase<T> : UserControlBase<T> where T : ViewerPan
 	private readonly IWindowService _windowService;
 	private readonly IStringProvider _stringProvider;
 	private IMediaItemViewModel? _contextMenuTargetFile;
+	private int _contextMenuOpeningVersion;
 
 	/// <summary>
 	/// <see cref="ViewerPaneBase{T}"/> クラスの新しいインスタンスを初期化します。
@@ -181,7 +183,7 @@ public abstract class ViewerPaneBase<T> : UserControlBase<T> where T : ViewerPan
 	/// </summary>
 	/// <param name="sender">イベント発生元。</param>
 	/// <param name="e">イベント引数。</param>
-	protected async void FileContextMenu_Opening(object sender, object e) {
+	protected void FileContextMenu_Opening(object sender, object e) {
 		if (sender is not MenuFlyout menuFlyout || this.ViewModel is null) {
 			return;
 		}
@@ -229,24 +231,47 @@ public abstract class ViewerPaneBase<T> : UserControlBase<T> where T : ViewerPan
 		}
 
 		addRoot.Items.Clear();
-		var paths = await this.ViewModel.GetRecentAlbumPathsAsync(12);
-		foreach (var path in paths) {
-			var item = new MenuFlyoutItem {
-				Text = path,
-				Tag = $"{AddToAlbumItemTagPrefix}{path}",
+		var version = ++this._contextMenuOpeningVersion;
+		_ = this.PopulateRecentAlbumsAsync(addRoot, version);
+	}
+
+	/// <summary>
+	/// コンテキストメニューの最近使用したアルバム一覧を非同期に読み込み、サブメニューを構築します。
+	/// </summary>
+	/// <param name="addRoot">構築対象のルートサブメニュー。</param>
+	/// <param name="version">競合検知用のメニュー展開バージョン。</param>
+	private async Task PopulateRecentAlbumsAsync(MenuFlyoutSubItem addRoot, int version) {
+		try {
+			if (this.ViewModel is null) {
+				return;
+			}
+
+			var paths = await this.ViewModel.GetRecentAlbumPathsAsync(12);
+			if (version != this._contextMenuOpeningVersion) {
+				return;
+			}
+
+			addRoot.Items.Clear();
+			foreach (var path in paths) {
+				var item = new MenuFlyoutItem {
+					Text = path,
+					Tag = $"{AddToAlbumItemTagPrefix}{path}",
+				};
+				item.Click += this.MenuFlyoutItem_Click;
+				addRoot.Items.Add(item);
+			}
+			if (addRoot.Items.Count > 0) {
+				addRoot.Items.Add(new MenuFlyoutSeparator());
+			}
+			var createItem = new MenuFlyoutItem {
+				Text = this._stringProvider.GetString("Viewer_ContextCreateNewAlbum"),
+				Tag = AddToAlbumCreateTag,
 			};
-			item.Click += this.MenuFlyoutItem_Click;
-			addRoot.Items.Add(item);
+			createItem.Click += this.MenuFlyoutItem_Click;
+			addRoot.Items.Add(createItem);
+		} catch (Exception ex) {
+			Log.Error(ex, "コンテキストメニューの最近使用したアルバム一覧の読み込みに失敗しました。");
 		}
-		if (addRoot.Items.Count > 0) {
-			addRoot.Items.Add(new MenuFlyoutSeparator());
-		}
-		var createItem = new MenuFlyoutItem {
-			Text = this._stringProvider.GetString("Viewer_ContextCreateNewAlbum"),
-			Tag = AddToAlbumCreateTag,
-		};
-		createItem.Click += this.MenuFlyoutItem_Click;
-		addRoot.Items.Add(createItem);
 	}
 
 	private async Task CreateAlbumAndAddItemsAsync(IMediaItemViewModel[] targetFiles) {

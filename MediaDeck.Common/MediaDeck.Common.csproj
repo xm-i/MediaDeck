@@ -14,4 +14,8 @@
     <ProjectReference Include="..\MediaDeck.Composition\MediaDeck.Composition.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="MediaDeck.Core.Tests" />
+  </ItemGroup>
+
 </Project>

@@ -220,7 +220,7 @@ public partial class App {
 				await using (var db = await dbFactory.CreateDbContextAsync()) {
 					await db.Database.EnsureCreatedAsync();
 
-					var dbVersion = db.DbVersions.AsNoTracking().FirstOrDefault(x => x.Id == 1);
+					var dbVersion = await db.DbVersions.AsNoTracking().FirstOrDefaultAsync(x => x.Id == 1);
 					if (dbVersion == null) {
 						db.DbVersions.Add(new() {
 							Id = 1,

@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using System.Linq;
+using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -47,11 +48,11 @@ namespace MediaDeck.Analyzers {
 				return;
 			}
 
-			if (IsIgnoredInvocation(node, context.SemanticModel)) {
+			if (IsIgnoredInvocation(node, context.SemanticModel, context.CancellationToken)) {
 				return;
 			}
 
-			if (HasCompositeDisposableArgument(node, context.SemanticModel)) {
+			if (HasCompositeDisposableArgument(node, context.SemanticModel, context.CancellationToken)) {
 				return;
 			}
 
@@ -71,18 +72,18 @@ namespace MediaDeck.Analyzers {
 				n is ArgumentSyntax ||
 				(n is LocalDeclarationStatementSyntax l && l.UsingKeyword.IsKind(SyntaxKind.UsingKeyword)) ||
 				n is UsingStatementSyntax ||
-				IsHandledAssignment(n, context.SemanticModel));
+				IsHandledAssignment(n, context.SemanticModel, context.CancellationToken));
 
 			if (ancestor != null) {
 				return;
 			}
 
 			// A more robust check using semantic model to see if it returns `IDisposable`.
-			var typeInfo = context.SemanticModel.GetTypeInfo(node);
+			var typeInfo = context.SemanticModel.GetTypeInfo(node, context.CancellationToken);
 			ITypeSymbol? type = typeInfo.Type;
 
 			if (type == null) {
-				var symbolInfo = context.SemanticModel.GetSymbolInfo(node);
+				var symbolInfo = context.SemanticModel.GetSymbolInfo(node, context.CancellationToken);
 				if (symbolInfo.Symbol is IMethodSymbol methodSymbol) {
 					type = methodSymbol.ReturnType;
 				}
@@ -119,15 +120,16 @@ namespace MediaDeck.Analyzers {
 		/// </summary>
 		/// <param name="n">判定対象の構文ノード</param>
 		/// <param name="semanticModel">セマンティックモデル</param>
+		/// <param name="cancellationToken">キャンセレーショントークン</param>
 		/// <returns>破棄管理された代入式の場合 true</returns>
-		private static bool IsHandledAssignment(SyntaxNode n, SemanticModel semanticModel) {
+		private static bool IsHandledAssignment(SyntaxNode n, SemanticModel semanticModel, CancellationToken cancellationToken) {
 			if (n is AssignmentExpressionSyntax assignment) {
 				// SerialDisposable.Disposable = ... のような Disposable プロパティへの代入は破棄管理されているため許可する
 				if (assignment.Left is MemberAccessExpressionSyntax ma && ma.Name.Identifier.Text == "Disposable") {
 					return true;
 				}
 
-				var leftSymbol = semanticModel.GetSymbolInfo(assignment.Left).Symbol;
+				var leftSymbol = semanticModel.GetSymbolInfo(assignment.Left, cancellationToken).Symbol;
 
 				// WinUI の UIElement.ProtectedCursor 等はフレームワーク側でライフサイクル管理されるため許可する
 				if (leftSymbol is IPropertySymbol { Name: "ProtectedCursor" } prop &&
@@ -142,7 +144,7 @@ namespace MediaDeck.Analyzers {
 
 				// 同じ型内の Dispose メソッドで明示的に破棄されるフィールドまたはプロパティへの代入は許可する
 				if (leftSymbol is IFieldSymbol or IPropertySymbol &&
-					IsDisposedInTypeDispose(leftSymbol, assignment, semanticModel)) {
+					IsDisposedInTypeDispose(leftSymbol, assignment, semanticModel, cancellationToken)) {
 					return true;
 				}
 
@@ -157,8 +159,9 @@ namespace MediaDeck.Analyzers {
 		/// <param name="memberSymbol">判定対象のメンバーシンボル</param>
 		/// <param name="node">代入式ノード</param>
 		/// <param name="semanticModel">セマンティックモデル</param>
+		/// <param name="cancellationToken">キャンセレーショントークン</param>
 		/// <returns>Dispose メソッド内で破棄されている場合 true</returns>
-		private static bool IsDisposedInTypeDispose(ISymbol memberSymbol, SyntaxNode node, SemanticModel semanticModel) {
+		private static bool IsDisposedInTypeDispose(ISymbol memberSymbol, SyntaxNode node, SemanticModel semanticModel, CancellationToken cancellationToken) {
 			var typeDecl = node.FirstAncestorOrSelf<TypeDeclarationSyntax>();
 			if (typeDecl == null) {
 				return false;
@@ -186,7 +189,7 @@ namespace MediaDeck.Analyzers {
 						continue;
 					}
 
-					var targetSymbol = semanticModel.GetSymbolInfo(targetExpr).Symbol;
+					var targetSymbol = semanticModel.GetSymbolInfo(targetExpr, cancellationToken).Symbol;
 					if (SymbolEqualityComparer.Default.Equals(targetSymbol, memberSymbol)) {
 						return true;
 					}
@@ -201,8 +204,9 @@ namespace MediaDeck.Analyzers {
 		/// </summary>
 		/// <param name="node">判定対象の式</param>
 		/// <param name="semanticModel">セマンティックモデル</param>
+		/// <param name="cancellationToken">キャンセレーショントークン</param>
 		/// <returns>CompositeDisposable を引数として渡している場合 true</returns>
-		private static bool HasCompositeDisposableArgument(ExpressionSyntax node, SemanticModel semanticModel) {
+		private static bool HasCompositeDisposableArgument(ExpressionSyntax node, SemanticModel semanticModel, CancellationToken cancellationToken) {
 			if (node is not InvocationExpressionSyntax inv) {
 				return false;
 			}
@@ -213,7 +217,7 @@ namespace MediaDeck.Analyzers {
 					continue;
 				}
 
-				var argType = semanticModel.GetTypeInfo(arg.Expression).Type;
+				var argType = semanticModel.GetTypeInfo(arg.Expression, cancellationToken).Type;
 				if (argType?.Name == "CompositeDisposable") {
 					return true;
 				}
@@ -227,8 +231,9 @@ namespace MediaDeck.Analyzers {
 		/// </summary>
 		/// <param name="node">判定対象の式</param>
 		/// <param name="semanticModel">セマンティックモデル</param>
+		/// <param name="cancellationToken">キャンセレーショントークン</param>
 		/// <returns>除外すべき呼び出しの場合 true</returns>
-		private static bool IsIgnoredInvocation(ExpressionSyntax node, SemanticModel semanticModel) {
+		private static bool IsIgnoredInvocation(ExpressionSyntax node, SemanticModel semanticModel, CancellationToken cancellationToken) {
 			if (node is InvocationExpressionSyntax inv && inv.Expression is MemberAccessExpressionSyntax ma) {
 				var name = ma.Name.Identifier.Text;
 				// DI コンテナからのサービス取得はコンテナがライフサイクルを管理するため除外する
@@ -238,7 +243,7 @@ namespace MediaDeck.Analyzers {
 
 				// 既存コレクションから要素参照を取得する LINQ メソッドは新規生成ではないため除外する
 				if (name is "First" or "FirstOrDefault" or "Last" or "LastOrDefault" or "Single" or "SingleOrDefault" or "ElementAt" or "ElementAtOrDefault") {
-					var symbol = semanticModel.GetSymbolInfo(inv).Symbol as IMethodSymbol;
+					var symbol = semanticModel.GetSymbolInfo(inv, cancellationToken).Symbol as IMethodSymbol;
 					var containingType = symbol?.ContainingType?.ToDisplayString();
 					if (containingType is "System.Linq.Enumerable" or "System.Linq.Queryable") {
 						return true;

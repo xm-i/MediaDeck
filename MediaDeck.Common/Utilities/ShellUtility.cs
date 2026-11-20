@@ -56,12 +56,22 @@ public static class ShellUtility {
 			return;
 		}
 
-		var psi = new ProcessStartInfo {
-			FileName = "explorer.exe",
+		var psi = CreateShowInExplorerStartInfo(filePath);
+		using var p = Process.Start(psi);
+	}
+
+	/// <summary>
+	/// Explorerでファイルを選択表示するための <see cref="ProcessStartInfo"/> を生成します。
+	/// </summary>
+	/// <param name="filePath">選択するファイルのフルパス。</param>
+	/// <returns>構成済みの <see cref="ProcessStartInfo"/>。</returns>
+	internal static ProcessStartInfo CreateShowInExplorerStartInfo(string filePath) {
+		var explorerPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "explorer.exe");
+		return new ProcessStartInfo {
+			FileName = explorerPath,
 			Arguments = $"/select,\"{filePath}\"",
 			UseShellExecute = false
 		};
-		using var p = Process.Start(psi);
 	}
 
 	/// <summary>

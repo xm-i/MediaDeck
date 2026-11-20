@@ -67,7 +67,7 @@ public partial class ArchiveMediaItemOperator : BaseMediaItemOperator {
 			}
 		}
 
-		using var archiveFile = ZipFile.Open(filePath, ZipArchiveMode.Read);
+		await using var archiveFile = await ZipFile.OpenAsync(filePath, ZipArchiveMode.Read);
 		var first = archiveFile.Entries.FirstOrDefault(x => this._mediaItemTypeService.IsTargetPath(x.Name, MediaType.Image));
 
 		string? thumbRelativePath = null;
@@ -108,7 +108,7 @@ public partial class ArchiveMediaItemOperator : BaseMediaItemOperator {
 
 		if (first != null) {
 			try {
-				using var stream = first!.Open();
+				await using var stream = await first.OpenAsync();
 				using var ms = new MemoryStream();
 				await stream.CopyToAsync(ms);
 				ms.Seek(0, SeekOrigin.Begin);
@@ -146,11 +146,14 @@ public partial class ArchiveMediaItemOperator : BaseMediaItemOperator {
 		return registeredItem;
 	}
 
+	/// <summary>
+	/// メディアアイテムのメタデータを最新のファイル内容で更新します。
+	/// </summary>
+	/// <param name="mediaItem">更新対象のメディアアイテム。</param>
+	/// <returns>非同期操作を表すタスク。</returns>
 	public override async Task UpdateMetadata(MediaItem mediaItem) {
-		using var fileMs = new MemoryStream();
 		try {
-			using var fileFs = File.OpenRead(mediaItem.FilePath);
-			using var archiveFile = ZipFile.Open(mediaItem.FilePath, ZipArchiveMode.Read);
+			await using var archiveFile = await ZipFile.OpenAsync(mediaItem.FilePath, ZipArchiveMode.Read);
 
 			mediaItem.Metadata = new() {
 				Entries = [new() { Key = "PageCount", Value = archiveFile.Entries.Count(x => this._mediaItemTypeService.IsTargetPath(x.Name, MediaType.Image)).ToString() }]

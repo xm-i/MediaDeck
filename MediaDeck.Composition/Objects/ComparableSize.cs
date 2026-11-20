@@ -101,14 +101,14 @@ public struct ComparableSize : IComparable<ComparableSize>, IComparable {
 		return $"{this.Width}x{this.Height}";
 	}
 
+	/// <inheritdoc/>
 	public override bool Equals(object? obj) {
 		if (obj is not ComparableSize cs) {
 			return false;
 		}
 
-		var size = cs;
-		return this.Width == size.Width &&
-			this.Height == size.Height;
+		return this.Width.CompareTo(cs.Width) == 0 &&
+			this.Height.CompareTo(cs.Height) == 0;
 	}
 
 	public override int GetHashCode() {

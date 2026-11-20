@@ -31,4 +31,14 @@ public class AppPathProviderTests {
 		var provider = new AppPathProvider();
 		provider.NoThumbnailFilePath.ShouldBe(FilePathConstants.NoThumbnailFilePath);
 	}
+
+	/// <summary>
+	/// <see cref="FilePathConstants.DatabaseFilePath"/> および <see cref="FilePathConstants.ThumbnailDirectoryPath"/> が
+	/// <see cref="FilePathConstants.BaseDirectory"/> 配下の期待パスを返すことを検証します。
+	/// </summary>
+	[Fact]
+	public void DerivedPaths_AreUnderBaseDirectory() {
+		FilePathConstants.DatabaseFilePath.ShouldBe(Path.Combine(FilePathConstants.BaseDirectory, "pix.db"));
+		FilePathConstants.ThumbnailDirectoryPath.ShouldBe(Path.Combine(FilePathConstants.BaseDirectory, "thumbs"));
+	}
 }

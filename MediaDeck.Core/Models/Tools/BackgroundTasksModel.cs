@@ -62,13 +62,13 @@ public class BackgroundTasksModel : ModelBase {
 				this._stringProvider.GetString("BackgroundTask_UpdateFileHash"),
 				this._updateFileHashBackgroundService.CompletedCount,
 				this._updateFileHashBackgroundService.TargetCount,
-				() => this.Actions.OnNext(() => this._updateFileHashBackgroundService.EnqueueAllHashUpdatesAsync()),
+				() => this.Actions.OnNext(() => this._updateFileHashBackgroundService.EnqueueAllHashUpdatesAsync(CancellationToken.None)),
 				() => this._updateFileHashBackgroundService.CancelUpdate()),
 			new BackgroundTaskStatusItemModel(
 				this._stringProvider.GetString("BackgroundTask_UpdateFullHash"),
 				this._updateFileHashBackgroundService.FullHashCompletedCount,
 				this._updateFileHashBackgroundService.FullHashTargetCount,
-				() => this.Actions.OnNext(() => this._updateFileHashBackgroundService.CheckAndEnqueueFullHashUpdatesAsync()),
+				() => this.Actions.OnNext(() => this._updateFileHashBackgroundService.CheckAndEnqueueFullHashUpdatesAsync(CancellationToken.None)),
 				() => this._updateFileHashBackgroundService.CancelFullHashUpdate()),
 			new BackgroundTaskStatusItemModel(
 				this._stringProvider.GetString("BackgroundTask_UpdateMetadata"),

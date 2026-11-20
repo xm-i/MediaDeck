@@ -1,10 +1,14 @@
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.WinUI.Controls;
 
+using MediaDeck.Composition.Interfaces.Files;
+using MediaDeck.Core.Models.Files.SearchConditions;
 using MediaDeck.ViewModels.Panes.ViewerPanes;
 using MediaDeck.Views.Dialogs;
 
 using Microsoft.UI.Xaml.Controls;
+using Serilog;
 
 namespace MediaDeck.Views.Panes.ViewerPanes;
 
@@ -41,10 +45,23 @@ public sealed partial class SearchConditionManagerView {
 		this.ViewModel?.RefreshSearchTokenCandidates(sender.Text);
 	}
 
-	private async void TokenizingTextBox_TokenItemAdded(TokenizingTextBox sender, object args) {
+	private void TokenizingTextBox_TokenItemAdded(TokenizingTextBox sender, object args) {
 		// サジェストから prop. スタブが選択された場合は、未確定のスタブを除去してから
 		// 比較ダイアログを表示し、確定された PropertySearchCondition を追加する。
 		if (this.ViewModel?.TryGetUnconfiguredPropertyDescriptor(args, out var stub, out var descriptor) == true) {
+			_ = this.ShowPropertyComparisonDialogAsync(stub, descriptor);
+			return;
+		}
+		this.ViewModel?.NotifySearchConditionChanged();
+	}
+
+	/// <summary>
+	/// プロパティ検索条件の比較ダイアログを非同期に表示し、ユーザーの確定内容で条件を更新します。
+	/// </summary>
+	/// <param name="stub">サジェストから追加された未確定条件スタブ。</param>
+	/// <param name="descriptor">対象プロパティの記述子。</param>
+	private async Task ShowPropertyComparisonDialogAsync(ISearchCondition stub, MediaItemPropertyDescriptor descriptor) {
+		try {
 			var dialog = Ioc.Default.GetRequiredService<PropertyComparisonDialog>();
 			dialog.XamlRoot = this.XamlRoot;
 			dialog.Initialize(descriptor);
@@ -54,9 +71,9 @@ public sealed partial class SearchConditionManagerView {
 				return;
 			}
 			this.ViewModel?.ConfigurePropertyCondition(stub, descriptor.Name, dialog.SelectedOperator, dialog.SelectedValue);
-			return;
+		} catch (Exception ex) {
+			Log.Error(ex, "プロパティ比較ダイアログの表示中にエラーが発生しました。");
 		}
-		this.ViewModel?.NotifySearchConditionChanged();
 	}
 
 	private void TokenizingTextBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args) {

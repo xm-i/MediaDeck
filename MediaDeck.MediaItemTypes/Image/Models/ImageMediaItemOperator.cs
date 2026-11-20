@@ -126,7 +126,7 @@ public class ImageMediaItemOperator : BaseMediaItemOperator {
 			mf.IsUnderFolderGroup = await this.GetIsUnderFolderGroup(db, directoryPath);
 
 			if (latitude != null && longitude != null) {
-				if (!await db.Positions.AnyAsync(x => x.Latitude == latitude.Value && x.Longitude == longitude.Value, ct)) {
+				if (await db.Positions.FindAsync([latitude.Value, longitude.Value], ct) is null) {
 					await db.Positions.AddAsync(new Position { Latitude = latitude.Value, Longitude = longitude.Value }, ct);
 				}
 			}

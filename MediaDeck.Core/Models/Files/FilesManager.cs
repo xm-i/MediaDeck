@@ -44,10 +44,10 @@ public class FilesManager {
 		await deleteQuery.ExecuteDeleteAsync();
 
 		var folderGroups = targetFiles.Where(x => x.MediaType == MediaType.FolderGroup).Select(fg => fg.FilePath).ToArray();
-		if (folderGroups.Any()) {
-			var targets = db.MediaItems.Where(x => folderGroups.Any(fg => fg == x.DirectoryPath || x.DirectoryPath.StartsWith(fg + Path.DirectorySeparatorChar))).ToArray();
+		if (folderGroups.Length > 0) {
+			var targets = await db.MediaItems.Where(x => folderGroups.Any(fg => fg == x.DirectoryPath || x.DirectoryPath.StartsWith(fg + Path.DirectorySeparatorChar))).ToArrayAsync();
 			foreach (var target in targets) {
-				target.IsUnderFolderGroup = db.MediaItems.Any(fg => target.DirectoryPath == fg.FilePath || target.DirectoryPath.StartsWith(fg.FilePath + Path.DirectorySeparatorChar));
+				target.IsUnderFolderGroup = await db.MediaItems.AnyAsync(fg => target.DirectoryPath == fg.FilePath || target.DirectoryPath.StartsWith(fg.FilePath + Path.DirectorySeparatorChar));
 			}
 			db.UpdateRange(targets);
 		}

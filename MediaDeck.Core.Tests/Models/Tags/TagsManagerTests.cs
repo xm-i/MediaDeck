@@ -262,15 +262,23 @@ public class TagsManagerTests {
 		fileTags.ShouldContain(tagMock.Object);
 	}
 
+	/// <summary>
+	/// タグが null の場合、タグ付けを行わず DB も更新されないことを検証します。
+	/// </summary>
 	[Fact]
 	public async Task AddTagAsync_ShouldDoNothing_WhenTagIsNull() {
 		var dbFactory = this.CreateInMemoryDbFactory(nameof(this.AddTagAsync_ShouldDoNothing_WhenTagIsNull));
 		var manager = new TagsManager(dbFactory, new TagModelFactory());
 
+		var fileTags = new List<ITagModel>();
 		var fileModelMock = new Mock<IMediaItemModel>();
-		fileModelMock.SetupGet(x => x.Tags).Returns([]);
+		fileModelMock.SetupGet(x => x.Tags).Returns(fileTags);
 
 		await manager.AddTagAsync([fileModelMock.Object], null!);
+
+		fileTags.ShouldBeEmpty();
+		await using var db = await dbFactory.CreateDbContextAsync();
+		(await db.MediaItemTags.CountAsync()).ShouldBe(0);
 	}
 
 	[Fact]
@@ -313,14 +321,23 @@ public class TagsManagerTests {
 		fileTags.ShouldBeEmpty();
 	}
 
+	/// <summary>
+	/// 対象ファイルが指定されたタグを保持していない場合、何も削除されず DB も更新されないことを検証します。
+	/// </summary>
 	[Fact]
 	public async Task RemoveTagAsync_ShouldDoNothing_WhenFilesDoNotHaveTag() {
 		var dbFactory = this.CreateInMemoryDbFactory(nameof(this.RemoveTagAsync_ShouldDoNothing_WhenFilesDoNotHaveTag));
 		var manager = new TagsManager(dbFactory, new TagModelFactory());
+		var fileTags = new List<ITagModel>();
 		var fileModelMock = new Mock<IMediaItemModel>();
 		fileModelMock.SetupGet(x => x.Id).Returns(100);
-		fileModelMock.SetupGet(x => x.Tags).Returns(new List<ITagModel>());
+		fileModelMock.SetupGet(x => x.Tags).Returns(fileTags);
+
 		await manager.RemoveTagAsync([fileModelMock.Object], 99);
+
+		fileTags.ShouldBeEmpty();
+		await using var db = await dbFactory.CreateDbContextAsync();
+		(await db.MediaItemTags.CountAsync()).ShouldBe(0);
 	}
 
 	[Fact]
