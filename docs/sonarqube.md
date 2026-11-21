@@ -52,8 +52,10 @@ Jenkins サーバー（Ubuntu）とは別に、**開発用 Windows PC を Jenkin
    - **Server authentication token**: 手順 2 で作成したクレデンシャルを選択
 4. Pipeline ジョブ（または Multibranch Pipeline）で本リポジトリの `Jenkinsfile` を指定します。
 
-> **Quality Gate でビルド結果を判定したい場合**:
-> SonarQube 側の **Project Settings > Webhooks** に `https://<JenkinsのURL>/sonarqube-webhook/` を登録したうえで、`Jenkinsfile` 内の `stage('Quality Gate')` のコメントアウトを解除してください。
+> **Quality Gate によるビルド成否判定**:
+> デフォルトでは `Jenkinsfile` 内の `dotnet-sonarscanner begin` に `/d:sonar.qualitygate.wait=true`（タイムアウト 300 秒）を指定しており、`dotnet-sonarscanner end` 実行時に SonarQube 側の Quality Gate 評価完了をポーリング待機して、Failed の場合は Jenkins ビルドを失敗させます（Webhook 設定不要）。
+>
+> Quality Gate を独立した Jenkins ステージとして分離したい場合は、SonarQube 側の **Project Settings > Webhooks** に `https://<JenkinsのURL>/sonarqube-webhook/` を登録したうえで、`Jenkinsfile` から `/d:sonar.qualitygate.wait=true`・`/d:sonar.qualitygate.timeout=300` を外し、`stage('Quality Gate')` のコメントアウトを解除してください。
 
 ### 手順 B: SonarQube プラグインを入れずに Credentials のみで実行する場合
 `Jenkinsfile` 内の `withSonarQubeEnv('SonarQube') { ... }` を、コメント記載の `withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_AUTH_TOKEN')]) { ... }` に差し替えてください。

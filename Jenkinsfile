@@ -90,13 +90,16 @@ pipeline {
             Invoke-Checked { dotnet restore MediaDeck.slnx -p:Platform=x64 }
 
             # SonarScanner 開始（Community Build のため sonar.branch.name は指定しない）
+            # sonar.qualitygate.wait=true により、end 実行時に Quality Gate 評価完了まで待機し Failed ならビルドを失敗させる
             $beginArgs = @(
               'tool', 'run', 'dotnet-sonarscanner', 'begin',
               "/k:$($env:SONAR_PROJECT_KEY)",
               "/n:$($env:SONAR_PROJECT_NAME)",
               "/s:$analysisSettingsPath",
               "/d:sonar.host.url=$sonarHostUrl",
-              "/d:sonar.token=$sonarToken"
+              "/d:sonar.token=$sonarToken",
+              '/d:sonar.qualitygate.wait=true',
+              '/d:sonar.qualitygate.timeout=300'
             )
             if (-not [string]::IsNullOrWhiteSpace($projectVersion)) {
               $beginArgs += "/v:$projectVersion"
@@ -117,7 +120,7 @@ pipeline {
                 --results-directory './TestResults'
             }
 
-            # 解析結果を SonarQube サーバーへ送信
+            # 解析結果を SonarQube サーバーへ送信し、Quality Gate 評価完了まで待機（Failed 時は非ゼロ終了）
             Invoke-Checked { dotnet tool run dotnet-sonarscanner end "/d:sonar.token=$sonarToken" }
           '''
           // }
@@ -125,7 +128,10 @@ pipeline {
       }
     }
 
-    // SonarQube 側で Jenkins 向け Webhook を設定した後に Quality Gate 待機を有効化する場合は、以下のコメントを解除してください
+    // 現在は sonar.qualitygate.wait=true により上記ステージ内で Quality Gate 評価まで待機して成否を判定しています
+    // Webhook 方式で Quality Gate を独立ステージに分離したい場合は、上記 begin 引数の
+    // /d:sonar.qualitygate.wait=true と /d:sonar.qualitygate.timeout=300 を外し、
+    // SonarQube 側で Jenkins 向け Webhook を設定したうえで以下のコメントを解除してください
     // stage('Quality Gate') {
     //   steps {
     //     timeout(time: 5, unit: 'MINUTES') {
