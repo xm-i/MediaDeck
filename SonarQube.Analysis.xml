@@ -14,8 +14,8 @@
   <!-- 外部サブモジュール（AutoDiAttributes / GenJsonConfig）および自動生成コードを解析対象から除外 -->
   <Property Name="sonar.exclusions">lib/AutoDiAttributes/**,lib/GenJsonConfig/**,**/Migrations/**,**/*.g.cs,**/*.g.i.cs</Property>
 
-  <!-- サブモジュール・テストプロジェクト・アナライザー本体・WinUI 3 UI プロジェクト・自動生成コードをカバレッジ計測対象から除外 -->
-  <Property Name="sonar.coverage.exclusions">lib/AutoDiAttributes/**,lib/GenJsonConfig/**,MediaDeck.Core.Tests/**,lib/MediaDeck.Analyzers/**,MediaDeck/**,MediaDeck.MediaItemTypes.UI/**,**/Migrations/**,**/*.g.cs,**/*.g.i.cs</Property>
+  <!-- サブモジュール・テストプロジェクト・アナライザー本体・WinUI 3 UI・ViewModel プロジェクト・自動生成コードをカバレッジ計測対象から除外 -->
+  <Property Name="sonar.coverage.exclusions">lib/AutoDiAttributes/**,lib/GenJsonConfig/**,MediaDeck.Core.Tests/**,lib/MediaDeck.Analyzers/**,MediaDeck/**,MediaDeck.MediaItemTypes.UI/**,MediaDeck.ViewModels/**,**/Migrations/**,**/*.g.cs,**/*.g.i.cs</Property>
 
   <!-- 単体テスト実行結果 (TRX) およびコードカバレッジ (OpenCover) レポートパス -->
   <Property Name="sonar.cs.vstest.reportsPaths">TestResults/test-results.trx</Property>

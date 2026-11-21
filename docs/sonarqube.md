@@ -15,7 +15,7 @@ MediaDeck における SonarQube (`https://sonarqube.home.internal`) の運用�
 | `.vscode/extensions.json` | VS Code 推奨拡張機能（`sonarsource.sonarlint-vscode`）の定義 |
 
 - プロジェクトキー: `xm-i_MediaDeck_276a5153-1289-4cf8-88c6-e97e51bfce54`
-- 除外対象: 外部サブモジュール（`lib/AutoDiAttributes/**`, `lib/GenJsonConfig/**`）、自動生成ファイル（`*.g.cs`, `*.g.i.cs`）、EF Core マイグレーション。自作アナライザー（`lib/MediaDeck.Analyzers`）および WinUI 3 UI プロジェクト（`MediaDeck/**`, `MediaDeck.MediaItemTypes.UI/**`）はコード解析対象に含め、単体テスト計測対象外のためカバレッジ計測分母からは除外しています。
+- 除外対象: 外部サブモジュール（`lib/AutoDiAttributes/**`, `lib/GenJsonConfig/**`）、自動生成ファイル（`*.g.cs`, `*.g.i.cs`）、EF Core マイグレーション。自作アナライザー（`lib/MediaDeck.Analyzers`）、WinUI 3 UI プロジェクト（`MediaDeck/**`, `MediaDeck.MediaItemTypes.UI/**`）、および ViewModel プロジェクト（`MediaDeck.ViewModels/**`）はコード解析対象（静的解析）には含め、単体テスト計測対象外のためカバレッジ計測分母からは除外しています。
 
 ---
 
