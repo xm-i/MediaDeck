@@ -14,18 +14,29 @@ namespace MediaDeck.Core.Tests.Models.Tags;
 /// <summary>
 /// <see cref="TagsManager"/> の単体テスト。
 /// </summary>
-public class TagsManagerTests {
-	private IDbContextFactory<MediaDeckDbContext> CreateInMemoryDbFactory(string dbName) {
-		var options = new DbContextOptionsBuilder<MediaDeckDbContext>()
-			.UseInMemoryDatabase(databaseName: dbName)
-			.ConfigureWarnings(x => x.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.InMemoryEventId.TransactionIgnoredWarning))
-			.Options;
+/// <summary>
+/// <see cref="TagsManager"/> の単体テスト。
+/// </summary>
+public sealed class TagsManagerTests : IDisposable {
+	private readonly List<SqliteTestDbFactory> _dbFactories = [];
 
-		var factoryMock = new Mock<IDbContextFactory<MediaDeckDbContext>>();
-		factoryMock.Setup(f => f.CreateDbContextAsync(It.IsAny<CancellationToken>()))
-			.ReturnsAsync(() => new MediaDeckDbContext(options));
+	/// <summary>
+	/// テストで使用したデータベースファクトリを解放します。
+	/// </summary>
+	public void Dispose() {
+		foreach (var factory in this._dbFactories) {
+			factory.Dispose();
+		}
+	}
 
-		return factoryMock.Object;
+	/// <summary>
+	/// テスト用の SQLite インメモリデータベースファクトリを生成します。
+	/// </summary>
+	/// <returns>データベースコンテキストファクトリ</returns>
+	private IDbContextFactory<MediaDeckDbContext> CreateSqliteDbFactory() {
+		var factory = new SqliteTestDbFactory();
+		this._dbFactories.Add(factory);
+		return factory;
 	}
 
 	private async Task SeedDatabaseAsync(IDbContextFactory<MediaDeckDbContext> dbFactory) {
@@ -40,8 +51,7 @@ public class TagsManagerTests {
 
 	[Fact]
 	public async Task FindTagByNameAsync_ShouldReturnTag_WhenTagExists() {
-		var dbName = nameof(this.FindTagByNameAsync_ShouldReturnTag_WhenTagExists);
-		var dbFactory = this.CreateInMemoryDbFactory(dbName);
+		var dbFactory = this.CreateSqliteDbFactory();
 		await using (var db = await dbFactory.CreateDbContextAsync()) {
 			db.Tags.Add(new Tag { TagId = 1, TagName = "ExistingTag", Detail = "", TagCategory = null!, MediaItemTags = [], TagAliases = [] });
 			await db.SaveChangesAsync();
@@ -55,7 +65,7 @@ public class TagsManagerTests {
 
 	[Fact]
 	public async Task FindTagByNameAsync_ShouldReturnNull_WhenTagDoesNotExist() {
-		var dbFactory = this.CreateInMemoryDbFactory(nameof(this.FindTagByNameAsync_ShouldReturnNull_WhenTagDoesNotExist));
+		var dbFactory = this.CreateSqliteDbFactory();
 		var manager = new TagsManager(dbFactory, new TagModelFactory());
 		var result = await manager.FindTagByNameAsync("NonExistingTag");
 		result.ShouldBeNull();
@@ -63,7 +73,7 @@ public class TagsManagerTests {
 
 	[Fact]
 	public async Task CreateTagCategoryAsync_ShouldCreateAndPersistCategoryImmediately() {
-		var dbFactory = this.CreateInMemoryDbFactory(nameof(this.CreateTagCategoryAsync_ShouldCreateAndPersistCategoryImmediately));
+		var dbFactory = this.CreateSqliteDbFactory();
 		await this.SeedDatabaseAsync(dbFactory);
 		var manager = new TagsManager(dbFactory, new TagModelFactory());
 		await manager.InitializeAsync();
@@ -84,7 +94,7 @@ public class TagsManagerTests {
 
 	[Fact]
 	public async Task UpdateTagCategoryAsync_ShouldUpdateAndPersistCategory() {
-		var dbFactory = this.CreateInMemoryDbFactory(nameof(this.UpdateTagCategoryAsync_ShouldUpdateAndPersistCategory));
+		var dbFactory = this.CreateSqliteDbFactory();
 		await this.SeedDatabaseAsync(dbFactory);
 		var manager = new TagsManager(dbFactory, new TagModelFactory());
 		await manager.InitializeAsync();
@@ -107,7 +117,7 @@ public class TagsManagerTests {
 
 	[Fact]
 	public async Task UpdateTagCategoryAsync_ShouldDoNothing_ForNoCategory() {
-		var dbFactory = this.CreateInMemoryDbFactory(nameof(this.UpdateTagCategoryAsync_ShouldDoNothing_ForNoCategory));
+		var dbFactory = this.CreateSqliteDbFactory();
 		await this.SeedDatabaseAsync(dbFactory);
 		var manager = new TagsManager(dbFactory, new TagModelFactory());
 		await manager.InitializeAsync();
@@ -120,7 +130,7 @@ public class TagsManagerTests {
 
 	[Fact]
 	public async Task DeleteTagCategoryAsync_ShouldDeleteImmediatelyAndMoveTagsToNoCategory() {
-		var dbFactory = this.CreateInMemoryDbFactory(nameof(this.DeleteTagCategoryAsync_ShouldDeleteImmediatelyAndMoveTagsToNoCategory));
+		var dbFactory = this.CreateSqliteDbFactory();
 		await this.SeedDatabaseAsync(dbFactory);
 		var manager = new TagsManager(dbFactory, new TagModelFactory());
 		await manager.InitializeAsync();
@@ -144,7 +154,7 @@ public class TagsManagerTests {
 
 	[Fact]
 	public async Task DeleteTagCategoryAsync_ShouldDoNothing_ForNoCategory() {
-		var dbFactory = this.CreateInMemoryDbFactory(nameof(this.DeleteTagCategoryAsync_ShouldDoNothing_ForNoCategory));
+		var dbFactory = this.CreateSqliteDbFactory();
 		await this.SeedDatabaseAsync(dbFactory);
 		var manager = new TagsManager(dbFactory, new TagModelFactory());
 		await manager.InitializeAsync();
@@ -156,7 +166,7 @@ public class TagsManagerTests {
 
 	[Fact]
 	public async Task CreateTagImmediatelyAsync_ShouldCreateTagAndAliases_WhenValidArgumentsProvided() {
-		var dbFactory = this.CreateInMemoryDbFactory(nameof(this.CreateTagImmediatelyAsync_ShouldCreateTagAndAliases_WhenValidArgumentsProvided));
+		var dbFactory = this.CreateSqliteDbFactory();
 		await this.SeedDatabaseAsync(dbFactory);
 		var manager = new TagsManager(dbFactory, new TagModelFactory());
 		await manager.InitializeAsync();
@@ -174,14 +184,15 @@ public class TagsManagerTests {
 
 	[Fact]
 	public async Task CreateTagImmediatelyAsync_ShouldThrowException_WhenAliasesIsNull() {
-		var dbFactory = this.CreateInMemoryDbFactory(nameof(this.CreateTagImmediatelyAsync_ShouldThrowException_WhenAliasesIsNull));
+		var dbFactory = this.CreateSqliteDbFactory();
+		await this.SeedDatabaseAsync(dbFactory);
 		var manager = new TagsManager(dbFactory, new TagModelFactory());
-		await Should.ThrowAsync<Exception>(() => manager.CreateTagImmediatelyAsync(1, "NewTag", null, "NewDetail", null!));
+		await Should.ThrowAsync<ArgumentNullException>(() => manager.CreateTagImmediatelyAsync(1, "NewTag", null, "NewDetail", null!));
 	}
 
 	[Fact]
 	public async Task UpdateTagAsync_ShouldUpdatePropertiesAliasesAndMoveCategory() {
-		var dbFactory = this.CreateInMemoryDbFactory(nameof(this.UpdateTagAsync_ShouldUpdatePropertiesAliasesAndMoveCategory));
+		var dbFactory = this.CreateSqliteDbFactory();
 		await this.SeedDatabaseAsync(dbFactory);
 		var manager = new TagsManager(dbFactory, new TagModelFactory());
 		await manager.InitializeAsync();
@@ -223,7 +234,7 @@ public class TagsManagerTests {
 
 	[Fact]
 	public async Task DeleteTagAsync_ShouldDeleteImmediatelyFromDbAndMemory() {
-		var dbFactory = this.CreateInMemoryDbFactory(nameof(this.DeleteTagAsync_ShouldDeleteImmediatelyFromDbAndMemory));
+		var dbFactory = this.CreateSqliteDbFactory();
 		await this.SeedDatabaseAsync(dbFactory);
 		var manager = new TagsManager(dbFactory, new TagModelFactory());
 		await manager.InitializeAsync();
@@ -243,7 +254,7 @@ public class TagsManagerTests {
 
 	[Fact]
 	public async Task AddTagAsync_ShouldAddTagToFiles_WhenFilesDoNotHaveTag() {
-		var dbFactory = this.CreateInMemoryDbFactory(nameof(this.AddTagAsync_ShouldAddTagToFiles_WhenFilesDoNotHaveTag));
+		var dbFactory = this.CreateSqliteDbFactory();
 		var manager = new TagsManager(dbFactory, new TagModelFactory());
 		var tagMock = new Mock<ITagModel>();
 		tagMock.SetupGet(x => x.TagId).Returns(99);
@@ -267,7 +278,7 @@ public class TagsManagerTests {
 	/// </summary>
 	[Fact]
 	public async Task AddTagAsync_ShouldDoNothing_WhenTagIsNull() {
-		var dbFactory = this.CreateInMemoryDbFactory(nameof(this.AddTagAsync_ShouldDoNothing_WhenTagIsNull));
+		var dbFactory = this.CreateSqliteDbFactory();
 		var manager = new TagsManager(dbFactory, new TagModelFactory());
 
 		var fileTags = new List<ITagModel>();
@@ -283,7 +294,7 @@ public class TagsManagerTests {
 
 	[Fact]
 	public async Task AddTagAsync_ShouldDoNothing_WhenFilesAlreadyHaveTag() {
-		var dbFactory = this.CreateInMemoryDbFactory(nameof(this.AddTagAsync_ShouldDoNothing_WhenFilesAlreadyHaveTag));
+		var dbFactory = this.CreateSqliteDbFactory();
 		var manager = new TagsManager(dbFactory, new TagModelFactory());
 		var tagMock = new Mock<ITagModel>();
 		tagMock.SetupGet(x => x.TagId).Returns(99);
@@ -301,7 +312,7 @@ public class TagsManagerTests {
 
 	[Fact]
 	public async Task RemoveTagAsync_ShouldRemoveTagFromFiles_WhenFilesHaveTag() {
-		var dbFactory = this.CreateInMemoryDbFactory(nameof(this.RemoveTagAsync_ShouldRemoveTagFromFiles_WhenFilesHaveTag));
+		var dbFactory = this.CreateSqliteDbFactory();
 		var manager = new TagsManager(dbFactory, new TagModelFactory());
 		var tagMock = new Mock<ITagModel>();
 		tagMock.SetupGet(x => x.TagId).Returns(99);
@@ -326,7 +337,7 @@ public class TagsManagerTests {
 	/// </summary>
 	[Fact]
 	public async Task RemoveTagAsync_ShouldDoNothing_WhenFilesDoNotHaveTag() {
-		var dbFactory = this.CreateInMemoryDbFactory(nameof(this.RemoveTagAsync_ShouldDoNothing_WhenFilesDoNotHaveTag));
+		var dbFactory = this.CreateSqliteDbFactory();
 		var manager = new TagsManager(dbFactory, new TagModelFactory());
 		var fileTags = new List<ITagModel>();
 		var fileModelMock = new Mock<IMediaItemModel>();
@@ -342,7 +353,7 @@ public class TagsManagerTests {
 
 	[Fact]
 	public async Task InitializeAsync_ShouldLoadTagsAndCategoriesFromDatabase() {
-		var dbFactory = this.CreateInMemoryDbFactory(nameof(this.InitializeAsync_ShouldLoadTagsAndCategoriesFromDatabase));
+		var dbFactory = this.CreateSqliteDbFactory();
 		await this.SeedDatabaseAsync(dbFactory);
 		var manager = new TagsManager(dbFactory, new TagModelFactory());
 		await manager.InitializeAsync();
@@ -352,7 +363,7 @@ public class TagsManagerTests {
 
 	[Fact]
 	public async Task UpdateTagAsync_ShouldEmitTagChanged() {
-		var dbFactory = this.CreateInMemoryDbFactory(nameof(this.UpdateTagAsync_ShouldEmitTagChanged));
+		var dbFactory = this.CreateSqliteDbFactory();
 		await this.SeedDatabaseAsync(dbFactory);
 		using var manager = new TagsManager(dbFactory, new TagModelFactory());
 		await manager.InitializeAsync();
@@ -370,7 +381,7 @@ public class TagsManagerTests {
 
 	[Fact]
 	public async Task DeleteTagCategoryAsync_ShouldEmitTagChangedForMovedTags() {
-		var dbFactory = this.CreateInMemoryDbFactory(nameof(this.DeleteTagCategoryAsync_ShouldEmitTagChangedForMovedTags));
+		var dbFactory = this.CreateSqliteDbFactory();
 		await this.SeedDatabaseAsync(dbFactory);
 		using var manager = new TagsManager(dbFactory, new TagModelFactory());
 		await manager.InitializeAsync();

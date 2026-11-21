@@ -16,21 +16,36 @@ using Shouldly;
 
 namespace MediaDeck.Core.Tests.Models.Files;
 
-public class SearchConditionManagerTests {
-	private static IDbContextFactory<MediaDeckDbContext> CreateInMemoryDbFactory(string dbName) {
-		var options = new DbContextOptionsBuilder<MediaDeckDbContext>()
-			.UseInMemoryDatabase(databaseName: dbName)
-			.ConfigureWarnings(x => x.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.InMemoryEventId.TransactionIgnoredWarning))
-			.Options;
+/// <summary>
+/// <see cref="SearchConditionManager"/> の単体テスト。
+/// </summary>
+public sealed class SearchConditionManagerTests : IDisposable {
+	private readonly List<SqliteTestDbFactory> _dbFactories = [];
 
-		var factoryMock = new Mock<IDbContextFactory<MediaDeckDbContext>>();
-		factoryMock.Setup(f => f.CreateDbContextAsync(It.IsAny<CancellationToken>()))
-			.ReturnsAsync(() => new MediaDeckDbContext(options));
-
-		return factoryMock.Object;
+	/// <summary>
+	/// テストで使用したデータベースファクトリを解放します。
+	/// </summary>
+	public void Dispose() {
+		foreach (var factory in this._dbFactories) {
+			factory.Dispose();
+		}
 	}
 
-	private static SearchConditionManagerTestContext CreateSut(string testName) {
+	/// <summary>
+	/// テスト用の SQLite インメモリデータベースファクトリを生成します。
+	/// </summary>
+	/// <returns>データベースコンテキストファクトリ</returns>
+	private IDbContextFactory<MediaDeckDbContext> CreateSqliteDbFactory() {
+		var factory = new SqliteTestDbFactory();
+		this._dbFactories.Add(factory);
+		return factory;
+	}
+
+	/// <summary>
+	/// テスト用の <see cref="SearchConditionManagerTestContext"/> を生成します。
+	/// </summary>
+	/// <returns>テストコンテキスト</returns>
+	private SearchConditionManagerTestContext CreateSut() {
 		var addSubject = new Subject<ISearchCondition>();
 		var removeSubject = new Subject<ISearchCondition>();
 		var updateSubject = new Subject<Action<ObservableList<ISearchCondition>>>();
@@ -44,8 +59,8 @@ public class SearchConditionManagerTests {
 		var tagsManagerMock = new Mock<ITagsManager>();
 		tagsManagerMock.Setup(x => x.Tags).Returns(tags);
 
-		// FolderRepositoryにInMemory DBを渡して空のルートフォルダを返す状態にする
-		var dbFactory = CreateInMemoryDbFactory(testName);
+		// FolderRepositoryにSQLiteインメモリDBを渡して空のルートフォルダを返す状態にする
+		var dbFactory = this.CreateSqliteDbFactory();
 		var folderDispatcherMock = new Mock<ISearchConditionNotificationDispatcher>();
 		var folderUpdateSubject = new Subject<Action<ObservableList<ISearchCondition>>>();
 		folderDispatcherMock.Setup(x => x.UpdateRequest).Returns(folderUpdateSubject);
@@ -64,7 +79,7 @@ public class SearchConditionManagerTests {
 	/// </summary>
 	[Fact]
 	public void AddRequest_AddsSearchCondition() {
-		using var context = CreateSut(nameof(AddRequest_AddsSearchCondition));
+		using var context = this.CreateSut();
 
 		var condition = new WordSearchCondition { Word = "test" };
 		context.AddSubject.OnNext(condition);
@@ -77,7 +92,7 @@ public class SearchConditionManagerTests {
 	/// </summary>
 	[Fact]
 	public void RemoveRequest_RemovesSearchCondition() {
-		using var context = CreateSut(nameof(RemoveRequest_RemovesSearchCondition));
+		using var context = this.CreateSut();
 
 		var condition = new WordSearchCondition { Word = "test" };
 		context.AddSubject.OnNext(condition);
@@ -91,7 +106,7 @@ public class SearchConditionManagerTests {
 	/// </summary>
 	[Fact]
 	public void UpdateRequest_ModifiesSearchConditions() {
-		using var context = CreateSut(nameof(UpdateRequest_ModifiesSearchConditions));
+		using var context = this.CreateSut();
 
 		var condition = new WordSearchCondition { Word = "injected" };
 		context.UpdateSubject.OnNext(list => list.Add(condition));
@@ -104,7 +119,7 @@ public class SearchConditionManagerTests {
 	/// </summary>
 	[Fact]
 	public void Candidates_ContainPropertySearchConditions() {
-		using var context = CreateSut(nameof(Candidates_ContainPropertySearchConditions));
+		using var context = this.CreateSut();
 
 		context.Manager.SearchConditionCandidates.OfType<PropertySearchCondition>().ShouldNotBeEmpty();
 	}
@@ -114,7 +129,7 @@ public class SearchConditionManagerTests {
 	/// </summary>
 	[Fact]
 	public void Candidates_ReflectAddedAndEditedTag() {
-		using var context = CreateSut(nameof(Candidates_ReflectAddedAndEditedTag));
+		using var context = this.CreateSut();
 		using var tag = new MediaDeck.Core.Models.Tags.TagModel {
 			TagId = 42,
 			TagName = string.Empty

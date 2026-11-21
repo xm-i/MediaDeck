@@ -193,11 +193,13 @@ public class MediaDeckDbContext(DbContextOptions dbContextOptions) : DbContext(d
 			.OnDelete(DeleteBehavior.SetNull);
 
 		modelBuilder.Entity<MediaItem>()
-			.OwnsOne(m => m.Metadata, b => {
+			.ComplexProperty(m => m.Metadata, b => {
 				b.ToJson();
-				b.OwnsMany(m => m.Entries);
+				b.ComplexCollection(m => m.Entries);
 			});
 
+		// MediaItemAdditionalInfo は現在プロパティを持たないため、ComplexProperty にするとモデル検証エラーとなる。
+		// 単一 Owned Entity は警告対象外のため OwnsOne(...).ToJson() を維持する。
 		modelBuilder.Entity<MediaItem>()
 			.OwnsOne(m => m.AdditionalInfo, b => {
 				b.ToJson();

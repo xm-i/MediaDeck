@@ -3,7 +3,6 @@ using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Tables;
 using MediaDeck.Core.Services.DuplicateFileDetector;
 using Microsoft.EntityFrameworkCore;
-using Moq;
 using Shouldly;
 
 namespace MediaDeck.Core.Tests.Services.DuplicateFileDetector;
@@ -11,18 +10,26 @@ namespace MediaDeck.Core.Tests.Services.DuplicateFileDetector;
 /// <summary>
 /// <see cref="DuplicateFileDetectorService"/> のユニットテスト。
 /// </summary>
-public class DuplicateFileDetectorServiceTests {
-	private IDbContextFactory<MediaDeckDbContext> CreateInMemoryDbFactory(string dbName) {
-		var options = new DbContextOptionsBuilder<MediaDeckDbContext>()
-			.UseInMemoryDatabase(databaseName: dbName)
-			.ConfigureWarnings(x => x.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.InMemoryEventId.TransactionIgnoredWarning))
-			.Options;
+public sealed class DuplicateFileDetectorServiceTests : IDisposable {
+	private readonly List<SqliteTestDbFactory> _dbFactories = [];
 
-		var factoryMock = new Mock<IDbContextFactory<MediaDeckDbContext>>();
-		factoryMock.Setup(f => f.CreateDbContextAsync(It.IsAny<CancellationToken>()))
-			.ReturnsAsync(() => new MediaDeckDbContext(options));
+	/// <summary>
+	/// テストで使用したデータベースファクトリを解放します。
+	/// </summary>
+	public void Dispose() {
+		foreach (var factory in this._dbFactories) {
+			factory.Dispose();
+		}
+	}
 
-		return factoryMock.Object;
+	/// <summary>
+	/// テスト用の SQLite インメモリデータベースファクトリを生成します。
+	/// </summary>
+	/// <returns>データベースコンテキストファクトリ</returns>
+	private IDbContextFactory<MediaDeckDbContext> CreateSqliteDbFactory() {
+		var factory = new SqliteTestDbFactory();
+		this._dbFactories.Add(factory);
+		return factory;
 	}
 
 	/// <summary>
@@ -30,8 +37,7 @@ public class DuplicateFileDetectorServiceTests {
 	/// </summary>
 	[Fact]
 	public async Task DetectDuplicatesAsync_WithFullHash_ShouldFindDuplicates() {
-		var dbName = nameof(this.DetectDuplicatesAsync_WithFullHash_ShouldFindDuplicates);
-		var dbFactory = this.CreateInMemoryDbFactory(dbName);
+		var dbFactory = this.CreateSqliteDbFactory();
 
 		await using (var db = await dbFactory.CreateDbContextAsync()) {
 			db.MediaItems.Add(new MediaItem { MediaItemId = 1, MediaType = MediaType.Image, FilePath = "a.jpg", FullHash = "hash1", DirectoryPath = "dir", Description = "", IsUnderFolderGroup = false });
@@ -60,8 +66,7 @@ public class DuplicateFileDetectorServiceTests {
 	/// </summary>
 	[Fact]
 	public async Task DetectDuplicatesAsync_WithPreHash_ShouldFindDuplicates() {
-		var dbName = nameof(this.DetectDuplicatesAsync_WithPreHash_ShouldFindDuplicates);
-		var dbFactory = this.CreateInMemoryDbFactory(dbName);
+		var dbFactory = this.CreateSqliteDbFactory();
 
 		await using (var db = await dbFactory.CreateDbContextAsync()) {
 			db.MediaItems.Add(new MediaItem { MediaItemId = 1, MediaType = MediaType.Image, FilePath = "a.jpg", PreHash = "pre1", DirectoryPath = "dir", Description = "", IsUnderFolderGroup = false });
@@ -84,8 +89,7 @@ public class DuplicateFileDetectorServiceTests {
 	/// </summary>
 	[Fact]
 	public async Task DetectDuplicatesAsync_ShouldSortGroupsAndFiles() {
-		var dbName = nameof(this.DetectDuplicatesAsync_ShouldSortGroupsAndFiles);
-		var dbFactory = this.CreateInMemoryDbFactory(dbName);
+		var dbFactory = this.CreateSqliteDbFactory();
 
 		await using (var db = await dbFactory.CreateDbContextAsync()) {
 			// グループB
@@ -121,8 +125,7 @@ public class DuplicateFileDetectorServiceTests {
 	/// </summary>
 	[Fact]
 	public async Task DetectDuplicatesAsync_ShouldClearPreviousResults() {
-		var dbName = nameof(this.DetectDuplicatesAsync_ShouldClearPreviousResults);
-		var dbFactory = this.CreateInMemoryDbFactory(dbName);
+		var dbFactory = this.CreateSqliteDbFactory();
 
 		await using (var db = await dbFactory.CreateDbContextAsync()) {
 			db.MediaItems.Add(new MediaItem { MediaItemId = 1, MediaType = MediaType.Image, FilePath = "a.jpg", FullHash = "hash1", DirectoryPath = "dir", Description = "", IsUnderFolderGroup = false });

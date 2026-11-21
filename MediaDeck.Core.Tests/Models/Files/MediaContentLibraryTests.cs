@@ -1,4 +1,3 @@
-using MediaDeck.Composition.Database;
 using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Composition.Interfaces.Threading;
 using MediaDeck.Composition.Stores.Config.Model;
@@ -8,7 +7,6 @@ using MediaDeck.Core.Models.Files;
 using MediaDeck.Core.Models.Files.Loaders;
 using MediaDeck.Core.Models.NotificationDispatcher;
 using MediaDeck.Core.Models.Repositories;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using R3;
@@ -16,14 +14,20 @@ using Shouldly;
 
 namespace MediaDeck.Core.Tests.Models.Files;
 
-
+/// <summary>
+/// <see cref="MediaContentLibrary"/> の単体テスト。
+/// </summary>
 public sealed class MediaContentLibraryTests : IDisposable {
 	private readonly MediaContentLibrary _sut;
 	private readonly SearchConditionManager _searchConditionManager;
 	private readonly FolderRepository _folderRepository;
 	private readonly SearchConditionNotificationDispatcher _dispatcher;
 	private readonly ServiceProvider _serviceProvider;
+	private readonly SqliteTestDbFactory _dbFactory;
 
+	/// <summary>
+	/// <see cref="MediaContentLibraryTests"/> クラスの新しいインスタンスを初期化します。
+	/// </summary>
 	public MediaContentLibraryTests() {
 		var filesLoader = new Mock<FilesLoader>(
 			MockBehavior.Loose,
@@ -46,14 +50,9 @@ public sealed class MediaContentLibraryTests : IDisposable {
 		var tagsManager = new Mock<ITagsManager>();
 		tagsManager.Setup(x => x.Tags).Returns(new ObservableCollections.ObservableList<MediaDeck.Composition.Interfaces.Tags.ITagModel>());
 
-		// Real FolderRepository with InMemory DB
-		var dbOptions = new DbContextOptionsBuilder<MediaDeckDbContext>()
-			.UseInMemoryDatabase($"MCL_{Guid.NewGuid()}")
-			.Options;
-		var dbFactoryMock = new Mock<IDbContextFactory<MediaDeckDbContext>>();
-		dbFactoryMock.Setup(x => x.CreateDbContextAsync(It.IsAny<CancellationToken>()))
-			.ReturnsAsync(() => new MediaDeckDbContext(dbOptions));
-		this._folderRepository = new FolderRepository(dbFactoryMock.Object, this._dispatcher, tabState);
+		// 実 SQLite インメモリ DB を用いた FolderRepository
+		this._dbFactory = new SqliteTestDbFactory();
+		this._folderRepository = new FolderRepository(this._dbFactory, this._dispatcher, tabState);
 
 		this._searchConditionManager = new SearchConditionManager(this._dispatcher, tagsManager.Object, this._folderRepository, tabState);
 
@@ -62,10 +61,14 @@ public sealed class MediaContentLibraryTests : IDisposable {
 		this._sut = new MediaContentLibrary(filesLoader, searchConfig, this._searchConditionManager, this._dispatcher, uiDispatcher.Object);
 	}
 
+	/// <summary>
+	/// テストで使用したリソースを解放します。
+	/// </summary>
 	public void Dispose() {
 		this._sut.Dispose();
 		this._searchConditionManager.Dispose();
 		this._folderRepository.Dispose();
+		this._dbFactory.Dispose();
 		this._dispatcher.Dispose();
 		this._serviceProvider.Dispose();
 	}

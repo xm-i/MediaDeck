@@ -14,18 +14,29 @@ using Shouldly;
 
 namespace MediaDeck.Core.Tests.Models.Repositories;
 
-public class FolderRepositoryTests {
-	private static IDbContextFactory<MediaDeckDbContext> CreateInMemoryDbFactory(string dbName) {
-		var options = new DbContextOptionsBuilder<MediaDeckDbContext>()
-			.UseInMemoryDatabase(databaseName: dbName)
-			.ConfigureWarnings(x => x.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.InMemoryEventId.TransactionIgnoredWarning))
-			.Options;
+/// <summary>
+/// <see cref="FolderRepository"/> の単体テスト。
+/// </summary>
+public sealed class FolderRepositoryTests : IDisposable {
+	private readonly List<SqliteTestDbFactory> _dbFactories = [];
 
-		var factoryMock = new Mock<IDbContextFactory<MediaDeckDbContext>>();
-		factoryMock.Setup(f => f.CreateDbContextAsync(It.IsAny<CancellationToken>()))
-			.ReturnsAsync(() => new MediaDeckDbContext(options));
+	/// <summary>
+	/// テストで使用したデータベースファクトリを解放します。
+	/// </summary>
+	public void Dispose() {
+		foreach (var factory in this._dbFactories) {
+			factory.Dispose();
+		}
+	}
 
-		return factoryMock.Object;
+	/// <summary>
+	/// テスト用の SQLite インメモリデータベースファクトリを生成します。
+	/// </summary>
+	/// <returns>データベースコンテキストファクトリ</returns>
+	private IDbContextFactory<MediaDeckDbContext> CreateSqliteDbFactory() {
+		var factory = new SqliteTestDbFactory();
+		this._dbFactories.Add(factory);
+		return factory;
 	}
 
 	private static FolderRepository CreateSut(IDbContextFactory<MediaDeckDbContext> dbFactory) {
@@ -42,7 +53,7 @@ public class FolderRepositoryTests {
 	/// </summary>
 	[Fact]
 	public async Task Load_EmptyDb_CreatesRootFolder() {
-		var dbFactory = CreateInMemoryDbFactory(nameof(Load_EmptyDb_CreatesRootFolder));
+		var dbFactory = this.CreateSqliteDbFactory();
 		using var sut = CreateSut(dbFactory);
 
 		await sut.Load();
@@ -56,7 +67,7 @@ public class FolderRepositoryTests {
 	/// </summary>
 	[Fact]
 	public async Task Load_WithMediaItems_BuildsFolderTree() {
-		var dbFactory = CreateInMemoryDbFactory(nameof(Load_WithMediaItems_BuildsFolderTree));
+		var dbFactory = this.CreateSqliteDbFactory();
 
 		await using (var db = await dbFactory.CreateDbContextAsync()) {
 			db.MediaItems.Add(new MediaItem {
@@ -95,7 +106,7 @@ public class FolderRepositoryTests {
 	/// </summary>
 	[Fact]
 	public async Task Load_CalledTwiceWithSameData_DoesNotRebuildTree() {
-		var dbFactory = CreateInMemoryDbFactory(nameof(Load_CalledTwiceWithSameData_DoesNotRebuildTree));
+		var dbFactory = this.CreateSqliteDbFactory();
 		using var sut = CreateSut(dbFactory);
 
 		await sut.Load();

@@ -14,18 +14,26 @@ namespace MediaDeck.Core.Tests.Services.MediaItemMetadataUpdator;
 /// <summary>
 /// <see cref="MediaItemMetadataUpdatorService"/> のユニットテスト。
 /// </summary>
-public class MediaItemMetadataUpdatorServiceTests {
-	private IDbContextFactory<MediaDeckDbContext> CreateInMemoryDbFactory(string dbName) {
-		var options = new DbContextOptionsBuilder<MediaDeckDbContext>()
-			.UseInMemoryDatabase(databaseName: dbName)
-			.ConfigureWarnings(x => x.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.InMemoryEventId.TransactionIgnoredWarning))
-			.Options;
+public sealed class MediaItemMetadataUpdatorServiceTests : IDisposable {
+	private readonly List<SqliteTestDbFactory> _dbFactories = [];
 
-		var factoryMock = new Mock<IDbContextFactory<MediaDeckDbContext>>();
-		factoryMock.Setup(f => f.CreateDbContextAsync(It.IsAny<CancellationToken>()))
-			.ReturnsAsync(() => new MediaDeckDbContext(options));
+	/// <summary>
+	/// テストで使用したデータベースファクトリを解放します。
+	/// </summary>
+	public void Dispose() {
+		foreach (var factory in this._dbFactories) {
+			factory.Dispose();
+		}
+	}
 
-		return factoryMock.Object;
+	/// <summary>
+	/// テスト用の SQLite インメモリデータベースファクトリを生成します。
+	/// </summary>
+	/// <returns>データベースコンテキストファクトリ</returns>
+	private IDbContextFactory<MediaDeckDbContext> CreateSqliteDbFactory() {
+		var factory = new SqliteTestDbFactory();
+		this._dbFactories.Add(factory);
+		return factory;
 	}
 
 	/// <summary>
@@ -33,8 +41,7 @@ public class MediaItemMetadataUpdatorServiceTests {
 	/// </summary>
 	[Fact]
 	public async Task UpdateMetadataAsync_ShouldUpdateAllItems() {
-		var dbName = nameof(this.UpdateMetadataAsync_ShouldUpdateAllItems);
-		var dbFactory = this.CreateInMemoryDbFactory(dbName);
+		var dbFactory = this.CreateSqliteDbFactory();
 		await using (var db = await dbFactory.CreateDbContextAsync()) {
 			db.MediaItems.Add(new MediaItem { MediaItemId = 1, MediaType = MediaType.Image, FilePath = "test1", DirectoryPath = "dir", Description = "", IsUnderFolderGroup = false });
 			db.MediaItems.Add(new MediaItem { MediaItemId = 2, MediaType = MediaType.Image, FilePath = "test2", DirectoryPath = "dir", Description = "", IsUnderFolderGroup = false });
@@ -62,8 +69,7 @@ public class MediaItemMetadataUpdatorServiceTests {
 	/// </summary>
 	[Fact]
 	public async Task UpdateMetadataAsync_WithIds_ShouldUpdateOnlySpecificItems() {
-		var dbName = nameof(this.UpdateMetadataAsync_WithIds_ShouldUpdateOnlySpecificItems);
-		var dbFactory = this.CreateInMemoryDbFactory(dbName);
+		var dbFactory = this.CreateSqliteDbFactory();
 		await using (var db = await dbFactory.CreateDbContextAsync()) {
 			db.MediaItems.Add(new MediaItem { MediaItemId = 1, MediaType = MediaType.Image, FilePath = "test1", DirectoryPath = "dir", Description = "", IsUnderFolderGroup = false });
 			db.MediaItems.Add(new MediaItem { MediaItemId = 2, MediaType = MediaType.Image, FilePath = "test2", DirectoryPath = "dir", Description = "", IsUnderFolderGroup = false });
@@ -92,8 +98,7 @@ public class MediaItemMetadataUpdatorServiceTests {
 	/// </summary>
 	[Fact]
 	public async Task UpdateMetadataAsync_ShouldRespectCancellation() {
-		var dbName = nameof(this.UpdateMetadataAsync_ShouldRespectCancellation);
-		var dbFactory = this.CreateInMemoryDbFactory(dbName);
+		var dbFactory = this.CreateSqliteDbFactory();
 		await using (var db = await dbFactory.CreateDbContextAsync()) {
 			for (int i = 1; i <= 10; i++) {
 				db.MediaItems.Add(new MediaItem { MediaItemId = i, MediaType = MediaType.Image, FilePath = $"test{i}", DirectoryPath = "dir", Description = "", IsUnderFolderGroup = false });
@@ -130,8 +135,7 @@ public class MediaItemMetadataUpdatorServiceTests {
 	/// </summary>
 	[Fact]
 	public async Task TargetCount_ShouldBeAdditive_WhenMultipleRequestsAreMade() {
-		var dbName = nameof(this.TargetCount_ShouldBeAdditive_WhenMultipleRequestsAreMade);
-		var dbFactory = this.CreateInMemoryDbFactory(dbName);
+		var dbFactory = this.CreateSqliteDbFactory();
 		await using (var db = await dbFactory.CreateDbContextAsync()) {
 			db.MediaItems.Add(new MediaItem { MediaItemId = 1, MediaType = MediaType.Image, FilePath = "test1", DirectoryPath = "dir", Description = "", IsUnderFolderGroup = false });
 			db.MediaItems.Add(new MediaItem { MediaItemId = 2, MediaType = MediaType.Image, FilePath = "test2", DirectoryPath = "dir", Description = "", IsUnderFolderGroup = false });
@@ -174,8 +178,7 @@ public class MediaItemMetadataUpdatorServiceTests {
 	/// </summary>
 	[Fact]
 	public async Task UpdateMetadataAsync_ShouldContinueProcessing_WhenOneItemFails() {
-		var dbName = nameof(this.UpdateMetadataAsync_ShouldContinueProcessing_WhenOneItemFails);
-		var dbFactory = this.CreateInMemoryDbFactory(dbName);
+		var dbFactory = this.CreateSqliteDbFactory();
 		await using (var db = await dbFactory.CreateDbContextAsync()) {
 			db.MediaItems.Add(new MediaItem { MediaItemId = 1, MediaType = MediaType.Image, FilePath = "test1", DirectoryPath = "dir", Description = "", IsUnderFolderGroup = false });
 			db.MediaItems.Add(new MediaItem { MediaItemId = 2, MediaType = MediaType.Image, FilePath = "test2", DirectoryPath = "dir", Description = "", IsUnderFolderGroup = false });

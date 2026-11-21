@@ -18,22 +18,37 @@ using Shouldly;
 
 namespace MediaDeck.Core.Tests.Models.Files.Loaders;
 
-public class FilesLoaderTests {
-	private static IDbContextFactory<MediaDeckDbContext> CreateInMemoryDbFactory(string dbName) {
-		var options = new DbContextOptionsBuilder<MediaDeckDbContext>()
-			.UseInMemoryDatabase(databaseName: dbName)
-			.ConfigureWarnings(x => x.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.InMemoryEventId.TransactionIgnoredWarning))
-			.Options;
+/// <summary>
+/// <see cref="FilesLoader"/> の単体テスト。
+/// </summary>
+public sealed class FilesLoaderTests : IDisposable {
+	private readonly List<SqliteTestDbFactory> _dbFactories = [];
 
-		var factoryMock = new Mock<IDbContextFactory<MediaDeckDbContext>>();
-		factoryMock.Setup(f => f.CreateDbContextAsync(It.IsAny<CancellationToken>()))
-			.ReturnsAsync(() => new MediaDeckDbContext(options));
-
-		return factoryMock.Object;
+	/// <summary>
+	/// テストで使用したデータベースファクトリを解放します。
+	/// </summary>
+	public void Dispose() {
+		foreach (var factory in this._dbFactories) {
+			factory.Dispose();
+		}
 	}
 
-	private static (FilesLoader loader, IDbContextFactory<MediaDeckDbContext> dbFactory) CreateSut(string testName) {
-		var dbFactory = CreateInMemoryDbFactory(testName);
+	/// <summary>
+	/// テスト用の SQLite インメモリデータベースファクトリを生成します。
+	/// </summary>
+	/// <returns>データベースコンテキストファクトリ</returns>
+	private IDbContextFactory<MediaDeckDbContext> CreateSqliteDbFactory() {
+		var factory = new SqliteTestDbFactory();
+		this._dbFactories.Add(factory);
+		return factory;
+	}
+
+	/// <summary>
+	/// テスト対象の <see cref="FilesLoader"/> とデータベースファクトリを生成します。
+	/// </summary>
+	/// <returns>テスト対象インスタンスとデータベースファクトリのタプル</returns>
+	private (FilesLoader loader, IDbContextFactory<MediaDeckDbContext> dbFactory) CreateSut() {
+		var dbFactory = this.CreateSqliteDbFactory();
 
 		// SortSelector
 		var sortDispatcherMock = new Mock<ISearchConditionNotificationDispatcher>();
@@ -86,14 +101,14 @@ public class FilesLoaderTests {
 
 	[Fact]
 	public async Task GetTotalCountAsync_EmptyDb_ReturnsZero() {
-		var (loader, _) = CreateSut(nameof(GetTotalCountAsync_EmptyDb_ReturnsZero));
+		var (loader, _) = this.CreateSut();
 		var count = await loader.GetTotalCountAsync([]);
 		count.ShouldBe(0);
 	}
 
 	[Fact]
 	public async Task GetTotalCountAsync_WithItems_ReturnsCount() {
-		var (loader, dbFactory) = CreateSut(nameof(GetTotalCountAsync_WithItems_ReturnsCount));
+		var (loader, dbFactory) = this.CreateSut();
 		await SeedItems(dbFactory, 5);
 
 		var count = await loader.GetTotalCountAsync([]);
@@ -102,7 +117,7 @@ public class FilesLoaderTests {
 
 	[Fact]
 	public async Task GetFilesStreamAsync_ReturnsAllItems() {
-		var (loader, dbFactory) = CreateSut(nameof(GetFilesStreamAsync_ReturnsAllItems));
+		var (loader, dbFactory) = this.CreateSut();
 		await SeedItems(dbFactory, 3);
 
 		var items = new List<IMediaItemModel>();
@@ -114,7 +129,7 @@ public class FilesLoaderTests {
 
 	[Fact]
 	public async Task GetFilesStreamAsync_WithTake_LimitsResults() {
-		var (loader, dbFactory) = CreateSut(nameof(GetFilesStreamAsync_WithTake_LimitsResults));
+		var (loader, dbFactory) = this.CreateSut();
 		await SeedItems(dbFactory, 5);
 
 		var items = new List<IMediaItemModel>();
@@ -126,7 +141,7 @@ public class FilesLoaderTests {
 
 	[Fact]
 	public async Task GetFilesStreamAsync_WithSkip_SkipsItems() {
-		var (loader, dbFactory) = CreateSut(nameof(GetFilesStreamAsync_WithSkip_SkipsItems));
+		var (loader, dbFactory) = this.CreateSut();
 		await SeedItems(dbFactory, 5);
 
 		var items = new List<IMediaItemModel>();
@@ -135,8 +150,12 @@ public class FilesLoaderTests {
 		}
 		items.Count.ShouldBe(2);
 	}
-	private static (FilesLoader loader, IDbContextFactory<MediaDeckDbContext> dbFactory) CreateRandomSut(string testName) {
-		var dbFactory = CreateInMemoryDbFactory(testName);
+	/// <summary>
+	/// ランダムソート設定のテスト対象 <see cref="FilesLoader"/> とデータベースファクトリを生成します。
+	/// </summary>
+	/// <returns>テスト対象インスタンスとデータベースファクトリのタプル</returns>
+	private (FilesLoader loader, IDbContextFactory<MediaDeckDbContext> dbFactory) CreateRandomSut() {
+		var dbFactory = this.CreateSqliteDbFactory();
 
 		var sortDispatcherMock = new Mock<ISearchConditionNotificationDispatcher>();
 		sortDispatcherMock.Setup(x => x.SortChanged).Returns(new Subject<Unit>());
@@ -175,7 +194,7 @@ public class FilesLoaderTests {
 
 	[Fact]
 	public async Task GetFilesStreamAsync_RandomSort_ReturnsAllItemsWithoutDuplication() {
-		var (loader, dbFactory) = CreateRandomSut(nameof(GetFilesStreamAsync_RandomSort_ReturnsAllItemsWithoutDuplication));
+		var (loader, dbFactory) = this.CreateRandomSut();
 		await SeedItems(dbFactory, 10);
 
 		var items = new List<IMediaItemModel>();
@@ -188,7 +207,7 @@ public class FilesLoaderTests {
 
 	[Fact]
 	public async Task GetFilesStreamAsync_RandomSort_PaginationMaintainsConsistencyWithoutDuplicates() {
-		var (loader, dbFactory) = CreateRandomSut(nameof(GetFilesStreamAsync_RandomSort_PaginationMaintainsConsistencyWithoutDuplicates));
+		var (loader, dbFactory) = this.CreateRandomSut();
 		await SeedItems(dbFactory, 10);
 
 		var page1 = new List<IMediaItemModel>();
@@ -211,7 +230,7 @@ public class FilesLoaderTests {
 
 	[Fact]
 	public async Task GetTotalCountAsync_RandomSort_ReturnsCount() {
-		var (loader, dbFactory) = CreateRandomSut(nameof(GetTotalCountAsync_RandomSort_ReturnsCount));
+		var (loader, dbFactory) = this.CreateRandomSut();
 		await SeedItems(dbFactory, 7);
 
 		// 一度ストリームを読んでシャッフルキャッシュを生成

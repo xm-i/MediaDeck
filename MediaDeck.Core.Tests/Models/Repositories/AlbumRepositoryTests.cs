@@ -14,18 +14,29 @@ using Shouldly;
 
 namespace MediaDeck.Core.Tests.Models.Repositories;
 
-public class AlbumRepositoryTests {
-	private static IDbContextFactory<MediaDeckDbContext> CreateInMemoryDbFactory(string dbName) {
-		var options = new DbContextOptionsBuilder<MediaDeckDbContext>()
-			.UseInMemoryDatabase(databaseName: dbName)
-			.ConfigureWarnings(x => x.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.InMemoryEventId.TransactionIgnoredWarning))
-			.Options;
+/// <summary>
+/// <see cref="AlbumRepository"/> の単体テスト。
+/// </summary>
+public sealed class AlbumRepositoryTests : IDisposable {
+	private readonly List<SqliteTestDbFactory> _dbFactories = [];
 
-		var factoryMock = new Mock<IDbContextFactory<MediaDeckDbContext>>();
-		factoryMock.Setup(f => f.CreateDbContextAsync(It.IsAny<CancellationToken>()))
-			.ReturnsAsync(() => new MediaDeckDbContext(options));
+	/// <summary>
+	/// テストで使用したデータベースファクトリを解放します。
+	/// </summary>
+	public void Dispose() {
+		foreach (var factory in this._dbFactories) {
+			factory.Dispose();
+		}
+	}
 
-		return factoryMock.Object;
+	/// <summary>
+	/// テスト用の SQLite インメモリデータベースファクトリを生成します。
+	/// </summary>
+	/// <returns>データベースコンテキストファクトリ</returns>
+	private IDbContextFactory<MediaDeckDbContext> CreateSqliteDbFactory() {
+		var factory = new SqliteTestDbFactory();
+		this._dbFactories.Add(factory);
+		return factory;
 	}
 
 	private static AlbumRepository CreateSut(IDbContextFactory<MediaDeckDbContext> dbFactory) {
@@ -42,7 +53,7 @@ public class AlbumRepositoryTests {
 	/// </summary>
 	[Fact]
 	public async Task Load_EmptyDb_CreatesRootAlbum() {
-		var dbFactory = CreateInMemoryDbFactory(nameof(Load_EmptyDb_CreatesRootAlbum));
+		var dbFactory = this.CreateSqliteDbFactory();
 		using var sut = CreateSut(dbFactory);
 
 		await sut.Load();
@@ -56,7 +67,7 @@ public class AlbumRepositoryTests {
 	/// </summary>
 	[Fact]
 	public async Task Load_WithAlbums_BuildsTree() {
-		var dbFactory = CreateInMemoryDbFactory(nameof(Load_WithAlbums_BuildsTree));
+		var dbFactory = this.CreateSqliteDbFactory();
 
 		// Seed
 		await using (var db = await dbFactory.CreateDbContextAsync()) {
@@ -78,7 +89,7 @@ public class AlbumRepositoryTests {
 	/// </summary>
 	[Fact]
 	public async Task GetOrCreateAsync_CreatesNewAlbum() {
-		var dbFactory = CreateInMemoryDbFactory(nameof(GetOrCreateAsync_CreatesNewAlbum));
+		var dbFactory = this.CreateSqliteDbFactory();
 		using var sut = CreateSut(dbFactory);
 
 		var result = await sut.GetOrCreateAsync("NewAlbum/Sub");
@@ -92,7 +103,7 @@ public class AlbumRepositoryTests {
 	/// </summary>
 	[Fact]
 	public async Task GetOrCreateAsync_ReturnsExisting() {
-		var dbFactory = CreateInMemoryDbFactory(nameof(GetOrCreateAsync_ReturnsExisting));
+		var dbFactory = this.CreateSqliteDbFactory();
 
 		await using (var db = await dbFactory.CreateDbContextAsync()) {
 			db.Albums.Add(new Album { Path = "Existing", MediaItemAlbums = [] });
@@ -111,7 +122,7 @@ public class AlbumRepositoryTests {
 	/// </summary>
 	[Fact]
 	public async Task AddItemsAsync_AddsMediaItems() {
-		var dbFactory = CreateInMemoryDbFactory(nameof(AddItemsAsync_AddsMediaItems));
+		var dbFactory = this.CreateSqliteDbFactory();
 
 		// Seed a media item
 		await using (var db = await dbFactory.CreateDbContextAsync()) {
@@ -143,7 +154,7 @@ public class AlbumRepositoryTests {
 	/// </summary>
 	[Fact]
 	public async Task GetRecentAlbumsAsync_ReturnsAlbums() {
-		var dbFactory = CreateInMemoryDbFactory(nameof(GetRecentAlbumsAsync_ReturnsAlbums));
+		var dbFactory = this.CreateSqliteDbFactory();
 
 		await using (var db = await dbFactory.CreateDbContextAsync()) {
 			db.Albums.Add(new Album { Path = "A", MediaItemAlbums = [] });
@@ -162,7 +173,7 @@ public class AlbumRepositoryTests {
 	/// </summary>
 	[Fact]
 	public async Task GetOrCreateAsync_EmptyPath_ThrowsArgumentException() {
-		var dbFactory = CreateInMemoryDbFactory(nameof(GetOrCreateAsync_EmptyPath_ThrowsArgumentException));
+		var dbFactory = this.CreateSqliteDbFactory();
 		using var sut = CreateSut(dbFactory);
 
 		await Should.ThrowAsync<ArgumentException>(() => sut.GetOrCreateAsync(""));
@@ -173,7 +184,7 @@ public class AlbumRepositoryTests {
 	/// </summary>
 	[Fact]
 	public async Task GetOrCreateAsync_NewAlbum_UpdatesRootAlbumAndNotifiesOthers() {
-		var dbFactory = CreateInMemoryDbFactory(nameof(GetOrCreateAsync_NewAlbum_UpdatesRootAlbumAndNotifiesOthers));
+		var dbFactory = this.CreateSqliteDbFactory();
 		using var sut1 = CreateSut(dbFactory);
 		using var sut2 = CreateSut(dbFactory);
 
@@ -199,7 +210,7 @@ public class AlbumRepositoryTests {
 	/// </summary>
 	[Fact]
 	public async Task DeleteAlbumAsync_LeafAlbum_DeletesAlbumAndLinksAndNotifiesOthers() {
-		var dbFactory = CreateInMemoryDbFactory(nameof(DeleteAlbumAsync_LeafAlbum_DeletesAlbumAndLinksAndNotifiesOthers));
+		var dbFactory = this.CreateSqliteDbFactory();
 
 		await using (var db = await dbFactory.CreateDbContextAsync()) {
 			db.MediaItems.Add(new MediaItem {
@@ -243,7 +254,7 @@ public class AlbumRepositoryTests {
 	/// </summary>
 	[Fact]
 	public async Task DeleteAlbumAsync_ParentAlbum_ReturnsFalseAndDoesNotDelete() {
-		var dbFactory = CreateInMemoryDbFactory(nameof(DeleteAlbumAsync_ParentAlbum_ReturnsFalseAndDoesNotDelete));
+		var dbFactory = this.CreateSqliteDbFactory();
 		using var sut = CreateSut(dbFactory);
 
 		await sut.GetOrCreateAsync("Parent");
@@ -277,7 +288,7 @@ public class AlbumRepositoryTests {
 	/// </summary>
 	[Fact]
 	public async Task RenameAlbumAsync_SingleAlbum_RenamesAndNotifiesOthers() {
-		var dbFactory = CreateInMemoryDbFactory(nameof(RenameAlbumAsync_SingleAlbum_RenamesAndNotifiesOthers));
+		var dbFactory = this.CreateSqliteDbFactory();
 
 		await using (var db = await dbFactory.CreateDbContextAsync()) {
 			db.MediaItems.Add(new MediaItem {
@@ -323,7 +334,7 @@ public class AlbumRepositoryTests {
 	/// </summary>
 	[Fact]
 	public async Task RenameAlbumAsync_ParentAndChildAlbums_RenamesPrefix() {
-		var dbFactory = CreateInMemoryDbFactory(nameof(RenameAlbumAsync_ParentAndChildAlbums_RenamesPrefix));
+		var dbFactory = this.CreateSqliteDbFactory();
 		using var sut = CreateSut(dbFactory);
 
 		await sut.GetOrCreateAsync("Travel/2024");
@@ -346,7 +357,7 @@ public class AlbumRepositoryTests {
 	/// </summary>
 	[Fact]
 	public async Task RenameAlbumAsync_DuplicatePath_ReturnsDuplicatePath() {
-		var dbFactory = CreateInMemoryDbFactory(nameof(RenameAlbumAsync_DuplicatePath_ReturnsDuplicatePath));
+		var dbFactory = this.CreateSqliteDbFactory();
 		using var sut = CreateSut(dbFactory);
 
 		await sut.GetOrCreateAsync("AlbumA");
@@ -364,7 +375,7 @@ public class AlbumRepositoryTests {
 	/// </summary>
 	[Fact]
 	public async Task RenameAlbumAsync_DestinationUnderSource_ReturnsInvalidDestinationUnderSource() {
-		var dbFactory = CreateInMemoryDbFactory(nameof(RenameAlbumAsync_DestinationUnderSource_ReturnsInvalidDestinationUnderSource));
+		var dbFactory = this.CreateSqliteDbFactory();
 		using var sut = CreateSut(dbFactory);
 
 		await sut.GetOrCreateAsync("Travel/2024");
@@ -380,7 +391,7 @@ public class AlbumRepositoryTests {
 	/// </summary>
 	[Fact]
 	public async Task RenameAlbumAsync_CaseOnlyChange_UpdatesCasing() {
-		var dbFactory = CreateInMemoryDbFactory(nameof(RenameAlbumAsync_CaseOnlyChange_UpdatesCasing));
+		var dbFactory = this.CreateSqliteDbFactory();
 		using var sut = CreateSut(dbFactory);
 
 		await sut.GetOrCreateAsync("travel");
