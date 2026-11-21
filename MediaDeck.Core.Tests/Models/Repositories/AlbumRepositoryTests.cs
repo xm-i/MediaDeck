@@ -2,9 +2,12 @@ using MediaDeck.Composition.Database;
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Interfaces.Notifications;
+using MediaDeck.Composition.Interfaces.Threading;
 using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Composition.Tables;
+using MediaDeck.Core.Models.Files.SearchConditions;
 using MediaDeck.Core.Models.Repositories;
+using MediaDeck.Core.Models.Repositories.Objects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
@@ -39,13 +42,24 @@ public sealed class AlbumRepositoryTests : IDisposable {
 		return factory;
 	}
 
-	private static AlbumRepository CreateSut(IDbContextFactory<MediaDeckDbContext> dbFactory) {
+	private static AlbumRepository CreateSut(
+		IDbContextFactory<MediaDeckDbContext> dbFactory,
+		IUiDispatcher? uiDispatcher = null,
+		TabStateModel? tabState = null) {
 		var dispatcherMock = new Mock<ISearchConditionNotificationDispatcher>();
 		dispatcherMock.Setup(x => x.UpdateRequest).Returns(new Subject<Action<ObservableList<ISearchCondition>>>());
+		if (tabState == null) {
+			var services = new ServiceCollection();
+			MediaDeck.Composition.DIRegistration.AddGeneratedServices(services);
+			tabState = services.BuildServiceProvider().GetRequiredService<TabStateModel>();
+		}
+		return new AlbumRepository(dbFactory, dispatcherMock.Object, tabState, uiDispatcher ?? new RecordingUiDispatcher());
+	}
+
+	private static TabStateModel CreateTabState() {
 		var services = new ServiceCollection();
 		MediaDeck.Composition.DIRegistration.AddGeneratedServices(services);
-		var tabState = services.BuildServiceProvider().GetRequiredService<TabStateModel>();
-		return new AlbumRepository(dbFactory, dispatcherMock.Object, tabState);
+		return services.BuildServiceProvider().GetRequiredService<TabStateModel>();
 	}
 
 	/// <summary>
@@ -402,5 +416,181 @@ public sealed class AlbumRepositoryTests : IDisposable {
 		result.ShouldBe(AlbumRenameResult.Success);
 		sut.RootAlbum.Value.ChildAlbums[0].AlbumPath.ShouldBe("Travel");
 		sut.RootAlbum.Value.ChildAlbums[0].ChildAlbums[0].AlbumPath.ShouldBe("Travel/2024");
+	}
+
+	/// <summary>
+	/// Load が呼び出し元スレッドとは別のバックグラウンドスレッドで DB クエリを実行し、IUiDispatcher 経由で RootAlbum を更新することを確認します。
+	/// </summary>
+	[Fact]
+	public void Load_RunsDbQueryOffCallerThread_AndUpdatesRootAlbumViaUiDispatcher() {
+		var baseFactory = this.CreateSqliteDbFactory();
+		using (var db = baseFactory.CreateDbContext()) {
+			db.Albums.Add(new Album { Path = "Travel/2024", MediaItemAlbums = [] });
+			db.SaveChanges();
+		}
+
+		var trackingFactory = new TrackingDbContextFactory(baseFactory);
+		var uiDispatcher = new RecordingUiDispatcher();
+		using var sut = CreateSut(trackingFactory, uiDispatcher);
+
+		int? callerThreadId = null;
+		Exception? threadException = null;
+		var thread = new Thread(() => {
+			try {
+				callerThreadId = Environment.CurrentManagedThreadId;
+				sut.Load().GetAwaiter().GetResult();
+			} catch (Exception ex) {
+				threadException = ex;
+			}
+		});
+		thread.IsBackground = true;
+		thread.Start();
+		thread.Join(TimeSpan.FromSeconds(10)).ShouldBeTrue();
+
+		threadException.ShouldBeNull();
+		callerThreadId.ShouldNotBeNull();
+		trackingFactory.DbQueryThreadIds.ShouldNotBeEmpty();
+		trackingFactory.DbQueryThreadIds.ShouldAllBe(id => id != callerThreadId.Value);
+		uiDispatcher.RunAsyncActionCount.ShouldBe(1);
+		sut.RootAlbum.Value.ShouldNotBeNull();
+		sut.RootAlbum.Value.ChildAlbums.Length.ShouldBe(1);
+	}
+
+	/// <summary>
+	/// AlbumSearchCondition が設定されている場合、RootAlbum 更新通知の時点で IsExpanded が既に復元されていることを確認します。
+	/// </summary>
+	[Fact]
+	public async Task Load_WithAlbumSearchCondition_RestoresIsExpandedBeforePublishingRootAlbum() {
+		var dbFactory = this.CreateSqliteDbFactory();
+		await using (var db = await dbFactory.CreateDbContextAsync()) {
+			db.Albums.Add(new Album { Path = "Travel/2024", MediaItemAlbums = [] });
+			db.Albums.Add(new Album { Path = "Travel/2025", MediaItemAlbums = [] });
+			await db.SaveChangesAsync();
+		}
+
+		var tabState = CreateTabState();
+		tabState.SearchState.SearchCondition.Add(new AlbumSearchCondition {
+			AlbumPath = "Travel/2024",
+			IncludeSubAlbums = true,
+		});
+
+		using var sut = CreateSut(dbFactory, tabState: tabState);
+		AlbumObject? observedRoot = null;
+		bool? observedParentExpanded = null;
+		bool? observedTargetExpanded = null;
+		using var subscription = sut.RootAlbum
+			.Where(root => root != null)
+			.Subscribe(root => {
+				observedRoot = root;
+				var travel = root.ChildAlbums.FirstOrDefault(x => x.AlbumName == "Travel");
+				observedParentExpanded = travel?.IsExpanded;
+				observedTargetExpanded = travel?.ChildAlbums.FirstOrDefault(x => x.AlbumName == "2024")?.IsExpanded;
+			});
+
+		await sut.Load();
+
+		observedRoot.ShouldNotBeNull();
+		observedParentExpanded.ShouldBe(true);
+		observedTargetExpanded.ShouldBe(true);
+	}
+
+	/// <summary>
+	/// 同一データで Load を 2 回呼び出してもツリーが再構築されず、UI ディスパッチャーも再呼び出しされないことを確認します。
+	/// </summary>
+	[Fact]
+	public async Task Load_CalledTwiceWithSameData_DoesNotRebuildTreeOrInvokeUiDispatcherAgain() {
+		var dbFactory = this.CreateSqliteDbFactory();
+		var uiDispatcher = new RecordingUiDispatcher();
+		using var sut = CreateSut(dbFactory, uiDispatcher);
+
+		await sut.Load();
+		var first = sut.RootAlbum.Value;
+		var countAfterFirst = uiDispatcher.RunAsyncActionCount;
+
+		await sut.Load();
+		var second = sut.RootAlbum.Value;
+
+		first.ShouldBeSameAs(second);
+		uiDispatcher.RunAsyncActionCount.ShouldBe(countAfterFirst);
+	}
+
+	/// <summary>
+	/// Dispose 後に Load を呼び出しても UI ディスパッチャー呼び出しや RootAlbum 更新が行われないことを確認します。
+	/// </summary>
+	[Fact]
+	public async Task Load_WhenDisposed_SkipsUiUpdate() {
+		var dbFactory = this.CreateSqliteDbFactory();
+		var uiDispatcher = new RecordingUiDispatcher();
+		var sut = CreateSut(dbFactory, uiDispatcher);
+
+		sut.Dispose();
+		await sut.Load();
+
+		uiDispatcher.RunAsyncActionCount.ShouldBe(0);
+		sut.RootAlbum.Value.ShouldBeNull();
+	}
+
+	/// <summary>
+	/// 同期的にコールバックを実行しつつ呼び出し回数を記録するテスト用 <see cref="IUiDispatcher"/> 実装。
+	/// </summary>
+	private sealed class RecordingUiDispatcher : IUiDispatcher {
+		private int _runAsyncActionCount;
+
+		/// <summary>
+		/// <see cref="RunAsync(Action)"/> が呼ばれた回数を取得します。
+		/// </summary>
+		public int RunAsyncActionCount {
+			get {
+				return Volatile.Read(ref this._runAsyncActionCount);
+			}
+		}
+
+		/// <inheritdoc />
+		public void Run(Action action) {
+			action();
+		}
+
+		/// <inheritdoc />
+		public Task RunAsync(Action action) {
+			Interlocked.Increment(ref this._runAsyncActionCount);
+			action();
+			return Task.CompletedTask;
+		}
+
+		/// <inheritdoc />
+		public Task RunAsync(Func<Task> action) {
+			return action();
+		}
+	}
+
+	/// <summary>
+	/// <see cref="CreateDbContextAsync"/> 実行時のスレッド ID を記録するテスト用ラッパーファクトリ。
+	/// </summary>
+	private sealed class TrackingDbContextFactory(IDbContextFactory<MediaDeckDbContext> inner) : IDbContextFactory<MediaDeckDbContext> {
+		private readonly List<int> _dbQueryThreadIds = [];
+
+		/// <summary>
+		/// 記録されたマネージドスレッド ID 一覧を取得します。
+		/// </summary>
+		public IReadOnlyList<int> DbQueryThreadIds {
+			get {
+				lock (this._dbQueryThreadIds) {
+					return [.. this._dbQueryThreadIds];
+				}
+			}
+		}
+
+		/// <inheritdoc />
+		public MediaDeckDbContext CreateDbContext() {
+			return inner.CreateDbContext();
+		}
+
+		/// <inheritdoc />
+		public Task<MediaDeckDbContext> CreateDbContextAsync(CancellationToken cancellationToken = default) {
+			lock (this._dbQueryThreadIds) {
+				this._dbQueryThreadIds.Add(Environment.CurrentManagedThreadId);
+			}
+			return inner.CreateDbContextAsync(cancellationToken);
+		}
 	}
 }

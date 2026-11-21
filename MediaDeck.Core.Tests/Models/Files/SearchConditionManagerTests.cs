@@ -2,6 +2,7 @@ using MediaDeck.Composition.Database;
 using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Interfaces.Notifications;
 using MediaDeck.Composition.Interfaces.Tags;
+using MediaDeck.Composition.Interfaces.Threading;
 using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Core.Models.Files;
 using MediaDeck.Core.Models.Files.SearchConditions;
@@ -67,7 +68,14 @@ public sealed class SearchConditionManagerTests : IDisposable {
 		var services = new ServiceCollection();
 		MediaDeck.Composition.DIRegistration.AddGeneratedServices(services);
 		var tabState = services.BuildServiceProvider().GetRequiredService<TabStateModel>();
-		var folderRepo = new FolderRepository(dbFactory, folderDispatcherMock.Object, tabState);
+		var uiDispatcherMock = new Mock<IUiDispatcher>();
+		uiDispatcherMock.Setup(x => x.Run(It.IsAny<Action>())).Callback<Action>(a => a());
+		uiDispatcherMock.Setup(x => x.RunAsync(It.IsAny<Action>())).Returns<Action>(a => {
+			a();
+			return Task.CompletedTask;
+		});
+		uiDispatcherMock.Setup(x => x.RunAsync(It.IsAny<Func<Task>>())).Returns<Func<Task>>(async a => await a());
+		var folderRepo = new FolderRepository(dbFactory, folderDispatcherMock.Object, tabState, uiDispatcherMock.Object);
 		folderRepo.RootFolder.Value = new FolderObject(null, "", []);
 
 		var manager = new SearchConditionManager(dispatcherMock.Object, tagsManagerMock.Object, folderRepo, tabState);

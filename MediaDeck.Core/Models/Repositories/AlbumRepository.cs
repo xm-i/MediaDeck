@@ -1,6 +1,9 @@
 using MediaDeck.Common.Extensions;
+using MediaDeck.Common.Utilities;
 using MediaDeck.Composition.Database;
+using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.Notifications;
+using MediaDeck.Composition.Interfaces.Threading;
 using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Composition.Tables;
 using MediaDeck.Core.Models.Files.SearchConditions;
@@ -18,6 +21,9 @@ public class AlbumRepository : RepositoryBase {
 	private readonly IDbContextFactory<MediaDeckDbContext> _dbFactory;
 	private readonly ISearchConditionNotificationDispatcher _searchConditionNotificationDispatcher;
 	private readonly TabStateModel _tabState;
+	private readonly IUiDispatcher _uiDispatcher;
+	private readonly AsyncLock _asyncLock = new();
+	private ValueCountPair<string>[] _currentAlbumStatusList = [];
 
 	/// <summary>
 	/// <see cref="AlbumRepository"/> クラスの新しいインスタンスを初期化します。
@@ -25,49 +31,129 @@ public class AlbumRepository : RepositoryBase {
 	/// <param name="dbFactory">データベースコンテキストファクトリ。</param>
 	/// <param name="searchConditionNotificationDispatcher">検索条件通知ディスパッチャ。</param>
 	/// <param name="tabState">タブ状態モデル。</param>
-	public AlbumRepository(IDbContextFactory<MediaDeckDbContext> dbFactory,
+	/// <param name="uiDispatcher">UI スレッドディスパッチャー。</param>
+	public AlbumRepository(
+		IDbContextFactory<MediaDeckDbContext> dbFactory,
 		ISearchConditionNotificationDispatcher searchConditionNotificationDispatcher,
-		TabStateModel tabState) {
+		TabStateModel tabState,
+		IUiDispatcher uiDispatcher) {
 		this._dbFactory = dbFactory;
 		this._searchConditionNotificationDispatcher = searchConditionNotificationDispatcher;
 		this._tabState = tabState;
+		this._uiDispatcher = uiDispatcher;
+		this.RootAlbum = new ReactiveProperty<AlbumObject>().AddTo(this.CompositeDisposable);
 		FileNotifications
 			.FileRegistered
 			.ThrottleLast(TimeSpan.FromSeconds(10))
-			.SubscribeAwait(async (_, ct) => await this.Load(), AwaitOperation.Sequential)
+			.SubscribeAwait(async (_, ct) => {
+				try {
+					await this.Load(ct).ConfigureAwait(false);
+				} catch (OperationCanceledException) when (ct.IsCancellationRequested) {
+				}
+			}, AwaitOperation.Sequential, false)
 			.AddTo(this.CompositeDisposable);
 		AlbumNotifications
 			.AlbumUpdated
 			.Where(sender => !ReferenceEquals(sender, this))
-			.SubscribeAwait(async (_, ct) => await this.Load(), AwaitOperation.Sequential)
+			.SubscribeAwait(async (_, ct) => {
+				try {
+					await this.Load(ct).ConfigureAwait(false);
+				} catch (OperationCanceledException) when (ct.IsCancellationRequested) {
+				}
+			}, AwaitOperation.Sequential, false)
 			.AddTo(this.CompositeDisposable);
 	}
 
+	/// <summary>
+	/// ルートアルバムを取得します。
+	/// </summary>
 	public ReactiveProperty<AlbumObject> RootAlbum {
 		get;
-	} = new();
+	}
 
-	private ValueCountPair<string>[] _currentAlbumStatusList = [];
-
-	public override async Task Load() {
-		await using var db = await this._dbFactory.CreateDbContextAsync();
-
-		// 全アルバムと、それぞれの直接登録メディア件数
-		var counts = await db.Albums
-			.Select(a => new ValueCountPair<string>(a.Path, a.MediaItemAlbums.Count()))
-			.ToListAsync();
-
-		var list = counts
-			.OrderBy(x => x.Value)
-			.ToList();
-
-		var statusArray = list.ToArray();
-		if (statusArray.SequenceEqual(this._currentAlbumStatusList)) {
-			this.RootAlbum.Value ??= new AlbumObject(null, "", []);
+	/// <summary>
+	/// データベースからアルバム階層をバックグラウンドで読み込み、UI スレッド上でツリーを反映します。
+	/// </summary>
+	/// <param name="cancellationToken">キャンセルトークン。</param>
+	/// <returns>読み込み処理を表すタスク。</returns>
+	public override async Task Load(CancellationToken cancellationToken = default) {
+		if (this.DisposeState != DisposeState.NotDisposed) {
 			return;
 		}
-		this._currentAlbumStatusList = statusArray;
+		cancellationToken.ThrowIfCancellationRequested();
 
+		using var _ = await this._asyncLock.LockAsync(cancellationToken).ConfigureAwait(false);
+		if (this.DisposeState != DisposeState.NotDisposed) {
+			return;
+		}
+		cancellationToken.ThrowIfCancellationRequested();
+
+		var loadResult = await Task.Run(async () => {
+			await using var db = await this._dbFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
+
+			// 全アルバムと、それぞれの直接登録メディア件数
+			var counts = await db.Albums
+				.Select(a => new ValueCountPair<string>(a.Path, a.MediaItemAlbums.Count()))
+				.ToListAsync(cancellationToken)
+				.ConfigureAwait(false);
+
+			var list = counts
+				.OrderBy(x => x.Value)
+				.ToList();
+
+			var statusArray = list.ToArray();
+			if (statusArray.SequenceEqual(this._currentAlbumStatusList)) {
+				return new AlbumLoadResult(false, statusArray, null);
+			}
+
+			var rootAlbum = BuildAlbumTree(list, cancellationToken);
+			return new AlbumLoadResult(true, statusArray, rootAlbum);
+		}, cancellationToken).ConfigureAwait(false);
+
+		if (!loadResult.Changed) {
+			if (this.RootAlbum.Value != null) {
+				return;
+			}
+			if (this.DisposeState != DisposeState.NotDisposed) {
+				return;
+			}
+			cancellationToken.ThrowIfCancellationRequested();
+
+			var emptyRoot = new AlbumObject(null, "", []);
+			await this._uiDispatcher.RunAsync(() => {
+				if (this.DisposeState != DisposeState.NotDisposed || cancellationToken.IsCancellationRequested) {
+					return;
+				}
+				this.RootAlbum.Value ??= emptyRoot;
+			}).ConfigureAwait(false);
+			cancellationToken.ThrowIfCancellationRequested();
+			return;
+		}
+
+		if (this.DisposeState != DisposeState.NotDisposed) {
+			return;
+		}
+		cancellationToken.ThrowIfCancellationRequested();
+
+		var newRoot = loadResult.RootAlbum!;
+		await this._uiDispatcher.RunAsync(() => {
+			if (this.DisposeState != DisposeState.NotDisposed || cancellationToken.IsCancellationRequested) {
+				return;
+			}
+			this.Restore(newRoot);
+			this._currentAlbumStatusList = loadResult.StatusList;
+			this.RootAlbum.Value = newRoot;
+		}).ConfigureAwait(false);
+		cancellationToken.ThrowIfCancellationRequested();
+	}
+
+	/// <summary>
+	/// 集計済みのアルバム一覧から中間分岐ノードを補完してルートアルバムを構築します。
+	/// </summary>
+	/// <param name="list">アルバムパスと登録件数のペア一覧。</param>
+	/// <param name="cancellationToken">キャンセルトークン。</param>
+	/// <returns>構築されたルートアルバムオブジェクト。</returns>
+	private static AlbumObject BuildAlbumTree(List<ValueCountPair<string>> list, CancellationToken cancellationToken) {
 		var all = list.Select(x => (x.Value, x.Count, Split: x.Value.Split(AlbumObject.Separator))).ToArray();
 		var maxPathDepth = all.Length == 0 ? 0 : all.Max(x => x.Split.Length);
 
@@ -76,6 +162,8 @@ public class AlbumRepository : RepositoryBase {
 
 		// 中間ノード補完
 		for (var depth = 1; depth <= maxPathDepth; depth++) {
+			cancellationToken.ThrowIfCancellationRequested();
+
 			var target = all.Where(x => x.Split.Length > depth).ToArray();
 			list.AddRange(target
 				.Select(x => (
@@ -88,11 +176,14 @@ public class AlbumRepository : RepositoryBase {
 				.Select(x => new ValueCountPair<string>(x.Key, 0)));
 		}
 
-		this.RootAlbum.Value = new AlbumObject(null, "", [.. list.OrderBy(x => x.Value)]);
-
-		this.Restore();
+		return new AlbumObject(null, "", [.. list.OrderBy(x => x.Value)]);
 	}
 
+	/// <summary>
+	/// 選択されたアルバムを検索条件として設定します。
+	/// </summary>
+	/// <param name="albumObject">対象アルバム。</param>
+	/// <param name="includeSubAlbums">サブアルバムを含めるかどうか。</param>
 	public void SetRepositoryCandidate(AlbumObject albumObject, bool includeSubAlbums) {
 		this._searchConditionNotificationDispatcher.UpdateRequest.OnNext(x => {
 			x.RemoveRange(x.Where(c => c is IRepositorySearchCondition));
@@ -284,12 +375,16 @@ public class AlbumRepository : RepositoryBase {
 		return path;
 	}
 
-	private void Restore() {
+	/// <summary>
+	/// タブ状態に保存されたアルバム検索条件に従ってツリーの展開状態を復元します。
+	/// </summary>
+	/// <param name="rootAlbum">展開状態を復元するルートアルバム。</param>
+	private void Restore(AlbumObject rootAlbum) {
 		var condition = this._tabState.SearchState.SearchCondition.OfType<AlbumSearchCondition>().FirstOrDefault();
 		if (condition == null) {
 			return;
 		}
-		var parent = this.RootAlbum.Value;
+		var parent = rootAlbum;
 		while (true) {
 			var previousParent = parent;
 			foreach (var child in parent.ChildAlbums) {
@@ -304,4 +399,12 @@ public class AlbumRepository : RepositoryBase {
 			}
 		}
 	}
+
+	/// <summary>
+	/// バックグラウンド読み込み処理の結果を保持します。
+	/// </summary>
+	/// <param name="Changed">前回状態から変更があったかどうか。</param>
+	/// <param name="StatusList">最新のアルバム状態一覧。</param>
+	/// <param name="RootAlbum">構築されたルートアルバム（変更なし時は <c>null</c>）。</param>
+	private readonly record struct AlbumLoadResult(bool Changed, ValueCountPair<string>[] StatusList, AlbumObject? RootAlbum);
 }

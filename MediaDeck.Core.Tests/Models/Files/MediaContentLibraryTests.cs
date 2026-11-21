@@ -50,13 +50,19 @@ public sealed class MediaContentLibraryTests : IDisposable {
 		var tagsManager = new Mock<ITagsManager>();
 		tagsManager.Setup(x => x.Tags).Returns(new ObservableCollections.ObservableList<MediaDeck.Composition.Interfaces.Tags.ITagModel>());
 
+		var uiDispatcher = new Mock<IUiDispatcher>();
+		uiDispatcher.Setup(x => x.Run(It.IsAny<Action>())).Callback<Action>(a => a());
+		uiDispatcher.Setup(x => x.RunAsync(It.IsAny<Action>())).Returns<Action>(a => {
+			a();
+			return Task.CompletedTask;
+		});
+		uiDispatcher.Setup(x => x.RunAsync(It.IsAny<Func<Task>>())).Returns<Func<Task>>(async a => await a());
+
 		// 実 SQLite インメモリ DB を用いた FolderRepository
 		this._dbFactory = new SqliteTestDbFactory();
-		this._folderRepository = new FolderRepository(this._dbFactory, this._dispatcher, tabState);
+		this._folderRepository = new FolderRepository(this._dbFactory, this._dispatcher, tabState, uiDispatcher.Object);
 
 		this._searchConditionManager = new SearchConditionManager(this._dispatcher, tagsManager.Object, this._folderRepository, tabState);
-
-		var uiDispatcher = new Mock<IUiDispatcher>();
 
 		this._sut = new MediaContentLibrary(filesLoader, searchConfig, this._searchConditionManager, this._dispatcher, uiDispatcher.Object);
 	}
