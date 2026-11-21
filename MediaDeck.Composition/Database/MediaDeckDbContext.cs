@@ -141,6 +141,12 @@ public class MediaDeckDbContext(DbContextOptions dbContextOptions) : DbContext(d
 		modelBuilder.Entity<MediaItem>()
 			.HasIndex(x => x.FullHash);
 
+		modelBuilder.Entity<MediaItem>()
+			.HasIndex(x => x.DirectoryPath);
+
+		modelBuilder.Entity<MediaItem>()
+			.HasIndex(x => new { x.PreHash, x.IsExists });
+
 		// Relation
 		modelBuilder.Entity<ImageFile>()
 			.HasOne(i => i.MediaItem)

@@ -61,6 +61,7 @@
 - **TabState拡張時の必須更新 (重要)**: `TabStateModel` / `SearchStateModel` / `ViewerStateModel` に新しい状態プロパティを追加した場合、必ず次の2箇所も同時に更新すること。
   - `TabStateModel.ApplyDefaultState`: `AppState.DefaultTabState` から新規 `tabState` へ初期値をコピーする処理を追加する（※新規タブ作成時に `MainWindowViewModel.AddTab` や `WindowManager` から本メソッドが呼ばれます）。
   - `TabViewModel.SubscribeDefaultTabStateSync`: タブ側変更を `AppState.DefaultTabState` へ反映する購読処理を追加する。
+- **DBスキーマ変更時の必須更新 (重要)**: 既存 DB には `EnsureCreatedAsync()` が適用されないため、`MediaDeckDbContext` や `MediaDeck.Composition/Tables/` でスキーマ（テーブル・カラム・インデックス・制約等）を変更する場合は、必ず `MediaDeck.Composition/Database/Migrations/` に `IDatabaseMigration` 実装を追加し、`DatabaseMigrationRegistry` の `LatestVersion` と `Migrations` を更新すること。仕組みと詳細手順は `.agents/skills/db-migration/SKILL.md` を参照すること。
 - **ロギング**: プロジェクト全体のログ出力には `Serilog` を使用する。
 - **DIとサービス管理**: `AutoDiAttributes` などを活用してDIの自動登録を行い、コンポーネント間は疎結合に保つ。
 - **R3/ObservableCollectionsのバインディング (非常に重要)**: `ObservableList<T>` や `ObservableDictionary<K, V>` はそのままでは WinUI 3 の UI にバインドできません。ViewModel では `.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current)` を使用して、UI スレッドへの同期を伴う `INotifyCollectionChangedSynchronizedViewList<T>` 等に変換して公開してください。

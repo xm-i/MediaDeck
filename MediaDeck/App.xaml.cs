@@ -225,26 +225,8 @@ public partial class App {
 
 
 			splashViewModel?.UpdateStatus(stringProvider.GetString("Splash_InitializingDatabase"));
-			var dbPath = FilePathConstants.DatabaseFilePath;
-			if (!File.Exists(dbPath)) {
-				{
-					// 事前に0バイトファイルを作らないとEnsureCreatedAsyncで死ぬ
-					using var __ = File.Create(dbPath);
-				}
-				var dbFactory = Ioc.Default.GetRequiredService<IDbContextFactory<MediaDeckDbContext>>();
-				await using (var db = await dbFactory.CreateDbContextAsync()) {
-					await db.Database.EnsureCreatedAsync();
-
-					var dbVersion = await db.DbVersions.AsNoTracking().FirstOrDefaultAsync(x => x.Id == 1);
-					if (dbVersion == null) {
-						db.DbVersions.Add(new() {
-							Id = 1,
-							Version = 1,
-						});
-						await db.SaveChangesAsync();
-					}
-				}
-			}
+			var databaseMigrationService = Ioc.Default.GetRequiredService<IDatabaseMigrationService>();
+			await databaseMigrationService.InitializeAsync(FilePathConstants.DatabaseFilePath);
 
 			splashViewModel?.UpdateStatus(stringProvider.GetString("Splash_LoadingConfig"));
 			Directory.CreateDirectory(this._configStore.Config.PathConfig.TemporaryFolderPath.Value);
