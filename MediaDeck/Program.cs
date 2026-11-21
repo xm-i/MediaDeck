@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using System.Threading;
 using MediaDeck.Composition.Constants;
 using MediaDeck.Composition.Startup;
@@ -6,9 +7,15 @@ using Microsoft.UI.Xaml;
 
 namespace MediaDeck;
 
-public static class Program {
-	[System.Runtime.InteropServices.DllImport("Microsoft.ui.xaml.dll")]
-	private static extern void XamlCheckProcessRequirements();
+/// <summary>
+/// アプリケーションのエントリーポイントを提供します。
+/// </summary>
+public static partial class Program {
+	/// <summary>
+	/// WinUI 3 プロセスの実行要件を確認します。
+	/// </summary>
+	[LibraryImport("Microsoft.ui.xaml.dll")]
+	private static partial void XamlCheckProcessRequirements();
 
 	[STAThread]
 	public static void Main(string[] args) {

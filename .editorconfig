@@ -268,3 +268,15 @@ dotnet_naming_style.パスカル_ケース.capitalization = pascal_case
 dotnet_diagnostic.IDE0005.severity = warning
 [**/SerializerContext/*.cs]
 dotnet_diagnostic.IDE0005.severity = none
+
+# Roslyn アナライザー個別制御
+[*.cs]
+# PublishTrimmed=False / Native AOT 未使用のため WinRT トリミング・AOT 向け警告を無効化
+dotnet_diagnostic.CsWinRT1028.severity = none
+dotnet_diagnostic.CsWinRT1030.severity = none
+# 通常ログ（ILogger.LogDebug / LogInformation）を LoggerMessage 化せず運用するため無効化
+dotnet_diagnostic.CA1873.severity = none
+
+[MediaDeck.Common/Utilities/ShellUtility.cs]
+# MediaDeck.Common では AllowUnsafeBlocks を有効化せず、SHELLEXECUTEINFOW の文字列フィールド付き構造体マーシャリングも DllImport で維持する
+dotnet_diagnostic.SYSLIB1054.severity = none

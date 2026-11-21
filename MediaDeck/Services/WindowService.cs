@@ -14,7 +14,7 @@ namespace MediaDeck.Services;
 /// </summary>
 [Inject(InjectServiceLifetime.Singleton, typeof(IWindowService))]
 [Inject(InjectServiceLifetime.Singleton)]
-public class WindowService(WindowManager windowManager, IServiceProvider serviceProvider) : ServiceBase, IWindowService {
+public partial class WindowService(WindowManager windowManager, IServiceProvider serviceProvider) : ServiceBase, IWindowService {
 	private readonly WindowManager _windowManager = windowManager;
 	private readonly IServiceProvider _serviceProvider = serviceProvider;
 
@@ -231,12 +231,22 @@ public class WindowService(WindowManager windowManager, IServiceProvider service
 		base.Dispose(disposing);
 	}
 
-	private static class NativeMethods {
-		[DllImport("user32.dll", EntryPoint = "SetWindowLongPtr", SetLastError = true)]
-		private static extern nint SetWindowLongPtr64(nint hWnd, int nIndex, nint dwNewLong);
+	/// <summary>
+	/// Win32 ウィンドウ操作用の P/Invoke 定義を提供します。
+	/// </summary>
+	private static partial class NativeMethods {
+		// LibraryImport は A/W サフィックスを自動補完しないため、Unicode 版の実際のエクスポート名を明示する
+		/// <summary>
+		/// 64 ビットプロセス向けに指定されたウィンドウの属性値を変更します。
+		/// </summary>
+		[LibraryImport("user32.dll", EntryPoint = "SetWindowLongPtrW", SetLastError = true)]
+		private static partial nint SetWindowLongPtr64(nint hWnd, int nIndex, nint dwNewLong);
 
-		[DllImport("user32.dll", EntryPoint = "SetWindowLong", SetLastError = true)]
-		private static extern int SetWindowLong32(nint hWnd, int nIndex, int dwNewLong);
+		/// <summary>
+		/// 32 ビットプロセス向けに指定されたウィンドウの属性値を変更します。
+		/// </summary>
+		[LibraryImport("user32.dll", EntryPoint = "SetWindowLongW", SetLastError = true)]
+		private static partial int SetWindowLong32(nint hWnd, int nIndex, int dwNewLong);
 
 		public static nint SetWindowLongPtr(nint hWnd, int nIndex, nint dwNewLong) {
 			return IntPtr.Size == 8
@@ -244,9 +254,12 @@ public class WindowService(WindowManager windowManager, IServiceProvider service
 				: SetWindowLong32(hWnd, nIndex, (int)dwNewLong);
 		}
 
-		[DllImport("user32.dll")]
+		/// <summary>
+		/// 指定されたウィンドウをフォアグラウンドに表示します。
+		/// </summary>
+		[LibraryImport("user32.dll")]
 		[return: MarshalAs(UnmanagedType.Bool)]
-		public static extern bool SetForegroundWindow(nint hWnd);
+		public static partial bool SetForegroundWindow(nint hWnd);
 
 		public const int GWLP_HWNDPARENT = -8;
 	}
