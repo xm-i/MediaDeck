@@ -27,26 +27,26 @@ using Serilog;
 
 namespace MediaDeck;
 
+/// <summary>
+/// アプリケーションのエントリー動作とDI・ライフサイクルを管理するクラス。
+/// </summary>
 public partial class App {
 	private readonly IConfigStore _configStore;
 	private readonly IStateStore _stateStore;
+	private readonly ILogger<App> _logger;
 	private DispatcherQueue? _dispatcherQueue;
 
-
 	/// <summary>
-	///     ILoggerFactory for DI外クラスでのログ使用。
+	/// <see cref="App"/> クラスの新しいインスタンスを初期化し、DI・ロガーおよび未処理例外ハンドラを構築する。
 	/// </summary>
-	private static ILoggerFactory LoggerFactory {
-		get {
-			return field ??= Ioc.Default.GetRequiredService<ILoggerFactory>();
-		}
-	}
-
 	public App() {
 		if (!Directory.Exists(FilePathConstants.BaseDirectory)) {
 			Directory.CreateDirectory(FilePathConstants.BaseDirectory);
 		}
 		BuildConfigureServices();
+		this._logger = Ioc.Default.GetRequiredService<ILogger<App>>();
+		this.RegisterUnhandledExceptionHandlers();
+
 		this._configStore = Ioc.Default.GetRequiredService<IConfigStore>();
 		this._stateStore = Ioc.Default.GetRequiredService<IStateStore>();
 
@@ -66,9 +66,9 @@ public partial class App {
 	}
 
 	/// <summary>
-	/// Invoked when the application is launched.
+	/// アプリケーション起動時の初期化とメインウィンドウ復元を実行する。
 	/// </summary>
-	/// <param name="args">Details about the launch request and process.</param>
+	/// <param name="args">起動リクエストとプロセスに関する詳細情報。</param>
 	protected override async void OnLaunched(LaunchActivatedEventArgs args) {
 		this._dispatcherQueue = DispatcherQueue.GetForCurrentThread();
 
@@ -89,16 +89,6 @@ public partial class App {
 			windowService.ActivateCentered<FolderManagerWindow>(mainWindow);
 		}
 
-		var logger = LoggerFactory.CreateLogger<App>();
-		AppDomain.CurrentDomain.UnhandledException += (_, e) => {
-			logger.LogError(e.ExceptionObject as Exception, "UnhandledException");
-		};
-		UnhandledException += (_, e) => {
-			logger.LogError(e.Exception, "XAML UnhandledException");
-		};
-		ObservableSystem.RegisterUnhandledExceptionHandler(e => {
-			logger.LogError(e, "R3 UnhandledException");
-		});
 		// メインウィンドウが表示されたらスプラッシュ画面を閉じる
 		splashScreen.Close();
 
@@ -106,8 +96,33 @@ public partial class App {
 		var appEnvironmentService = Ioc.Default.GetRequiredService<IAppEnvironmentService>();
 		if (appEnvironmentService.IsUnpackaged && this._configStore.Config.EnvironmentConfig.CheckForUpdatesOnStartup.Value) {
 			var appUpdateService = Ioc.Default.GetRequiredService<IAppUpdateService>();
-			_ = CheckForUpdatesOnStartupAsync(appUpdateService, logger);
+			_ = CheckForUpdatesOnStartupAsync(appUpdateService, this._logger);
 		}
+	}
+
+	/// <summary>
+	/// アプリケーション全体の未処理例外ハンドラを登録する。
+	/// </summary>
+	private void RegisterUnhandledExceptionHandlers() {
+		AppDomain.CurrentDomain.UnhandledException += (_, e) => {
+			if (e.ExceptionObject is Exception exception) {
+				this._logger.LogError(exception, "UnhandledException (IsTerminating={IsTerminating})", e.IsTerminating);
+			} else {
+				this._logger.LogError("UnhandledException (IsTerminating={IsTerminating}): {ExceptionObject}", e.IsTerminating, e.ExceptionObject);
+			}
+			if (e.IsTerminating) {
+				Log.CloseAndFlush();
+			}
+		};
+		TaskScheduler.UnobservedTaskException += (_, e) => {
+			this._logger.LogError(e.Exception, "TaskScheduler UnobservedTaskException");
+		};
+		this.UnhandledException += (_, e) => {
+			this._logger.LogError(e.Exception, "XAML UnhandledException: {Message}", e.Message);
+		};
+		ObservableSystem.RegisterUnhandledExceptionHandler(e => {
+			this._logger.LogError(e, "R3 UnhandledException");
+		});
 	}
 
 	/// <summary>
