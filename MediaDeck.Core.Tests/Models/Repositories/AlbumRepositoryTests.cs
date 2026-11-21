@@ -35,8 +35,8 @@ public sealed class AlbumRepositoryTests : IDisposable {
 	/// <summary>
 	/// テスト用の SQLite インメモリデータベースファクトリを生成します。
 	/// </summary>
-	/// <returns>データベースコンテキストファクトリ</returns>
-	private IDbContextFactory<MediaDeckDbContext> CreateSqliteDbFactory() {
+	/// <returns>テスト用データベースファクトリ</returns>
+	private SqliteTestDbFactory CreateSqliteDbFactory() {
 		var factory = new SqliteTestDbFactory();
 		this._dbFactories.Add(factory);
 		return factory;

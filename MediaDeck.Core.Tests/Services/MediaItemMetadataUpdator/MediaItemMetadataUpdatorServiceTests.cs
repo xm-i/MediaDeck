@@ -1,10 +1,8 @@
-using MediaDeck.Composition.Database;
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.MediaItemTypes;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.Models;
 using MediaDeck.Composition.Tables;
 using MediaDeck.Core.Services.MediaItemMetadataUpdator;
-using Microsoft.EntityFrameworkCore;
 using Moq;
 using R3;
 using Shouldly;
@@ -29,8 +27,8 @@ public sealed class MediaItemMetadataUpdatorServiceTests : IDisposable {
 	/// <summary>
 	/// テスト用の SQLite インメモリデータベースファクトリを生成します。
 	/// </summary>
-	/// <returns>データベースコンテキストファクトリ</returns>
-	private IDbContextFactory<MediaDeckDbContext> CreateSqliteDbFactory() {
+	/// <returns>テスト用データベースファクトリ</returns>
+	private SqliteTestDbFactory CreateSqliteDbFactory() {
 		var factory = new SqliteTestDbFactory();
 		this._dbFactories.Add(factory);
 		return factory;

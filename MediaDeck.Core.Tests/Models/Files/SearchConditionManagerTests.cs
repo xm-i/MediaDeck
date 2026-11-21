@@ -1,4 +1,3 @@
-using MediaDeck.Composition.Database;
 using MediaDeck.Composition.Interfaces.Files;
 using MediaDeck.Composition.Interfaces.Notifications;
 using MediaDeck.Composition.Interfaces.Tags;
@@ -8,7 +7,6 @@ using MediaDeck.Core.Models.Files;
 using MediaDeck.Core.Models.Files.SearchConditions;
 using MediaDeck.Core.Models.Repositories;
 using MediaDeck.Core.Models.Repositories.Objects;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using ObservableCollections;
@@ -35,8 +33,8 @@ public sealed class SearchConditionManagerTests : IDisposable {
 	/// <summary>
 	/// テスト用の SQLite インメモリデータベースファクトリを生成します。
 	/// </summary>
-	/// <returns>データベースコンテキストファクトリ</returns>
-	private IDbContextFactory<MediaDeckDbContext> CreateSqliteDbFactory() {
+	/// <returns>テスト用データベースファクトリ</returns>
+	private SqliteTestDbFactory CreateSqliteDbFactory() {
 		var factory = new SqliteTestDbFactory();
 		this._dbFactories.Add(factory);
 		return factory;

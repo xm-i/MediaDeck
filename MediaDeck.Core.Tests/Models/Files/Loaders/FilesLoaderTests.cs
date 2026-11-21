@@ -1,4 +1,3 @@
-using MediaDeck.Composition.Database;
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.MediaItemTypes;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.Models;
@@ -10,7 +9,6 @@ using MediaDeck.Composition.Tables;
 using MediaDeck.Core.Models.Files.Filter;
 using MediaDeck.Core.Models.Files.Loaders;
 using MediaDeck.Core.Models.Files.Sort;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using R3;
@@ -36,8 +34,8 @@ public sealed class FilesLoaderTests : IDisposable {
 	/// <summary>
 	/// テスト用の SQLite インメモリデータベースファクトリを生成します。
 	/// </summary>
-	/// <returns>データベースコンテキストファクトリ</returns>
-	private IDbContextFactory<MediaDeckDbContext> CreateSqliteDbFactory() {
+	/// <returns>テスト用データベースファクトリ</returns>
+	private SqliteTestDbFactory CreateSqliteDbFactory() {
 		var factory = new SqliteTestDbFactory();
 		this._dbFactories.Add(factory);
 		return factory;
@@ -47,7 +45,7 @@ public sealed class FilesLoaderTests : IDisposable {
 	/// テスト対象の <see cref="FilesLoader"/> とデータベースファクトリを生成します。
 	/// </summary>
 	/// <returns>テスト対象インスタンスとデータベースファクトリのタプル</returns>
-	private (FilesLoader loader, IDbContextFactory<MediaDeckDbContext> dbFactory) CreateSut() {
+	private (FilesLoader loader, SqliteTestDbFactory dbFactory) CreateSut() {
 		var dbFactory = this.CreateSqliteDbFactory();
 
 		// SortSelector
@@ -82,7 +80,7 @@ public sealed class FilesLoaderTests : IDisposable {
 		return (loader, dbFactory);
 	}
 
-	private static async Task SeedItems(IDbContextFactory<MediaDeckDbContext> dbFactory, int count) {
+	private static async Task SeedItems(SqliteTestDbFactory dbFactory, int count) {
 		await using var db = await dbFactory.CreateDbContextAsync();
 		for (var i = 1; i <= count; i++) {
 			db.MediaItems.Add(new MediaItem {
@@ -154,7 +152,7 @@ public sealed class FilesLoaderTests : IDisposable {
 	/// ランダムソート設定のテスト対象 <see cref="FilesLoader"/> とデータベースファクトリを生成します。
 	/// </summary>
 	/// <returns>テスト対象インスタンスとデータベースファクトリのタプル</returns>
-	private (FilesLoader loader, IDbContextFactory<MediaDeckDbContext> dbFactory) CreateRandomSut() {
+	private (FilesLoader loader, SqliteTestDbFactory dbFactory) CreateRandomSut() {
 		var dbFactory = this.CreateSqliteDbFactory();
 
 		var sortDispatcherMock = new Mock<ISearchConditionNotificationDispatcher>();

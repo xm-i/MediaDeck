@@ -1,4 +1,3 @@
-using MediaDeck.Composition.Database;
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.Models;
 using MediaDeck.Composition.Interfaces.Tags;
@@ -32,14 +31,14 @@ public sealed class TagsManagerTests : IDisposable {
 	/// <summary>
 	/// テスト用の SQLite インメモリデータベースファクトリを生成します。
 	/// </summary>
-	/// <returns>データベースコンテキストファクトリ</returns>
-	private IDbContextFactory<MediaDeckDbContext> CreateSqliteDbFactory() {
+	/// <returns>テスト用データベースファクトリ</returns>
+	private SqliteTestDbFactory CreateSqliteDbFactory() {
 		var factory = new SqliteTestDbFactory();
 		this._dbFactories.Add(factory);
 		return factory;
 	}
 
-	private async Task SeedDatabaseAsync(IDbContextFactory<MediaDeckDbContext> dbFactory) {
+	private async Task SeedDatabaseAsync(SqliteTestDbFactory dbFactory) {
 		await using var db = await dbFactory.CreateDbContextAsync();
 		db.TagCategories.Add(new TagCategory { TagCategoryId = 1, TagCategoryName = "Category1", Detail = "CatDetail1", Tags = [] });
 		db.TagCategories.Add(new TagCategory { TagCategoryId = 2, TagCategoryName = "Category2", Detail = "CatDetail2", Tags = [] });
