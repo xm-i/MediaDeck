@@ -197,23 +197,33 @@ public class FileHashUpdatorService : ServiceBase, IFileHashUpdatorService {
 	}
 
 	/// <summary>
+	/// 存在するメディアアイテムの中で、同一のPreHashが2件以上存在するPreHash値を抽出するサブクエリを構築する。
+	/// </summary>
+	/// <param name="db">データベースコンテキスト</param>
+	/// <returns>重複しているPreHashのクエリ</returns>
+	private static IQueryable<string?> CreateDuplicatePreHashesQuery(MediaDeckDbContext db) {
+		return db.MediaItems
+			.Where(m => m.IsExists && m.PreHash != null)
+			.GroupBy(m => m.PreHash)
+			.Where(g => g.Count() >= 2)
+			.Select(g => g.Key);
+	}
+
+	/// <summary>
 	/// PreHashが重複しているメディアアイテムのFullHash更新をキューに追加する。
 	/// FullHashが未設定、またはPreHashより古い場合に更新対象とする。
 	/// </summary>
-	private async Task EnqueueFullHashUpdatesForDuplicatePreHashAsync(CancellationToken ct) {
+	/// <param name="ct">キャンセルトークン</param>
+	internal async Task EnqueueFullHashUpdatesForDuplicatePreHashAsync(CancellationToken ct) {
 		List<long> duplicateIds;
 		await using (var db = await this._dbFactory.CreateDbContextAsync(ct).ConfigureAwait(false)) {
 			// PreHashが同一のレコードが2つ以上あるグループを見つけ、
 			// その中でFullHashが未設定またはPreHashより古いものを抽出
-			var duplicatePreHashes = await db.MediaItems
-				.Where(m => m.IsExists && m.PreHash != null)
-				.GroupBy(m => m.PreHash)
-				.Where(g => g.Count() >= 2)
-				.Select(g => g.Key)
-				.ToListAsync(ct).ConfigureAwait(false);
+			var duplicatePreHashes = CreateDuplicatePreHashesQuery(db);
 
 			duplicateIds = await db.MediaItems
 				.Where(m => m.IsExists &&
+					m.PreHash != null &&
 					duplicatePreHashes.Contains(m.PreHash) &&
 					(m.FullHash == null || m.PreHashUpdatedTime > m.FullHashUpdatedTime))
 				.Select(m => m.MediaItemId)
@@ -230,17 +240,13 @@ public class FileHashUpdatorService : ServiceBase, IFileHashUpdatorService {
 	/// PreHashが重複していないメディアアイテムのFullHashとFullHashUpdatedTimeをクリアする。
 	/// 重複が解消されたファイルから不要なFullHashを削除する。
 	/// </summary>
-	private async Task ClearFullHashForNonDuplicatePreHashAsync(CancellationToken ct) {
+	/// <param name="ct">キャンセルトークン</param>
+	internal async Task ClearFullHashForNonDuplicatePreHashAsync(CancellationToken ct) {
 		await this._databaseWriteCoordinator.ExecuteAsync(async writeCt => {
 			await using (var db = await this._dbFactory.CreateDbContextAsync(writeCt).ConfigureAwait(false))
 			await using (var transaction = await db.Database.BeginTransactionAsync(writeCt).ConfigureAwait(false)) {
-				// PreHashが重複しているグループを特定
-				var duplicatePreHashes = await db.MediaItems
-					.Where(m => m.IsExists && m.PreHash != null)
-					.GroupBy(m => m.PreHash)
-					.Where(g => g.Count() >= 2)
-					.Select(g => g.Key)
-					.ToListAsync(writeCt).ConfigureAwait(false);
+				// PreHashが重複しているグループを特定するサブクエリを構築
+				var duplicatePreHashes = CreateDuplicatePreHashesQuery(db);
 
 				// PreHashが重複していないレコードのFullHashをクリア
 				await db.MediaItems
