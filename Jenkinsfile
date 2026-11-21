@@ -3,6 +3,7 @@
 // - Windows ビルドエージェント（.NET 11 SDK / Windows SDK 10.0.26100.0 が必要）
 // - Jenkins の「SonarQube Scanner」プラグインでサーバー名 "SonarQube" (URL: https://sonarqube.home.internal) を登録済みであること
 //   ※ withSonarQubeEnv を使わず Secret text クレデンシャルのみで実行する場合は、ステージ内のコメント例に切り替えてください
+// - GitHub Webhook による自動ビルドを行う場合は、Jenkins に「GitHub」プラグインがインストールされていること
 
 pipeline {
   // Windows エージェント（開発機等）に "windows" ラベルを付与して実行
@@ -13,6 +14,11 @@ pipeline {
   options {
     // 多重実行によるビルド成果物・.sonarqube 作業フォルダの競合を防止
     disableConcurrentBuilds()
+  }
+
+  triggers {
+    // GitHub Webhook（/github-webhook/）からの push 通知で自動ビルドを実行
+    githubPush()
   }
 
   environment {

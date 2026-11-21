@@ -64,6 +64,49 @@ Jenkins サーバー（Ubuntu）とは別に、**開発用 Windows PC を Jenkin
 - **方法 1（推奨）**: Jenkins エージェントの Windows「信頼されたルート証明機関」ストアにルート CA 証明書をインストールし、必要に応じて `Jenkinsfile` の `environment` にある `SONAR_SCANNER_OPTS` 行（`-Djavax.net.ssl.trustStoreType=WINDOWS-ROOT -Djavax.net.ssl.trustStore=NONE`）を有効化してください。
 - **方法 2**: PKCS#12 形式のトラストストア（`.p12`）を用意し、`dotnet-sonarscanner begin` に `/d:sonar.scanner.truststorePath=...` と `/d:sonar.scanner.truststorePassword=...` を追加してください。
 
+### GitHub Webhook による自動ビルド設定
+
+GitHub の `push` イベントをトリガーに Jenkins パイプラインを自動実行する場合の手順です。
+
+- **前提**: Jenkins に **GitHub** プラグインがインストールされていること（未導入の場合 `/github-webhook/` が 404 になります）。
+
+#### 1. GitHub リポジトリ側の設定
+リポジトリの **Settings > Webhooks > Add webhook** から以下を登録します。
+
+- **Payload URL**: `https://<Jenkinsの公開URL>/github-webhook/`
+  - ※ 末尾の `/` は必須です（省略するとリダイレクトが発生し POST が失敗する場合があります）。
+- **Content type**: `application/json`
+- **Secret**: 任意のランダム文字列（外部公開エンドポイントの保護のため設定を推奨）
+- **SSL verification**: `Enable SSL verification`
+- **Which events would you like to trigger this webhook?**: `Just the push event.`
+- **Active**: チェックを入れて保存
+
+#### 2. Jenkins ジョブ側の設定
+SonarQube Community Build での単一ブランチ解析を前提とするため、通常の **Pipeline** ジョブで対象ブランチを限定して構成します。
+
+1. **General**: **GitHub project** にチェックを入れ、**Project url** に `https://github.com/xm-i/MediaDeck/` を指定します。
+2. **Triggers**: `Jenkinsfile` に `triggers { githubPush() }` が定義されているため、初回ビルド後に **GitHub hook trigger for GITScm polling** が自動で有効になります（初回前に手動でチェックを入れても構いません）。
+3. **Pipeline**:
+   - **Definition**: `Pipeline script from SCM`
+   - **SCM**: `Git`
+   - **Repository URL**: `https://github.com/xm-i/MediaDeck.git`
+   - **Branches to build**: `*/develop`（`*/master` 等、解析対象ブランチに限定）
+   - **Script Path**: `Jenkinsfile`
+4. 保存後、**初回のみ手動で「Build Now」を 1 回実行**します。
+   - ※ Webhook トリガーは既存の Git ポーリング履歴および `Jenkinsfile` の `triggers` 定義をもとに動作するため、初回手動ビルドが必要です。
+
+#### 3. Secret 検証の設定（推奨）
+GitHub 側で Secret を設定した場合は、Jenkins 側にも同じ値を登録します。
+
+1. **Manage Jenkins > Credentials** で `Secret text` クレデンシャルを作成し、GitHub の Webhook と同じ Secret を保存します。
+2. **Manage Jenkins > System > GitHub > GitHub Servers**（未登録の場合は追加）で **Advanced...** を開き、**Shared secret** に手順 1 のクレデンシャルを選択して保存します。
+
+#### 4. 動作確認
+1. GitHub の **Settings > Webhooks > 作成した Webhook > Recent Deliveries** を開き、初回 `ping` イベントのレスポンスが **`200 OK`** であることを確認します。
+2. 初回手動ビルドの完了後、対象ブランチへ `push`（または `Recent Deliveries` の `push` イベントから **Redeliver**）を実行し、ジョブが起動することを確認します。
+   - ※ 既にビルド済みの最新コミットを `Redeliver` した場合は差分なしとしてスキップされます。
+3. `200 OK` なのにジョブが起動しない場合は、ジョブ画面左メニューの **GitHub Hook Log** / **Git Polling Log**、および **Manage Jenkins > System Log** を確認してください。
+
 ---
 
 ## 2. IDE（Visual Studio / VS Code）での Connected Mode 設定
