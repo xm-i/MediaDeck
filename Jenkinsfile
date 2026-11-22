@@ -4,6 +4,7 @@
 // - Jenkins の「SonarQube Scanner」プラグインでサーバー名 "SonarQube" (URL: https://sonarqube.home.internal) を登録済みであること
 //   ※ withSonarQubeEnv を使わず Secret text クレデンシャルのみで実行する場合は、ステージ内のコメント例に切り替えてください
 // - GitHub Webhook による自動ビルドを行う場合は、Jenkins に「GitHub」プラグインがインストールされていること
+// - 失敗時の Slack 通知を行うため、Jenkins に「Slack Notification」プラグインをインストールし、システム設定（Manage Jenkins > System > Slack）でワークスペース・認証情報を設定済みであること（通知先チャンネル ID: G016QPXM4DR）
 
 pipeline {
   // Windows エージェント（開発機等）に "windows" ラベルを付与して実行
@@ -150,6 +151,19 @@ pipeline {
             if (Test-Path '.sonarqube') { Remove-Item -Path '.sonarqube' -Recurse -Force -ErrorAction SilentlyContinue }
           '''
         }
+      }
+    }
+
+    failure {
+      script {
+        def buildUrl = env.BUILD_URL ? (env.BUILD_URL.endsWith('/') ? env.BUILD_URL : "${env.BUILD_URL}/") : ''
+        def jobInfo = buildUrl ? "<${buildUrl}|${env.JOB_NAME} #${env.BUILD_NUMBER}>" : "${env.JOB_NAME} #${env.BUILD_NUMBER}"
+        def consoleInfo = buildUrl ? "\nコンソールログ: <${buildUrl}console|確認する>" : ''
+        slackSend(
+          channel: 'G016QPXM4DR',
+          color: 'danger',
+          message: "MediaDeck のビルド・テスト・SonarQube 解析に失敗しました。\nジョブ: ${jobInfo}${consoleInfo}"
+        )
       }
     }
   }
