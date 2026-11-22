@@ -20,6 +20,7 @@
     <ProjectReference Include="..\MediaDeck.Core\MediaDeck.Core.csproj" />
     <ProjectReference Include="..\MediaDeck.MediaItemTypes\MediaDeck.MediaItemTypes.csproj" />
     <ProjectReference Include="..\MediaDeck.Store\MediaDeck.Store.csproj" />
+    <ProjectReference Include="..\MediaDeck.ViewModels\MediaDeck.ViewModels.csproj" />
   </ItemGroup>
 
   <ItemGroup>

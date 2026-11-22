@@ -75,6 +75,19 @@ public class TabScopeFactory : DisposableBase, ITabScopeFactory {
 			return existing;
 		}
 
+		var tabViewModel = new TabViewModel(tabState, this._stateStore, () => this.CreateTabContentViewModel(tabState));
+		this._tabViewModels[tabState.TabId] = tabViewModel;
+		this._logger.LogInformation("TabViewModelを生成しました（遅延ロード待機）: TabId={TabId}", tabState.TabId);
+
+		return tabViewModel;
+	}
+
+	/// <summary>
+	/// 指定された <see cref="TabStateModel"/> に対応するタブ固有のDIスコープから <see cref="TabContentViewModel"/> を解決・初期化します。
+	/// </summary>
+	/// <param name="tabState">タブ状態モデル。</param>
+	/// <returns>初期化済みの <see cref="TabContentViewModel"/>。</returns>
+	private TabContentViewModel CreateTabContentViewModel(TabStateModel tabState) {
 		var scopeProvider = tabState.ServiceProvider;
 
 		// 通知コンテキストの初期化（所属するWindowIdを動的に検索）
@@ -83,12 +96,11 @@ public class TabScopeFactory : DisposableBase, ITabScopeFactory {
 			return this._stateStore.RootState.Windows.FirstOrDefault(w => w.TabIds.Contains(tabState.TabId))?.WindowId;
 		};
 
-		// タブ固有のDIスコープから TabViewModel を解決
-		var tabViewModel = scopeProvider.GetRequiredService<TabViewModel>();
-		this._tabViewModels[tabState.TabId] = tabViewModel;
-		this._logger.LogInformation("TabViewModelを生成・初期化しました: TabId={TabId}", tabState.TabId);
+		// タブ固有のDIスコープから TabContentViewModel を解決
+		var contentViewModel = scopeProvider.GetRequiredService<TabContentViewModel>();
+		this._logger.LogInformation("TabContentViewModelを生成・初期化しました: TabId={TabId}", tabState.TabId);
 
-		return tabViewModel;
+		return contentViewModel;
 	}
 
 	/// <summary>

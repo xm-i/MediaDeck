@@ -57,6 +57,16 @@ public class MainWindowViewModel : ViewModelBase {
 			this.CompositeDisposable
 			);
 
+		// SelectedTabId が未設定または存在しないタブを指している場合は先頭タブへフォールバックする
+		if (this.SelectedTab.Value == null) {
+			this.SelectedTab.Value = this.Tabs.FirstOrDefault();
+		}
+
+		// アクティブになったタブのみ初回ロードを実行する（非アクティブタブは初回選択時まで遅延ロード）
+		this.SelectedTab
+			.Subscribe(tab => tab?.EnsureLoaded())
+			.AddTo(this.CompositeDisposable);
+
 		this.AddTabCommand.Subscribe(x => {
 			this.AddTab();
 		}).AddTo(this.CompositeDisposable);

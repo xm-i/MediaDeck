@@ -16,7 +16,7 @@ public interface ITabScopeFactory {
 
 	/// <summary>
 	/// 指定された <see cref="TabStateModel"/> に対応する <see cref="TabViewModel"/> を取得または生成します。
-	/// 初回呼び出し時にタブ固有のDIスコープに対して通知コンテキスト等を初期化します。
+	/// コンテンツのDI解決と初期化は初回アクティブ化（<see cref="TabViewModel.EnsureLoaded"/>）時に遅延実行されます。
 	/// </summary>
 	/// <param name="tabState">タブ状態モデル</param>
 	/// <returns>構築された <see cref="TabViewModel"/></returns>

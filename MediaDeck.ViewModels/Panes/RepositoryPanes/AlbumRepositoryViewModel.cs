@@ -1,4 +1,5 @@
 using MediaDeck.Common.Extensions;
+using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Core.Models.Repositories;
 using MediaDeck.Core.Models.Repositories.Objects;
 
@@ -13,7 +14,7 @@ public class AlbumRepositoryViewModel : RepositoryViewModelBase {
 	/// <see cref="AlbumRepositoryViewModel"/> クラスの新しいインスタンスを初期化します。
 	/// </summary>
 	/// <param name="albumRepository">アルバムリポジトリ。</param>
-	public AlbumRepositoryViewModel(AlbumRepository albumRepository) : base("Album", albumRepository) {
+	public AlbumRepositoryViewModel(AlbumRepository albumRepository) : base(RepositoryType.Album, "Album", albumRepository) {
 		this.AlbumRepository = albumRepository;
 		this.RootAlbum = albumRepository.RootAlbum.ObserveOnCurrentSynchronizationContext().ToBindableReactiveProperty(null!).AddTo(this.CompositeDisposable);
 		this.IsEmpty = albumRepository.RootAlbum

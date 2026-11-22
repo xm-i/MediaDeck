@@ -17,4 +17,4 @@ public sealed partial class TabContentPane {
 /// <summary>
 /// TabContentPane の基底クラス。UserControlBase を介して ViewModel プロパティを提供します。
 /// </summary>
-public abstract class TabContentPaneUserControl : UserControlBase<TabViewModel>;
+public abstract class TabContentPaneUserControl : UserControlBase<TabContentViewModel>;

@@ -1,5 +1,6 @@
 using MediaDeck.Common.Extensions;
 using MediaDeck.Composition.Stores.Config.Model;
+using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Core.Models.Repositories;
 using MediaDeck.Core.Models.Repositories.Objects;
 
@@ -15,7 +16,7 @@ public class FolderRepositoryViewModel : RepositoryViewModelBase {
 	/// </summary>
 	/// <param name="folderRepository">フォルダリポジトリモデル。</param>
 	/// <param name="folderManagerConfig">フォルダ管理設定モデル。</param>
-	public FolderRepositoryViewModel(FolderRepository folderRepository, FolderManagerConfigModel folderManagerConfig) : base("Folder", folderRepository) {
+	public FolderRepositoryViewModel(FolderRepository folderRepository, FolderManagerConfigModel folderManagerConfig) : base(RepositoryType.Folder, "Folder", folderRepository) {
 		this.RootFolder = folderRepository.RootFolder.ObserveOnCurrentSynchronizationContext().ToBindableReactiveProperty(null!).AddTo(this.CompositeDisposable);
 
 		this.IsEmpty = folderRepository.RootFolder

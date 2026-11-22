@@ -1,104 +1,87 @@
 using MediaDeck.Common.Base;
-using MediaDeck.Common.Extensions;
+using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Core.Stores.State;
-using MediaDeck.ViewModels.Panes.DetailPanes;
-using MediaDeck.ViewModels.Panes.FilterPanes;
-using MediaDeck.ViewModels.Panes.RepositoryPanes;
-using MediaDeck.ViewModels.Panes.SortPanes;
-using MediaDeck.ViewModels.Panes.StatusPanes;
-using MediaDeck.ViewModels.Panes.ViewerPanes;
 
 namespace MediaDeck.ViewModels;
 
 /// <summary>
-/// 1つのタブに対応するViewModel。
-/// タブ固有のDIスコープ内で管理される。
+/// 1つのタブに対応する軽量シェルViewModel。
+/// 実体となる <see cref="TabContentViewModel"/> は初回アクティブ化時に遅延生成される。
 /// </summary>
-[Inject(InjectServiceLifetime.Scoped)]
 public class TabViewModel : ViewModelBase {
+	private readonly IStateStore _stateStore;
+	private readonly Func<TabContentViewModel> _contentFactory;
+	private bool _isLoaded;
+
 	/// <summary>
-	/// このタブの状態モデル
+	/// このタブの状態モデルを取得します。
 	/// </summary>
 	public TabStateModel TabState {
 		get;
 	}
 
 	/// <summary>
-	/// タブの表示名
+	/// タブの表示名を取得します。
 	/// </summary>
 	public BindableReactiveProperty<string> DisplayName {
 		get;
 	}
 
-	public ViewerSelectorViewModel ViewerSelectorViewModel {
+	/// <summary>
+	/// 遅延ロードされるタブコンテンツ本体を取得します。未ロード時は <c>null</c> です。
+	/// </summary>
+	public BindableReactiveProperty<TabContentViewModel?> Content {
 		get;
 	}
 
-	public FilterSelectorViewModel FilterSelectorViewModel {
-		get;
+	/// <summary>
+	/// タブコンテンツがロード済みであるかどうかを取得します。
+	/// </summary>
+	public bool IsLoaded {
+		get {
+			return this.Content.Value != null;
+		}
 	}
 
-	public DetailSelectorViewModel DetailSelectorViewModel {
-		get;
-	}
-
-	public RepositorySelectorViewModel RepositorySelectorViewModel {
-		get;
-	}
-
-	public StatusBarViewModel StatusBarViewModel {
-		get;
-	}
-
-	public SortSelectorViewModel SortSelectorViewModel {
-		get;
-	}
-
-	public BindableReactiveProperty<double> LeftPaneWidth {
-		get;
-	}
-
-	public BindableReactiveProperty<double> RightPaneWidth {
-		get;
-	}
-
-	public BindableReactiveProperty<double> RepositoryPaneHeight {
-		get;
-	}
-
+	/// <summary>
+	/// <see cref="TabViewModel"/> クラスの新しいインスタンスを初期化します。
+	/// </summary>
+	/// <param name="tabState">タブ状態モデル。</param>
+	/// <param name="stateStore">アプリケーション状態ストア。</param>
+	/// <param name="contentFactory">タブコンテンツ本体を生成するファクトリデリゲート。</param>
 	public TabViewModel(
 		TabStateModel tabState,
 		IStateStore stateStore,
-		ViewerSelectorViewModel viewerSelectorViewModel,
-		FilterSelectorViewModel filterSelectorViewModel,
-		SortSelectorViewModel sortSelectorViewModel,
-		DetailSelectorViewModel detailSelectorViewModel,
-		RepositorySelectorViewModel repositorySelectorViewModel,
-		StatusBarViewModel statusBarViewModel) {
+		Func<TabContentViewModel> contentFactory) {
 		this.TabState = tabState;
+		this._stateStore = stateStore;
+		this._contentFactory = contentFactory;
 
 		this.DisplayName = this.TabState.DisplayName.ToBindableReactiveProperty("New Tab").AddTo(this.CompositeDisposable);
-		this.LeftPaneWidth = this.TabState.LeftPaneWidth.ToTwoWayBindableReactiveProperty().AddTo(this.CompositeDisposable);
-		this.RightPaneWidth = this.TabState.RightPaneWidth.ToTwoWayBindableReactiveProperty().AddTo(this.CompositeDisposable);
-		this.RepositoryPaneHeight = this.TabState.RepositoryPaneHeight.ToTwoWayBindableReactiveProperty().AddTo(this.CompositeDisposable);
+		this.Content = new BindableReactiveProperty<TabContentViewModel?>(null).AddTo(this.CompositeDisposable);
+	}
 
-		this.ViewerSelectorViewModel = viewerSelectorViewModel;
-		this.FilterSelectorViewModel = filterSelectorViewModel;
-		this.SortSelectorViewModel = sortSelectorViewModel;
-		this.DetailSelectorViewModel = detailSelectorViewModel;
-		this.RepositorySelectorViewModel = repositorySelectorViewModel;
-		this.StatusBarViewModel = statusBarViewModel.AddTo(this.CompositeDisposable);
+	/// <summary>
+	/// タブコンテンツが未ロードの場合に生成・初期化および初回データロードを実行します。
+	/// 既にロード済みまたは破棄済みの場合は何もしません。
+	/// </summary>
+	public void EnsureLoaded() {
+		if (this.DisposeState != DisposeState.NotDisposed || this._isLoaded) {
+			return;
+		}
 
-		this.ViewerSelectorViewModel.MediaContentLibraryViewModel.SelectedFiles.Subscribe(x => {
-			this.DetailSelectorViewModel.TargetFiles.Value = x.Select(v => v.FileModel).ToArray();
-		}).AddTo(this.CompositeDisposable);
-
-		// タブの状態変更をAppStateのデフォルトタブ状態に同期
-		this.SubscribeDefaultTabStateSync(stateStore.RootState.AppState);
-
-		// 初回ロード
-		this.ViewerSelectorViewModel.MediaContentLibraryViewModel.Reload();
+		this._isLoaded = true;
+		try {
+			var content = this._contentFactory();
+			content.AddTo(this.CompositeDisposable);
+			this.SubscribeDefaultTabStateSync(this._stateStore.RootState.AppState);
+			this.Content.Value = content;
+			content.Reload();
+		} catch {
+			this._isLoaded = false;
+			throw;
+		}
 	}
 
 	/// <summary>

@@ -33,11 +33,7 @@ public class RepositorySelectorViewModel : ViewModelBase {
 				RepositoryType.Album => albumRepositoryViewModel,
 				_ => folderRepositoryViewModel
 			},
-			vm => vm switch {
-				FolderRepositoryViewModel _ => RepositoryType.Folder,
-				AlbumRepositoryViewModel _ => RepositoryType.Album,
-				_ => RepositoryType.Folder
-			},
+			vm => vm?.RepositoryType ?? RepositoryType.Folder,
 			folderRepositoryViewModel,
 			this.CompositeDisposable
 		);

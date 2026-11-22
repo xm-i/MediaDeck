@@ -73,7 +73,7 @@
 								<TextBlock Text="{x:Bind DisplayName.Value, Mode=OneWay}" />
 							</Grid>
 						</TabViewItem.Header>
-						<tabPanes:TabContentPane ViewModel="{x:Bind Mode=OneWay}" />
+						<tabPanes:TabContentHost ViewModel="{x:Bind Mode=OneWay}" />
 					</TabViewItem>
 				</DataTemplate>
 			</TabView.TabItemTemplate>
@@ -88,7 +88,7 @@
 
 		<!-- ステータスバー -->
 		<statusPanes:StatusBarPane Grid.Row="2"
-			ViewModel="{x:Bind _viewModel.SelectedTab.Value.StatusBarViewModel, Mode=OneWay}" />
+			ViewModel="{x:Bind _viewModel.SelectedTab.Value.Content.Value.StatusBarViewModel, Mode=OneWay}" />
 
 		<!-- ウィンドウのボーダー (活性状態に応じて色が変わる) -->
 		<Border x:Name="RootBorder"
