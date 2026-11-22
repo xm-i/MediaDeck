@@ -91,4 +91,26 @@ public class TagModelTests {
 		model.TagCategory = newCategoryMock.Object;
 		model.TagCategory.ShouldBe(newCategoryMock.Object);
 	}
+
+	/// <summary>
+	/// 使用回数を明示指定した場合、<see cref="Tag.MediaItemTags"/> が未ロードでも例外にならず指定値が設定されることを検証します。
+	/// </summary>
+	[Fact]
+	public void Constructor_WithExplicitUsageCount_DoesNotAccessUnloadedMediaItemTags() {
+		var tag = new Tag {
+			TagId = 1,
+			TagCategoryId = 1,
+			TagName = "TestTag",
+			Detail = "TestDetail",
+			Ruby = "てすとたぐ",
+			TagCategory = null!,
+			TagAliases = []
+		};
+		var categoryMock = new Mock<ITagCategoryModel>();
+		var factoryMock = new Mock<ITagModelFactory>();
+
+		using var model = new TagModel(tag, categoryMock.Object, factoryMock.Object, usageCount: 5);
+
+		model.UsageCount.Value.ShouldBe(5);
+	}
 }

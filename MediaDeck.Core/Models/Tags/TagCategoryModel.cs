@@ -27,7 +27,7 @@ public class TagCategoryModel : ModelBase, ITagCategoryModel {
 			this.TagCategoryId = tagCategory.TagCategoryId;
 			this._tagCategoryName = tagCategory.TagCategoryName;
 			this._detail = tagCategory.Detail;
-			if (factory != null) {
+			if (factory != null && tagCategory.Tags is { Count: > 0 }) {
 				this._tags.AddRange(tagCategory.Tags.OrderByDescending(x => x.MediaItemTags.Count).Select(t => factory.Create(t, this)));
 			}
 		} else {

@@ -360,6 +360,72 @@ public sealed class TagsManagerTests : IDisposable {
 		manager.Tags.Count.ShouldBe(2);
 	}
 
+	/// <summary>
+	/// 初期化時に使用件数の集計・使用回数降順（同件数時はタグID昇順）並び替え・別名読み込み・カテゴリー順序が正しく行われることを検証します。
+	/// </summary>
+	[Fact]
+	public async Task InitializeAsync_ShouldAggregateUsageCountsSortTagsAndLoadAliasesWithoutTrackingMediaItemTags() {
+		var dbFactory = this.CreateSqliteDbFactory();
+		await using (var db = await dbFactory.CreateDbContextAsync()) {
+			db.TagCategories.AddRange(
+				new TagCategory { TagCategoryId = 2, TagCategoryName = "Cat2", Detail = "", Tags = [] },
+				new TagCategory { TagCategoryId = 1, TagCategoryName = "Cat1", Detail = "", Tags = [] });
+
+			db.Tags.AddRange(
+				new Tag { TagId = 10, TagCategoryId = 1, TagName = "Cat1_Zero", Detail = "", TagCategory = null!, MediaItemTags = [], TagAliases = [] },
+				new Tag { TagId = 11, TagCategoryId = 1, TagName = "Cat1_Two_HighId", Detail = "", TagCategory = null!, MediaItemTags = [], TagAliases = [new TagAlias { TagId = 11, TagAliasId = 0, Alias = "Alias11" }] },
+				new Tag { TagId = 12, TagCategoryId = 1, TagName = "Cat1_Three", Detail = "", TagCategory = null!, MediaItemTags = [], TagAliases = [new TagAlias { TagId = 12, TagAliasId = 0, Alias = "Alias12A" }, new TagAlias { TagId = 12, TagAliasId = 1, Alias = "Alias12B" }] },
+				new Tag { TagId = 9, TagCategoryId = 1, TagName = "Cat1_Two_LowId", Detail = "", TagCategory = null!, MediaItemTags = [], TagAliases = [] },
+				new Tag { TagId = 20, TagCategoryId = null, TagName = "NoCat_Zero", Detail = "", TagCategory = null!, MediaItemTags = [], TagAliases = [] },
+				new Tag { TagId = 21, TagCategoryId = null, TagName = "NoCat_Two", Detail = "", TagCategory = null!, MediaItemTags = [], TagAliases = [new TagAlias { TagId = 21, TagAliasId = 0, Alias = "Alias21" }] },
+				new Tag { TagId = 22, TagCategoryId = null, TagName = "NoCat_One", Detail = "", TagCategory = null!, MediaItemTags = [], TagAliases = [] });
+
+			db.MediaItems.AddRange(
+				new MediaItem { MediaType = MediaType.Image, MediaItemId = 1, FilePath = "f1", DirectoryPath = "d", Description = "", IsUnderFolderGroup = false },
+				new MediaItem { MediaType = MediaType.Image, MediaItemId = 2, FilePath = "f2", DirectoryPath = "d", Description = "", IsUnderFolderGroup = false },
+				new MediaItem { MediaType = MediaType.Image, MediaItemId = 3, FilePath = "f3", DirectoryPath = "d", Description = "", IsUnderFolderGroup = false });
+
+			db.MediaItemTags.AddRange(
+				new MediaItemTag { MediaItemId = 1, TagId = 12 },
+				new MediaItemTag { MediaItemId = 2, TagId = 12 },
+				new MediaItemTag { MediaItemId = 3, TagId = 12 },
+				new MediaItemTag { MediaItemId = 1, TagId = 11 },
+				new MediaItemTag { MediaItemId = 2, TagId = 11 },
+				new MediaItemTag { MediaItemId = 1, TagId = 9 },
+				new MediaItemTag { MediaItemId = 2, TagId = 9 },
+				new MediaItemTag { MediaItemId = 1, TagId = 21 },
+				new MediaItemTag { MediaItemId = 2, TagId = 21 },
+				new MediaItemTag { MediaItemId = 1, TagId = 22 });
+
+			await db.SaveChangesAsync();
+		}
+
+		using var manager = new TagsManager(dbFactory, new TagModelFactory());
+		await manager.InitializeAsync();
+
+		// カテゴリー順（未分類 → TagCategoryId 昇順）
+		manager.TagCategories.Select(c => c.TagCategoryId).ShouldBe([null, 1, 2]);
+
+		// 未分類カテゴリーの並び順と使用件数
+		manager.NoCategory.Tags.Select(t => t.TagId).ShouldBe([21, 22, 20]);
+		manager.NoCategory.Tags.Select(t => t.UsageCount.Value).ShouldBe([2, 1, 0]);
+
+		// Category1 の並び順（使用回数降順・同件数時は TagId 昇順）と使用件数
+		var cat1 = manager.TagCategories.First(c => c.TagCategoryId == 1);
+		cat1.Tags.Select(t => t.TagId).ShouldBe([12, 9, 11, 10]);
+		cat1.Tags.Select(t => t.UsageCount.Value).ShouldBe([3, 2, 2, 0]);
+
+		// Category2 は空
+		var cat2 = manager.TagCategories.First(c => c.TagCategoryId == 2);
+		cat2.Tags.ShouldBeEmpty();
+
+		// TagAliases（0件・複数件）の確認
+		manager.Tags.First(t => t.TagId == 10).TagAliases.ShouldBeEmpty();
+		manager.Tags.First(t => t.TagId == 11).TagAliases.Select(a => a.Alias).ShouldBe(["Alias11"]);
+		manager.Tags.First(t => t.TagId == 12).TagAliases.Select(a => a.Alias).ShouldBe(["Alias12A", "Alias12B"], ignoreOrder: true);
+		manager.Tags.First(t => t.TagId == 21).TagAliases.Select(a => a.Alias).ShouldBe(["Alias21"]);
+	}
+
 	[Fact]
 	public async Task UpdateTagAsync_ShouldEmitTagChanged() {
 		var dbFactory = this.CreateSqliteDbFactory();

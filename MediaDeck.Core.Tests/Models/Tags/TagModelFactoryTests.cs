@@ -42,6 +42,29 @@ public class TagModelFactoryTests {
 		result.TagAliases[0].Alias.ShouldBe("エイリアス");
 	}
 
+	/// <summary>
+	/// 使用回数を明示指定するオーバーロードで、<see cref="Tag.MediaItemTags"/> 未設定時にも例外なく指定値が反映されることを検証します。
+	/// </summary>
+	[Fact]
+	public void Create_WithUsageCount_CreatesTagModelWithSpecifiedCountAndWithoutAccessingMediaItemTags() {
+		var factory = CreateSut();
+		using var category = factory.CreateCategory();
+		var tag = new Tag {
+			TagId = 2,
+			TagName = "Test2",
+			Ruby = "てすと2",
+			TagCategoryId = null,
+			TagCategory = null!,
+			TagAliases = [],
+			Detail = "Detail2"
+		};
+
+		using var result = factory.Create(tag, category, 7);
+
+		result.TagId.ShouldBe(2);
+		result.UsageCount.Value.ShouldBe(7);
+	}
+
 	[Fact]
 	public void CreateCategory_WithTagCategory_CreatesInitializedCategoryModel() {
 		var factory = CreateSut();

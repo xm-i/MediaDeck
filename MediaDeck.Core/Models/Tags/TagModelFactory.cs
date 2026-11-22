@@ -15,6 +15,11 @@ public class TagModelFactory(IStringProvider? stringProvider = null) : ITagModel
 	}
 
 	/// <inheritdoc />
+	public ITagModel Create(Tag tag, ITagCategoryModel category, int usageCount) {
+		return new TagModel(tag, category, this, usageCount);
+	}
+
+	/// <inheritdoc />
 	public ITagCategoryModel CreateCategory(TagCategory? tagCategory) {
 		return new TagCategoryModel(tagCategory, this, stringProvider);
 	}

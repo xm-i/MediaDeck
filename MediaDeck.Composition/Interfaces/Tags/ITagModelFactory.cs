@@ -15,6 +15,15 @@ public interface ITagModelFactory {
 	public ITagModel Create(Tag tag, ITagCategoryModel category);
 
 	/// <summary>
+	/// 使用回数を明示指定してタグモデルを作成します。
+	/// </summary>
+	/// <param name="tag">タグエンティティ</param>
+	/// <param name="category">所属カテゴリモデル</param>
+	/// <param name="usageCount">タグの使用回数</param>
+	/// <returns>作成されたタグモデル</returns>
+	public ITagModel Create(Tag tag, ITagCategoryModel category, int usageCount);
+
+	/// <summary>
 	/// タグカテゴリーモデルを作成します。
 	/// </summary>
 	/// <param name="tagCategory">タグカテゴリーエンティティ（未分類の場合は null）</param>

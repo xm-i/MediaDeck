@@ -300,26 +300,23 @@ public class TagsManager : ModelBase, ITagsManager {
 		this._isInitialized = true;
 
 		await using var db = await this._dbFactory.CreateDbContextAsync();
-		var tagCategories =
-			await
-				db.TagCategories
-					.AsSplitQuery()
-					.Include(x => x.Tags)
-					.ThenInclude(x => x.TagAliases)
-					.Include(x => x.Tags)
-					.ThenInclude(x => x.MediaItemTags)
-					.OrderBy(x => x.TagCategoryId)
-					.ToArrayAsync();
+		var tagCategories = await db.TagCategories
+			.AsNoTracking()
+			.OrderBy(x => x.TagCategoryId)
+			.ToArrayAsync();
 
-		var noCategoryTags =
-			await
-				db.Tags
-					.AsSplitQuery()
-					.Where(x => x.TagCategoryId == null)
-					.Include(x => x.TagAliases)
-					.Include(x => x.MediaItemTags)
-					.OrderByDescending(x => x.MediaItemTags.Count)
-					.ToArrayAsync();
+		var allTags = await db.Tags
+			.AsNoTracking()
+			.Include(x => x.TagAliases)
+			.ToArrayAsync();
+
+		var tagUsageCounts = await db.MediaItemTags
+			.AsNoTracking()
+			.GroupBy(x => x.TagId)
+			.Select(g => new { TagId = g.Key, Count = g.Count() })
+			.ToDictionaryAsync(x => x.TagId, x => x.Count);
+
+		var tagsByCategory = allTags.ToLookup(x => x.TagCategoryId);
 
 		this._tagCategories.Clear();
 		this._tags.Clear();
@@ -328,16 +325,31 @@ public class TagsManager : ModelBase, ITagsManager {
 
 		var noCategoryModel = this._tagModelFactory.CreateCategory(null);
 		this.NoCategory = noCategoryModel;
-		noCategoryModel.AddTagRange(noCategoryTags.Select(t => this._tagModelFactory.Create(t, noCategoryModel)));
+		this.PopulateCategoryTags(noCategoryModel, tagsByCategory[null], tagUsageCounts);
 		this._tagCategories.Add(noCategoryModel);
 		tags.AddRange(noCategoryModel.Tags);
 
 		foreach (var categoryEntity in tagCategories) {
 			var categoryModel = this._tagModelFactory.CreateCategory(categoryEntity);
+			this.PopulateCategoryTags(categoryModel, tagsByCategory[categoryEntity.TagCategoryId], tagUsageCounts);
 			this._tagCategories.Add(categoryModel);
 			tags.AddRange(categoryModel.Tags);
 		}
 
 		this._tags.AddRange(tags);
+	}
+
+	/// <summary>
+	/// 指定されたカテゴリーモデルへタグを使用回数降順・同件数時はタグID昇順で登録します。
+	/// </summary>
+	/// <param name="categoryModel">登録先のカテゴリーモデル</param>
+	/// <param name="categoryTags">カテゴリーに所属するタグエンティティ一覧</param>
+	/// <param name="tagUsageCounts">タグIDごとの使用回数辞書</param>
+	private void PopulateCategoryTags(ITagCategoryModel categoryModel, IEnumerable<Tag> categoryTags, IReadOnlyDictionary<int, int> tagUsageCounts) {
+		var orderedTags = categoryTags
+			.OrderByDescending(t => tagUsageCounts.GetValueOrDefault(t.TagId))
+			.ThenBy(t => t.TagId)
+			.Select(t => this._tagModelFactory.Create(t, categoryModel, tagUsageCounts.GetValueOrDefault(t.TagId)));
+		categoryModel.AddTagRange(orderedTags);
 	}
 }

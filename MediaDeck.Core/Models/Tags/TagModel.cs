@@ -28,9 +28,10 @@ public class TagModel : ModelBase, ITagModel {
 	/// <param name="tag">タグエンティティ</param>
 	/// <param name="category">所属するカテゴリーモデル</param>
 	/// <param name="factory">タグモデルファクトリー</param>
-	public TagModel(Tag tag, ITagCategoryModel category, ITagModelFactory? factory = null) {
+	/// <param name="usageCount">タグの使用回数（未指定時は <see cref="Tag.MediaItemTags"/> から取得）</param>
+	public TagModel(Tag tag, ITagCategoryModel category, ITagModelFactory? factory = null, int? usageCount = null) {
 		this._changed = new Subject<Unit>().AddTo(this.CompositeDisposable);
-		this.UsageCount = new ReactiveProperty<int>(tag.MediaItemTags.Count).AddTo(this.CompositeDisposable);
+		this.UsageCount = new ReactiveProperty<int>(usageCount ?? tag.MediaItemTags.Count).AddTo(this.CompositeDisposable);
 
 		this.TagId = tag.TagId;
 		this.TagCategoryId = tag.TagCategoryId;

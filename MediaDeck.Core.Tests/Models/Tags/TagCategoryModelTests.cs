@@ -39,6 +39,25 @@ public class TagCategoryModelTests {
 		model.Detail.ShouldBe("Detail1");
 	}
 
+	/// <summary>
+	/// <see cref="TagCategory.Tags"/> が未ロード（null）の場合でも例外を投げず空のタグ一覧で初期化されることを検証します。
+	/// </summary>
+	[Fact]
+	public void Constructor_WithUnloadedTags_InitializesEmptyTags() {
+		var factoryMock = new Mock<ITagModelFactory>();
+		var tagCategory = new TagCategory {
+			TagCategoryId = 1,
+			TagCategoryName = "Cat1",
+			Detail = "Detail1",
+			Tags = null!
+		};
+
+		using var model = new TagCategoryModel(tagCategory, factoryMock.Object);
+
+		model.TagCategoryId.ShouldBe(1);
+		model.Tags.Count.ShouldBe(0);
+	}
+
 	[Fact]
 	public void AddTag_AddsToCollection() {
 		using var model = new TagCategoryModel();
