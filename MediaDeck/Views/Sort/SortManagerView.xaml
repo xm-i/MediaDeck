@@ -6,197 +6,449 @@
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:sortVm="using:MediaDeck.ViewModels.Sort"
-	xmlns:stateObjects="using:MediaDeck.Composition.Stores.State.Model.Objects"
-	xmlns:enum="using:MediaDeck.Composition.Enum"
 	xmlns:toolkit="using:CommunityToolkit.WinUI.Controls"
 	mc:Ignorable="d" >
 
-	<Grid Padding="12" >
+	<Grid Padding="16,12" >
 		<Grid.ColumnDefinitions>
-			<ColumnDefinition Width="220" />
-			<ColumnDefinition Width="Auto" />
+			<ColumnDefinition Width="280" MinWidth="220" MaxWidth="420" />
+			<ColumnDefinition Width="12" />
 			<ColumnDefinition Width="*" />
 		</Grid.ColumnDefinitions>
 
-		<!-- ソート条件一覧 -->
-		<Grid Grid.Column="0" >
-			<Grid.RowDefinitions>
-				<RowDefinition Height="Auto" />
-				<RowDefinition Height="8" />
-				<RowDefinition Height="*" />
-				<RowDefinition Height="8" />
-				<RowDefinition Height="Auto" />
-			</Grid.RowDefinitions>
-
-			<TextBlock Grid.Row="0"
-				x:Uid="SortManager_SortConditionsTitle"
-				FontWeight="SemiBold"
-				FontSize="14" />
-
-			<Border Grid.Row="2"
-				BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
-				BorderThickness="1"
-				CornerRadius="4" >
-				<ListBox ItemsSource="{x:Bind ViewModel.SortConditions, Mode=OneWay}"
-					SelectedItem="{x:Bind ViewModel.CurrentCondition.Value, Mode=TwoWay}" >
-					<ItemsControl.ItemTemplate>
-						<DataTemplate x:DataType="sortVm:SortConditionEditorViewModel" >
-							<TextBlock Text="{x:Bind DisplayName.Value, Converter={StaticResource StringNullOrEmptyToDefaultConverter}, ConverterParameter=SortManager_Untitled, Mode=OneWay}"
-								TextTrimming="CharacterEllipsis" />
-						</DataTemplate>
-					</ItemsControl.ItemTemplate>
-				</ListBox>
-			</Border>
-
-			<StackPanel Grid.Row="4"
-				Orientation="Horizontal"
-				Spacing="8" >
-				<Button Command="{x:Bind ViewModel.AddSortConditionCommand}"
-					x:Uid="SortManager_AddConditionButton" >
-					<StackPanel Orientation="Horizontal"
-						Spacing="6" >
-						<FontIcon Glyph="&#xF8AA;"
-							FontSize="12" />
-						<TextBlock x:Uid="SortManager_AddConditionButton_Text" />
-					</StackPanel>
-				</Button>
-				<Button Command="{x:Bind ViewModel.RemoveSortConditionCommand}"
-					CommandParameter="{x:Bind ViewModel.CurrentCondition.Value, Mode=OneWay}"
-					x:Uid="SortManager_RemoveConditionButton" >
-					<StackPanel Orientation="Horizontal"
-						Spacing="6" >
-						<FontIcon Glyph="&#xF78A;"
-							FontSize="12" />
-						<TextBlock x:Uid="SortManager_RemoveConditionButton_Text" />
-					</StackPanel>
-				</Button>
-			</StackPanel>
-		</Grid>
-
-		<!-- 区切り -->
-		<toolkit:GridSplitter Grid.Column="1"
-			Width="4"
-			HorizontalAlignment="Center"
-			ResizeBehavior="BasedOnAlignment" />
-
-		<!-- ソート条件編集エリア -->
-		<Border Grid.Column="2"
-			Visibility="{x:Bind ViewModel.CurrentCondition.Value, Mode=OneWay, Converter={StaticResource NullToCollapseConverter}}"
-			Padding="16"
-			Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-			BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
-			BorderThickness="1"
-			CornerRadius="8" >
+		<!-- 左ペイン: ソート条件一覧 -->
+		<Border Grid.Column="0"
+			CornerRadius="8"
+			Background="{ThemeResource LayerFillColorDefaultBrush}"
+			BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+			BorderThickness="1" >
 			<Grid>
 				<Grid.RowDefinitions>
 					<RowDefinition Height="Auto" />
-					<RowDefinition Height="16" />
-					<RowDefinition Height="Auto" />
-					<RowDefinition Height="16" />
 					<RowDefinition Height="*" />
 				</Grid.RowDefinitions>
 
-				<!-- 条件名入力 -->
-				<StackPanel Grid.Row="0"
-					Spacing="6" >
-					<TextBlock x:Uid="SortManager_ConditionNameLabel"
-						FontWeight="SemiBold" />
-					<TextBox
-						Text="{x:Bind ViewModel.CurrentCondition.Value.DisplayName.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-						x:Uid="SortManager_ConditionNameTextBox" />
-				</StackPanel>
-
-				<!-- ソート項目追加 -->
-				<StackPanel Grid.Row="2"
-					Spacing="6" >
-					<TextBlock x:Uid="SortManager_AddSortItemLabel"
-						FontWeight="SemiBold" />
-					<Grid>
+				<!-- ヘッダー -->
+				<Border Grid.Row="0"
+					Padding="14,10"
+					BorderThickness="0,0,0,1"
+					BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}" >
+					<Grid ColumnSpacing="8" >
 						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="Auto" />
-							<ColumnDefinition Width="8" />
 							<ColumnDefinition Width="*" />
-							<ColumnDefinition Width="8" />
 							<ColumnDefinition Width="Auto" />
 						</Grid.ColumnDefinitions>
-						<ToggleButton Grid.Column="0"
-							IsChecked="{x:Bind ViewModel.CurrentCondition.Value.Direction.Value, Mode=TwoWay, Converter={StaticResource ListSortDirectionToBooleanConverter}}"
-							x:Uid="SortManager_SortDirectionToggle" >
-							<FontIcon
-								Glyph="{x:Bind ViewModel.CurrentCondition.Value.Direction.Value, Mode=OneWay, Converter={StaticResource ListSortDirectionToIconGlyphConverter}}" />
-						</ToggleButton>
-						<ComboBox x:Name="SortItemKeyComboBox"
-							Grid.Column="2"
-							HorizontalAlignment="Stretch"
-							x:Uid="SortManager_SortItemComboBox"
-							ItemsSource="{x:Bind ViewModel.CurrentCondition.Value.CandidateSortItemKeys.Value, Mode=OneWay}" >
-							<ComboBox.ItemTemplate>
-								<DataTemplate x:DataType="enum:SortItemKey" >
-									<TextBlock Text="{x:Bind Mode=OneTime, Converter={StaticResource SortKeyToDisplayNameConverter}}" />
-								</DataTemplate>
-							</ComboBox.ItemTemplate>
-						</ComboBox>
-						<Button Grid.Column="4"
-							Command="{x:Bind ViewModel.CurrentCondition.Value.AddSortItemCommand, Mode=OneWay}"
-							CommandParameter="{x:Bind SortItemKeyComboBox.SelectedValue, Mode=OneWay}"
-							Style="{StaticResource AccentButtonStyle}" >
+						<StackPanel Grid.Column="0"
+							Orientation="Horizontal"
+							Spacing="8"
+							VerticalAlignment="Center" >
+							<FontIcon Glyph="&#xE8CB;"
+								FontSize="15"
+								Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
+							<TextBlock x:Uid="SortManager_SortConditionsTitle"
+								Style="{StaticResource BodyStrongTextBlockStyle}"
+								VerticalAlignment="Center" />
+							<Border Padding="7,1"
+								CornerRadius="10"
+								Background="{ThemeResource SubtleFillColorSecondaryBrush}"
+								VerticalAlignment="Center" >
+								<TextBlock Text="{x:Bind ViewModel.ConditionCount.Value, Mode=OneWay}"
+									Style="{StaticResource CaptionTextBlockStyle}"
+									Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+							</Border>
+						</StackPanel>
+						<Button Grid.Column="1"
+							HorizontalAlignment="Right"
+							Command="{x:Bind ViewModel.AddSortConditionCommand, Mode=OneWay}"
+							Style="{StaticResource AccentButtonStyle}"
+							Padding="10,5"
+							x:Uid="SortManager_AddConditionButton" >
 							<StackPanel Orientation="Horizontal"
 								Spacing="6" >
-								<FontIcon Glyph="&#xF8AA;"
+								<FontIcon Glyph="&#xE710;"
 									FontSize="12" />
-								<TextBlock x:Uid="SortManager_AddSortItemButton_Text" />
+								<TextBlock x:Uid="SortManager_AddConditionButton_Text" />
 							</StackPanel>
 						</Button>
 					</Grid>
+				</Border>
+
+				<!-- 条件リスト -->
+				<ListView Grid.Row="1"
+					SelectionMode="Single"
+					Padding="6"
+					Background="Transparent"
+					ItemsSource="{x:Bind ViewModel.SortConditions, Mode=OneWay}"
+					SelectedItem="{x:Bind ViewModel.CurrentCondition.Value, Mode=TwoWay}" >
+					<ListView.ItemContainerStyle>
+						<Style TargetType="ListViewItem"
+							BasedOn="{StaticResource DefaultListViewItemStyle}" >
+							<Setter Property="HorizontalContentAlignment" Value="Stretch" />
+							<Setter Property="Margin" Value="0,2" />
+							<Setter Property="Padding" Value="12,8" />
+						</Style>
+					</ListView.ItemContainerStyle>
+					<ListView.ItemTemplate>
+						<DataTemplate x:DataType="sortVm:SortConditionEditorViewModel" >
+							<StackPanel Spacing="2" >
+								<TextBlock Text="{x:Bind DisplayName.Value, Converter={StaticResource StringNullOrEmptyToDefaultConverter}, ConverterParameter=SortManager_Untitled, Mode=OneWay}"
+									FontWeight="SemiBold"
+									TextTrimming="CharacterEllipsis" />
+								<TextBlock Text="{x:Bind SummaryText.Value, Mode=OneWay}"
+									Style="{StaticResource CaptionTextBlockStyle}"
+									Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+									TextTrimming="CharacterEllipsis" />
+							</StackPanel>
+						</DataTemplate>
+					</ListView.ItemTemplate>
+				</ListView>
+			</Grid>
+		</Border>
+
+		<!-- 区切り -->
+		<toolkit:GridSplitter Grid.Column="1"
+			Width="12"
+			HorizontalAlignment="Center"
+			ResizeBehavior="BasedOnAlignment"
+			Background="Transparent" />
+
+		<!-- 右ペイン: ソート条件編集エリア -->
+		<Border Grid.Column="2"
+			CornerRadius="8"
+			Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+			BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+			BorderThickness="1" >
+			<Grid Padding="20" >
+				<!-- 空状態 (0件) -->
+				<StackPanel HorizontalAlignment="Center"
+					VerticalAlignment="Center"
+					Spacing="14"
+					MaxWidth="360"
+					Visibility="{x:Bind ViewModel.ShowEmptyMessage.Value, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" >
+					<FontIcon Glyph="&#xE8CB;"
+						FontSize="44"
+						HorizontalAlignment="Center"
+						Foreground="{ThemeResource TextFillColorDisabledBrush}" />
+					<TextBlock x:Uid="SortManager_EmptyConditionsTitle"
+						Style="{StaticResource SubtitleTextBlockStyle}"
+						HorizontalAlignment="Center"
+						TextAlignment="Center" />
+					<TextBlock x:Uid="SortManager_EmptyConditionsDescription"
+						Style="{StaticResource CaptionTextBlockStyle}"
+						Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+						HorizontalAlignment="Center"
+						TextAlignment="Center"
+						TextWrapping="Wrap" />
+					<Button Command="{x:Bind ViewModel.AddSortConditionCommand, Mode=OneWay}"
+						Style="{StaticResource AccentButtonStyle}"
+						HorizontalAlignment="Center" >
+						<StackPanel Orientation="Horizontal"
+							Spacing="8" >
+							<FontIcon Glyph="&#xE710;"
+								FontSize="13" />
+							<TextBlock x:Uid="SortManager_CreateFirstCondition" />
+						</StackPanel>
+					</Button>
 				</StackPanel>
 
-				<!-- 適用済みソート一覧 -->
-				<Grid Grid.Row="4" >
+				<!-- 未選択案内 (1件以上) -->
+				<StackPanel HorizontalAlignment="Center"
+					VerticalAlignment="Center"
+					Spacing="14"
+					Visibility="{x:Bind ViewModel.ShowSelectConditionMessage.Value, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" >
+					<FontIcon Glyph="&#xE8CB;"
+						FontSize="44"
+						HorizontalAlignment="Center"
+						Foreground="{ThemeResource TextFillColorDisabledBrush}" />
+					<TextBlock x:Uid="SortManager_SelectConditionMessage"
+						Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+						HorizontalAlignment="Center"
+						TextAlignment="Center" />
+				</StackPanel>
+
+				<!-- 編集ビュー -->
+				<Grid Visibility="{x:Bind ViewModel.HasCurrentCondition.Value, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" >
 					<Grid.RowDefinitions>
 						<RowDefinition Height="Auto" />
-						<RowDefinition Height="8" />
+						<RowDefinition Height="Auto" />
 						<RowDefinition Height="*" />
 					</Grid.RowDefinitions>
 
-					<TextBlock Grid.Row="0"
-						x:Uid="SortManager_ActiveSortItemsLabel"
-						FontWeight="SemiBold" />
+					<!-- ヘッダー＆条件名 -->
+					<StackPanel Grid.Row="0"
+						Spacing="10" >
+						<Grid ColumnSpacing="8" >
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="*" />
+								<ColumnDefinition Width="Auto" />
+							</Grid.ColumnDefinitions>
+							<TextBlock Grid.Column="0"
+								x:Uid="SortManager_ConditionSettingsHeader"
+								FontSize="12"
+								FontWeight="SemiBold"
+								VerticalAlignment="Center"
+								Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
+							<Button Grid.Column="1"
+								HorizontalAlignment="Right"
+								Command="{x:Bind ViewModel.RemoveSortConditionCommand, Mode=OneWay}"
+								CommandParameter="{x:Bind ViewModel.CurrentCondition.Value, Mode=OneWay}"
+								Padding="10,5"
+								x:Uid="SortManager_DeleteConditionButton" >
+								<StackPanel Orientation="Horizontal"
+									Spacing="6" >
+									<FontIcon Glyph="&#xE74D;"
+										FontSize="13"
+										Foreground="{ThemeResource SystemFillColorCriticalBrush}" />
+									<TextBlock x:Uid="SortManager_DeleteConditionButton_Text"
+										FontSize="12"
+										Foreground="{ThemeResource SystemFillColorCriticalBrush}" />
+								</StackPanel>
+							</Button>
+						</Grid>
+						<StackPanel Spacing="6" >
+							<TextBlock x:Uid="SortManager_ConditionNameLabel"
+								FontWeight="SemiBold" />
+							<TextBox
+								Text="{x:Bind ViewModel.CurrentCondition.Value.DisplayName.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+								x:Uid="SortManager_ConditionNameTextBox" />
+						</StackPanel>
+					</StackPanel>
 
-					<Border Grid.Row="2"
+					<!-- ソート項目追加ビルダーカード -->
+					<Border Grid.Row="1"
+						Margin="0,16,0,0"
+						Padding="14,12"
+						Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
 						BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
 						BorderThickness="1"
-						CornerRadius="4" >
-						<ItemsControl ItemsSource="{x:Bind ViewModel.CurrentCondition.Value.SortItemObjects, Mode=OneWay}" >
-							<ItemsControl.ItemTemplate>
-								<DataTemplate x:DataType="stateObjects:SortItemObject" >
-									<Grid Padding="8"
-										BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
-										BorderThickness="0,0,0,1" >
-										<Grid.ColumnDefinitions>
-											<ColumnDefinition Width="Auto" />
-											<ColumnDefinition Width="12" />
-											<ColumnDefinition Width="*" />
-											<ColumnDefinition Width="Auto" />
-										</Grid.ColumnDefinitions>
-										<FontIcon Grid.Column="0"
-											Glyph="{x:Bind Direction, Converter={StaticResource ListSortDirectionToIconGlyphConverter}}"
-											FontSize="14" />
-										<TextBlock Grid.Column="2"
-											Text="{x:Bind SortItemKey, Converter={StaticResource SortKeyToDisplayNameConverter}}"
-											VerticalAlignment="Center" />
-										<Button Grid.Column="3"
-											Click="RemoveSortItemButton_Click"
-											Tag="{x:Bind}"
-											x:Uid="SortManager_RemoveSortItemButton"
-											Padding="6" >
-											<FontIcon Glyph="&#xF78A;"
-												FontSize="12" />
-										</Button>
-									</Grid>
-								</DataTemplate>
-							</ItemsControl.ItemTemplate>
-						</ItemsControl>
+						CornerRadius="8" >
+						<StackPanel Spacing="10" >
+							<TextBlock x:Uid="SortManager_AddSortItemLabel"
+								FontWeight="SemiBold" />
+							<Grid ColumnSpacing="8" >
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="*" />
+									<ColumnDefinition Width="Auto" />
+									<ColumnDefinition Width="Auto" />
+								</Grid.ColumnDefinitions>
+
+								<ComboBox Grid.Column="0"
+									HorizontalAlignment="Stretch"
+									x:Uid="SortManager_SortItemComboBox"
+									ItemsSource="{x:Bind ViewModel.CurrentCondition.Value.CandidateSortKeys, Mode=OneWay}"
+									SelectedItem="{x:Bind ViewModel.CurrentCondition.Value.SelectedSortKey.Value, Mode=TwoWay}" >
+									<ComboBox.ItemTemplate>
+										<DataTemplate x:DataType="sortVm:SortKeyOption" >
+											<StackPanel Orientation="Horizontal"
+												Spacing="8" >
+												<FontIcon Glyph="{x:Bind IconGlyph}"
+													FontSize="14"
+													Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+												<TextBlock Text="{x:Bind DisplayName}"
+													VerticalAlignment="Center" />
+											</StackPanel>
+										</DataTemplate>
+									</ComboBox.ItemTemplate>
+								</ComboBox>
+
+								<toolkit:Segmented Grid.Column="1"
+									SelectionMode="Single"
+									ItemsSource="{x:Bind ViewModel.CurrentCondition.Value.DirectionOptions, Mode=OneWay}"
+									SelectedItem="{x:Bind ViewModel.CurrentCondition.Value.SelectedDirectionOption.Value, Mode=TwoWay}" >
+									<toolkit:Segmented.ItemTemplate>
+										<DataTemplate x:DataType="sortVm:SortDirectionOption" >
+											<StackPanel Orientation="Horizontal"
+												Spacing="6" >
+												<FontIcon Glyph="{x:Bind IconGlyph}"
+													FontSize="13" />
+												<TextBlock Text="{x:Bind DisplayName}"
+													VerticalAlignment="Center" />
+											</StackPanel>
+										</DataTemplate>
+									</toolkit:Segmented.ItemTemplate>
+								</toolkit:Segmented>
+
+								<Button Grid.Column="2"
+									Command="{x:Bind ViewModel.CurrentCondition.Value.AddSortItemCommand, Mode=OneWay}"
+									Style="{StaticResource AccentButtonStyle}" >
+									<StackPanel Orientation="Horizontal"
+										Spacing="6" >
+										<FontIcon Glyph="&#xE710;"
+											FontSize="12" />
+										<TextBlock x:Uid="SortManager_AddSortItemButton_Text" />
+									</StackPanel>
+								</Button>
+							</Grid>
+						</StackPanel>
 					</Border>
+
+					<!-- 適用済みソート優先順位一覧 -->
+					<Grid Grid.Row="2"
+						Margin="0,16,0,0" >
+						<Grid.RowDefinitions>
+							<RowDefinition Height="Auto" />
+							<RowDefinition Height="8" />
+							<RowDefinition Height="*" />
+						</Grid.RowDefinitions>
+
+						<Grid Grid.Row="0"
+							ColumnSpacing="12" >
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="Auto" />
+								<ColumnDefinition Width="*" />
+							</Grid.ColumnDefinitions>
+							<StackPanel Grid.Column="0"
+								Orientation="Horizontal"
+								Spacing="8"
+								VerticalAlignment="Center" >
+								<TextBlock x:Uid="SortManager_ActiveSortItemsLabel"
+									FontWeight="SemiBold"
+									VerticalAlignment="Center" />
+								<Border Padding="7,1"
+									CornerRadius="10"
+									Background="{ThemeResource SubtleFillColorSecondaryBrush}"
+									VerticalAlignment="Center" >
+									<TextBlock Text="{x:Bind ViewModel.CurrentCondition.Value.SortItemCount.Value, Mode=OneWay}"
+										Style="{StaticResource CaptionTextBlockStyle}"
+										Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+								</Border>
+							</StackPanel>
+							<TextBlock Grid.Column="1"
+								HorizontalAlignment="Right"
+								VerticalAlignment="Center"
+								x:Uid="SortManager_PriorityHint"
+								Style="{StaticResource CaptionTextBlockStyle}"
+								Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+								TextTrimming="CharacterEllipsis" />
+						</Grid>
+
+						<!-- 0件時空メッセージ -->
+						<Border Grid.Row="2"
+							Padding="24"
+							Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+							BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
+							BorderThickness="1"
+							CornerRadius="8"
+							Visibility="{x:Bind ViewModel.CurrentCondition.Value.IsEmpty.Value, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" >
+							<StackPanel HorizontalAlignment="Center"
+								VerticalAlignment="Center"
+								Spacing="8" >
+								<FontIcon Glyph="&#xE8CB;"
+									FontSize="28"
+									HorizontalAlignment="Center"
+									Foreground="{ThemeResource TextFillColorDisabledBrush}" />
+								<TextBlock x:Uid="SortManager_EmptySortItemsMessage"
+									Style="{StaticResource CaptionTextBlockStyle}"
+									Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+									TextAlignment="Center" />
+							</StackPanel>
+						</Border>
+
+						<!-- 優先順位リスト -->
+						<ScrollViewer Grid.Row="2"
+							VerticalScrollBarVisibility="Auto"
+							Visibility="{x:Bind ViewModel.CurrentCondition.Value.HasSortItems.Value, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" >
+							<ItemsRepeater ItemsSource="{x:Bind ViewModel.CurrentCondition.Value.SortItems, Mode=OneWay}" >
+								<ItemsRepeater.Layout>
+									<StackLayout Spacing="6" />
+								</ItemsRepeater.Layout>
+								<ItemsRepeater.ItemTemplate>
+									<DataTemplate x:DataType="sortVm:SortItemEditorViewModel" >
+										<Border Padding="12,8"
+											Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+											BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
+											BorderThickness="1"
+											CornerRadius="6" >
+											<Grid ColumnSpacing="10" >
+												<Grid.ColumnDefinitions>
+													<ColumnDefinition Width="Auto" />
+													<ColumnDefinition Width="Auto" />
+													<ColumnDefinition Width="*" />
+													<ColumnDefinition Width="Auto" />
+													<ColumnDefinition Width="Auto" />
+													<ColumnDefinition Width="Auto" />
+												</Grid.ColumnDefinitions>
+
+												<!-- 優先順位バッジ -->
+												<Border Grid.Column="0"
+													Width="24"
+													Height="24"
+													CornerRadius="12"
+													Background="{ThemeResource AccentFillColorDefaultBrush}"
+													VerticalAlignment="Center" >
+													<TextBlock Text="{x:Bind Priority.Value, Mode=OneWay}"
+														HorizontalAlignment="Center"
+														VerticalAlignment="Center"
+														FontSize="12"
+														FontWeight="SemiBold"
+														Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}" />
+												</Border>
+
+												<!-- キーアイコン -->
+												<FontIcon Grid.Column="1"
+													Glyph="{x:Bind KeyIconGlyph}"
+													FontSize="16"
+													Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+													VerticalAlignment="Center" />
+
+												<!-- キー名 -->
+												<TextBlock Grid.Column="2"
+													Text="{x:Bind KeyDisplayName}"
+													FontWeight="SemiBold"
+													VerticalAlignment="Center"
+													TextTrimming="CharacterEllipsis" />
+
+												<!-- インライン方向切替ボタン -->
+												<Button Grid.Column="3"
+													Command="{x:Bind ToggleDirectionCommand}"
+													Padding="10,4"
+													CornerRadius="14"
+													x:Uid="SortManager_ToggleItemDirection" >
+													<StackPanel Orientation="Horizontal"
+														Spacing="6" >
+														<FontIcon Glyph="{x:Bind DirectionIconGlyph}"
+															FontSize="12" />
+														<TextBlock Text="{x:Bind DirectionDisplayName}"
+															FontSize="12"
+															VerticalAlignment="Center" />
+													</StackPanel>
+												</Button>
+
+												<!-- 優先順位上下移動ボタン -->
+												<StackPanel Grid.Column="4"
+													Orientation="Horizontal"
+													Spacing="4"
+													VerticalAlignment="Center" >
+													<Button Command="{x:Bind MoveUpCommand}"
+														Padding="7,5"
+														x:Uid="SortManager_MoveUp" >
+														<FontIcon Glyph="&#xE70E;"
+															FontSize="12" />
+													</Button>
+													<Button Command="{x:Bind MoveDownCommand}"
+														Padding="7,5"
+														x:Uid="SortManager_MoveDown" >
+														<FontIcon Glyph="&#xE70D;"
+															FontSize="12" />
+													</Button>
+												</StackPanel>
+
+												<!-- 削除ボタン -->
+												<Button Grid.Column="5"
+													Command="{x:Bind RemoveCommand}"
+													Padding="7,5"
+													x:Uid="SortManager_RemoveSortItemButton" >
+													<FontIcon Glyph="&#xE74D;"
+														FontSize="13"
+														Foreground="{ThemeResource SystemFillColorCriticalBrush}" />
+												</Button>
+											</Grid>
+										</Border>
+									</DataTemplate>
+								</ItemsRepeater.ItemTemplate>
+							</ItemsRepeater>
+						</ScrollViewer>
+					</Grid>
 				</Grid>
 			</Grid>
 		</Border>

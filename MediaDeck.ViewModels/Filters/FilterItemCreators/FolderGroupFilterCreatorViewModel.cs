@@ -13,54 +13,92 @@ public class FolderGroupFilterCreatorViewModel : ViewModelBase, IFilterCreatorVi
 	private readonly IStringProvider _stringProvider;
 
 	/// <summary>
-	/// 表示名
+	/// <see cref="FolderGroupFilterCreatorViewModel"/> クラスの新しいインスタンスを初期化します。
 	/// </summary>
+	/// <param name="target">追加先のフィルター条件編集 ViewModel。</param>
+	/// <param name="stringProvider">文字列リソースプロバイダー。</param>
+	public FolderGroupFilterCreatorViewModel(ReactiveProperty<FilteringConditionEditorViewModel?> target, IStringProvider stringProvider) {
+		this._stringProvider = stringProvider;
+		this.IsSelected = new BindableReactiveProperty<bool>(false).AddTo(this.CompositeDisposable);
+		this.SearchType = new BindableReactiveProperty<DisplayObject<SearchTypeInclude>?>().AddTo(this.CompositeDisposable);
+
+		this.SearchTypeList = [
+			new DisplayObject<SearchTypeInclude>(this._stringProvider.GetString("FilterCreator_FolderGroup_OptionInclude"), SearchTypeInclude.Include),
+			new DisplayObject<SearchTypeInclude>(this._stringProvider.GetString("FilterCreator_FolderGroup_OptionExclude"), SearchTypeInclude.Exclude)
+		];
+		this.SearchType.Value = this.SearchTypeList.First();
+
+		this.AddFilterCommand = this.SearchType
+			.Select(x => x is not null)
+			.ToReactiveCommand()
+			.AddTo(this.CompositeDisposable);
+		this.AddFilterCommand.Subscribe(_ => {
+			if (this.SearchType.Value is not { } searchType) {
+				return;
+			}
+			var filter = new FolderGroupFilterItemObject {
+				SearchType = searchType.Value
+			};
+			target.Value?.AddFilter(filter);
+		}).AddTo(this.CompositeDisposable);
+	}
+
+	/// <inheritdoc />
+	public FilterCreatorKind Kind {
+		get {
+			return FilterCreatorKind.FolderGroup;
+		}
+	}
+
+	/// <inheritdoc />
 	public string Title {
 		get {
 			return this._stringProvider.GetString("FilterCreator_FolderGroup_Title");
 		}
 	}
 
-	/// <summary>
-	/// タグ名
-	/// </summary>
-	public BindableReactiveProperty<string> TagName {
-		get;
-	} = new();
+	/// <inheritdoc />
+	public string ShortTitle {
+		get {
+			return this._stringProvider.GetString("FilterCreator_FolderGroup_ShortTitle");
+		}
+	}
 
-	/// <summary>
-	/// 検索条件としてフォルダ配下のファイルを検索するか、フォルダ配下外のファイルを検索するかを選択する。
-	/// </summary>
-	public BindableReactiveProperty<DisplayObject<SearchTypeInclude>> SearchType {
-		get;
-	} = new();
+	/// <inheritdoc />
+	public string IconGlyph {
+		get {
+			return "\uED41";
+		}
+	}
 
-	/// <summary>
-	/// フォルダ配下/フォルダ配下外の選択候補
-	/// </summary>
-	public IEnumerable<DisplayObject<SearchTypeInclude>> SearchTypeList {
+	/// <inheritdoc />
+	public string Description {
+		get {
+			return this._stringProvider.GetString("FilterCreator_FolderGroup_Description");
+		}
+	}
+
+	/// <inheritdoc />
+	public BindableReactiveProperty<bool> IsSelected {
 		get;
 	}
 
 	/// <summary>
-	/// フィルター追加コマンド
+	/// フォルダグループ配下/配下外の選択状態を取得します。
 	/// </summary>
+	public BindableReactiveProperty<DisplayObject<SearchTypeInclude>?> SearchType {
+		get;
+	}
+
+	/// <summary>
+	/// フォルダグループ配下/配下外の選択候補一覧を取得します。
+	/// </summary>
+	public IReadOnlyList<DisplayObject<SearchTypeInclude>> SearchTypeList {
+		get;
+	}
+
+	/// <inheritdoc />
 	public ReactiveCommand AddFilterCommand {
 		get;
-	} = new();
-
-	public FolderGroupFilterCreatorViewModel(ReactiveProperty<FilteringConditionEditorViewModel?> target, IStringProvider stringProvider) {
-		this._stringProvider = stringProvider;
-		this.SearchTypeList = [
-			new DisplayObject<SearchTypeInclude>(this._stringProvider.GetString("FilterCreator_FolderGroup_Include"), SearchTypeInclude.Include),
-			new DisplayObject<SearchTypeInclude>(this._stringProvider.GetString("FilterCreator_FolderGroup_Exclude"), SearchTypeInclude.Exclude)
-		];
-		this.SearchType.Value = this.SearchTypeList.First();
-		this.AddFilterCommand.Subscribe(_ => {
-			var filter = new FolderGroupFilterItemObject {
-				SearchType = this.SearchType.Value.Value
-			};
-			target.Value?.AddFilter(filter);
-		}).AddTo(this.CompositeDisposable);
 	}
 }

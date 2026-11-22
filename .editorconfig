@@ -276,6 +276,8 @@ dotnet_diagnostic.CsWinRT1028.severity = none
 dotnet_diagnostic.CsWinRT1030.severity = none
 # 通常ログ（ILogger.LogDebug / LogInformation）を LoggerMessage 化せず運用するため無効化
 dotnet_diagnostic.CA1873.severity = none
+# IReadOnlyList<T> 等での First()/FirstOrDefault() による可読性を優先するため無効化
+dotnet_diagnostic.CA1826.severity = none
 
 [MediaDeck.Common/Utilities/ShellUtility.cs]
 # MediaDeck.Common では AllowUnsafeBlocks を有効化せず、SHELLEXECUTEINFOW の文字列フィールド付き構造体マーシャリングも DllImport で維持する

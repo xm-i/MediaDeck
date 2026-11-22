@@ -12,47 +12,92 @@ public class ExistsFilterCreatorViewModel : ViewModelBase, IFilterCreatorViewMod
 	private readonly IStringProvider _stringProvider;
 
 	/// <summary>
-	/// 表示名
+	/// <see cref="ExistsFilterCreatorViewModel"/> クラスの新しいインスタンスを初期化します。
 	/// </summary>
+	/// <param name="target">追加先のフィルター条件編集 ViewModel。</param>
+	/// <param name="stringProvider">文字列リソースプロバイダー。</param>
+	public ExistsFilterCreatorViewModel(ReactiveProperty<FilteringConditionEditorViewModel?> target, IStringProvider stringProvider) {
+		this._stringProvider = stringProvider;
+		this.IsSelected = new BindableReactiveProperty<bool>(false).AddTo(this.CompositeDisposable);
+		this.Exists = new BindableReactiveProperty<DisplayObject<bool>?>().AddTo(this.CompositeDisposable);
+
+		this.ExistsList = [
+			new DisplayObject<bool>(this._stringProvider.GetString("FilterCreator_Exists_True"), true),
+			new DisplayObject<bool>(this._stringProvider.GetString("FilterCreator_Exists_False"), false)
+		];
+		this.Exists.Value = this.ExistsList.First();
+
+		this.AddFilterCommand = this.Exists
+			.Select(x => x is not null)
+			.ToReactiveCommand()
+			.AddTo(this.CompositeDisposable);
+		this.AddFilterCommand.Subscribe(_ => {
+			if (this.Exists.Value is not { } exists) {
+				return;
+			}
+			var filter = new ExistsFilterItemObject {
+				Exists = exists.Value
+			};
+			target.Value?.AddFilter(filter);
+		}).AddTo(this.CompositeDisposable);
+	}
+
+	/// <inheritdoc />
+	public FilterCreatorKind Kind {
+		get {
+			return FilterCreatorKind.Exists;
+		}
+	}
+
+	/// <inheritdoc />
 	public string Title {
 		get {
 			return this._stringProvider.GetString("FilterCreator_Exists_Title");
 		}
 	}
 
-	/// <summary>
-	/// ファイルが存在するか否か
-	/// </summary>
-	public BindableReactiveProperty<DisplayObject<bool>> Exists {
-		get;
-	} = new();
+	/// <inheritdoc />
+	public string ShortTitle {
+		get {
+			return this._stringProvider.GetString("FilterCreator_Exists_ShortTitle");
+		}
+	}
 
-	/// <summary>
-	/// ファイルが存在するか否かの候補
-	/// </summary>
-	public IEnumerable<DisplayObject<bool>> ExistsList {
+	/// <inheritdoc />
+	public string IconGlyph {
+		get {
+			return "\uE9D5";
+		}
+	}
+
+	/// <inheritdoc />
+	public string Description {
+		get {
+			return this._stringProvider.GetString("FilterCreator_Exists_Description");
+		}
+	}
+
+	/// <inheritdoc />
+	public BindableReactiveProperty<bool> IsSelected {
 		get;
 	}
 
 	/// <summary>
-	/// フィルター追加コマンド
+	/// ファイルが存在するか否かの選択状態を取得します。
 	/// </summary>
+	public BindableReactiveProperty<DisplayObject<bool>?> Exists {
+		get;
+	}
+
+	/// <summary>
+	/// ファイルが存在するか否かの選択候補一覧を取得します。
+	/// </summary>
+	public IReadOnlyList<DisplayObject<bool>> ExistsList {
+		get;
+	}
+
+	/// <inheritdoc />
 	public ReactiveCommand AddFilterCommand {
 		get;
-	} = new();
-
-	public ExistsFilterCreatorViewModel(ReactiveProperty<FilteringConditionEditorViewModel?> target, IStringProvider stringProvider) {
-		this._stringProvider = stringProvider;
-		this.ExistsList = [
-			new DisplayObject<bool>(this._stringProvider.GetString("FilterCreator_Exists_True"), true),
-			new DisplayObject<bool>(this._stringProvider.GetString("FilterCreator_Exists_False"), false)
-		];
-		this.Exists.Value = this.ExistsList.First();
-		this.AddFilterCommand.Subscribe(vm => {
-			var filter = new ExistsFilterItemObject {
-				Exists = this.Exists.Value.Value
-			};
-			target.Value?.AddFilter(filter);
-		}).AddTo(this.CompositeDisposable);
 	}
 }

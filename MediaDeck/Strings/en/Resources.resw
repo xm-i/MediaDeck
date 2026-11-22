@@ -1730,4 +1730,192 @@
   <data name="EnvironmentConfigPage_CheckForUpdatesOnStartupDescription.Text" xml:space="preserve">
     <value>Automatically check for the latest release at startup and notify you in the title bar when a new version is available</value>
   </data>
+
+  <!-- SortManager / FilterManager UI Redesign -->
+  <data name="Common_AndMoreCount" xml:space="preserve">
+    <value>+{0} more</value>
+  </data>
+  <data name="Sort_Direction_Ascending" xml:space="preserve">
+    <value>Ascending</value>
+  </data>
+  <data name="Sort_Direction_Descending" xml:space="preserve">
+    <value>Descending</value>
+  </data>
+  <data name="Filter_ClearSelection.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Clear all active filters</value>
+  </data>
+  <data name="Filter_EmptyMessage.Text" xml:space="preserve">
+    <value>No filter conditions yet</value>
+  </data>
+  <data name="Filter_CreateFilterButton.Text" xml:space="preserve">
+    <value>Create Filter</value>
+  </data>
+  <data name="SortManager_FooterHint.Text" xml:space="preserve">
+    <value>Click Apply or Save to keep your changes.</value>
+  </data>
+  <data name="SortManager_ConditionSettingsHeader.Text" xml:space="preserve">
+    <value>Sort Condition Settings</value>
+  </data>
+  <data name="SortManager_DeleteConditionButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Delete this sort condition</value>
+  </data>
+  <data name="SortManager_DeleteConditionButton_Text.Text" xml:space="preserve">
+    <value>Delete Condition</value>
+  </data>
+  <data name="SortManager_NoSortItemsSummary" xml:space="preserve">
+    <value>No sort items</value>
+  </data>
+  <data name="SortManager_EmptyConditionsTitle.Text" xml:space="preserve">
+    <value>No sort conditions</value>
+  </data>
+  <data name="SortManager_EmptyConditionsDescription.Text" xml:space="preserve">
+    <value>Create reusable sort presets to quickly organize your media.</value>
+  </data>
+  <data name="SortManager_CreateFirstCondition.Text" xml:space="preserve">
+    <value>Create New Sort Condition</value>
+  </data>
+  <data name="SortManager_SelectConditionMessage.Text" xml:space="preserve">
+    <value>Select a sort condition from the list on the left</value>
+  </data>
+  <data name="SortManager_PriorityHint.Text" xml:space="preserve">
+    <value>Applied in order from top to bottom</value>
+  </data>
+  <data name="SortManager_EmptySortItemsMessage.Text" xml:space="preserve">
+    <value>No sort items yet. Add one from the controls above.</value>
+  </data>
+  <data name="SortManager_ToggleItemDirection.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Click to toggle ascending/descending</value>
+  </data>
+  <data name="SortManager_MoveUp.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Move priority up</value>
+  </data>
+  <data name="SortManager_MoveDown.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Move priority down</value>
+  </data>
+  <data name="FilterManager_FooterHint.Text" xml:space="preserve">
+    <value>Click Apply or Save to keep your changes.</value>
+  </data>
+  <data name="FilterManager_ConditionSettingsHeader.Text" xml:space="preserve">
+    <value>Filter Condition Settings</value>
+  </data>
+  <data name="FilterManager_DeleteConditionButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Delete this filter condition</value>
+  </data>
+  <data name="FilterManager_DeleteConditionButton_Text.Text" xml:space="preserve">
+    <value>Delete Condition</value>
+  </data>
+  <data name="FilterManager_NoFilterItemsSummary" xml:space="preserve">
+    <value>No rules</value>
+  </data>
+  <data name="FilterManager_EmptyConditionsTitle.Text" xml:space="preserve">
+    <value>No filter conditions</value>
+  </data>
+  <data name="FilterManager_EmptyConditionsDescription.Text" xml:space="preserve">
+    <value>Combine rules such as tags, ratings, and resolution to narrow down your media.</value>
+  </data>
+  <data name="FilterManager_CreateFirstCondition.Text" xml:space="preserve">
+    <value>Create New Filter Condition</value>
+  </data>
+  <data name="FilterManager_SelectConditionMessage.Text" xml:space="preserve">
+    <value>Select a filter condition from the list on the left</value>
+  </data>
+  <data name="FilterManager_AndBadge.Text" xml:space="preserve">
+    <value>AND</value>
+  </data>
+  <data name="FilterManager_AndHint.Text" xml:space="preserve">
+    <value>Files must match all rules below</value>
+  </data>
+  <data name="FilterManager_EmptyFilterItemsMessage.Text" xml:space="preserve">
+    <value>No filter rules yet. Choose a category above to add one.</value>
+  </data>
+  <data name="FilterCreator_Tag_ShortTitle" xml:space="preserve">
+    <value>Tag</value>
+  </data>
+  <data name="FilterCreator_FilePath_ShortTitle" xml:space="preserve">
+    <value>File Path</value>
+  </data>
+  <data name="FilterCreator_MediaType_ShortTitle" xml:space="preserve">
+    <value>Type</value>
+  </data>
+  <data name="FilterCreator_Rate_ShortTitle" xml:space="preserve">
+    <value>Rating</value>
+  </data>
+  <data name="FilterCreator_Resolution_ShortTitle" xml:space="preserve">
+    <value>Resolution</value>
+  </data>
+  <data name="FilterCreator_Location_ShortTitle" xml:space="preserve">
+    <value>Location</value>
+  </data>
+  <data name="FilterCreator_FolderGroup_ShortTitle" xml:space="preserve">
+    <value>Folder Group</value>
+  </data>
+  <data name="FilterCreator_Exists_ShortTitle" xml:space="preserve">
+    <value>Exists</value>
+  </data>
+  <data name="FilterCreator_Tag_Description" xml:space="preserve">
+    <value>Filter files that include or exclude the specified tag.</value>
+  </data>
+  <data name="FilterCreator_FilePath_Description" xml:space="preserve">
+    <value>Filter files whose path includes or excludes the specified text.</value>
+  </data>
+  <data name="FilterCreator_MediaType_Description" xml:space="preserve">
+    <value>Filter files by media type (image or video).</value>
+  </data>
+  <data name="FilterCreator_Rate_Description" xml:space="preserve">
+    <value>Filter files by star rating (0 to 5).</value>
+  </data>
+  <data name="FilterCreator_Resolution_Description" xml:space="preserve">
+    <value>Filter files by width and/or height in pixels.</value>
+  </data>
+  <data name="FilterCreator_Location_Description" xml:space="preserve">
+    <value>Filter files by whether they contain location coordinates.</value>
+  </data>
+  <data name="FilterCreator_FolderGroup_Description" xml:space="preserve">
+    <value>Filter files by whether they belong to a folder group.</value>
+  </data>
+  <data name="FilterCreator_Exists_Description" xml:space="preserve">
+    <value>Filter files by whether the file exists on disk.</value>
+  </data>
+  <data name="FilterCreator_AddFilter_Text.Text" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="FilterCreator_Tag_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>Enter tag name (supports aliases)...</value>
+  </data>
+  <data name="FilterCreator_FilePath_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>Enter text in file path...</value>
+  </data>
+  <data name="FilterCreator_Rate_Unrated" xml:space="preserve">
+    <value>Unrated (0)</value>
+  </data>
+  <data name="FilterCreator_Rate_Stars" xml:space="preserve">
+    <value>★ {0}</value>
+  </data>
+  <data name="FilterCreator_Rate_SetZero.Content" xml:space="preserve">
+    <value>0 (Unrated)</value>
+  </data>
+  <data name="FilterCreator_Rate_SetZero.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Set rating to 0 (unrated)</value>
+  </data>
+  <data name="FilterCreator_Resolution_WidthPlaceholder.PlaceholderText" xml:space="preserve">
+    <value>Width (px)</value>
+  </data>
+  <data name="FilterCreator_Resolution_HeightPlaceholder.PlaceholderText" xml:space="preserve">
+    <value>Height (px)</value>
+  </data>
+  <data name="FilterCreator_Resolution_Hint.Text" xml:space="preserve">
+    <value>You can also specify only width or only height.</value>
+  </data>
+  <data name="FilterCreator_Resolution_PresetLabel.Text" xml:space="preserve">
+    <value>Presets:</value>
+  </data>
+  <data name="FilterCreator_Resolution_Clear.Content" xml:space="preserve">
+    <value>Clear</value>
+  </data>
+  <data name="FilterCreator_FolderGroup_OptionInclude" xml:space="preserve">
+    <value>In Folder Group</value>
+  </data>
+  <data name="FilterCreator_FolderGroup_OptionExclude" xml:space="preserve">
+    <value>Outside Folder Group</value>
+  </data>
 </root>

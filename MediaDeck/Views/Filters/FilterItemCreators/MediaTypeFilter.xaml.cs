@@ -3,12 +3,18 @@ using MediaDeck.ViewModels.Filters.FilterItemCreators;
 namespace MediaDeck.Views.Filters.FilterItemCreators;
 
 /// <summary>
-/// MediaTypeFilter.xaml の相互作用ロジック
+/// メディアタイプフィルター入力用コントロール。
 /// </summary>
 public partial class MediaTypeFilter {
+	/// <summary>
+	/// <see cref="MediaTypeFilter"/> クラスの新しいインスタンスを初期化します。
+	/// </summary>
 	public MediaTypeFilter() {
 		this.InitializeComponent();
 	}
 }
 
-public class MediaTypeFilterPageBase : PageBase<MediaTypeFilterCreatorViewModel>;
+/// <summary>
+/// <see cref="MediaTypeFilter"/> の基底クラス。
+/// </summary>
+public class MediaTypeFilterControlBase : UserControlBase<MediaTypeFilterCreatorViewModel>;

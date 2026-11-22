@@ -2,6 +2,7 @@ using System.ComponentModel;
 
 using MediaDeck.Common.Base;
 using MediaDeck.Common.Extensions;
+using MediaDeck.Composition.Interfaces;
 using MediaDeck.Core.Models.Files.Sort;
 using MediaDeck.Core.Stores.State;
 
@@ -12,13 +13,18 @@ namespace MediaDeck.ViewModels.Panes.SortPanes;
 /// </summary>
 [Inject(InjectServiceLifetime.Scoped)]
 public class SortSelectorViewModel : ViewModelBase {
+	private readonly IStateStore _stateStore;
+
 	/// <summary>
-	/// コンストラクタ
+	/// <see cref="SortSelectorViewModel"/> クラスの新しいインスタンスを初期化します。
 	/// </summary>
-	public SortSelectorViewModel(SortSelector model, IStateStore stateStore) {
+	/// <param name="model">ソートセレクターモデル。</param>
+	/// <param name="stateStore">状態ストア。</param>
+	/// <param name="stringProvider">多言語リソースプロバイダー。</param>
+	public SortSelectorViewModel(SortSelector model, IStateStore stateStore, IStringProvider stringProvider) {
 		this._stateStore = stateStore;
 		this.SortConditions = model.SortConditions
-			.CreateViewWithDisposal(x => new SortConditionViewModel(x))
+			.CreateViewWithDisposal(x => new SortConditionViewModel(x, stringProvider))
 			.ToNotifyCollectionChangedWithDisposal(SynchronizationContextCollectionEventDispatcher.Current)
 			.AddTo(this.CompositeDisposable);
 		this.CurrentCondition = model.CurrentSortCondition.ToTwoWayBindableReactiveProperty(
@@ -27,31 +33,64 @@ public class SortSelectorViewModel : ViewModelBase {
 			this.SortConditions.FirstOrDefault(c => c.Model == model.CurrentSortCondition.Value),
 			this.CompositeDisposable);
 		this.Direction = model.Direction.ToTwoWayBindableReactiveProperty(model.Direction.Value, this.CompositeDisposable);
+
+		this.DirectionDisplayName = this.Direction
+			.Select(dir => SortDisplayHelper.GetDirectionDisplayName(dir, stringProvider))
+			.ToBindableReactiveProperty(SortDisplayHelper.GetDirectionDisplayName(this.Direction.Value, stringProvider))
+			.AddTo(this.CompositeDisposable);
+
+		this.CurrentConditionSummary = new BindableReactiveProperty<string>(string.Empty)
+			.AddTo(this.CompositeDisposable);
+
+		var summarySubscription = new SerialDisposable().AddTo(this.CompositeDisposable);
+		this.CurrentCondition.Subscribe(cond => {
+			if (cond is null) {
+				summarySubscription.Disposable = null;
+				this.CurrentConditionSummary.Value = string.Empty;
+				return;
+			}
+			summarySubscription.Disposable = cond.SummaryText.Subscribe(summary => {
+				this.CurrentConditionSummary.Value = summary;
+			});
+		}).AddTo(this.CompositeDisposable);
 	}
 
-	private readonly IStateStore _stateStore;
-
 	/// <summary>
-	/// カレント条件
+	/// カレント条件を取得します。
 	/// </summary>
 	public BindableReactiveProperty<SortConditionViewModel?> CurrentCondition {
 		get;
 	}
 
 	/// <summary>
-	/// ソート条件
+	/// ソート条件一覧を取得します。
 	/// </summary>
 	public INotifyCollectionChangedSynchronizedViewList<SortConditionViewModel> SortConditions {
 		get;
 	}
 
 	/// <summary>
-	/// ソート方向
+	/// ソート方向を取得します。
 	/// </summary>
 	public BindableReactiveProperty<ListSortDirection> Direction {
 		get;
 	}
 
+	/// <summary>
+	/// 現在のソート方向の表示名を取得します。
+	/// </summary>
+	public BindableReactiveProperty<string> DirectionDisplayName {
+		get;
+	}
+
+	/// <summary>
+	/// 選択中ソート条件の概要テキストを取得します。
+	/// </summary>
+	public BindableReactiveProperty<string> CurrentConditionSummary {
+		get;
+	}
+
+	/// <inheritdoc />
 	protected override void Dispose(bool disposing) {
 		base.Dispose(disposing);
 	}

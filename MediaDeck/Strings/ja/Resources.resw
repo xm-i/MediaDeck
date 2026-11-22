@@ -1730,4 +1730,192 @@
   <data name="EnvironmentConfigPage_CheckForUpdatesOnStartupDescription.Text" xml:space="preserve">
     <value>アプリ起動時に最新リリースを確認し、新しいバージョンがある場合はタイトルバーでお知らせします</value>
   </data>
+
+  <!-- SortManager / FilterManager UI刷新追加分 -->
+  <data name="Common_AndMoreCount" xml:space="preserve">
+    <value>他{0}件</value>
+  </data>
+  <data name="Sort_Direction_Ascending" xml:space="preserve">
+    <value>昇順</value>
+  </data>
+  <data name="Sort_Direction_Descending" xml:space="preserve">
+    <value>降順</value>
+  </data>
+  <data name="Filter_ClearSelection.ToolTipService.ToolTip" xml:space="preserve">
+    <value>適用中のフィルターをすべて解除</value>
+  </data>
+  <data name="Filter_EmptyMessage.Text" xml:space="preserve">
+    <value>フィルター条件が登録されていません</value>
+  </data>
+  <data name="Filter_CreateFilterButton.Text" xml:space="preserve">
+    <value>フィルターを作成</value>
+  </data>
+  <data name="SortManager_FooterHint.Text" xml:space="preserve">
+    <value>変更内容を保存するには「適用」または「保存」をクリックしてください</value>
+  </data>
+  <data name="SortManager_ConditionSettingsHeader.Text" xml:space="preserve">
+    <value>ソート条件の設定</value>
+  </data>
+  <data name="SortManager_DeleteConditionButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>このソート条件を削除</value>
+  </data>
+  <data name="SortManager_DeleteConditionButton_Text.Text" xml:space="preserve">
+    <value>この条件を削除</value>
+  </data>
+  <data name="SortManager_NoSortItemsSummary" xml:space="preserve">
+    <value>ソート項目が未設定</value>
+  </data>
+  <data name="SortManager_EmptyConditionsTitle.Text" xml:space="preserve">
+    <value>ソート条件がありません</value>
+  </data>
+  <data name="SortManager_EmptyConditionsDescription.Text" xml:space="preserve">
+    <value>よく使う並べ替えの組み合わせを作成して、すばやく切り替えられます。</value>
+  </data>
+  <data name="SortManager_CreateFirstCondition.Text" xml:space="preserve">
+    <value>新しいソート条件を作成</value>
+  </data>
+  <data name="SortManager_SelectConditionMessage.Text" xml:space="preserve">
+    <value>左の一覧からソート条件を選択してください</value>
+  </data>
+  <data name="SortManager_PriorityHint.Text" xml:space="preserve">
+    <value>上から順に優先して並べ替えます</value>
+  </data>
+  <data name="SortManager_EmptySortItemsMessage.Text" xml:space="preserve">
+    <value>ソート項目がまだありません。上の欄から追加してください。</value>
+  </data>
+  <data name="SortManager_ToggleItemDirection.ToolTipService.ToolTip" xml:space="preserve">
+    <value>クリックして昇順/降順を切り替え</value>
+  </data>
+  <data name="SortManager_MoveUp.ToolTipService.ToolTip" xml:space="preserve">
+    <value>優先順位を1つ上げる</value>
+  </data>
+  <data name="SortManager_MoveDown.ToolTipService.ToolTip" xml:space="preserve">
+    <value>優先順位を1つ下げる</value>
+  </data>
+  <data name="FilterManager_FooterHint.Text" xml:space="preserve">
+    <value>変更内容を保存するには「適用」または「保存」をクリックしてください</value>
+  </data>
+  <data name="FilterManager_ConditionSettingsHeader.Text" xml:space="preserve">
+    <value>フィルター条件の設定</value>
+  </data>
+  <data name="FilterManager_DeleteConditionButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>このフィルター条件を削除</value>
+  </data>
+  <data name="FilterManager_DeleteConditionButton_Text.Text" xml:space="preserve">
+    <value>この条件を削除</value>
+  </data>
+  <data name="FilterManager_NoFilterItemsSummary" xml:space="preserve">
+    <value>ルールが未設定</value>
+  </data>
+  <data name="FilterManager_EmptyConditionsTitle.Text" xml:space="preserve">
+    <value>フィルター条件がありません</value>
+  </data>
+  <data name="FilterManager_EmptyConditionsDescription.Text" xml:space="preserve">
+    <value>タグや評価、解像度などの条件を組み合わせてメディアを絞り込めます。</value>
+  </data>
+  <data name="FilterManager_CreateFirstCondition.Text" xml:space="preserve">
+    <value>新しいフィルター条件を作成</value>
+  </data>
+  <data name="FilterManager_SelectConditionMessage.Text" xml:space="preserve">
+    <value>左の一覧からフィルター条件を選択してください</value>
+  </data>
+  <data name="FilterManager_AndBadge.Text" xml:space="preserve">
+    <value>AND</value>
+  </data>
+  <data name="FilterManager_AndHint.Text" xml:space="preserve">
+    <value>すべての条件に一致するファイルを表示</value>
+  </data>
+  <data name="FilterManager_EmptyFilterItemsMessage.Text" xml:space="preserve">
+    <value>ルールがまだありません。上のカテゴリから条件を追加してください。</value>
+  </data>
+  <data name="FilterCreator_Tag_ShortTitle" xml:space="preserve">
+    <value>タグ</value>
+  </data>
+  <data name="FilterCreator_FilePath_ShortTitle" xml:space="preserve">
+    <value>ファイルパス</value>
+  </data>
+  <data name="FilterCreator_MediaType_ShortTitle" xml:space="preserve">
+    <value>種別</value>
+  </data>
+  <data name="FilterCreator_Rate_ShortTitle" xml:space="preserve">
+    <value>評価</value>
+  </data>
+  <data name="FilterCreator_Resolution_ShortTitle" xml:space="preserve">
+    <value>解像度</value>
+  </data>
+  <data name="FilterCreator_Location_ShortTitle" xml:space="preserve">
+    <value>位置情報</value>
+  </data>
+  <data name="FilterCreator_FolderGroup_ShortTitle" xml:space="preserve">
+    <value>フォルダ</value>
+  </data>
+  <data name="FilterCreator_Exists_ShortTitle" xml:space="preserve">
+    <value>存在</value>
+  </data>
+  <data name="FilterCreator_Tag_Description" xml:space="preserve">
+    <value>指定したタグが付いている（または付いていない）ファイルで絞り込みます。</value>
+  </data>
+  <data name="FilterCreator_FilePath_Description" xml:space="preserve">
+    <value>ファイルパスやフォルダ名に含まれる文字列で絞り込みます。</value>
+  </data>
+  <data name="FilterCreator_MediaType_Description" xml:space="preserve">
+    <value>メディアの種別（画像または動画）で絞り込みます。</value>
+  </data>
+  <data name="FilterCreator_Rate_Description" xml:space="preserve">
+    <value>星評価（0〜5）の比較条件で絞り込みます。</value>
+  </data>
+  <data name="FilterCreator_Resolution_Description" xml:space="preserve">
+    <value>画像の幅や高さ（ピクセル）の条件で絞り込みます。</value>
+  </data>
+  <data name="FilterCreator_Location_Description" xml:space="preserve">
+    <value>GPS などの位置情報（座標）の有無で絞り込みます。</value>
+  </data>
+  <data name="FilterCreator_FolderGroup_Description" xml:space="preserve">
+    <value>登録されたフォルダグループの配下かどうかで絞り込みます。</value>
+  </data>
+  <data name="FilterCreator_Exists_Description" xml:space="preserve">
+    <value>実ファイルがディスク上に存在するか（リンク切れ等）で絞り込みます。</value>
+  </data>
+  <data name="FilterCreator_AddFilter_Text.Text" xml:space="preserve">
+    <value>追加</value>
+  </data>
+  <data name="FilterCreator_Tag_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>タグ名を入力（読み仮名・別名でも検索可）</value>
+  </data>
+  <data name="FilterCreator_FilePath_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>パスやファイル名の一部を入力</value>
+  </data>
+  <data name="FilterCreator_Rate_Unrated" xml:space="preserve">
+    <value>未評価 (0)</value>
+  </data>
+  <data name="FilterCreator_Rate_Stars" xml:space="preserve">
+    <value>★ {0}</value>
+  </data>
+  <data name="FilterCreator_Rate_SetZero.Content" xml:space="preserve">
+    <value>0 (未評価)</value>
+  </data>
+  <data name="FilterCreator_Rate_SetZero.ToolTipService.ToolTip" xml:space="preserve">
+    <value>評価を 0（未評価）に設定</value>
+  </data>
+  <data name="FilterCreator_Resolution_WidthPlaceholder.PlaceholderText" xml:space="preserve">
+    <value>幅 (px)</value>
+  </data>
+  <data name="FilterCreator_Resolution_HeightPlaceholder.PlaceholderText" xml:space="preserve">
+    <value>高さ (px)</value>
+  </data>
+  <data name="FilterCreator_Resolution_Hint.Text" xml:space="preserve">
+    <value>幅のみ・高さのみの指定も可能です</value>
+  </data>
+  <data name="FilterCreator_Resolution_PresetLabel.Text" xml:space="preserve">
+    <value>プリセット:</value>
+  </data>
+  <data name="FilterCreator_Resolution_Clear.Content" xml:space="preserve">
+    <value>クリア</value>
+  </data>
+  <data name="FilterCreator_FolderGroup_OptionInclude" xml:space="preserve">
+    <value>フォルダグループ配下</value>
+  </data>
+  <data name="FilterCreator_FolderGroup_OptionExclude" xml:space="preserve">
+    <value>フォルダグループ配下外</value>
+  </data>
 </root>

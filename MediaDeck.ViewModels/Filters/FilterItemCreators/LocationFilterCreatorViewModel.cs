@@ -12,47 +12,92 @@ public class LocationFilterCreatorViewModel : ViewModelBase, IFilterCreatorViewM
 	private readonly IStringProvider _stringProvider;
 
 	/// <summary>
-	/// 表示名
+	/// <see cref="LocationFilterCreatorViewModel"/> クラスの新しいインスタンスを初期化します。
 	/// </summary>
+	/// <param name="target">追加先のフィルター条件編集 ViewModel。</param>
+	/// <param name="stringProvider">文字列リソースプロバイダー。</param>
+	public LocationFilterCreatorViewModel(ReactiveProperty<FilteringConditionEditorViewModel?> target, IStringProvider stringProvider) {
+		this._stringProvider = stringProvider;
+		this.IsSelected = new BindableReactiveProperty<bool>(false).AddTo(this.CompositeDisposable);
+		this.HasLocation = new BindableReactiveProperty<DisplayObject<bool>?>().AddTo(this.CompositeDisposable);
+
+		this.HasLocationList = [
+			new DisplayObject<bool>(this._stringProvider.GetString("FilterCreator_Location_Contains_True"), true),
+			new DisplayObject<bool>(this._stringProvider.GetString("FilterCreator_Location_Contains_False"), false)
+		];
+		this.HasLocation.Value = this.HasLocationList.First();
+
+		this.AddFilterCommand = this.HasLocation
+			.Select(x => x is not null)
+			.ToReactiveCommand()
+			.AddTo(this.CompositeDisposable);
+		this.AddFilterCommand.Subscribe(_ => {
+			if (this.HasLocation.Value is not { } hasLocation) {
+				return;
+			}
+			var filter = new LocationFilterItemObject {
+				Contains = hasLocation.Value
+			};
+			target.Value?.AddFilter(filter);
+		}).AddTo(this.CompositeDisposable);
+	}
+
+	/// <inheritdoc />
+	public FilterCreatorKind Kind {
+		get {
+			return FilterCreatorKind.Location;
+		}
+	}
+
+	/// <inheritdoc />
 	public string Title {
 		get {
 			return this._stringProvider.GetString("FilterCreator_Location_Title");
 		}
 	}
 
-	/// <summary>
-	/// フィルター追加コマンド
-	/// </summary>
-	public ReactiveCommand AddFilterCommand {
-		get;
-	} = new();
+	/// <inheritdoc />
+	public string ShortTitle {
+		get {
+			return this._stringProvider.GetString("FilterCreator_Location_ShortTitle");
+		}
+	}
 
-	/// <summary>
-	/// 座標情報を持っているか否か
-	/// </summary>
-	public BindableReactiveProperty<DisplayObject<bool>> HasLocation {
-		get;
-	} = new();
+	/// <inheritdoc />
+	public string IconGlyph {
+		get {
+			return "\uE707";
+		}
+	}
 
-	/// <summary>
-	/// 座標情報を持っているか否かの候補
-	/// </summary>
-	public IEnumerable<DisplayObject<bool>> HasLocationList {
+	/// <inheritdoc />
+	public string Description {
+		get {
+			return this._stringProvider.GetString("FilterCreator_Location_Description");
+		}
+	}
+
+	/// <inheritdoc />
+	public BindableReactiveProperty<bool> IsSelected {
 		get;
 	}
 
-	public LocationFilterCreatorViewModel(ReactiveProperty<FilteringConditionEditorViewModel?> target, IStringProvider stringProvider) {
-		this._stringProvider = stringProvider;
-		this.HasLocationList = [
-			new DisplayObject<bool>(this._stringProvider.GetString("FilterCreator_Location_Contains_True"), true),
-			new DisplayObject<bool>(this._stringProvider.GetString("FilterCreator_Location_Contains_False"), false)
-		];
-		this.HasLocation.Value = this.HasLocationList.First();
-		this.AddFilterCommand.Subscribe(vm => {
-			var filter = new LocationFilterItemObject {
-				Contains = this.HasLocation.Value.Value
-			};
-			target.Value?.AddFilter(filter);
-		}).AddTo(this.CompositeDisposable);
+	/// <inheritdoc />
+	public ReactiveCommand AddFilterCommand {
+		get;
+	}
+
+	/// <summary>
+	/// 座標情報を持っているか否かの選択状態を取得します。
+	/// </summary>
+	public BindableReactiveProperty<DisplayObject<bool>?> HasLocation {
+		get;
+	}
+
+	/// <summary>
+	/// 座標情報を持っているか否かの選択候補一覧を取得します。
+	/// </summary>
+	public IReadOnlyList<DisplayObject<bool>> HasLocationList {
+		get;
 	}
 }

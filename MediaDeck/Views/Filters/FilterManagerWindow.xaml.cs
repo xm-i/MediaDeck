@@ -5,6 +5,9 @@ using MediaDeck.Views.Helpers;
 
 namespace MediaDeck.Views.Filters;
 
+/// <summary>
+/// フィルター条件を管理するためのウィンドウ。
+/// </summary>
 [Inject(InjectServiceLifetime.Transient)]
 public sealed partial class FilterManagerWindow : Microsoft.UI.Xaml.Window {
 	private readonly CompositeDisposable _disposable = new();
@@ -24,7 +27,7 @@ public sealed partial class FilterManagerWindow : Microsoft.UI.Xaml.Window {
 		// テーマのバインド
 		ThemeHelper.BindTheme(this, configStore, this._disposable);
 
-		this.AppWindow.Resize(new(1000, 700));
+		this.AppWindow.Resize(new(1040, 720));
 		this.ViewModel.RequestClose.Subscribe(_ => {
 			this.Close();
 		}).AddTo(this._disposable);

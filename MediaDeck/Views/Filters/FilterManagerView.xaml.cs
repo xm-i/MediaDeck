@@ -1,48 +1,32 @@
 using MediaDeck.ViewModels.Filters;
 using MediaDeck.ViewModels.Filters.FilterItemCreators;
-using MediaDeck.Views.Filters.FilterItemCreators;
 
-using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls.Primitives;
 
 namespace MediaDeck.Views.Filters;
 
+/// <summary>
+/// フィルター条件管理ビュー。
+/// </summary>
 public sealed partial class FilterManagerView {
+	/// <summary>
+	/// <see cref="FilterManagerView"/> クラスの新しいインスタンスを初期化します。
+	/// </summary>
 	public FilterManagerView() {
 		this.InitializeComponent();
 	}
 
-	private void FilterCreatorComboBox_SelectionChanged(object sender, SelectionChangedEventArgs args) {
-		if (args.AddedItems.FirstOrDefault() is not IFilterCreatorViewModel filterCreatorViewModel) {
-			return;
-		}
-
-		switch (filterCreatorViewModel) {
-			case ExistsFilterCreatorViewModel:
-				this.ContentFrame.Navigate(typeof(ExistsFilter));
-				break;
-			case FilePathFilterCreatorViewModel:
-				this.ContentFrame.Navigate(typeof(FilePathFilter));
-				break;
-			case LocationFilterCreatorViewModel:
-				this.ContentFrame.Navigate(typeof(LocationFilter));
-				break;
-			case MediaTypeFilterCreatorViewModel:
-				this.ContentFrame.Navigate(typeof(MediaTypeFilter));
-				break;
-			case RateFilterCreatorViewModel:
-				this.ContentFrame.Navigate(typeof(RateFilter));
-				break;
-			case ResolutionFilterCreatorViewModel:
-				this.ContentFrame.Navigate(typeof(ResolutionFilter));
-				break;
-			case TagFilterCreatorViewModel:
-				this.ContentFrame.Navigate(typeof(TagFilter));
-				break;
-			case FolderGroupFilterCreatorViewModel:
-				this.ContentFrame.Navigate(typeof(FolderGroupFilter));
-				break;
+	private void FilterCreatorChip_Click(object sender, RoutedEventArgs e) {
+		if (sender is ToggleButton button && button.Tag is IFilterCreatorViewModel creator) {
+			this.ViewModel?.SelectFilterCreatorCommand.Execute(creator);
+			// 選択中チップを再クリックしても未選択状態へ戻らないよう選択状態を維持する
+			button.IsChecked = creator.IsSelected.Value;
 		}
 	}
 }
 
+/// <summary>
+/// <see cref="FilterManagerView"/> の基底クラス。
+/// </summary>
 public class FilterManagerViewUserControl : UserControlBase<FilterManagerViewModel>;

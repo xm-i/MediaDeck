@@ -1,21 +1,20 @@
-using MediaDeck.Composition.Stores.State.Model.Objects;
 using MediaDeck.ViewModels.Sort;
-
-using Microsoft.UI.Xaml;
 
 namespace MediaDeck.Views.Sort;
 
+/// <summary>
+/// ソート条件管理ビュー。
+/// </summary>
 public sealed partial class SortManagerView {
+	/// <summary>
+	/// <see cref="SortManagerView"/> クラスの新しいインスタンスを初期化します。
+	/// </summary>
 	public SortManagerView() {
 		this.InitializeComponent();
 	}
-
-	private void RemoveSortItemButton_Click(object sender, RoutedEventArgs e) {
-		if (sender is FrameworkElement { Tag: SortItemObject sortItem } &&
-			this.ViewModel?.CurrentCondition.Value is { } currentCondition) {
-			currentCondition.RemoveSortItemCommand.Execute(sortItem);
-		}
-	}
 }
 
+/// <summary>
+/// <see cref="SortManagerView"/> の基底クラス。
+/// </summary>
 public class SortManagerViewUserControl : UserControlBase<SortManagerViewModel>;

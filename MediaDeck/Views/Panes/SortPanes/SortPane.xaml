@@ -28,36 +28,48 @@
 		</controls:PaneHeaderControl>
 
 		<!-- Content -->
-		<Grid Grid.Row="1"
+		<StackPanel Grid.Row="1"
 			Padding="12,8"
+			Spacing="6"
 			Background="{ThemeResource LayerFillColorDefaultBrush}" >
-			<Grid.ColumnDefinitions>
-				<ColumnDefinition Width="*" />
-				<ColumnDefinition Width="Auto" />
-			</Grid.ColumnDefinitions>
-			<ComboBox Grid.Column="0"
-				x:Name="CurrentCondition"
-				HorizontalAlignment="Stretch"
-				ItemsSource="{x:Bind ViewModel.SortConditions,Mode=OneWay}"
-				SelectedItem="{x:Bind ViewModel.CurrentCondition.Value,Mode=OneWay}"
-				SelectionChanged="CurrentCondition_SelectionChanged">
-				<ComboBox.ItemTemplate>
-					<DataTemplate x:DataType="sortpanesVm:SortConditionViewModel" >
-						<TextBlock Text="{x:Bind DisplayName.Value, Mode=OneWay}" />
-					</DataTemplate>
-				</ComboBox.ItemTemplate>
-			</ComboBox>
-			<ToggleButton Grid.Column="1"
-				x:Name="DirectionToggleButton"
-				x:Uid="Sort_ToggleDirection"
-				Margin="6,0,0,0"
-				IsChecked="{x:Bind ViewModel.Direction.Value, Mode=OneWay, Converter={StaticResource ListSortDirectionToBooleanConverter}}"
-				Checked="DirectionToggleButton_Checked"
-				Unchecked="DirectionToggleButton_Unchecked" >
-				<FontIcon
-					Glyph="{x:Bind ViewModel.Direction.Value, Mode=OneWay, Converter={StaticResource ListSortDirectionToIconGlyphConverter}}"
-					FontSize="14" />
-			</ToggleButton>
-		</Grid>
+			<Grid>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="*" />
+					<ColumnDefinition Width="Auto" />
+				</Grid.ColumnDefinitions>
+				<ComboBox Grid.Column="0"
+					x:Name="CurrentCondition"
+					HorizontalAlignment="Stretch"
+					ItemsSource="{x:Bind ViewModel.SortConditions, Mode=OneWay}"
+					SelectedItem="{x:Bind ViewModel.CurrentCondition.Value, Mode=OneWay}"
+					SelectionChanged="CurrentCondition_SelectionChanged">
+					<ComboBox.ItemTemplate>
+						<DataTemplate x:DataType="sortpanesVm:SortConditionViewModel" >
+							<TextBlock Text="{x:Bind DisplayName.Value, Converter={StaticResource StringNullOrEmptyToDefaultConverter}, ConverterParameter=SortManager_Untitled, Mode=OneWay}"
+								ToolTipService.ToolTip="{x:Bind SummaryText.Value, Mode=OneWay}"
+								TextTrimming="CharacterEllipsis" />
+						</DataTemplate>
+					</ComboBox.ItemTemplate>
+				</ComboBox>
+				<ToggleButton Grid.Column="1"
+					x:Name="DirectionToggleButton"
+					Margin="6,0,0,0"
+					ToolTipService.ToolTip="{x:Bind ViewModel.DirectionDisplayName.Value, Mode=OneWay}"
+					IsChecked="{x:Bind ViewModel.Direction.Value, Mode=OneWay, Converter={StaticResource ListSortDirectionToBooleanConverter}}"
+					Checked="DirectionToggleButton_Checked"
+					Unchecked="DirectionToggleButton_Unchecked" >
+					<FontIcon
+						Glyph="{x:Bind ViewModel.Direction.Value, Mode=OneWay, Converter={StaticResource ListSortDirectionToIconGlyphConverter}}"
+						FontSize="14" />
+				</ToggleButton>
+			</Grid>
+
+			<TextBlock Text="{x:Bind ViewModel.CurrentConditionSummary.Value, Mode=OneWay}"
+				Style="{StaticResource CaptionTextBlockStyle}"
+				Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+				TextTrimming="CharacterEllipsis"
+				ToolTipService.ToolTip="{x:Bind ViewModel.CurrentConditionSummary.Value, Mode=OneWay}"
+				Visibility="{x:Bind ViewModel.CurrentConditionSummary.Value, Mode=OneWay, Converter={StaticResource StringNotEmptyToVisibilityConverter}}" />
+		</StackPanel>
 	</Grid>
 </local:SortPaneUserControl>

@@ -13,7 +13,9 @@
 	xmlns:toolkit="using:CommunityToolkit.WinUI.Controls"
 	mc:Ignorable="d" >
 
-	<Grid Padding="2">
+	<Grid x:Name="RootGrid"
+		Padding="2"
+		SizeChanged="RootGrid_SizeChanged" >
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition Width="{x:Bind ViewModel.LeftPaneWidth.Value, Mode=TwoWay, Converter={StaticResource DoubleToGridLengthConverter}}" MinWidth="100" />
 			<ColumnDefinition Width="Auto" />
@@ -22,13 +24,13 @@
 			<ColumnDefinition Width="{x:Bind ViewModel.RightPaneWidth.Value, Mode=TwoWay, Converter={StaticResource DoubleToGridLengthConverter}}" MinWidth="100" />
 		</Grid.ColumnDefinitions>
 		<Grid.RowDefinitions>
-			<RowDefinition Height="{x:Bind ViewModel.RepositoryPaneHeight.Value, Mode=TwoWay, Converter={StaticResource DoubleToGridLengthConverter}}" MinHeight="100" />
+			<RowDefinition x:Name="RepositoryPaneRow" Height="{x:Bind ViewModel.RepositoryPaneHeight.Value, Mode=TwoWay, Converter={StaticResource DoubleToGridLengthConverter}}" MinHeight="100" />
 			<RowDefinition Height="Auto" />
-			<RowDefinition Height="*" />
+			<RowDefinition x:Name="SortFilterPaneRow" Height="*" MinHeight="220" />
 		</Grid.RowDefinitions>
 		<repositoryPanes:RepositorySelector Grid.Column="0" Grid.Row="0"
 			ViewModel="{x:Bind ViewModel.RepositorySelectorViewModel, Mode=OneWay}" />
-		<toolkit:GridSplitter Grid.Column="0" Grid.Row="1"
+		<toolkit:GridSplitter x:Name="RepositoryRowSplitter" Grid.Column="0" Grid.Row="1"
 			Height="4"
 			ResizeDirection="Rows"
 			ResizeBehavior="BasedOnAlignment"
@@ -36,7 +38,7 @@
 		<Grid Grid.Column="0" Grid.Row="2">
 			<Grid.RowDefinitions>
 				<RowDefinition Height="Auto" />
-				<RowDefinition Height="*" />
+				<RowDefinition Height="*" MinHeight="100" />
 			</Grid.RowDefinitions>
 			<sortPanes:SortPane Grid.Row="0"
 				ViewModel="{x:Bind ViewModel.SortSelectorViewModel, Mode=OneWay}" />

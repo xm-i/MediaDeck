@@ -50,22 +50,44 @@ public class SearchDefinitionsConfigModel {
 		];
 	}
 
+	/// <summary>
+	/// 新しいソート条件を追加します。
+	/// </summary>
+	/// <returns>追加されたソート条件オブジェクト。</returns>
 	public SortObject AddSortCondition() {
 		var so = this._serviceProvider.GetRequiredService<SortObject>();
 		this.SortConditions.Add(so);
 		return so;
 	}
 
+	/// <summary>
+	/// 指定したソート条件を削除します。
+	/// </summary>
+	/// <param name="sortObject">削除対象のソート条件オブジェクト。</param>
 	public void RemoveSortCondition(SortObject sortObject) {
+		for (var i = 0; i < this.SortConditions.Count; i++) {
+			if (ReferenceEquals(this.SortConditions[i], sortObject)) {
+				this.SortConditions.RemoveAt(i);
+				return;
+			}
+		}
 		this.SortConditions.Remove(sortObject);
 	}
 
+	/// <summary>
+	/// 新しいフィルター条件を追加します。
+	/// </summary>
+	/// <returns>追加されたフィルター条件オブジェクト。</returns>
 	public FilterObject AddFilteringCondition() {
 		var fo = this._serviceProvider.GetRequiredService<FilterObject>();
 		this.FilteringConditions.Add(fo);
 		return fo;
 	}
 
+	/// <summary>
+	/// 指定したフィルター条件を削除します。
+	/// </summary>
+	/// <param name="filterObject">削除対象のフィルター条件オブジェクト。</param>
 	public void RemoveFilteringCondition(FilterObject filterObject) {
 		this.FilteringConditions.Remove(filterObject);
 	}

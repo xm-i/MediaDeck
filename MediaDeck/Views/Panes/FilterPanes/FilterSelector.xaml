@@ -19,29 +19,127 @@
 		<controls:PaneHeaderControl Grid.Row="0"
 			x:Uid="Filter_Header"
 			Glyph="&#xE71C;">
-			<Button
-				x:Uid="Filter_Settings"
-				Click="OpenFilterSettingsWindowButton_Click" >
-				<FontIcon Glyph="&#xE713;"
-					FontSize="14" />
-			</Button>
+			<StackPanel Orientation="Horizontal"
+				Spacing="4"
+				VerticalAlignment="Center" >
+				<Border Padding="7,1"
+					CornerRadius="10"
+					Background="{ThemeResource AccentFillColorDefaultBrush}"
+					VerticalAlignment="Center"
+					Visibility="{x:Bind ViewModel.HasSelectedConditions.Value, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" >
+					<TextBlock Text="{x:Bind ViewModel.SelectedCount.Value, Mode=OneWay}"
+						FontSize="11"
+						FontWeight="SemiBold"
+						Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}" />
+				</Border>
+				<Button
+					x:Uid="Filter_ClearSelection"
+					Command="{x:Bind ViewModel.ClearSelectionCommand, Mode=OneWay}"
+					Visibility="{x:Bind ViewModel.HasSelectedConditions.Value, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" >
+					<FontIcon Glyph="&#xE711;"
+						FontSize="14" />
+				</Button>
+				<Button
+					x:Uid="Filter_Settings"
+					Click="OpenFilterSettingsWindowButton_Click" >
+					<FontIcon Glyph="&#xE713;"
+						FontSize="14" />
+				</Button>
+			</StackPanel>
 		</controls:PaneHeaderControl>
 
 		<!-- Content -->
 		<Border Grid.Row="1"
 			Background="{ThemeResource LayerFillColorDefaultBrush}" >
-			<ListView x:Name="FilteringConditionListBox"
-				Padding="8"
-				SelectionMode="Multiple"
-				ItemsSource="{x:Bind ViewModel.FilteringConditions, Mode=OneWay}"
-				SelectionChanged="FilteringConditionListBox_SelectionChanged" >
-				<ItemsControl.ItemTemplate>
-					<DataTemplate x:DataType="filtersVm:FilteringConditionViewModel" >
-						<TextBlock Text="{x:Bind DisplayName.Value, Mode=OneWay, TargetNullValue=NoName}"
-							Padding="4,6" />
-					</DataTemplate>
-				</ItemsControl.ItemTemplate>
-			</ListView>
+			<Grid>
+				<!-- 空状態 -->
+				<StackPanel HorizontalAlignment="Center"
+					VerticalAlignment="Center"
+					Spacing="8"
+					Padding="12"
+					Visibility="{x:Bind ViewModel.IsEmpty.Value, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" >
+					<FontIcon Glyph="&#xE71C;"
+						FontSize="24"
+						HorizontalAlignment="Center"
+						Foreground="{ThemeResource TextFillColorDisabledBrush}" />
+					<TextBlock x:Uid="Filter_EmptyMessage"
+						Style="{StaticResource CaptionTextBlockStyle}"
+						Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+						HorizontalAlignment="Center"
+						TextAlignment="Center"
+						TextWrapping="Wrap" />
+					<Button Click="OpenFilterSettingsWindowButton_Click"
+						HorizontalAlignment="Center"
+						Padding="10,5" >
+						<StackPanel Orientation="Horizontal"
+							Spacing="6" >
+							<FontIcon Glyph="&#xE710;"
+								FontSize="12" />
+							<TextBlock x:Uid="Filter_CreateFilterButton"
+								FontSize="12" />
+						</StackPanel>
+					</Button>
+				</StackPanel>
+
+				<!-- 条件一覧 -->
+				<ListView x:Name="FilteringConditionListBox"
+					Padding="6"
+					SelectionMode="Multiple"
+					Visibility="{x:Bind ViewModel.IsEmpty.Value, Mode=OneWay, Converter={StaticResource InvertBoolToVisibilityConverter}}"
+					ItemsSource="{x:Bind ViewModel.FilteringConditions, Mode=OneWay}"
+					SelectionChanged="FilteringConditionListBox_SelectionChanged" >
+					<ListView.Resources>
+						<ResourceDictionary>
+							<ResourceDictionary.ThemeDictionaries>
+								<ResourceDictionary x:Key="Default" >
+									<SolidColorBrush x:Key="ListViewItemCheckBrush" Color="#FFFFFFFF" />
+									<SolidColorBrush x:Key="ListViewItemCheckPressedBrush" Color="#E6FFFFFF" />
+									<SolidColorBrush x:Key="ListViewItemCheckBoxSelectedBrush" Color="{ThemeResource SystemAccentColor}" />
+									<SolidColorBrush x:Key="ListViewItemCheckBoxSelectedPointerOverBrush" Color="{ThemeResource SystemAccentColorDark1}" />
+									<SolidColorBrush x:Key="ListViewItemCheckBoxSelectedPressedBrush" Color="{ThemeResource SystemAccentColorDark2}" />
+								</ResourceDictionary>
+								<ResourceDictionary x:Key="Light" >
+									<SolidColorBrush x:Key="ListViewItemCheckBrush" Color="#FFFFFFFF" />
+									<SolidColorBrush x:Key="ListViewItemCheckPressedBrush" Color="#E6FFFFFF" />
+									<StaticResource x:Key="ListViewItemCheckBoxSelectedBrush" ResourceKey="AccentFillColorDefaultBrush" />
+									<StaticResource x:Key="ListViewItemCheckBoxSelectedPointerOverBrush" ResourceKey="AccentFillColorSecondaryBrush" />
+									<StaticResource x:Key="ListViewItemCheckBoxSelectedPressedBrush" ResourceKey="AccentFillColorTertiaryBrush" />
+								</ResourceDictionary>
+								<ResourceDictionary x:Key="HighContrast" >
+									<SolidColorBrush x:Key="ListViewItemCheckBrush" Color="{ThemeResource SystemColorHighlightTextColor}" />
+									<SolidColorBrush x:Key="ListViewItemCheckPressedBrush" Color="{ThemeResource SystemColorHighlightTextColor}" />
+									<SolidColorBrush x:Key="ListViewItemCheckBoxSelectedBrush" Color="{ThemeResource SystemColorHighlightColor}" />
+									<SolidColorBrush x:Key="ListViewItemCheckBoxSelectedPointerOverBrush" Color="{ThemeResource SystemColorHighlightColor}" />
+									<SolidColorBrush x:Key="ListViewItemCheckBoxSelectedPressedBrush" Color="{ThemeResource SystemColorHighlightColor}" />
+								</ResourceDictionary>
+							</ResourceDictionary.ThemeDictionaries>
+						</ResourceDictionary>
+					</ListView.Resources>
+					<ListView.ItemContainerStyle>
+						<Style TargetType="ListViewItem"
+							BasedOn="{StaticResource DefaultListViewItemStyle}" >
+							<Setter Property="HorizontalContentAlignment" Value="Stretch" />
+							<Setter Property="VerticalContentAlignment" Value="Stretch" />
+							<Setter Property="Padding" Value="0" />
+							<Setter Property="Margin" Value="0,2" />
+						</Style>
+					</ListView.ItemContainerStyle>
+					<ListView.ItemTemplate>
+						<DataTemplate x:DataType="filtersVm:FilteringConditionViewModel" >
+							<Grid Background="Transparent"
+								HorizontalAlignment="Stretch"
+								VerticalAlignment="Stretch"
+								Padding="16,8,12,8"
+								ToolTipService.ToolTip="{x:Bind DetailTooltip.Value, Mode=OneWay}" >
+								<TextBlock Text="{x:Bind DisplayName.Value, Converter={StaticResource StringNullOrEmptyToDefaultConverter}, ConverterParameter=FilterManager_Untitled, Mode=OneWay}"
+									VerticalAlignment="Center"
+									TextTrimming="CharacterEllipsis"
+									IsHitTestVisible="False" />
+							</Grid>
+						</DataTemplate>
+					</ListView.ItemTemplate>
+				</ListView>
+			</Grid>
 		</Border>
 	</Grid>
 </local:FilterSelectorUserControl>

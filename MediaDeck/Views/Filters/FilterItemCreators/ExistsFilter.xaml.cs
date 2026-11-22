@@ -3,12 +3,18 @@ using MediaDeck.ViewModels.Filters.FilterItemCreators;
 namespace MediaDeck.Views.Filters.FilterItemCreators;
 
 /// <summary>
-/// ExistsFilter.xaml の相互作用ロジック
+/// 存在フィルター入力用コントロール。
 /// </summary>
 public partial class ExistsFilter {
+	/// <summary>
+	/// <see cref="ExistsFilter"/> クラスの新しいインスタンスを初期化します。
+	/// </summary>
 	public ExistsFilter() {
 		this.InitializeComponent();
 	}
 }
 
-public class ExistsFilterPageBase : PageBase<ExistsFilterCreatorViewModel>;
+/// <summary>
+/// <see cref="ExistsFilter"/> の基底クラス。
+/// </summary>
+public class ExistsFilterControlBase : UserControlBase<ExistsFilterCreatorViewModel>;
