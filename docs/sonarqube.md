@@ -109,6 +109,13 @@ GitHub 側で Secret を設定した場合は、Jenkins 側にも同じ値を登
    - ※ 既にビルド済みの最新コミットを `Redeliver` した場合は差分なしとしてスキップされます。
 3. `200 OK` なのにジョブが起動しない場合は、ジョブ画面左メニューの **GitHub Hook Log** / **Git Polling Log**、および **Manage Jenkins > System Log** を確認してください。
 
+### Slack 通知設定（ビルド失敗時）
+
+`Jenkinsfile` の `post { failure { ... } }` により、ビルド・単体テスト・SonarQube 解析（Quality Gate を含む）のいずれかが失敗した際に Slack（チャンネル ID: `G016QPXM4DR`）へ自動通知されます。
+
+- **前提**: Jenkins に **Slack Notification** プラグインがインストールされ、**Manage Jenkins > System > Slack** でワークスペース・認証情報（Credential）が設定済みであること。また、プライベートチャンネルへの通知を行うため、対象チャンネル（`G016QPXM4DR`）に Jenkins 連携用の Slack App（Bot）が招待されていること。
+- **通知先チャンネルを変更したい場合**: `Jenkinsfile` 内の `slackSend(...)` の `channel`（チャンネル ID または `#チャンネル名`）を変更してください（省略すると Jenkins のデフォルトチャンネルに送信されます）。
+
 ---
 
 ## 2. IDE（Visual Studio / VS Code）での Connected Mode 設定

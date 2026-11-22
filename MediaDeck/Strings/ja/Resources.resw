@@ -700,9 +700,6 @@
   <data name="Splash_PreparingBackgroundTasks" xml:space="preserve">
     <value>バックグラウンドタスクを準備しています...</value>
   </data>
-  <data name="Splash_StartingMediaEngine" xml:space="preserve">
-    <value>メディアエンジンを起動しています...</value>
-  </data>
   <data name="Splash_CleaningUpStates" xml:space="preserve">
     <value>アプリケーションの状態をクリーンアップしています...</value>
   </data>

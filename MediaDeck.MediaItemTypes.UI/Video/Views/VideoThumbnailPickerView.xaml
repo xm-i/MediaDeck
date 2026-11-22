@@ -30,7 +30,7 @@
 				<RowDefinition Height="*" />
 			</Grid.RowDefinitions>
 
-			<vControls:VideoPlayerControl x:Name="PlayerControl" Player="{x:Bind Player, Mode=OneWay}" />
+			<vControls:VideoPlayerControl x:Name="PlayerControl" />
 
 			<Image Grid.Row="1"
 				Source="{x:Bind ViewModel.CandidateThumbnail.Value,Mode=OneWay,Converter={StaticResource BinaryToImageSourceConverter}}" />

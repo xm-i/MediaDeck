@@ -37,7 +37,7 @@
 				</Grid.ColumnDefinitions>
 
 				<StackPanel Orientation="Horizontal">
-					<Button x:Name="btnPlayback" IsTabStop="False" Command="{x:Bind Player.Commands.TogglePlayPause, Mode=OneWay}" IsEnabled="{x:Bind Player.CanPlay, Mode=OneWay}" />
+					<Button x:Name="btnPlayback" IsTabStop="False" Command="{x:Bind Player.Commands.TogglePlayPause, Mode=OneWay, FallbackValue={x:Null}}" IsEnabled="{x:Bind Player.CanPlay, Mode=OneWay, FallbackValue=False}" />
 				</StackPanel>
 
 				<Grid Margin="8,0,8,0" Grid.Column="1">
@@ -50,20 +50,21 @@
 						IsTabStop="False" Grid.Column="0" Margin="10,0,10,0"
 						VerticalAlignment="Center"
 						IsThumbToolTipEnabled="False"
-						Value="{Binding Player.CurTime, Mode=TwoWay, Converter={StaticResource TicksToSeconds}}"
-						Maximum="{x:Bind Player.Duration, Mode=OneWay, Converter={StaticResource TicksToSeconds}}" />
+						IsEnabled="{x:Bind Player.CanPlay, Mode=OneWay, FallbackValue=False}"
+						Value="{Binding Player.CurTime, Mode=TwoWay, Converter={StaticResource TicksToSeconds}, FallbackValue=0}"
+						Maximum="{x:Bind Player.Duration, Mode=OneWay, Converter={StaticResource TicksToSeconds}, FallbackValue=0}" />
 
 					<TextBlock Grid.Column="1"
 						HorizontalAlignment="Left"
 						VerticalAlignment="Center">
-						<Run Text="{x:Bind Player.CurTime, Mode=OneWay, Converter={StaticResource TicksToTime}}" />
+						<Run Text="{x:Bind Player.CurTime, Mode=OneWay, Converter={StaticResource TicksToTime}, FallbackValue='00:00:00'}" />
 						<Run Text=" / " />
-						<Run Text="{x:Bind Player.Duration, Mode=OneWay, Converter={StaticResource TicksToTime}}" />
+						<Run Text="{x:Bind Player.Duration, Mode=OneWay, Converter={StaticResource TicksToTime}, FallbackValue='00:00:00'}" />
 					</TextBlock>
 				</Grid>
 
 				<StackPanel Grid.Column="2" Orientation="Horizontal">
-					<Slider IsTabStop="False" Maximum="100" Value="{x:Bind Player.Audio.Volume, Mode=TwoWay}" Width="100" />
+					<Slider x:Name="sliderVolume" IsTabStop="False" IsEnabled="{x:Bind IsPlayerReady, Mode=OneWay}" Maximum="100" Value="{x:Bind Player.Audio.Volume, Mode=TwoWay, FallbackValue=100}" Width="100" />
 				</StackPanel>
 			</Grid>
 		</Grid>

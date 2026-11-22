@@ -11,9 +11,9 @@ namespace MediaDeck.MediaItemTypes.UI.Video.Views;
 /// </summary>
 public sealed partial class VideoDetailViewerPreviewControlView : VideoDetailViewerPreviewControlViewUserControl {
 	/// <summary>
-	/// プレイヤーインスタンスを取得します。
+	/// プレイヤーインスタンスを取得します。未初期化の場合は null を返します。
 	/// </summary>
-	public Player Player {
+	public Player? Player {
 		get {
 			return this.PlayerControl.Player;
 		}
@@ -34,7 +34,8 @@ public sealed partial class VideoDetailViewerPreviewControlView : VideoDetailVie
 	/// <param name="newViewModel">新しいViewModel。</param>
 	protected override void OnViewModelChanged(IMediaItemViewModel? oldViewModel, IMediaItemViewModel? newViewModel) {
 		if (newViewModel is null) {
-			this.PlayerControl.Player.Stop();
+			this.PlayerControl.Stop();
+			base.OnViewModelChanged(oldViewModel, newViewModel);
 			return;
 		}
 
@@ -44,8 +45,7 @@ public sealed partial class VideoDetailViewerPreviewControlView : VideoDetailVie
 			this.PlayerControl.ThumbnailSource = null;
 		}
 
-		this.PlayerControl.Player.Open(newViewModel.FilePath);
-		this.PlayerControl.Player.Pause();
+		_ = this.PlayerControl.OpenAsync(newViewModel.FilePath);
 		base.OnViewModelChanged(oldViewModel, newViewModel);
 	}
 
@@ -55,7 +55,7 @@ public sealed partial class VideoDetailViewerPreviewControlView : VideoDetailVie
 	/// <param name="sender">イベント発生元。</param>
 	/// <param name="e">イベント引数。</param>
 	private void OnUnloaded(object sender, RoutedEventArgs e) {
-		this.PlayerControl.Player.Stop();
+		this.PlayerControl.Stop();
 	}
 }
 

@@ -35,6 +35,7 @@ public partial class App {
 	private readonly IStateStore _stateStore;
 	private readonly ILogger<App> _logger;
 	private DispatcherQueue? _dispatcherQueue;
+	private IMediaEngineService? _mediaEngineService;
 
 	/// <summary>
 	/// <see cref="App"/> クラスの新しいインスタンスを初期化し、DI・ロガーおよび未処理例外ハンドラを構築する。
@@ -59,6 +60,7 @@ public partial class App {
 #endif
 		this.InitializeComponent();
 		AppDomain.CurrentDomain.ProcessExit += (_, _) => {
+			this._mediaEngineService?.Shutdown();
 			this._stateStore.Save();
 			this._configStore.Save();
 			this.Vacuum();
@@ -71,6 +73,7 @@ public partial class App {
 	/// <param name="args">起動リクエストとプロセスに関する詳細情報。</param>
 	protected override async void OnLaunched(LaunchActivatedEventArgs args) {
 		this._dispatcherQueue = DispatcherQueue.GetForCurrentThread();
+		this._mediaEngineService = Ioc.Default.GetRequiredService<IMediaEngineService>();
 
 		// スプラッシュ画面を表示
 		var stringProvider = Ioc.Default.GetRequiredService<IStringProvider>();
@@ -243,19 +246,6 @@ public partial class App {
 			var backgroundTasksModel = Ioc.Default.GetRequiredService<BackgroundTasksModel>();
 			backgroundTasksModel.Start();
 
-			splashViewModel?.UpdateStatus(stringProvider.GetString("Splash_StartingMediaEngine"));
-			await Task.Delay(100);
-			this._dispatcherQueue?.TryEnqueue(() => {
-				FlyleafLib.Engine.Start(new FlyleafLib.EngineConfig() {
-#if DEBUG
-					LogOutput = ":debug",
-					LogLevel = FlyleafLib.LogLevel.Debug,
-					FFmpegLogLevel = Flyleaf.FFmpeg.LogLevel.Warning,
-#endif
-					UIRefresh = false,
-					FFmpegPath = this._configStore.Config.PathConfig.FFMpegFolderPath.Value,
-				});
-			});
 			splashViewModel?.UpdateStatus(stringProvider.GetString("Splash_Ready"));
 		});
 	}
