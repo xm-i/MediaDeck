@@ -12,7 +12,7 @@ namespace MediaDeck.ViewModels;
 public class TabViewModel : ViewModelBase {
 	private readonly IStateStore _stateStore;
 	private readonly Func<TabContentViewModel> _contentFactory;
-	private bool _isLoaded;
+	private bool _isLoadStarted;
 
 	/// <summary>
 	/// このタブの状態モデルを取得します。
@@ -67,11 +67,11 @@ public class TabViewModel : ViewModelBase {
 	/// 既にロード済みまたは破棄済みの場合は何もしません。
 	/// </summary>
 	public void EnsureLoaded() {
-		if (this.DisposeState != DisposeState.NotDisposed || this._isLoaded) {
+		if (this.DisposeState != DisposeState.NotDisposed || this._isLoadStarted) {
 			return;
 		}
 
-		this._isLoaded = true;
+		this._isLoadStarted = true;
 		try {
 			var content = this._contentFactory();
 			content.AddTo(this.CompositeDisposable);
@@ -79,7 +79,7 @@ public class TabViewModel : ViewModelBase {
 			this.Content.Value = content;
 			content.Reload();
 		} catch {
-			this._isLoaded = false;
+			this._isLoadStarted = false;
 			throw;
 		}
 	}
