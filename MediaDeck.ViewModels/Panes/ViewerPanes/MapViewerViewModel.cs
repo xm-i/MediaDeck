@@ -1,5 +1,6 @@
 using MediaDeck.Composition.Interfaces.MediaItemTypes.ViewModels;
 using MediaDeck.Composition.Interfaces.Primitives;
+using MediaDeck.Composition.Interfaces.Services;
 using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Core.Models.Files;
@@ -23,14 +24,16 @@ public class MapViewerViewModel : ViewerPaneViewModelBase {
 	/// <param name="tabState">タブ状態モデル。</param>
 	/// <param name="locationFactory">位置情報ファクトリ。</param>
 	/// <param name="executionConfig">外部実行設定モデル。</param>
+	/// <param name="clipboardService">クリップボード操作サービス。</param>
 	public MapViewerViewModel(
 		FilesManager filesManager,
 		MediaContentLibraryViewModel mediaContentLibraryViewModel,
 		SearchConditionManagerViewModel searchConditionManagerViewModel,
 		TabStateModel tabState,
 		ILocationFactory locationFactory,
-		ExecutionConfigModel executionConfig)
-		: base(ViewerType.Map, "Map", "\uE800", filesManager, mediaContentLibraryViewModel, searchConditionManagerViewModel, tabState, executionConfig) {
+		ExecutionConfigModel executionConfig,
+		IClipboardService clipboardService)
+		: base(ViewerType.Map, "Map", "\uE800", filesManager, mediaContentLibraryViewModel, searchConditionManagerViewModel, tabState, executionConfig, clipboardService) {
 		this._locationFactory = locationFactory;
 
 		this.Center = new BindableReactiveProperty<ILocation>(this._locationFactory.Create(35, 135)).AddTo(this.CompositeDisposable);

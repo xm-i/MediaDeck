@@ -1,3 +1,4 @@
+using MediaDeck.Composition.Interfaces.Services;
 using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Core.Models.Files;
@@ -13,5 +14,6 @@ public class WrapViewerViewModel(
 	MediaContentLibraryViewModel mediaContentLibraryViewModel,
 	SearchConditionManagerViewModel searchConditionManagerViewModel,
 	TabStateModel tabState,
-	ExecutionConfigModel executionConfig)
-	: ViewerPaneViewModelBase(ViewerType.Wrap, "Wrap", "\uE80A", filesManager, mediaContentLibraryViewModel, searchConditionManagerViewModel, tabState, executionConfig);
+	ExecutionConfigModel executionConfig,
+	IClipboardService clipboardService)
+	: ViewerPaneViewModelBase(ViewerType.Wrap, "Wrap", "\uE80A", filesManager, mediaContentLibraryViewModel, searchConditionManagerViewModel, tabState, executionConfig, clipboardService);

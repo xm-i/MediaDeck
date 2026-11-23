@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using MediaDeck.Composition.Interfaces;
+using MediaDeck.Composition.Interfaces.Services;
 using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Core.Models.Files;
@@ -43,14 +44,16 @@ public class ListViewerViewModel : ViewerPaneViewModelBase {
 	/// <param name="tabState">タブ状態モデル</param>
 	/// <param name="stringProvider">文字列プロバイダー</param>
 	/// <param name="executionConfig">外部実行設定モデル</param>
+	/// <param name="clipboardService">クリップボード操作サービス</param>
 	public ListViewerViewModel(
 		FilesManager filesManager,
 		MediaContentLibraryViewModel mediaContentLibraryViewModel,
 		SearchConditionManagerViewModel searchConditionManagerViewModel,
 		TabStateModel tabState,
 		IStringProvider stringProvider,
-		ExecutionConfigModel executionConfig)
-		: base(ViewerType.List, "List", "\uE8FD", filesManager, mediaContentLibraryViewModel, searchConditionManagerViewModel, tabState, executionConfig) {
+		ExecutionConfigModel executionConfig,
+		IClipboardService clipboardService)
+		: base(ViewerType.List, "List", "\uE8FD", filesManager, mediaContentLibraryViewModel, searchConditionManagerViewModel, tabState, executionConfig, clipboardService) {
 		var viewerState = tabState.ViewerState;
 
 		ListViewerColumn CreateBoundColumn(string columnId, string header, double defaultWidth, double minWidth, bool defaultVisible = true) {

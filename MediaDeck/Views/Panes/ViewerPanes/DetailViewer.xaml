@@ -32,6 +32,7 @@
 				SelectedItem="{x:Bind ViewModel.MediaContentLibraryViewModel.SelectedFile.Value, Mode=TwoWay}"
 				SelectionMode="Single"
 				SelectionChanged="List_SelectionChanged"
+				RightTapped="List_RightTapped"
 				BringIntoViewRequested="List_BringIntoViewRequested"
 				SizeChanged="List_SizeChanged"
 				ShowsScrollingPlaceholders="False"

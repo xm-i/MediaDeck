@@ -1,4 +1,5 @@
 using MediaDeck.Composition.Interfaces.MediaItemTypes.ViewModels;
+using MediaDeck.Composition.Interfaces.Services;
 using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Core.Models.Files;
@@ -18,13 +19,15 @@ public class DetailViewerViewModel : ViewerPaneViewModelBase, IDetailViewerViewM
 	/// <param name="searchConditionManagerViewModel">検索条件マネージャ ViewModel。</param>
 	/// <param name="tabState">タブ状態モデル。</param>
 	/// <param name="executionConfig">外部実行設定モデル。</param>
+	/// <param name="clipboardService">クリップボード操作サービス。</param>
 	public DetailViewerViewModel(
 		FilesManager filesManager,
 		MediaContentLibraryViewModel mediaContentLibraryViewModel,
 		SearchConditionManagerViewModel searchConditionManagerViewModel,
 		TabStateModel tabState,
-		ExecutionConfigModel executionConfig)
-		: base(ViewerType.Detail, "Detail", "\uE954", filesManager, mediaContentLibraryViewModel, searchConditionManagerViewModel, tabState, executionConfig) {
+		ExecutionConfigModel executionConfig,
+		IClipboardService clipboardService)
+		: base(ViewerType.Detail, "Detail", "\uE954", filesManager, mediaContentLibraryViewModel, searchConditionManagerViewModel, tabState, executionConfig, clipboardService) {
 		this.SelectedFile = new BindableReactiveProperty<IMediaItemViewModel?>(null).AddTo(this.CompositeDisposable);
 		this.SelectedFilePath = new BindableReactiveProperty<string?>(null).AddTo(this.CompositeDisposable);
 		this.SelectedFileThumbnailFilePath = new BindableReactiveProperty<string?>(null).AddTo(this.CompositeDisposable);

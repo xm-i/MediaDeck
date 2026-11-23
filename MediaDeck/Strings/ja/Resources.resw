@@ -475,21 +475,6 @@
   <data name="Viewer_ColumnRate.Text" xml:space="preserve">
     <value>評価</value>
   </data>
-  <data name="Viewer_ContextAddToAlbum.Text" xml:space="preserve">
-    <value>アルバムへ追加</value>
-  </data>
-  <data name="Viewer_ContextRecreateThumbnail.Text" xml:space="preserve">
-    <value>サムネイルを再生成</value>
-  </data>
-  <data name="Viewer_ContextUpdateMetadata.Text" xml:space="preserve">
-    <value>メタデータを更新</value>
-  </data>
-  <data name="Viewer_ContextRemoveFile.Text" xml:space="preserve">
-    <value>ファイルを削除</value>
-  </data>
-  <data name="Viewer_ContextOpenFolder.Text" xml:space="preserve">
-    <value>フォルダを開く</value>
-  </data>
   <data name="Viewer_LoadMore.Content" xml:space="preserve">
     <value>さらに読み込む</value>
   </data>
@@ -1469,12 +1454,6 @@
   </data>
 
   <!-- Viewer Context Menu & Dialogs -->
-  <data name="Viewer_ContextRemoveFileSingle" xml:space="preserve">
-    <value>ファイルをMediaDeckデータベースから削除しますか？</value>
-  </data>
-  <data name="Viewer_ContextRemoveFileMultiple" xml:space="preserve">
-    <value>{0}件のファイルをMediaDeckデータベースから削除しますか？</value>
-  </data>
   <data name="Viewer_ContextOpenWithExternal" xml:space="preserve">
     <value>外部プログラムで開く</value>
   </data>
@@ -1484,8 +1463,32 @@
   <data name="Viewer_ContextDefaultSuffix" xml:space="preserve">
     <value> (既定)</value>
   </data>
+  <data name="Viewer_ContextOpenFolder" xml:space="preserve">
+    <value>フォルダを開く</value>
+  </data>
+  <data name="Viewer_ContextCopyFilePath" xml:space="preserve">
+    <value>ファイルパスをコピー</value>
+  </data>
+  <data name="Viewer_ContextAddToAlbum" xml:space="preserve">
+    <value>アルバムへ追加</value>
+  </data>
   <data name="Viewer_ContextCreateNewAlbum" xml:space="preserve">
     <value>アルバムを新規作成</value>
+  </data>
+  <data name="Viewer_ContextRecreateThumbnail" xml:space="preserve">
+    <value>サムネイルを再生成</value>
+  </data>
+  <data name="Viewer_ContextUpdateMetadata" xml:space="preserve">
+    <value>メタデータを更新</value>
+  </data>
+  <data name="Viewer_ContextRemoveFile" xml:space="preserve">
+    <value>データベースから削除</value>
+  </data>
+  <data name="Viewer_ContextRemoveFileSingle" xml:space="preserve">
+    <value>ファイルをMediaDeckデータベースから削除しますか？</value>
+  </data>
+  <data name="Viewer_ContextRemoveFileMultiple" xml:space="preserve">
+    <value>{0}件のファイルをMediaDeckデータベースから削除しますか？</value>
   </data>
 
   <!-- FolderManager Dialogs -->

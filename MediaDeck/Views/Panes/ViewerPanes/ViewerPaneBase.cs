@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using MediaDeck.Composition.Interfaces;
+using MediaDeck.Composition.Interfaces.MediaItemTypes.Models;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.ViewModels;
 using MediaDeck.Core.Stores.Config;
 using MediaDeck.Services;
@@ -11,7 +12,9 @@ using MediaDeck.Views.Thumbnails;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media;
 using Serilog;
 using Windows.System;
 using Windows.UI.Core;
@@ -24,13 +27,19 @@ namespace MediaDeck.Views.Panes.ViewerPanes;
 /// </summary>
 /// <typeparam name="T">ビューアの ViewModel 型。</typeparam>
 public abstract class ViewerPaneBase<T> : UserControlBase<T> where T : ViewerPaneViewModelBase {
-	private const string AddToAlbumRootTag = "AddToAlbumRoot";
-	private const string AddToAlbumItemTagPrefix = "AddToAlbum:";
-	private const string AddToAlbumCreateTag = "AddToAlbum:Create";
+	private const string OpenWithIconGlyph = "\uE7AC";
+	private const string OpenFolderIconGlyph = "\uE838";
+	private const string CopyIconGlyph = "\uE8C8";
+	private const string AlbumIconGlyph = "\uE8FD";
+	private const string CreateAlbumIconGlyph = "\uE710";
+	private const string RecreateThumbnailIconGlyph = "\uEB9F";
+	private const string UpdateMetadataIconGlyph = "\uE72C";
+	private const string RemoveFileIconGlyph = "\uE74D";
+
 	private readonly IWindowService _windowService;
 	private readonly IStringProvider _stringProvider;
-	private IMediaItemViewModel? _contextMenuTargetFile;
 	private int _contextMenuOpeningVersion;
+	private bool _isDialogOpen;
 
 	/// <summary>
 	/// <see cref="ViewerPaneBase{T}"/> クラスの新しいインスタンスを初期化します。
@@ -74,173 +83,189 @@ public abstract class ViewerPaneBase<T> : UserControlBase<T> where T : ViewerPan
 	}
 
 	/// <summary>
-	/// ファイルアイテムの右タップハンドラ。コンテキストメニューを表示します。
+	/// ファイルアイテムの右タップハンドラ。共通コンテキストメニューを構築して表示します。
 	/// </summary>
 	/// <param name="sender">イベント発生元。</param>
 	/// <param name="e">イベント引数。</param>
 	protected void List_RightTapped(object sender, RightTappedRoutedEventArgs e) {
-		if (sender is not FrameworkElement parentControl) {
+		if (sender is not FrameworkElement parentControl || this.ViewModel is null) {
 			return;
 		}
 
-		var element = e.OriginalSource as FrameworkElement;
-		while (element != null && element.DataContext is not IMediaItemViewModel) {
-			element = element.Parent as FrameworkElement;
-		}
-
-		if (element?.DataContext is not IMediaItemViewModel fileViewModel) {
-			return;
-		}
-		this._contextMenuTargetFile = fileViewModel;
-
-		if (parentControl.Resources["FileContextMenu"] is not MenuFlyout menuFlyout) {
+		var targetElement = FindMediaItemElement(e.OriginalSource as DependencyObject, parentControl);
+		if (targetElement?.DataContext is not IMediaItemViewModel fileViewModel) {
 			return;
 		}
 
-		menuFlyout.ShowAt(element, e.GetPosition(element));
+		var menuFlyout = this.CreateFileContextMenu(fileViewModel);
+		menuFlyout.ShowAt(targetElement, new FlyoutShowOptions {
+			Position = e.GetPosition(targetElement),
+		});
+		e.Handled = true;
 	}
 
 	/// <summary>
-	/// コンテキストメニュー項目のクリックハンドラ。
+	/// ビジュアルツリーを親方向へ遡り、<see cref="IMediaItemViewModel"/> を DataContext に持つ要素を検索します。
 	/// </summary>
-	/// <param name="sender">イベント発生元。</param>
-	/// <param name="e">イベント引数。</param>
-	protected async void MenuFlyoutItem_Click(object sender, RoutedEventArgs e) {
-		if (this.ViewModel is null) {
-			return;
-		}
-		if (sender is not MenuFlyoutItem selectedItem) {
-			return;
-		}
-
-		var fvm = this._contextMenuTargetFile;
-		if (fvm is null) {
-			return;
-		}
-
-		var selectedFiles = this.ViewModel.MediaContentLibraryViewModel.SelectedFiles.Value;
-		var targetFiles = selectedFiles is { Length: > 0 } && selectedFiles.Contains(fvm) ? selectedFiles : [fvm];
-		var tag = selectedItem.Tag?.ToString();
-
-		if (tag == AddToAlbumCreateTag) {
-			await this.CreateAlbumAndAddItemsAsync(targetFiles);
-			return;
-		}
-		if (tag is { } t && t.StartsWith(AddToAlbumItemTagPrefix, StringComparison.Ordinal) && t != AddToAlbumCreateTag) {
-			var albumPath = t[AddToAlbumItemTagPrefix.Length..];
-			if (!string.IsNullOrWhiteSpace(albumPath)) {
-				await this.ViewModel.AddToAlbumAsync(albumPath, targetFiles);
+	/// <param name="source">探索開始要素。</param>
+	/// <param name="root">探索を打ち切る親要素。</param>
+	/// <returns>見つかった要素。存在しない場合は <c>null</c>。</returns>
+	private static FrameworkElement? FindMediaItemElement(DependencyObject? source, DependencyObject root) {
+		var current = source;
+		while (current != null && !ReferenceEquals(current, root)) {
+			if (current is FrameworkElement { DataContext: IMediaItemViewModel } fe) {
+				return fe;
 			}
-			return;
+			current = VisualTreeHelper.GetParent(current);
 		}
-
-		switch (tag) {
-			case "RecreateThumbnail":
-				if (targetFiles.Length > 1) {
-					this._windowService.ActivateCentered<BulkThumbnailRegenerationWindow>(this, bulkWindow => {
-						bulkWindow.ViewModel.Initialize(targetFiles);
-					});
-				} else {
-					this._windowService.ActivateCentered<ThumbnailPickerWindow>(this, window => {
-						window.ViewModel.FileViewModel.Value = fvm;
-					});
-				}
-				break;
-			case "RemoveFile": {
-					var message = targetFiles.Length == 1
-						? this._stringProvider.GetString("Viewer_ContextRemoveFileSingle")
-						: this._stringProvider.GetString("Viewer_ContextRemoveFileMultiple", targetFiles.Length);
-
-					var dialog = new ContentDialog {
-						XamlRoot = this.XamlRoot,
-						Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
-						Title = message,
-						PrimaryButtonText = this._stringProvider.GetString("DialogButton_Yes"),
-						SecondaryButtonText = this._stringProvider.GetString("DialogButton_No"),
-						CloseButtonText = this._stringProvider.GetString("DialogButton_Cancel"),
-						DefaultButton = ContentDialogButton.Primary
-					};
-					using var disposable = new CompositeDisposable();
-					ThemeHelper.BindTheme(dialog, Ioc.Default.GetRequiredService<IConfigStore>(), disposable);
-
-					var result = await dialog.ShowAsync();
-					if (result == ContentDialogResult.Primary) {
-						await this.ViewModel.DeleteFilesAndReloadAsync(targetFiles);
-					}
-					break;
-				}
-			case "UpdateMetadata":
-				this.ViewModel.UpdateMetadata(targetFiles);
-				break;
-			case "OpenFolder":
-				this.ViewModel.ShowInExplorer(fvm);
-				break;
-		}
+		return null;
 	}
 
 	/// <summary>
-	/// ファイルコンテキストメニュー展開前の処理。動的な外部プログラム項目などを構築します。
+	/// メディアアイテム用のコンテキストメニューを構築します。
 	/// </summary>
-	/// <param name="sender">イベント発生元。</param>
-	/// <param name="e">イベント引数。</param>
-	protected void FileContextMenu_Opening(object sender, object e) {
-		if (sender is not MenuFlyout menuFlyout || this.ViewModel is null) {
-			return;
+	/// <param name="targetFile">右クリック対象のメディアアイテム。</param>
+	/// <returns>構築された <see cref="MenuFlyout"/>。</returns>
+	private MenuFlyout CreateFileContextMenu(IMediaItemViewModel targetFile) {
+		var menuFlyout = new MenuFlyout();
+
+		this.AddOpenAndLinkSection(menuFlyout, targetFile);
+		menuFlyout.Items.Add(new MenuFlyoutSeparator());
+		this.AddCollectionSection(menuFlyout, targetFile);
+		menuFlyout.Items.Add(new MenuFlyoutSeparator());
+		this.AddMaintenanceSection(menuFlyout, targetFile);
+		menuFlyout.Items.Add(new MenuFlyoutSeparator());
+		this.AddDeleteSection(menuFlyout, targetFile);
+
+		return menuFlyout;
+	}
+
+	/// <summary>
+	/// 「開く・外部連携」セクションのメニュー項目を追加します。
+	/// </summary>
+	/// <param name="menuFlyout">追加先のメニュー。</param>
+	/// <param name="targetFile">対象のメディアアイテム。</param>
+	private void AddOpenAndLinkSection(MenuFlyout menuFlyout, IMediaItemViewModel targetFile) {
+		var programs = this.ViewModel!.GetExternalPrograms(targetFile.MediaType);
+		foreach (var program in programs) {
+			var name = string.IsNullOrWhiteSpace(program.Name.Value)
+				? this._stringProvider.GetString("Viewer_ContextOpenWithExternal")
+				: this._stringProvider.GetString("Viewer_ContextOpenWithFormat", program.Name.Value);
+			var displayText = program.IsDefault.Value
+				? $"{name}{this._stringProvider.GetString("Viewer_ContextDefaultSuffix")}"
+				: name;
+			var capturedProgram = program;
+			menuFlyout.Items.Add(CreateMenuItem(
+				displayText,
+				OpenWithIconGlyph,
+				async (_, _) => await this.ExecuteExternalProgramAsync(capturedProgram, targetFile)));
 		}
 
-		var fvm = this._contextMenuTargetFile;
-		if (fvm is null) {
-			return;
-		}
+		menuFlyout.Items.Add(CreateMenuItem(
+			this._stringProvider.GetString("Viewer_ContextOpenFolder"),
+			OpenFolderIconGlyph,
+			(_, _) => this.ViewModel?.ShowInExplorer(targetFile)));
 
-		var itemsToRemove = menuFlyout.Items.Where(x => x.Tag?.ToString()?.StartsWith("ExecuteProgram:") == true).ToList();
-		foreach (var item in itemsToRemove) {
-			menuFlyout.Items.Remove(item);
-		}
-		var sepToRemove = menuFlyout.Items.FirstOrDefault(x => x.Tag?.ToString() == "ExecuteProgramSeparator");
-		if (sepToRemove != null) {
-			menuFlyout.Items.Remove(sepToRemove);
-		}
+		menuFlyout.Items.Add(CreateMenuItem(
+			this._stringProvider.GetString("Viewer_ContextCopyFilePath"),
+			CopyIconGlyph,
+			(_, _) => this.CopyFilePaths(targetFile)));
+	}
 
-		var programs = this.ViewModel.GetExternalPrograms(fvm.MediaType);
+	/// <summary>
+	/// 「コレクション整理」セクションのメニュー項目を追加します。
+	/// </summary>
+	/// <param name="menuFlyout">追加先のメニュー。</param>
+	/// <param name="targetFile">対象のメディアアイテム。</param>
+	private void AddCollectionSection(MenuFlyout menuFlyout, IMediaItemViewModel targetFile) {
+		var addRoot = new MenuFlyoutSubItem {
+			Text = this._stringProvider.GetString("Viewer_ContextAddToAlbum"),
+			Icon = CreateFontIcon(AlbumIconGlyph),
+		};
 
-		if (programs.Count > 0) {
-			int index = 0;
-			foreach (var program in programs) {
-				var name = string.IsNullOrWhiteSpace(program.Name.Value)
-					? this._stringProvider.GetString("Viewer_ContextOpenWithExternal")
-					: this._stringProvider.GetString("Viewer_ContextOpenWithFormat", program.Name.Value);
-				var item = new MenuFlyoutItem {
-					Text = program.IsDefault.Value ? $"{name}{this._stringProvider.GetString("Viewer_ContextDefaultSuffix")}" : name,
-					Tag = $"ExecuteProgram:{program.GetHashCode()}",
-				};
-				item.Click += async (s, args) => {
-					var targetFiles = this.ViewModel.MediaContentLibraryViewModel.SelectedFiles.Value;
-					var filesToExecute = targetFiles is { Length: > 0 } && targetFiles.Contains(fvm) ? targetFiles : [fvm];
-					await this.ViewModel.ExecuteFilesAsync(program, filesToExecute);
-				};
-				menuFlyout.Items.Insert(index++, item);
-			}
-			var separator = new MenuFlyoutSeparator { Tag = "ExecuteProgramSeparator" };
-			menuFlyout.Items.Insert(index, separator);
-		}
+		// 読み込み完了前や取得失敗時にもサブメニューが空にならないよう、新規作成項目を先行配置する
+		addRoot.Items.Add(this.CreateNewAlbumMenuItem(targetFile));
+		menuFlyout.Items.Add(addRoot);
 
-		var addRoot = menuFlyout.Items.OfType<MenuFlyoutSubItem>().FirstOrDefault(x => x.Tag?.ToString() == AddToAlbumRootTag);
-		if (addRoot is null) {
-			return;
-		}
-
-		addRoot.Items.Clear();
 		var version = ++this._contextMenuOpeningVersion;
-		_ = this.PopulateRecentAlbumsAsync(addRoot, version);
+		_ = this.PopulateRecentAlbumsAsync(addRoot, targetFile, version);
+	}
+
+	/// <summary>
+	/// 「メディアメンテナンス」セクションのメニュー項目を追加します。
+	/// </summary>
+	/// <param name="menuFlyout">追加先のメニュー。</param>
+	/// <param name="targetFile">対象のメディアアイテム。</param>
+	private void AddMaintenanceSection(MenuFlyout menuFlyout, IMediaItemViewModel targetFile) {
+		menuFlyout.Items.Add(CreateMenuItem(
+			this._stringProvider.GetString("Viewer_ContextRecreateThumbnail"),
+			RecreateThumbnailIconGlyph,
+			(_, _) => this.OpenThumbnailRegeneration(targetFile)));
+
+		menuFlyout.Items.Add(CreateMenuItem(
+			this._stringProvider.GetString("Viewer_ContextUpdateMetadata"),
+			UpdateMetadataIconGlyph,
+			(_, _) => this.UpdateMetadata(targetFile)));
+	}
+
+	/// <summary>
+	/// 「削除」セクションのメニュー項目を追加します。
+	/// </summary>
+	/// <param name="menuFlyout">追加先のメニュー。</param>
+	/// <param name="targetFile">対象のメディアアイテム。</param>
+	private void AddDeleteSection(MenuFlyout menuFlyout, IMediaItemViewModel targetFile) {
+		menuFlyout.Items.Add(CreateMenuItem(
+			this._stringProvider.GetString("Viewer_ContextRemoveFile"),
+			RemoveFileIconGlyph,
+			async (_, _) => await this.ConfirmAndRemoveFilesAsync(targetFile)));
+	}
+
+	/// <summary>
+	/// 指定されたテキスト・アイコン・クリックハンドラを持つ <see cref="MenuFlyoutItem"/> を生成します。
+	/// </summary>
+	/// <param name="text">メニュー表示文字列。</param>
+	/// <param name="iconGlyph">アイコングリフ。</param>
+	/// <param name="onClick">クリック時のハンドラ。</param>
+	/// <returns>生成された <see cref="MenuFlyoutItem"/>。</returns>
+	private static MenuFlyoutItem CreateMenuItem(string text, string iconGlyph, RoutedEventHandler onClick) {
+		var item = new MenuFlyoutItem {
+			Text = text,
+			Icon = CreateFontIcon(iconGlyph),
+		};
+		item.Click += onClick;
+		return item;
+	}
+
+	/// <summary>
+	/// 指定されたグリフを持つ <see cref="FontIcon"/> を生成します。
+	/// </summary>
+	/// <param name="glyph">フォントグリフ。</param>
+	/// <returns>生成された <see cref="FontIcon"/>。</returns>
+	private static FontIcon CreateFontIcon(string glyph) {
+		return new FontIcon {
+			Glyph = glyph,
+		};
+	}
+
+	/// <summary>
+	/// 「アルバムを新規作成」のサブメニュー項目を生成します。
+	/// </summary>
+	/// <param name="targetFile">対象のメディアアイテム。</param>
+	/// <returns>生成された <see cref="MenuFlyoutItem"/>。</returns>
+	private MenuFlyoutItem CreateNewAlbumMenuItem(IMediaItemViewModel targetFile) {
+		return CreateMenuItem(
+			this._stringProvider.GetString("Viewer_ContextCreateNewAlbum"),
+			CreateAlbumIconGlyph,
+			async (_, _) => await this.CreateAlbumAndAddItemsAsync(targetFile));
 	}
 
 	/// <summary>
 	/// コンテキストメニューの最近使用したアルバム一覧を非同期に読み込み、サブメニューを構築します。
 	/// </summary>
 	/// <param name="addRoot">構築対象のルートサブメニュー。</param>
+	/// <param name="targetFile">対象のメディアアイテム。</param>
 	/// <param name="version">競合検知用のメニュー展開バージョン。</param>
-	private async Task PopulateRecentAlbumsAsync(MenuFlyoutSubItem addRoot, int version) {
+	private async Task PopulateRecentAlbumsAsync(MenuFlyoutSubItem addRoot, IMediaItemViewModel targetFile, int version) {
 		try {
 			if (this.ViewModel is null) {
 				return;
@@ -253,39 +278,161 @@ public abstract class ViewerPaneBase<T> : UserControlBase<T> where T : ViewerPan
 
 			addRoot.Items.Clear();
 			foreach (var path in paths) {
-				var item = new MenuFlyoutItem {
-					Text = path,
-					Tag = $"{AddToAlbumItemTagPrefix}{path}",
-				};
-				item.Click += this.MenuFlyoutItem_Click;
-				addRoot.Items.Add(item);
+				var capturedPath = path;
+				addRoot.Items.Add(CreateMenuItem(
+					capturedPath,
+					AlbumIconGlyph,
+					async (_, _) => await this.AddToAlbumAsync(capturedPath, targetFile)));
 			}
 			if (addRoot.Items.Count > 0) {
 				addRoot.Items.Add(new MenuFlyoutSeparator());
 			}
-			var createItem = new MenuFlyoutItem {
-				Text = this._stringProvider.GetString("Viewer_ContextCreateNewAlbum"),
-				Tag = AddToAlbumCreateTag,
-			};
-			createItem.Click += this.MenuFlyoutItem_Click;
-			addRoot.Items.Add(createItem);
+			addRoot.Items.Add(this.CreateNewAlbumMenuItem(targetFile));
 		} catch (Exception ex) {
 			Log.Error(ex, "コンテキストメニューの最近使用したアルバム一覧の読み込みに失敗しました。");
 		}
 	}
 
-	private async Task CreateAlbumAndAddItemsAsync(IMediaItemViewModel[] targetFiles) {
+	/// <summary>
+	/// 指定された外部プログラムで対象ファイル群を実行します。
+	/// </summary>
+	/// <param name="program">実行する外部プログラム設定。</param>
+	/// <param name="targetFile">右クリック対象のメディアアイテム。</param>
+	private async Task ExecuteExternalProgramAsync(IExecutionProgramObjectModel program, IMediaItemViewModel targetFile) {
 		if (this.ViewModel is null) {
 			return;
 		}
-		var dialog = Ioc.Default.GetRequiredService<NewAlbumDialog>();
-		dialog.XamlRoot = this.XamlRoot;
-		dialog.Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style;
-		var result = await dialog.ShowAsync();
-		if (result != ContentDialogResult.Primary || string.IsNullOrWhiteSpace(dialog.FullAlbumPath)) {
+		try {
+			var targetFiles = this.ViewModel.ResolveContextMenuTargetFiles(targetFile);
+			await this.ViewModel.ExecuteFilesAsync(program, targetFiles);
+		} catch (Exception ex) {
+			Log.Error(ex, "外部プログラムによるファイル実行に失敗しました。");
+		}
+	}
+
+	/// <summary>
+	/// 対象ファイル群のパスをクリップボードへコピーします。
+	/// </summary>
+	/// <param name="targetFile">右クリック対象のメディアアイテム。</param>
+	private void CopyFilePaths(IMediaItemViewModel targetFile) {
+		if (this.ViewModel is null) {
 			return;
 		}
-		await this.ViewModel.AddToAlbumAsync(dialog.FullAlbumPath, targetFiles);
+		var targetFiles = this.ViewModel.ResolveContextMenuTargetFiles(targetFile);
+		this.ViewModel.CopyFilePaths(targetFiles);
+	}
+
+	/// <summary>
+	/// 指定パスのアルバムへ対象ファイル群を追加します。
+	/// </summary>
+	/// <param name="albumPath">追加先のアルバムパス。</param>
+	/// <param name="targetFile">右クリック対象のメディアアイテム。</param>
+	private async Task AddToAlbumAsync(string albumPath, IMediaItemViewModel targetFile) {
+		if (this.ViewModel is null) {
+			return;
+		}
+		try {
+			var targetFiles = this.ViewModel.ResolveContextMenuTargetFiles(targetFile);
+			await this.ViewModel.AddToAlbumAsync(albumPath, targetFiles);
+		} catch (Exception ex) {
+			Log.Error(ex, "アルバムへのアイテム追加に失敗しました。AlbumPath={AlbumPath}", albumPath);
+		}
+	}
+
+	/// <summary>
+	/// 新規アルバム作成ダイアログを表示し、作成されたアルバムへ対象ファイル群を追加します。
+	/// </summary>
+	/// <param name="targetFile">右クリック対象のメディアアイテム。</param>
+	private async Task CreateAlbumAndAddItemsAsync(IMediaItemViewModel targetFile) {
+		if (this.ViewModel is null || this.XamlRoot is null || this._isDialogOpen) {
+			return;
+		}
+		this._isDialogOpen = true;
+		try {
+			var targetFiles = this.ViewModel.ResolveContextMenuTargetFiles(targetFile);
+			var dialog = Ioc.Default.GetRequiredService<NewAlbumDialog>();
+			dialog.XamlRoot = this.XamlRoot;
+			dialog.Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style;
+			var result = await dialog.ShowAsync();
+			if (result != ContentDialogResult.Primary || string.IsNullOrWhiteSpace(dialog.FullAlbumPath)) {
+				return;
+			}
+			await this.ViewModel.AddToAlbumAsync(dialog.FullAlbumPath, targetFiles);
+		} catch (Exception ex) {
+			Log.Error(ex, "新規アルバム作成およびアイテム追加に失敗しました。");
+		} finally {
+			this._isDialogOpen = false;
+		}
+	}
+
+	/// <summary>
+	/// 対象ファイル群のサムネイル再生成ウィンドウを表示します。
+	/// </summary>
+	/// <param name="targetFile">右クリック対象のメディアアイテム。</param>
+	private void OpenThumbnailRegeneration(IMediaItemViewModel targetFile) {
+		if (this.ViewModel is null) {
+			return;
+		}
+		var targetFiles = this.ViewModel.ResolveContextMenuTargetFiles(targetFile);
+		if (targetFiles.Length > 1) {
+			this._windowService.ActivateCentered<BulkThumbnailRegenerationWindow>(this, bulkWindow => {
+				bulkWindow.ViewModel.Initialize(targetFiles);
+			});
+		} else {
+			this._windowService.ActivateCentered<ThumbnailPickerWindow>(this, window => {
+				window.ViewModel.FileViewModel.Value = targetFile;
+			});
+		}
+	}
+
+	/// <summary>
+	/// 対象ファイル群のメタデータ更新を要求します。
+	/// </summary>
+	/// <param name="targetFile">右クリック対象のメディアアイテム。</param>
+	private void UpdateMetadata(IMediaItemViewModel targetFile) {
+		if (this.ViewModel is null) {
+			return;
+		}
+		var targetFiles = this.ViewModel.ResolveContextMenuTargetFiles(targetFile);
+		this.ViewModel.UpdateMetadata(targetFiles);
+	}
+
+	/// <summary>
+	/// データベースからの削除確認ダイアログを表示し、承認された場合に対象ファイル群を削除します。
+	/// </summary>
+	/// <param name="targetFile">右クリック対象のメディアアイテム。</param>
+	private async Task ConfirmAndRemoveFilesAsync(IMediaItemViewModel targetFile) {
+		if (this.ViewModel is null || this.XamlRoot is null || this._isDialogOpen) {
+			return;
+		}
+		this._isDialogOpen = true;
+		try {
+			var targetFiles = this.ViewModel.ResolveContextMenuTargetFiles(targetFile);
+			var message = targetFiles.Length == 1
+				? this._stringProvider.GetString("Viewer_ContextRemoveFileSingle")
+				: this._stringProvider.GetString("Viewer_ContextRemoveFileMultiple", targetFiles.Length);
+
+			var dialog = new ContentDialog {
+				XamlRoot = this.XamlRoot,
+				Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
+				Title = message,
+				PrimaryButtonText = this._stringProvider.GetString("DialogButton_Yes"),
+				SecondaryButtonText = this._stringProvider.GetString("DialogButton_No"),
+				CloseButtonText = this._stringProvider.GetString("DialogButton_Cancel"),
+				DefaultButton = ContentDialogButton.Primary,
+			};
+			using var disposable = new CompositeDisposable();
+			ThemeHelper.BindTheme(dialog, Ioc.Default.GetRequiredService<IConfigStore>(), disposable);
+
+			var result = await dialog.ShowAsync();
+			if (result == ContentDialogResult.Primary) {
+				await this.ViewModel.DeleteFilesAndReloadAsync(targetFiles);
+			}
+		} catch (Exception ex) {
+			Log.Error(ex, "ファイルのデータベースからの削除に失敗しました。");
+		} finally {
+			this._isDialogOpen = false;
+		}
 	}
 
 	/// <summary>

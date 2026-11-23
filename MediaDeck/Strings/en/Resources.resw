@@ -475,21 +475,6 @@
   <data name="Viewer_ColumnRate.Text" xml:space="preserve">
     <value>Rating</value>
   </data>
-  <data name="Viewer_ContextAddToAlbum.Text" xml:space="preserve">
-    <value>Add to Album</value>
-  </data>
-  <data name="Viewer_ContextRecreateThumbnail.Text" xml:space="preserve">
-    <value>Recreate Thumbnail</value>
-  </data>
-  <data name="Viewer_ContextUpdateMetadata.Text" xml:space="preserve">
-    <value>Update Metadata</value>
-  </data>
-  <data name="Viewer_ContextRemoveFile.Text" xml:space="preserve">
-    <value>Remove File</value>
-  </data>
-  <data name="Viewer_ContextOpenFolder.Text" xml:space="preserve">
-    <value>Open Folder</value>
-  </data>
   <data name="Viewer_LoadMore.Content" xml:space="preserve">
     <value>Load More</value>
   </data>
@@ -1469,12 +1454,6 @@
   </data>
 
   <!-- Viewer Context Menu & Dialogs -->
-  <data name="Viewer_ContextRemoveFileSingle" xml:space="preserve">
-    <value>Remove file from MediaDeck database?</value>
-  </data>
-  <data name="Viewer_ContextRemoveFileMultiple" xml:space="preserve">
-    <value>Remove {0} files from MediaDeck database?</value>
-  </data>
   <data name="Viewer_ContextOpenWithExternal" xml:space="preserve">
     <value>Open with external program</value>
   </data>
@@ -1484,8 +1463,32 @@
   <data name="Viewer_ContextDefaultSuffix" xml:space="preserve">
     <value> (Default)</value>
   </data>
+  <data name="Viewer_ContextOpenFolder" xml:space="preserve">
+    <value>Open Folder</value>
+  </data>
+  <data name="Viewer_ContextCopyFilePath" xml:space="preserve">
+    <value>Copy File Path</value>
+  </data>
+  <data name="Viewer_ContextAddToAlbum" xml:space="preserve">
+    <value>Add to Album</value>
+  </data>
   <data name="Viewer_ContextCreateNewAlbum" xml:space="preserve">
     <value>Create New Album</value>
+  </data>
+  <data name="Viewer_ContextRecreateThumbnail" xml:space="preserve">
+    <value>Recreate Thumbnail</value>
+  </data>
+  <data name="Viewer_ContextUpdateMetadata" xml:space="preserve">
+    <value>Update Metadata</value>
+  </data>
+  <data name="Viewer_ContextRemoveFile" xml:space="preserve">
+    <value>Remove from Database</value>
+  </data>
+  <data name="Viewer_ContextRemoveFileSingle" xml:space="preserve">
+    <value>Remove file from MediaDeck database?</value>
+  </data>
+  <data name="Viewer_ContextRemoveFileMultiple" xml:space="preserve">
+    <value>Remove {0} files from MediaDeck database?</value>
   </data>
 
   <!-- FolderManager Dialogs -->

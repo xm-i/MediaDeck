@@ -24,21 +24,6 @@
 				</ItemsPanelTemplate>
 			</GridView.ItemsPanel>
 			<GridView.Resources>
-				<MenuFlyout x:Key="FileContextMenu" Opening="FileContextMenu_Opening" >
-					<MenuFlyoutSubItem x:Uid="Viewer_ContextAddToAlbum" Tag="AddToAlbumRoot" />
-					<MenuFlyoutItem x:Uid="Viewer_ContextRecreateThumbnail"
-						Click="MenuFlyoutItem_Click"
-						Tag="RecreateThumbnail" />
-					<MenuFlyoutItem x:Uid="Viewer_ContextUpdateMetadata"
-						Click="MenuFlyoutItem_Click"
-						Tag="UpdateMetadata" />
-					<MenuFlyoutItem x:Uid="Viewer_ContextRemoveFile"
-						Click="MenuFlyoutItem_Click"
-						Tag="RemoveFile" />
-					<MenuFlyoutItem x:Uid="Viewer_ContextOpenFolder"
-						Click="MenuFlyoutItem_Click"
-						Tag="OpenFolder" />
-				</MenuFlyout>
 				<DataTemplate x:Key="NoOverlayThumbnailTpl" x:DataType="vmIf:IMediaItemViewModel" >
 					<Image Source="{x:Bind ThumbnailFilePath.Value, Mode=OneWay}" Stretch="Uniform" />
 				</DataTemplate>

@@ -4,6 +4,7 @@ using MediaDeck.Common.Utilities;
 using MediaDeck.Composition.Enum;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.Models;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.ViewModels;
+using MediaDeck.Composition.Interfaces.Services;
 using MediaDeck.Composition.Stores.Config.Model;
 using MediaDeck.Composition.Stores.State.Model;
 using MediaDeck.Core.Models.Files;
@@ -23,6 +24,7 @@ public abstract class ViewerPaneViewModelBase : ViewModelBase {
 
 	private readonly FilesManager _filesManager;
 	private readonly ExecutionConfigModel _executionConfig;
+	private readonly IClipboardService _clipboardService;
 
 	/// <summary>
 	/// <see cref="ViewerPaneViewModelBase"/> クラスの新しいインスタンスを初期化します。
@@ -35,6 +37,7 @@ public abstract class ViewerPaneViewModelBase : ViewModelBase {
 	/// <param name="searchConditionManagerViewModel">検索条件マネージャ ViewModel。</param>
 	/// <param name="tabState">タブ状態モデル。</param>
 	/// <param name="executionConfig">外部実行設定モデル。</param>
+	/// <param name="clipboardService">クリップボード操作サービス。</param>
 	protected ViewerPaneViewModelBase(
 		ViewerType viewerType,
 		string name,
@@ -43,9 +46,11 @@ public abstract class ViewerPaneViewModelBase : ViewModelBase {
 		MediaContentLibraryViewModel mediaContentLibraryViewModel,
 		SearchConditionManagerViewModel searchConditionManagerViewModel,
 		TabStateModel tabState,
-		ExecutionConfigModel executionConfig) {
+		ExecutionConfigModel executionConfig,
+		IClipboardService clipboardService) {
 		this._filesManager = filesManager;
 		this._executionConfig = executionConfig;
+		this._clipboardService = clipboardService;
 		this.ViewerType = viewerType;
 		this.Name = name;
 		this.IconGlyph = iconGlyph;
@@ -218,5 +223,42 @@ public abstract class ViewerPaneViewModelBase : ViewModelBase {
 		if (File.Exists(fileViewModel.FilePath) || Directory.Exists(fileViewModel.FilePath)) {
 			ShellUtility.ShowInExplorer(fileViewModel.FilePath);
 		}
+	}
+
+	/// <summary>
+	/// コンテキストメニュー操作の対象となるメディアアイテム配列を解決します。
+	/// 対象アイテムが現在の選択一覧に含まれる場合は選択一覧全体を、含まれない場合は対象アイテム単体を返します。
+	/// </summary>
+	/// <param name="targetFile">右クリック等で指定されたメディアアイテム。</param>
+	/// <returns>操作対象となるメディアアイテム配列。</returns>
+	public IMediaItemViewModel[] ResolveContextMenuTargetFiles(IMediaItemViewModel? targetFile) {
+		if (targetFile is null) {
+			return [];
+		}
+		var selectedFiles = this.MediaContentLibraryViewModel.SelectedFiles.Value;
+		if (selectedFiles is { Length: > 0 } && selectedFiles.Contains(targetFile)) {
+			return selectedFiles;
+		}
+		return [targetFile];
+	}
+
+	/// <summary>
+	/// 指定されたメディアアイテム群のファイルパスをクリップボードへコピーします。
+	/// 複数ある場合は改行区切りで連結し、大文字・小文字を区別せず重複を排除します。
+	/// </summary>
+	/// <param name="targetFiles">コピー対象のメディアアイテム一覧。</param>
+	public void CopyFilePaths(IEnumerable<IMediaItemViewModel>? targetFiles) {
+		if (targetFiles is null) {
+			return;
+		}
+		var paths = targetFiles
+			.Select(x => x.FilePath)
+			.Where(x => !string.IsNullOrWhiteSpace(x))
+			.Distinct(StringComparer.OrdinalIgnoreCase)
+			.ToArray();
+		if (paths.Length == 0) {
+			return;
+		}
+		this._clipboardService.SetText(string.Join(Environment.NewLine, paths));
 	}
 }
