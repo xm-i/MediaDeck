@@ -72,23 +72,29 @@
 			<ListBox.ItemContainerStyle>
 				<Style TargetType="ListBoxItem" >
 					<Setter Property="Padding"
-						Value="8,4" />
+						Value="0" />
 					<Setter Property="Margin"
 						Value="0,0,4,4" />
 					<Setter Property="Background"
 						Value="{ThemeResource SubtleFillColorSecondaryBrush}" />
 					<Setter Property="CornerRadius"
 						Value="4" />
+					<Setter Property="HorizontalContentAlignment"
+						Value="Stretch" />
+					<Setter Property="VerticalContentAlignment"
+						Value="Stretch" />
 				</Style>
 			</ListBox.ItemContainerStyle>
 			<ListBox.ItemTemplate>
 				<DataTemplate>
-					<Grid DoubleTapped="TagGrid_DoubleTapped"
-						RightTapped="TagGrid_RightTapped" >
+					<Grid Padding="8,4"
+						Background="Transparent"
+						DoubleTapped="TagGrid_DoubleTapped"
+						ContextRequested="TagGrid_ContextRequested" >
 						<StackPanel Orientation="Horizontal"
-							Spacing="4" >
-							<TextBlock IsTextSelectionEnabled="True"
-								Text="{Binding Value.TagName.Value}" />
+							Spacing="4"
+							VerticalAlignment="Center" >
+							<TextBlock Text="{Binding Value.TagName.Value}" />
 							<TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" >
 								<Run Text="(" />
 								<Run Text="{Binding Count}" />
@@ -99,6 +105,13 @@
 						</StackPanel>
 						<FlyoutBase.AttachedFlyout>
 							<MenuFlyout>
+								<MenuFlyoutItem x:Uid="Details_CopyTagName"
+									Command="{Binding DataContext.CopyTagNameCommand, ElementName=ControlRoot}"
+									CommandParameter="{Binding }" >
+									<MenuFlyoutItem.Icon>
+										<FontIcon Glyph="&#xE8C8;" />
+									</MenuFlyoutItem.Icon>
+								</MenuFlyoutItem>
 								<MenuFlyoutItem x:Uid="Details_OpenTagManager"
 									Command="{Binding DataContext.OpenTagManagerCommand, ElementName=ControlRoot}"
 									CommandParameter="{Binding }" >
@@ -106,6 +119,7 @@
 										<FontIcon Glyph="&#xE713;" />
 									</MenuFlyoutItem.Icon>
 								</MenuFlyoutItem>
+								<MenuFlyoutSeparator />
 								<MenuFlyoutItem x:Uid="Details_DeleteTag"
 									Command="{Binding DataContext.RemoveTagCommand, ElementName=ControlRoot}"
 									CommandParameter="{Binding }" >

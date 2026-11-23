@@ -2,6 +2,7 @@ using MediaDeck.Common.Base;
 using MediaDeck.Common.Extensions;
 using MediaDeck.Composition.Interfaces.MediaItemTypes.Models;
 using MediaDeck.Composition.Interfaces.Notifications;
+using MediaDeck.Composition.Interfaces.Services;
 using MediaDeck.Composition.Interfaces.Tags;
 using MediaDeck.Core.Models.Files;
 using MediaDeck.Core.Models.Files.SearchConditions;
@@ -102,6 +103,13 @@ public class TagsDetailViewModel : ViewModelBase {
 	} = new();
 
 	/// <summary>
+	/// タグ名コピーコマンド
+	/// </summary>
+	public ReactiveCommand<ValueCountPair<TagViewModel>> CopyTagNameCommand {
+		get;
+	} = new();
+
+	/// <summary>
 	/// タグ管理画面を開くコマンド
 	/// </summary>
 	public ReactiveCommand<ValueCountPair<TagViewModel>> OpenTagManagerCommand {
@@ -135,10 +143,12 @@ public class TagsDetailViewModel : ViewModelBase {
 	/// <param name="model">タグ詳細モデル</param>
 	/// <param name="searchConditionNotificationDispatcher">検索条件通知ディスパッチャー</param>
 	/// <param name="tagModelFactory">タグモデルファクトリー</param>
+	/// <param name="clipboardService">クリップボードサービス</param>
 	public TagsDetailViewModel(
 		TagsDetailModel model,
 		ISearchConditionNotificationDispatcher searchConditionNotificationDispatcher,
-		ITagModelFactory tagModelFactory) {
+		ITagModelFactory tagModelFactory,
+		IClipboardService clipboardService) {
 		this._model = model.AddTo(this.CompositeDisposable);
 		this.TagModelFactory = tagModelFactory;
 		this.TargetFiles.AddTo(this.CompositeDisposable);
@@ -147,6 +157,7 @@ public class TagsDetailViewModel : ViewModelBase {
 		this.OpenTagManagerRequested.AddTo(this.CompositeDisposable);
 		this.RefreshFilteredTagCandidatesCommand.AddTo(this.CompositeDisposable);
 		this.SearchTaggedFilesCommand.AddTo(this.CompositeDisposable);
+		this.CopyTagNameCommand.AddTo(this.CompositeDisposable);
 		this.OpenTagManagerCommand.AddTo(this.CompositeDisposable);
 		this.RemoveTagCommand.AddTo(this.CompositeDisposable);
 		this.AddTagCommand.AddTo(this.CompositeDisposable);
@@ -205,6 +216,12 @@ public class TagsDetailViewModel : ViewModelBase {
 				};
 				conditions.Add(condition);
 			});
+		}).AddTo(this.CompositeDisposable);
+
+		this.CopyTagNameCommand.Subscribe(x => {
+			if (x.Value is { TagName.Value: { Length: > 0 } tagName }) {
+				clipboardService.SetText(tagName);
+			}
 		}).AddTo(this.CompositeDisposable);
 
 		this.OpenTagManagerCommand.Subscribe(x => {

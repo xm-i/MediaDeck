@@ -5,6 +5,7 @@ using MediaDeck.Services;
 using MediaDeck.ViewModels.Panes.DetailPanes;
 using MediaDeck.ViewModels.Tags;
 using MediaDeck.Views.Tags;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
@@ -91,17 +92,35 @@ public sealed partial class TagsDetail {
 		}
 	}
 
+	/// <summary>
+	/// タグ項目がダブルタップされたときに、そのタグが付与されたファイルを検索します。
+	/// </summary>
+	/// <param name="sender">イベント発生元の要素。</param>
+	/// <param name="e">イベント引数。</param>
 	private void TagGrid_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e) {
-		if (this.TagListBox.SelectedItem is not ValueCountPair<TagViewModel> tag) {
+		if (sender is not FrameworkElement { DataContext: ValueCountPair<TagViewModel> tag }) {
 			return;
 		}
 		this.ViewModel?.SearchTaggedFilesCommand.Execute(tag);
 	}
 
-	private void TagGrid_RightTapped(object sender, RightTappedRoutedEventArgs e) {
-		if (sender is Grid grid) {
-			FlyoutBase.ShowAttachedFlyout(grid);
+	/// <summary>
+	/// タグ項目上でコンテキストメニューが要求されたときに、アタッチされたメニューを表示します。
+	/// </summary>
+	/// <param name="sender">イベント発生元の要素。</param>
+	/// <param name="args">イベント引数。</param>
+	private void TagGrid_ContextRequested(UIElement sender, ContextRequestedEventArgs args) {
+		if (sender is not FrameworkElement element || FlyoutBase.GetAttachedFlyout(element) is not { } flyout) {
+			return;
 		}
+
+		if (args.TryGetPosition(element, out var point)) {
+			flyout.ShowAt(element, new FlyoutShowOptions { Position = point });
+		} else {
+			flyout.ShowAt(element);
+		}
+
+		args.Handled = true;
 	}
 }
 

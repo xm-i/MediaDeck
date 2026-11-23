@@ -525,6 +525,7 @@ public sealed class TabLazyLoadTests : IDisposable {
 		services.AddSingleton(appUpdateMock.Object);
 
 		services.AddSingleton(new Mock<IFilePickerService>().Object);
+		services.AddSingleton(new Mock<IClipboardService>().Object);
 		services.AddTransient(_ => new Mock<IPdfDocumentOperator>().Object);
 	}
 

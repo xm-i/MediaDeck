@@ -403,6 +403,9 @@
   <data name="Details_AddTagsPlaceholder.PlaceholderText" xml:space="preserve">
     <value>タグを追加...</value>
   </data>
+  <data name="Details_CopyTagName.Text" xml:space="preserve">
+    <value>タグ名をコピー</value>
+  </data>
   <data name="Details_OpenTagManager.Text" xml:space="preserve">
     <value>タグ管理を開く</value>
   </data>

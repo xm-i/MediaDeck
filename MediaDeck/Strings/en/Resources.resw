@@ -403,6 +403,9 @@
   <data name="Details_AddTagsPlaceholder.PlaceholderText" xml:space="preserve">
     <value>Add tags...</value>
   </data>
+  <data name="Details_CopyTagName.Text" xml:space="preserve">
+    <value>Copy Tag Name</value>
+  </data>
   <data name="Details_OpenTagManager.Text" xml:space="preserve">
     <value>Open Tag Manager</value>
   </data>
